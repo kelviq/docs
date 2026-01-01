@@ -1,0 +1,426 @@
+---
+title: "JavaScript SDK"
+description: "Documentation for the kelviq JavaScript SDK"
+icon: 'js'
+---
+
+
+The `@kelviq/js-sdk` is a lightweight, plain TypeScript library designed for interacting with the kelviq entitlement service. It allows you to:
+
+* Fetch all feature entitlements for a specific organization and customer.
+* Cache these entitlements client-side for efficient and repeated access.
+* Check if a user has access to a particular feature.
+* Retrieve specific entitlement details, including boolean flags, numeric configurations, and metered usage data.
+* Manually refresh entitlement data from the server.
+
+<Note>If you are using React, you can use the <a href="/frontend-integration/react-sdk">React SDK</a> instead.</Note>
+
+### Installation
+
+Install the SDK using your preferred package manager or include it directly via CDN.
+
+```bash
+npm install @kelviq/js-sdk
+# or
+yarn add @kelviq/js-sdk
+# or
+pnpm add @kelviq/js-sdk
+```
+
+**CDN Installation:**
+```html
+<script src="https://unpkg.com/@kelviq/js-sdk/dist/kelviq-sdk.umd.js"></script>
+```
+
+### Basic Usage
+
+Get started with the SDK in just a few lines of code.
+
+```typescript
+import kelviqSDK from '@kelviq/js-sdk';
+
+// Initialize the SDK
+const pd = kelviqSDK({
+  customerId: "your-customer-id",
+  accessToken: "your-access-token",
+});
+
+// Check if user has access to a feature
+if (pd.hasAccess('premium-features')) {
+  console.log("User has access to premium features!");
+}
+
+// Get specific entitlement details
+const emailLimit = pd.getEntitlement('email-sends', 'metered');
+if (emailLimit && emailLimit.hasAccess) {
+  console.log(`Emails remaining: ${emailLimit.remaining}`);
+}
+```
+
+
+## API Reference
+
+Complete documentation of all SDK methods and configuration options.
+
+### Initialization
+
+Create and configure your SDK instance with the required parameters.
+
+```typescript
+// Initialize the SDK
+const pd = kelviqSDK({
+  customerId: "your-customer-id",
+  accessToken: "your-access-token",
+});
+```
+
+#### Options
+
+| Option | Type | Description |
+|--------|------|-------------|
+| `customerId` | `string` | Unique identifier for the customer |
+| `accessToken` | `string` | - | Authentication token for API requests |
+| `environment` | `sandbox\|production` | 'production' | The environment to use. If you want to use the sandbox, you must provide this. |
+| `initializeAndFetch` | `boolean` | `true` | Automatically fetch entitlements on initialization |
+| `onError` | `(error: Error) => void` | - | Error callback function |
+
+
+### Core Methods
+
+#### `hasAccess(featureId: string): boolean`
+
+Check if the user has access to a specific feature.
+
+```typescript
+if (pd.hasAccess('premium-features')) {
+  // Show premium features
+  showPremiumUI();
+}
+```
+
+#### `getEntitlement<T>(featureId: string, type: T['type']): T | null`
+
+Get detailed entitlement information for a specific feature.
+
+```typescript
+// Boolean entitlement
+const canUseAnalytics = pd.getEntitlement('analytics', 'boolean');
+if (canUseAnalytics?.hasAccess) {
+  enableAnalytics();
+}
+
+// Configurable entitlement
+const storageLimit = pd.getEntitlement('storage-limit', 'customizable');
+if (storageLimit?.hasAccess && storageLimit.configuration) {
+  setStorageLimit(storageLimit.configuration);
+}
+
+// Metered entitlement
+const emailQuota = pd.getEntitlement('email-sends', 'metered');
+if (emailQuota?.hasAccess && emailQuota.remaining !== null && emailQuota.remaining > 0) {
+  console.log(`Emails remaining: ${emailQuota.remaining}`);
+}
+```
+
+#### `getAllEntitlements(): EntitlementMap | null`
+
+Get all cached entitlements.
+
+```typescript
+const allEntitlements = pd.getAllEntitlements();
+if (allEntitlements) {
+  Object.entries(allEntitlements).forEach(([featureId, entitlement]) => {
+    console.log(`${featureId}: ${entitlement.hasAccess ? 'Access granted' : 'Access denied'}`);
+  });
+}
+```
+
+#### `fetchAllEntitlements(forceRefresh?: boolean): Promise<EntitlementMap>`
+
+Manually fetch or refresh entitlements from the server.
+
+```typescript
+// Fetch fresh data
+try {
+  const entitlements = await pd.fetchAllEntitlements(true);
+  console.log('Entitlements refreshed:', entitlements);
+} catch (error) {
+  console.error('Failed to refresh entitlements:', error);
+}
+```
+
+#### `isLoading(): boolean`
+
+Check if entitlements are currently being fetched.
+
+```typescript
+if (pd.isLoading()) {
+  showLoadingSpinner();
+} else {
+  hideLoadingSpinner();
+}
+```
+
+#### `getLastError(): Error | null`
+
+Get the last error that occurred during entitlement fetching.
+
+```typescript
+const lastError = pd.getLastError();
+if (lastError) {
+  console.error('Last SDK error:', lastError.message);
+}
+```
+
+#### `clearCache(): void`
+
+Clear the cached entitlements.
+
+```typescript
+pd.clearCache();
+// Next call to hasAccess or getEntitlement will trigger a new fetch
+```
+
+## Entitlement Types
+
+Different types of entitlements supported by the SDK.
+
+```typescript
+interface MeteredEntitlement {
+  featureId: string;
+  featureType: "METER" | "BOOLEAN" | "CUSTOMIZABLE";
+  hardLimit: boolean;
+  hasAccess: boolean;
+  currentUsage: number;
+  usageLimit: number | null;
+  remaining: number | null;
+  resetAt?: string | null;
+}
+```
+
+## Examples
+
+Real-world usage patterns and common implementation scenarios.
+
+### Feature Gating
+
+Control access to features based on user entitlements.
+
+```typescript
+// Simple feature gate
+if (pd.hasAccess('beta-features')) {
+  showBetaFeatures();
+}
+
+// Conditional rendering
+const canUseAdvancedSearch = pd.hasAccess('advanced-search');
+return (
+  <div>
+    <BasicSearch />
+    {canUseAdvancedSearch && <AdvancedSearch />}
+  </div>
+);
+```
+
+### Usage-Based Features
+
+Implement usage limits and quota management.
+
+```typescript
+const apiCalls = pd.getEntitlement('api-calls', 'metered');
+if (apiCalls?.hasAccess) {
+  if (apiCalls.remaining === null || apiCalls.remaining > 0) {
+    // Allow API call
+    makeApiCall();
+  } else {
+    // Show upgrade message
+    showUpgradeMessage();
+  }
+}
+```
+
+### Configuration-Based Features
+
+Apply dynamic configuration based on user entitlements.
+
+```typescript
+const teamSizeEntitlement = pd.getEntitlement('max-team-size', 'customizable');
+
+if (teamSizeEntitlement?.hasAccess && teamSizeEntitlement.configuration) {
+  const maxTeamSize = teamSizeEntitlement.configuration;
+
+  if (currentTeam.length >= maxTeamSize) {
+    showUpgradePrompt(); // or disable the "Add Member" button
+  } else {
+    enableTeamInvite();
+  }
+}
+
+```
+
+### Error Handling
+
+Robust error handling for production applications.
+
+```typescript
+const pd = kelviqSDK({
+  customerId: "user123",
+  accessToken: "token456",
+  onError: (error) => {
+    // Log to monitoring service
+    logError('kelviq SDK Error', error);
+    
+    // Show user-friendly message
+    showNotification('Unable to load feature settings', 'error');
+  }
+});
+
+// Handle fetch errors
+try {
+  await pd.fetchAllEntitlements();
+} catch (error) {
+  console.error('Failed to load entitlements:', error);
+  // Fallback to default behavior
+  showDefaultFeatures();
+}
+```
+
+### Custom API Request Service
+
+Integrate with your existing HTTP client or add custom logic.
+
+```typescript
+// Custom API request function
+async function customApiRequest<T>(config: ApiRequestConfig): Promise<ApiResponse<T>> {
+  const response = await fetch(config.url, {
+    method: config.method || 'GET',
+    headers: {
+      'Authorization': `Bearer ${config.accessToken}`,
+      'Content-Type': 'application/json',
+      ...config.headers
+    },
+    body: config.body ? JSON.stringify(config.body) : undefined
+  });
+  
+  if (!response.ok) {
+    throw new Error(`HTTP ${response.status}: ${response.statusText}`);
+  }
+  
+  return {
+    status: response.status,
+    statusText: response.statusText,
+    data: await response.json()
+  };
+}
+
+// Use custom API request
+const pd = kelviqSDK({
+  customerId: "user123",
+  accessToken: "token456"
+}, customApiRequest);
+```
+
+
+## TypeScript Support
+
+Full TypeScript support with comprehensive type definitions.
+
+The SDK is written in TypeScript and provides full type safety:
+
+```typescript
+import kelviqSDK, { 
+  KelviqClientOptions, 
+  EntitlementMap, 
+  MeteredEntitlement 
+} from '@kelviq/js-sdk';
+
+const options: KelviqClientOptions = {
+  customerId: "user123",
+  accessToken: "token456"
+};
+
+const pd = kelviqSDK(options);
+
+// Type-safe entitlement access
+const emailQuota: MeteredEntitlement | null = pd.getEntitlement('emails', 'metered');
+```
+
+
+## Advanced Configuration
+
+Advanced options for customizing SDK behavior and API integration.
+
+### API Configuration
+
+Configure API request behavior and retry logic.
+
+```typescript
+const pd = kelviqSDK({
+  customerId: "user123",
+  accessToken: "token456",
+  apiConfig: {
+    maxRetries: 5,
+    timeout: 10000,
+    backoffBaseDelay: 2000
+  }
+});
+```
+
+### Custom Error Handling
+
+Implement sophisticated error handling and recovery strategies.
+
+```typescript
+const pd = kelviqSDK({
+  customerId: "user123",
+  accessToken: "token456",
+  onError: (error) => {
+    // Send to error tracking service
+    Sentry.captureException(error);
+    
+    // Retry logic
+    if (error.message.includes('network')) {
+      setTimeout(() => pd.fetchAllEntitlements(), 5000);
+    }
+  }
+});
+```
+
+### Advanced Options
+
+Additional configuration options for specialized use cases.
+
+Default values are:
+```typescript
+const pd = kelviqSDK({
+  customerId: "",
+  accessToken: "",
+  apiUrl: "https://edge.api.kelviq.com/api/v1",
+  entitlementsPath: "entitlements/",
+  apiConfig: {
+    maxRetries: 3,
+    timeout: 5000,
+    backoffBaseDelay: 1000
+  }
+});
+```
+
+| Option | Type  | Description |
+|--------|------|---------|
+| `apiUrl` | `string` |  Base URL for the API |
+| `entitlementsPath` | `string` | Path for fetching entitlements |
+| `apiConfig.maxRetries` | `number` | Maximum number of retries for API requests |
+| `apiConfig.timeout` | `number` | Timeout for API requests in milliseconds |
+| `apiConfig.backoffBaseDelay` | `number` | Base delay for exponential backoff strategy |
+
+
+## Using the Sandbox
+
+If you want to use the sandbox, you need to set the `environment` option to `sandbox` in the `init` function.
+
+```typescript
+const pd = kelviqSDK({
+  customerId: "your-customer-id",
+  accessToken: "your-access-token",
+  environment: "sandbox"
+});

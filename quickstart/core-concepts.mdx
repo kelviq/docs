@@ -1,0 +1,80 @@
+---
+title: 'Core concepts'
+---
+
+kelviq builds on top of Stripe by adding a few key building blocks.  
+Understanding these will make it easier to design your pricing and integrate the SDK.
+
+---
+
+## Products
+
+A product is the main thing you sell.  
+Examples: “Cursor”, “TimeMaster Pro”, or “API Service”.
+
+---
+
+## Features
+
+A feature is a capability a customer can access. Features are defined once and can be reused across plans.  
+
+Examples: API access, AI tokens, storage space, priority support.
+
+---
+
+## Plans
+
+A plan is how you package and price your product. You attach features and prices to a plan.  
+
+Examples: Free, Starter, Pro, Enterprise.
+
+---
+
+## Entitlements
+
+Entitlements define how a customer can use a feature within a plan.  
+
+Examples:  
+- 1,000 API calls per month  
+- 10,000 AI tokens per month  
+- 100 GB storage space  
+
+Entitlements can be boolean (on/off), metered (usage limits), or config (custom values).
+
+---
+
+## Customers
+
+A customer is a person or company that subscribes to your product.  
+
+Typically, you create a customer record when someone signs up in your app.  
+When they subscribe in Stripe, kelviq maps that subscription to the customer record automatically.
+
+---
+
+## Sync with Stripe
+
+kelviq works on top of Stripe.  
+Everything you create in kelviq — products, plans, features, entitlements, promotions — is synced to Stripe when you publish changes.  
+
+You don’t need to set up anything manually in Stripe. Just connect once, and kelviq keeps data in sync.
+
+---
+
+
+## Integrate with your app
+
+To bring everything you set up in the dashboard into your app, use one of these options:
+
+- **SDKs** — check feature access and enforce usage limits in code  
+- **UI widgets** — prebuilt components like Pricing Table, Paywall, and Customer Portal that update automatically when you change settings in the dashboard  
+- **APIs** — use for custom needs such as syncing usage or triggering upgrades
+
+---
+
+## Need help?
+
+Have questions, need help with implementation, or want a walkthrough?  
+Email us at **hi@kelviq.com** or [book a demo](https://tidycal.com/neravath/15-minute-meeting).
+
+---

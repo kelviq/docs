@@ -1,0 +1,112 @@
+---
+title: 'Dashboard setup'
+---
+
+Before you can integrate kelviq into your app, you need to configure your **products, plans, and features** in the dashboard.  
+This setup defines how your pricing and entitlements will work.
+
+---
+
+## Create a product
+
+1. In the sidebar, go to **Products → Create product**  
+2. Enter a product name (e.g., “Pro SaaS App”)  
+3. Click **Save** — you’ll be redirected to the product page  
+
+---
+
+## Create a plan
+
+From the product page:  
+
+1. Click **Create plan**  
+2. Enter a plan name (e.g., “Basic Plan”)  
+3. Click **Save** — you’ll be redirected to the plan details page  
+
+---
+
+## Add pricing to the plan
+
+You can add fixed pricing or usage-based pricing (for metered features).  
+For now, let’s set up fixed pricing:
+
+1. In the plan page, click **Set price**  
+2. Select **Paid**  
+3. Choose a billing cycle (e.g., Monthly)  
+4. Select the **Fixed charges** pricing type  
+5. Enter a price (e.g., $10)  
+6. (Optional) Enable free trial  
+7. Click **Save** — you’ll be redirected back to the plan details page  
+
+---
+
+## Add features to the plan
+
+Scroll down to the **Entitlements** section.  
+
+1. Click **Add feature**  
+2. A modal will open where you can create features  
+3. Create your features (see below), then click **Add feature**  
+
+### Features overview
+
+Features are created independently and can be attached to multiple plans with different values.  
+There are three types:
+
+- **Switch (Boolean)** — on or off.  
+  Examples: custom branding, priority support, analytics access  
+
+- **Customizable** — a fixed numeric limit, no usage reporting.  
+  Examples: data retention days (7, 30, 365), max upload size (10 MB, 100 MB, 1 GB)  
+
+- **Metered** — tracked consumption, usage events sent to kelviq, resets each billing cycle.  
+  Examples: API calls per month, AI tokens processed, data transferred, emails sent  
+
+👉 For now, add one Boolean feature and one Metered feature. We’ll show you how to check access and track usage with the SDK later.  
+
+4. Once created, you’ll see features listed on the left side of the screen  
+5. Click the **+ (plus)** icon to attach a feature to the plan  
+6. Enter a value for the feature and click **Add**  
+7. The feature will now appear on the right side of the screen under the plan  
+8. Close the dialog — you’ll return to the plan details page  
+
+---
+
+## Publish the plan
+
+The last step is to publish your plan to Stripe.  
+
+1. Click **Publish**  
+2. If your Stripe account is not connected, you’ll be asked to connect  
+3. Click **Connect**, sign in to Stripe, and authorize the connection  
+4. Back in kelviq, click **Publish** again — the plan is now live and customers can subscribe to it. 
+
+---
+
+## Quick demo video
+A quick video demo showing the dashboard setup process.
+<Frame>
+  <video
+    controls
+    className="w-full aspect-video rounded-xl"
+    src="/videos/quickstart-dashboard.mp4"
+  >
+</video>
+</Frame>  
+
+## Next steps
+
+Your plan is now set up and synced with Stripe.  
+Next, you can integrate kelviq into your app:
+
+- Embed a pricing page with the **Pricing Table widget**  
+- Create a customer in kelviq when a user signs up in your app  
+- Use the kelviq **SDK** to check feature access and track usage  
+
+---
+## Need help?
+
+Have questions, need help with implementation, or want a walkthrough?  
+Email us at **hi@kelviq.com** or [book a demo](https://tidycal.com/neravath/15-minute-meeting).
+
+---

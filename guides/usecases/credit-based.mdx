@@ -1,0 +1,158 @@
+---
+title: "Modeling OpenAI's Prepaid Credit System"
+description: "A step-by-step guide to configuring a prepaid credit wallet system, where a single balance is consumed by various services at different rates."
+---
+
+This guide details how to replicate a sophisticated prepaid credit system like OpenAI's. The model allows a user to purchase a single balance of credits upfront and then consume those credits across multiple services (like language models, image generation, etc.), each with its own unique pricing.
+
+<Info>
+  **The Core Concept: The Unified Credit Model**
+  
+  The key to this setup is to separate what the customer **buys** from what they **use**.
+  
+  1.  **What They Buy:** Customers will purchase a single feature called `Prepaid API Credits`. This is the only item with a direct dollar cost, sold in packages (e.g., $100 for 100 credits).
+  
+  2.  **What They Use:** We will create individual `Metered` features for every billable OpenAI service (e.g., `GPT-4o Input Tokens`, `DALL-E 3 Images`). These features track consumption but have no price directly attached to them in the plan.
+  
+  3.  **The Logic:** At the end of a billing cycle, your backend will calculate the total monetary cost of all services used. You will then deduct the equivalent amount from the customer's `Prepaid API Credits` balance.
+
+</Info>
+
+---
+
+## Step 1: Create the Central "Prepaid API Credit" Feature
+
+This feature represents the wallet or balance that customers purchase.
+
+1.  Navigate to **Product Catalog > Feature entitlements**.
+2.  Click **+ Create feature**.
+3.  Fill in the details for the credit feature:
+    * **Feature name**: `Prepaid API Credits`
+    * **Feature type**: Select `Metered`.
+    * **Meter source**: Choose **Raw**.
+    * **Feature unit**: Enter `Credit` for the singular form and `Credits` for the plural form. (In this model, 1 Credit = $1.00 USD).
+4.  Click **Create**.
+
+---
+
+## Step 2: Create All Billable Service Features
+
+Now, create a separate `Metered (Raw)` feature for every distinct service OpenAI offers. These will be used for tracking usage only.
+
+<Tabs>
+<Tab title="Language Models">
+
+### GPT-4o
+
+1.  On the "Feature entitlements" page, click **+ Create feature**.
+2.  Enter the details for **GPT-4o Input**:
+    * **Feature name**: `GPT-4o - Input Tokens`
+    * **Feature type**: `Meter` > `Raw`
+    * **Feature unit**: `Token` / `Tokens`
+3.  Click **Create**.
+4.  Click **+ Create feature** again for **GPT-4o Output**:
+    * **Feature name**: `GPT-4o - Output Tokens`
+    * **Feature type**: `Meter` > `Raw`
+    * **Feature unit**: `Token` / `Tokens`
+5.  Click **Create**.
+
+*Create similar `Metered (Raw)` features for other language models like `GPT-4 Turbo - Input Tokens`, `GPT-3.5 Turbo - Input Tokens`, etc., as needed.*
+
+</Tab>
+<Tab title="Image Models">
+
+### DALL-E 3
+
+1.  On the "Feature entitlements" page, click **+ Create feature**.
+2.  Enter the details for **DALL-E 3 Standard Images**:
+    * **Feature name**: `DALL-E 3 - Standard Image`
+    * **Feature type**: `Meter` > `Raw`
+    * **Feature unit**: `Image` / `Images`
+3.  Click **Create**.
+4.  Click **+ Create feature** again for **DALL-E 3 HD Images**:
+    * **Feature name**: `DALL-E 3 - HD Image`
+    * **Feature type**: `Meter` > `Raw`
+    * **Feature unit**: `Image` / `Images`
+5.  Click **Create**.
+
+</Tab>
+<Tab title="Audio Models">
+
+### TTS & Whisper
+
+1.  On the "Feature entitlements" page, click **+ Create feature**.
+2.  Enter the details for **Text-to-Speech (TTS)**:
+    * **Feature name**: `TTS - Characters`
+    * **Feature type**: `Meter` > `Raw`
+    * **Feature unit**: `Character` / `Characters`
+3.  Click **Create**.
+4.  Click **+ Create feature** again for **Whisper Audio Transcription**:
+    * **Feature name**: `Whisper - Audio Minutes`
+    * **Feature type**: `Meter` > `Raw`
+    * **Feature unit**: `Minute` / `Minutes`
+5.  Click **Create**.
+
+</Tab>
+</Tabs>
+
+---
+
+## Step 3: Create the Product and Plan
+
+Create a single product and plan that will serve as the vehicle for selling the credit packages.
+
+1.  Navigate to **Product Catalog > Products** and click **+ Create product**.
+    * **Product name**: `OpenAI API Services`
+    * **Subscription type**: Select **Single active subscription**.
+2.  Click **Create**.
+3.  On the new product's page, click **+ Create plan**.
+    * **Plan name**: `Prepaid Credits`
+    * **Description**: `Pre-purchase credits to use across all OpenAI services.`
+4.  Click **Create**.
+
+---
+
+## Step 4: Configure the Credit Packages
+
+Here, we will configure the pricing for the `Prepaid Credits` plan. The user will be on a monthly billing cycle for invoicing, but will only be charged when they purchase a credit package.
+
+1.  On the `Prepaid Credits` plan page, click **Set price**.
+2.  Select the **Paid** plan type.
+3.  On the **"Billing cycle"** screen, you must select a cycle. Choose **Monthly** and click **Continue**.
+4.  On the **"Charges"** screen, **do not add a "Fixed Charge"**. This sets the recurring subscription fee to $0.
+5.  Click **Add usage-based charges**.
+6.  Choose the **Prepaid API Credits** feature.
+7.  Select **Prepaid commitment**. This is the critical step to ensure customers are billed upfront for the credits.
+8.  For the **"Pricing model,"** select **Package**.
+9.  Configure your first package:
+    * **Price**: `$20`
+    * **per package**: `20` units
+10. Click **Add**.
+11. Repeat the process to add other packages (e.g., $50 for 50 credits, $100 for 100 credits).
+12. **Save** the pricing configuration and **Publish** the plan.
+
+---
+
+## Step 5: Implement the Billing Logic
+
+With the setup complete, the final step is to implement the backend logic that connects service usage to the prepaid credit balance.
+
+<Accordion title="Implementing the Credit Deduction Logic">
+  
+1. **Customer Purchase:** A user goes to your pricing page and purchases the "100 for 100 credits" package. Because you selected "Prepaid commitment," they are charged 100 immediately. Their Prepaid API Credits balance in kelviq is now 100.
+2.  **Service Consumption:** The user makes various API calls. Your application sends usage events to kelviq for each service feature (e.g., `GPT-4o - Input Tokens`, `DALL-E 3 - Standard Image`).
+
+3.  **End-of-Cycle Calculation:** At the end of the billing period, your backend logic runs.
+    
+4.  **Fetch Usage Data:** You call the kelviq API to get the total usage for that customer for each service feature.
+    * `GPT-4o - Input Tokens`: 2,000,000 tokens
+    * `DALL-E 3 - Standard Image`: 50 images
+
+5.  **Calculate Monetary Cost:** Your backend applies the public OpenAI prices to the usage data.
+    * **Tokens Cost**: `2,000,000 tokens * ($5.00 / 1,000,000 tokens) = $10.00`
+    * **Images Cost**: `50 images * ($0.040 / image) = $2.00`
+    * **Total Cost**: `$10.00 + $2.00 = $12.00`
+
+6.  **Deduct from Credit Balance:** You then report a usage of `12.00` for the **`Prepaid API Credits`** feature for that customer. Their balance will be reduced from `100` to `88`. This deduction is what appears on their kelviq invoice.
+
+</Accordion>

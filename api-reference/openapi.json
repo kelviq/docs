@@ -1,94 +1,1170 @@
 {
-  "openapi": "3.1.0",
+  "openapi": "3.0.0",
   "info": {
-    "title": "OpenAPI Plant Store",
-    "description": "A sample API that uses a plant store as an example to demonstrate features in the OpenAPI specification",
-    "license": {
-      "name": "MIT"
-    },
-    "version": "1.0.0"
+    "title": "kelviq API",
+    "version": "1.0.0",
+    "description": "API for interacting with kelviq services, derived from Python SDK documentation."
   },
   "servers": [
     {
-      "url": "http://sandbox.mintlify.com"
+      "url": "https://api.kelviq.com/api/v1",
+      "description": "kelviq API Server (General - specific operations might override)"
     }
   ],
+  "components": {
+    "securitySchemes": {
+      "bearerAuth": {
+        "type": "http",
+        "scheme": "bearer",
+        "description": "The Server API Key obtained from the kelviq application. Pass as a Bearer token in the Authorization header. Example: 'Authorization: Bearer __YOUR_API_KEY__'"
+      }
+    },
+    "schemas": {
+      "ErrorResponse": {
+        "type": "object",
+        "properties": {
+          "status": {
+            "type": "string",
+            "description": "A status description for the error.",
+            "example": "Bad request"
+          },
+          "message": {
+            "type": "string",
+            "description": "A human-readable message providing details about the error.",
+            "example": "Offering does not exists"
+          }
+        }
+      },
+      "CustomerResponse": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "format": "uuid",
+            "description": "Server-generated unique UUID for the customer record.",
+            "readOnly": true,
+            "example": "a1b2c3d4-e5f6-7890-1234-567890abcdef"
+          },
+          "customerId": {
+            "type": "string",
+            "description": "The client-provided customer identifier.",
+            "example": "unique-customer-id-123"
+          },
+          "name": {
+            "type": "string",
+            "nullable": true,
+            "description": "The customer's name.",
+            "example": "John Doe"
+          },
+          "email": {
+            "type": "string",
+            "format": "email",
+            "nullable": true,
+            "description": "The customer's email.",
+            "example": "new.customer@example.com"
+          },
+          "details": {
+            "type": "object",
+            "additionalProperties": true,
+            "description": "Any server-added details about the customer (typically read-only).",
+            "readOnly": true,
+            "example": {}
+          },
+          "metadata": {
+            "type": "object",
+            "additionalProperties": {
+              "type": "string"
+            },
+            "nullable": true,
+            "description": "The metadata associated with the customer.",
+            "example": {
+              "source": "sdk_import",
+              "priority": "high"
+            }
+          },
+          "createdOn": {
+            "type": "string",
+            "nullable": false,
+            "description": "Customer created date and time",
+            "example": "2025-06-04T06:03:30.195790Z"
+          },
+          "modifiedOn": {
+            "type": "string",
+            "nullable": false,
+            "description": "Customer updated date and time",
+            "example": "2025-06-04T06:03:30.195790Z"
+          }
+        }
+      },
+      "CustomerCreateRequest": {
+        "type": "object",
+        "required": [
+          "customerId"
+        ],
+        "properties": {
+          "customerId": {
+            "type": "string",
+            "description": "A unique identifier for the customer that you define.",
+            "example": "unique-customer-id-456"
+          },
+          "email": {
+            "type": "string",
+            "format": "email",
+            "nullable": true,
+            "description": "The email address of the customer.",
+            "example": "another.new.customer@example.com"
+          },
+          "name": {
+            "type": "string",
+            "nullable": true,
+            "description": "The name of the customer.",
+            "example": "Jane Roe"
+          },
+          "metadata": {
+            "type": "object",
+            "additionalProperties": {
+              "type": "string"
+            },
+            "nullable": true,
+            "description": "A dictionary of custom key-value pairs.",
+            "example": {
+              "source": "sdk_import",
+              "priority": "low"
+            }
+          }
+        }
+      },
+      "CustomerUpdateRequest": {
+        "type": "object",
+        "description": "Fields for updating an existing customer. Only provided fields will be updated.",
+        "properties": {
+          "email": {
+            "type": "string",
+            "format": "email",
+            "nullable": true,
+            "description": "The email address of the customer.",
+            "example": "jane.roe.updated@example.com"
+          },
+          "name": {
+            "type": "string",
+            "nullable": true,
+            "description": "The name of the customer.",
+            "example": "Johnathan Doe"
+          },
+          "metadata": {
+            "type": "object",
+            "additionalProperties": {
+              "type": "string"
+            },
+            "nullable": true,
+            "description": "A dictionary of custom key-value pairs. If provided, it typically replaces the existing metadata. Refer to API behavior for merge strategy.",
+            "example": {
+              "source": "sdk_import",
+              "priority": "very_high",
+              "status": "active"
+            }
+          }
+        }
+      },
+      "FeatureInput": {
+        "type": "object",
+        "required": [
+          "identifier",
+          "quantity"
+        ],
+        "properties": {
+          "identifier": {
+            "type": "string",
+            "description": "The unique identifier for the feature.",
+            "example": "seats"
+          },
+          "quantity": {
+            "type": "integer",
+            "description": "The desired quantity for this feature.",
+            "example": 5
+          }
+        }
+      },
+      "CreateCheckoutSessionRequest": {
+        "type": "object",
+        "required": [
+          "planIdentifier",
+          "successUrl",
+          "chargePeriod"
+        ],
+        "properties": {
+          "planIdentifier": {
+            "type": "string",
+            "description": "The identifier of the specific plan the customer is checking out with.",
+            "example": "plan-pro-monthly"
+          },
+          "successUrl": {
+            "type": "string",
+            "format": "url",
+            "description": "The URL to which the user will be redirected after a successful checkout.",
+            "example": "https://kelviq.com/checkout/success"
+          },
+          "chargePeriod": {
+            "type": "string",
+            "description": "The billing cycle for the subscription.",
+            "enum": [
+              "ONE_TIME",
+              "MONTHLY",
+              "YEARLY",
+              "WEEKLY",
+              "DAILY",
+              "THREE_MONTHS",
+              "SIX_MONTHS"
+            ],
+            "example": "MONTHLY"
+          },
+          "offeringId": {
+            "type": "string",
+            "format": "uuid",
+            "nullable": true,
+            "description": "The ID (uuid) of the offering the customer is checking out with.",
+            "example": "96d3a293-34ac-48a5-b73d-976b15781afd"
+          },
+          "pricingTableId": {
+            "type": "string",
+            "format": "uuid",
+            "nullable": true,
+            "description": "The ID (uuid) of the pricingTable being used (considered if offeringId is not provided).",
+            "example": "6db2717a-4e43-4ae1-a293-6c0a775f6264"
+          },
+          "ruleId": {
+            "type": "string",
+            "format": "uuid",
+            "nullable": true,
+            "description": "The ID (uuid) of the pricing rule being applied (considered if offeringId is not provided).",
+            "example": "f2ebc23f-3f79-4cf4-b17e-fe8e30a42ab2"
+          },
+          "customerId": {
+            "type": "string",
+            "nullable": true,
+            "description": "The ID of the customer initiating the checkout. (If not provided, a new customer might be created depending on server logic).",
+            "example": "cust_789"
+          },
+          "features": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/FeatureInput"
+            },
+            "nullable": true,
+            "description": "A list of features and their desired quantities. SDK documentation notes this as '**Required**', but usage may vary based on examples.",
+            "example": [
+              {
+                "identifier": "seats",
+                "quantity": 5
+              }
+            ]
+          },
+          "ipAddress": {
+            "type": "string",
+            "nullable": true,
+            "description": "The IP Address of the customer, used for location-based pricing.",
+            "example": "103.154.35.20"
+          }
+        }
+      },
+      "CreateCheckoutSessionResponse": {
+        "type": "object",
+        "properties": {
+          "checkoutUrl": {
+            "type": "string",
+            "format": "url",
+            "description": "The URL that the customer should be redirected to complete the payment.",
+            "example": "https://checkout.stripe.com/c/pay/cs_test_b1sNi7D6u9iMCUFV1UZi9ZaiXKdOOmr3DCUW6XdCZIr5Id1F7#fid..."
+          },
+          "checkoutSessionId": {
+            "type": "string",
+            "description": "The unique ID for the created checkout session.",
+            "example": "cs_test_b1sNi7D6u9iMCUFV1UZi9ZwerfaiXKdOOmr3DCUW6XdCZIr5Id1F7G"
+          }
+        }
+      },
+      "EntitlementDetail": {
+        "type": "object",
+        "properties": {
+          "featureId": {
+            "type": "string",
+            "example": "advanced-analytics"
+          },
+          "hasAccess": {
+            "type": "boolean",
+            "example": true
+          },
+          "featureType": {
+            "type": "string",
+            "example": "METER"
+          },
+          "resetAt": {
+            "type": "string",
+            "description": "The reset timestamp for the entitlement (e.g., yyyy-MM-dd HH:mm:ss). Not necessarily ISO 8601.",
+            "example": "2025-05-22 08:27:45"
+          },
+          "hardLimit": {
+            "type": "boolean",
+            "nullable": true,
+            "example": false
+          },
+          "usageLimit": {
+            "type": "integer",
+            "format": "int32",
+            "nullable": true,
+            "example": 3
+          },
+          "currentUsage": {
+            "type": "integer",
+            "format": "int32",
+            "nullable": true,
+            "example": 0
+          },
+          "remaining": {
+            "type": "integer",
+            "format": "int32",
+            "nullable": true,
+            "example": 3
+          }
+        }
+      },
+      "CheckEntitlementsResponse": {
+        "type": "object",
+        "properties": {
+          "customerId": {
+            "type": "string",
+            "example": "cust_456"
+          },
+          "entitlements": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/EntitlementDetail"
+            }
+          }
+        }
+      },
+      "ReportUsageRequest": {
+        "type": "object",
+        "required": [
+          "value",
+          "customerId",
+          "featureId",
+          "behaviour"
+        ],
+        "properties": {
+          "value": {
+            "type": "integer",
+            "description": "The usage value being reported.",
+            "example": 150
+          },
+          "customerId": {
+            "type": "string",
+            "description": "Unique identifier for the customer associated with this usage.",
+            "example": "customer_001"
+          },
+          "featureId": {
+            "type": "string",
+            "description": "Unique identifier for the feature for which usage is being reported.",
+            "example": "seats"
+          },
+          "behaviour": {
+            "type": "string",
+            "enum": [
+              "SET",
+              "DELTA"
+            ],
+            "description": "Dictates how the usage is updated. SET replaces, DELTA increments.",
+            "example": "SET"
+          }
+        }
+      },
+      "ReportUsageResponse": {
+        "type": "object",
+        "properties": {
+          "value": {
+            "type": "integer",
+            "example": 150
+          },
+          "customerId": {
+            "type": "string",
+            "example": "customer_001"
+          },
+          "featureId": {
+            "type": "string",
+            "example": "seats"
+          },
+          "behaviour": {
+            "type": "string",
+            "enum": [
+              "SET",
+              "DELTA"
+            ],
+            "example": "SET"
+          },
+          "orgId": {
+            "type": "string",
+            "example": "1"
+          },
+          "eventName": {
+            "type": "string",
+            "description": "Internal event name (e.g., \"aggregated.usage\").",
+            "example": "aggregated.usage"
+          },
+          "idempotencyKey": {
+            "type": "string",
+            "description": "Server-generated unique idempotency key for this usage report instance.",
+            "example": "597ee95063c744ed9bcc9b1cf5676a8a"
+          },
+          "timestamp": {
+            "type": "string",
+            "description": "Server-generated UTC timestamp (e.g., yyyy-MM-dd HH:mm:ss.ffffff) when the report was processed.",
+            "example": "2025-05-22 08:27:45.430732"
+          }
+        }
+      },
+      "ReportEventRequest": {
+        "type": "object",
+        "required": [
+          "customerId",
+          "eventName",
+          "idempotencyKey",
+          "timestamp"
+        ],
+        "properties": {
+          "customerId": {
+            "type": "string",
+            "description": "Unique identifier for the customer who performed the event.",
+            "example": "customer_002"
+          },
+          "eventName": {
+            "type": "string",
+            "description": "Name of the event (e.g., \"user_login\", \"item_purchased\").",
+            "example": "api_invoked"
+          },
+          "idempotencyKey": {
+            "type": "string",
+            "description": "Client-generated unique key (UUID recommended) to ensure at-most-once processing.",
+            "example": "45f05c73-7a0b-44d4-82c6-042816d5645d"
+          },
+          "timestamp": {
+            "type": "string",
+            "description": "UTC timestamp when the event occurred (Format: yyyy-MM-dd HH:mm:ss.ffffff).",
+            "example": "2025-05-22 07:53:55.747959"
+          },
+          "properties": {
+            "type": "object",
+            "additionalProperties": true,
+            "nullable": true,
+            "description": "Custom key-value pairs associated with the event.",
+            "example": {
+              "featureId": "api-usage",
+              "value": 2
+            }
+          }
+        }
+      },
+      "ReportEventResponse": {
+        "type": "object",
+        "properties": {
+          "customerId": {
+            "type": "string",
+            "example": "customer_002"
+          },
+          "eventName": {
+            "type": "string",
+            "example": "api_invoked"
+          },
+          "idempotencyKey": {
+            "type": "string",
+            "example": "45f05c737a0b44d482c6042816d5645d"
+          },
+          "timestamp": {
+            "type": "string",
+            "example": "2025-05-22 07:53:55.747959"
+          },
+          "properties": {
+            "type": "object",
+            "additionalProperties": true,
+            "nullable": true,
+            "example": {
+              "featureId": "api-usage",
+              "value": 2
+            }
+          },
+          "orgId": {
+            "type": "string",
+            "example": "1"
+          }
+        }
+      },
+      "UpdateSubscriptionRequest": {
+        "type": "object",
+        "required": [
+          "planIdentifier",
+          "chargePeriod"
+        ],
+        "properties": {
+          "planIdentifier": {
+            "type": "string",
+            "description": "The identifier of the new plan.",
+            "example": "new_plan_enterprise"
+          },
+          "chargePeriod": {
+            "type": "string",
+            "enum": [
+              "ONE_TIME",
+              "MONTHLY",
+              "YEARLY",
+              "WEEKLY",
+              "DAILY",
+              "THREE_MONTHS",
+              "SIX_MONTHS"
+            ],
+            "description": "The new charging period for the subscription.",
+            "example": "YEARLY"
+          },
+          "offeringId": {
+            "type": "string",
+            "format": "uuid",
+            "nullable": true,
+            "description": "The ID of the new offering, if applicable.",
+            "example": "e4567-e89b-12d3-a456-426614174000"
+          },
+          "pricingTableId": {
+            "type": "string",
+            "format": "uuid",
+            "nullable": true,
+            "description": "The ID of the new pricingTable, if applicable.",
+            "example": "e4567-e89b-12d3-a456-426614174001"
+          },
+          "ruleId": {
+            "type": "string",
+            "format": "uuid",
+            "nullable": true,
+            "description": "The ID of the new pricing rule, if applicable.",
+            "example": "e4567-e89b-12d3-a456-426614174002"
+          },
+          "ipAddress": {
+            "type": "string",
+            "nullable": true,
+            "description": "The IP Address of the customer, for location-based pricing.",
+            "example": "103.154.35.20"
+          },
+          "features": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/FeatureInput"
+            },
+            "nullable": true,
+            "description": "List of features and quantities to update for the subscription.",
+            "example": [
+              {
+                "identifier": "seats",
+                "quantity": 10
+              }
+            ]
+          }
+        }
+      },
+      "UpdateSubscriptionResponse": {
+        "type": "object",
+        "properties": {
+          "subscriptionId": {
+            "type": "string",
+            "example": "dffaf07e-4517-47db-ba3a-59a05aa2d465"
+          }
+        }
+      },
+      "CancelSubscriptionRequest": {
+        "type": "object",
+        "required": [
+          "cancellationType"
+        ],
+        "properties": {
+          "cancellationType": {
+            "type": "string",
+            "enum": [
+              "IMMEDIATE",
+              "CURRENT_PERIOD_ENDS",
+              "SPECIFIC_DATE"
+            ],
+            "description": "Type of cancellation to perform.",
+            "example": "IMMEDIATE"
+          },
+          "cancellationDate": {
+            "type": "string",
+            "format": "date",
+            "nullable": true,
+            "description": "Required if cancellationType is 'SPECIFIC_DATE'. Format: yyyy-MM-dd.",
+            "example": "2025-12-31"
+          }
+        }
+      },
+      "CancelSubscriptionResponse": {
+        "type": "object",
+        "properties": {
+          "message": {
+            "type": "string",
+            "example": "Subscription cancellation processed successfully."
+          }
+        }
+      },
+      "PublicOfferingResponse": {
+        "type": "object",
+        "properties": {
+          "id": { "type": "string", "format": "uuid" },
+          "name": { "type": "string" },
+          "description": { "type": "string" },
+          "pricingTable": { "$ref": "#/components/schemas/PricingTable" },
+          "plans": { "type": "array", "items": { "$ref": "#/components/schemas/Plan" } },
+          "countryCode": { "type": "string" },
+          "pricingLocale": { "type": "string" },
+          "currencyCode": { "type": "string" },
+          "currencySymbol": { "type": "string" },
+          "baseCurrencyCode": { "type": "string" },
+          "baseCurrencySymbol": { "type": "string" },
+          "subscription": { "$ref": "#/components/schemas/SubscriptionInfo", "nullable": true },
+          "isCustomerExists": { "type": "boolean" },
+          "billingPeriods": { "type": "array", "items": { "$ref": "#/components/schemas/BillingPeriod" } }
+        }
+      },
+      "PricingTable": {
+        "type": "object",
+        "properties": {
+          "name": { "type": "string" },
+          "description": { "type": "string" },
+          "identifier": { "type": "string" },
+          "style": { "type": "object" },
+          "typography": { "type": "object" },
+          "layout": { "type": "object" },
+          "template": { "nullable": true },
+          "descriptionTooltipEnabled": { "type": "boolean" },
+          "pricingOptions": { "type": "object" }
+        }
+      },
+      "Plan": {
+        "type": "object",
+        "properties": {
+          "name": { "type": "string" },
+          "description": { "type": "string" },
+          "identifier": { "type": "string" },
+          "details": { "type": "object" },
+          "isVisible": { "type": "boolean" },
+          "metadata": { "type": "object" },
+          "price": { "$ref": "#/components/schemas/FeaturePrice" },
+          "addons": { "type": "array", "items": {} },
+          "originalPrice": { "type": "object" },
+          "enabled": { "type": "boolean" },
+          "features": { "type": "array", "items": { "$ref": "#/components/schemas/Feature" } },
+          "displayName": { "type": "string" },
+          "shouldHighlight": { "type": "boolean" },
+          "displayDescription": { "type": "string" }
+        }
+      },
+      "FeaturePrice": {
+        "type": "object",
+        "properties": {
+          "id": { "type": "string", "format": "uuid" },
+          "priceType": { "type": "string" },
+          "freeTrial": { "type": "boolean" },
+          "trialPeriod": { "type": "integer" },
+          "currency": { "type": "string" },
+          "charges": { "type": "array", "items": { "$ref": "#/components/schemas/Charge" } }
+        }
+      },
+      "Charge": {
+        "type": "object",
+        "properties": {
+          "id": { "type": "string", "format": "uuid" },
+          "chargePeriod": { "type": "string" },
+          "tiers": { "type": "array", "items": {} },
+          "priceData": { "type": "object" },
+          "details": { "type": "object" },
+          "advanced": { "type": "object" },
+          "featureQuantityPrice": { "type": "number" }
+        }
+      },
+      "Feature": {
+        "type": "object",
+        "properties": {
+          "enabled": { "type": "boolean" },
+          "identifier": { "type": "string" },
+          "displayName": { "type": "string" },
+          "displayDescription": { "type": "string" },
+          "displayTooltipDescription": { "type": "boolean" },
+          "id": { "type": "string", "format": "uuid" },
+          "name": { "type": "string" },
+          "description": { "type": "string" },
+          "featureType": { "type": "string" },
+          "details": { "type": "object" },
+          "isArchived": { "type": "boolean" },
+          "metadata": { "type": "object" },
+          "modifiedOn": { "type": "string", "format": "date-time" },
+          "meter": { "type": "object" },
+          "featureDetails": { "type": "object" },
+          "value": { "nullable": true },
+          "hardLimit": { "type": "boolean", "nullable": true },
+          "reset": { "type": "string", "nullable": true },
+          "resetTime": { "type": "string", "nullable": true },
+          "charges": { "type": "array", "items": { "$ref": "#/components/schemas/Charge" }, "nullable": true }
+        }
+      },
+      "SubscriptionInfo": {
+        "type": "object",
+        "properties": {
+          "planIdentifier": { "type": "string" },
+          "features": { "type": "array", "items": {} },
+          "subscriptionId": { "type": "string", "format": "uuid" },
+          "chargePeriod": { "type": "string" },
+          "hasPreviousSubscription": { "type": "boolean" }
+        }
+      },
+      "BillingPeriod": {
+        "type": "object",
+        "properties": {
+          "enabled": { "type": "boolean" },
+          "displayName": { "type": "string" },
+          "chargePeriod": { "type": "string" },
+          "promoCaption": { "type": "string" }
+        }
+      },
+      "SubscriptionListResponse": {
+        "type": "object",
+        "properties": {
+          "count": {
+            "type": "integer"
+          },
+          "next": {
+            "type": "string",
+            "format": "uri",
+            "nullable": true
+          },
+          "previous": {
+            "type": "string",
+            "format": "uri",
+            "nullable": true
+          },
+          "results": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/Subscription"
+            }
+          }
+        }
+      },
+      "Subscription": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "externalSubscriptionId": {
+            "type": "string"
+          },
+          "startDate": {
+            "type": "string",
+            "format": "date"
+          },
+          "endDate": {
+            "type": "string",
+            "format": "date",
+            "nullable": true
+          },
+          "billingPeriodStartTime": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "billingPeriodEndTime": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "amount": {
+            "type": "string"
+          },
+          "recurrence": {
+            "type": "string"
+          },
+          "currency": {
+            "type": "string"
+          },
+          "status": {
+            "type": "string"
+          },
+          "product": {
+            "type": "string"
+          },
+          "plan": {
+            "$ref": "#/components/schemas/SubscriptionPlan"
+          },
+          "features": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/SubscriptionFeatureDetail"
+            }
+          },
+          "trialDaysRemaining": {
+            "type": "integer"
+          },
+          "customerId": {
+            "type": "string"
+          }
+        }
+      },
+      "SubscriptionPlan": {
+        "type": "object",
+        "properties": {
+          "name": {
+            "type": "string"
+          },
+          "identifier": {
+            "type": "string"
+          }
+        }
+      },
+      "SubscriptionFeatureDetail": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "identifier": {
+            "type": "string"
+          },
+          "name": {
+            "type": "string"
+          },
+          "description": {
+            "type": "string"
+          },
+          "featureType": {
+            "type": "string"
+          },
+          "details": {
+            "type": "object"
+          },
+          "isArchived": {
+            "type": "boolean"
+          },
+          "metadata": {
+            "type": "object"
+          },
+          "modifiedOn": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "meter": {
+            "type": "object"
+          },
+          "featureDetails": {
+            "type": "object",
+            "properties": {
+              "units": {
+                "type": "object",
+                "properties": {
+                  "plural": {
+                    "type": "string"
+                  },
+                  "singular": {
+                    "type": "string"
+                  }
+                }
+              }
+            }
+          },
+          "reset": {
+            "type": "string",
+            "nullable": true
+          },
+          "resetTime": {
+            "type": "string",
+            "nullable": true
+          },
+          "value": {
+            "type": "integer"
+          },
+          "hardLimit": {
+            "type": "boolean"
+          }
+        }
+      }
+    }
+  },
   "security": [
     {
       "bearerAuth": []
     }
   ],
   "paths": {
-    "/plants": {
-      "get": {
-        "description": "Returns all plants from the system that the user has access to",
+    "/customers/": {
+      "post": {
+        "tags": [
+          "Customers"
+        ],
+        "summary": "Create a customer",
+        "description": "Creates a new customer record within kelviq.",
+        "operationId": "createCustomer",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CustomerCreateRequest"
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "Customer Created",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/CustomerResponse"
+                },
+                "example": {
+                  "id": "a1b2c3d4-e5f6-7890-1234-567890abcdef",
+                  "customerId": "unique-customer-id-123",
+                  "name": "John Doe",
+                  "email": "new.customer@example.com",
+                  "details": {},
+                  "metadata": {
+                    "source": "sdk_import",
+                    "priority": "high"
+                  },
+                  "createdOn": "2025-06-04T06:03:30.195790Z",
+                  "modifiedOn": "2025-06-04T06:03:30.195831Z"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/customers/{customerId}/": {
+      "patch": {
+        "tags": [
+          "Customers"
+        ],
+        "summary": "Update a customer",
+        "description": "Performs a partial update on an existing customer using their client-defined `customerId`.",
+        "operationId": "updateCustomer",
         "parameters": [
           {
-            "name": "limit",
-            "in": "query",
-            "description": "The maximum number of results to return",
+            "name": "customerId",
+            "in": "path",
+            "required": true,
+            "description": "The client-defined unique identifier for the customer.",
+            "example": "unique-customer-id-123",
             "schema": {
-              "type": "integer",
-              "format": "int32"
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CustomerUpdateRequest"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Customer Updated",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/CustomerResponse"
+                },
+                "example": {
+                  "id": "a1b2c3d4-e5f6-7890-1234-567890abcdef",
+                  "customerId": "unique-customer-id-123",
+                  "name": "Johnathan Doe",
+                  "email": "new.customer@example.com",
+                  "details": {},
+                  "metadata": {
+                    "source": "sdk_import",
+                    "priority": "high",
+                    "status": "active"
+                  },
+                  "createdOn": "2025-06-04T06:03:30.195790Z",
+                  "modifiedOn": "2025-06-04T06:03:30.195831Z"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/checkout/": {
+      "post": {
+        "tags": [
+          "Checkout"
+        ],
+        "summary": "Create a checkout session",
+        "description": "Creates a new checkout session for a customer to proceed with a purchase or subscription.",
+        "operationId": "createCheckoutSession",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CreateCheckoutSessionRequest"
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "Checkout Session Created",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/CreateCheckoutSessionResponse"
+                },
+                "example": {
+                  "checkoutUrl": "https://checkout.stripe.com/c/pay/cs_test_b1sNi7D6u9iMCUFV1UZi9ZaiXKdOOmr3DCUW6XdCZIr5Id1F7#fid...",
+                  "checkoutSessionId": "cs_test_b1sNi7D6u9iMCUFV1UZi9ZwerfaiXKdOOmr3DCUW6XdCZIr5Id1F7G"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/entitlements/": {
+      "get": {
+        "tags": [
+          "Entitlements"
+        ],
+        "summary": "Retrieve customer entitlements",
+        "description": "Retrieves detailed entitlement information for a customer.\n- If `featureId` is provided as a query parameter, returns details for that specific feature.\n- If `featureId` is omitted, returns all entitlements for the customer.\n",
+        "operationId": "getCustomerEntitlements",
+        "servers": [
+          {
+            "url": "https://edge.api.kelviq.com",
+            "description": "Edge API for Entitlements"
+          }
+        ],
+        "parameters": [
+          {
+            "name": "customerId",
+            "in": "query",
+            "required": true,
+            "description": "The unique identifier for the customer.",
+            "example": "cust_123",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "featureId",
+            "in": "query",
+            "required": false,
+            "description": "Optional. The unique identifier for a specific feature. If provided, filters entitlements to this feature.",
+            "example": "advanced-analytics",
+            "schema": {
+              "type": "string"
             }
           }
         ],
         "responses": {
           "200": {
-            "description": "Plant response",
+            "description": "A list of entitlement details for the customer.",
             "content": {
               "application/json": {
                 "schema": {
-                  "type": "array",
-                  "items": {
-                    "$ref": "#/components/schemas/Plant"
+                  "$ref": "#/components/schemas/CheckEntitlementsResponse"
+                },
+                "examples": {
+                  "specificFeatureExample": {
+                    "summary": "Example for get_entitlement for a specific feature",
+                    "value": {
+                      "customerId": "cust_456",
+                      "entitlements": [
+                        {
+                          "featureId": "advanced-analytics",
+                          "featureType": "METER",
+                          "hasAccess": true,
+                          "resetAt": "2025-05-22 08:27:45",
+                          "hardLimit": false,
+                          "usageLimit": 3,
+                          "currentUsage": 0,
+                          "remaining": 3
+                        }
+                      ]
+                    }
+                  },
+                  "allFeaturesExample": {
+                    "summary": "Example for get_all_entitlements for a customer",
+                    "value": {
+                      "customerId": "cust_123",
+                      "entitlements": [
+                        {
+                          "featureId": "advanced-analytics",
+                          "featureType": "METER",
+                          "hasAccess": true,
+                          "resetAt": "2025-05-22 08:27:45",
+                          "hardLimit": false,
+                          "usageLimit": 3,
+                          "currentUsage": 0,
+                          "remaining": 3
+                        },
+                        {
+                          "featureId": "basic-reporting",
+                          "featureType": "FLAG",
+                          "hasAccess": true,
+                          "resetAt": null
+                        }
+                      ]
+                    }
                   }
                 }
               }
             }
-          },
-          "400": {
-            "description": "Unexpected error",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/Error"
-                }
-              }
-            }
           }
         }
-      },
+      }
+    },
+    "/report/usage/": {
       "post": {
-        "description": "Creates a new plant in the store",
+        "tags": [
+          "Reporting"
+        ],
+        "summary": "Report pre-aggregated usage",
+        "description": "Reports pre-aggregated feature usage from your application to kelviq.",
+        "operationId": "reportUsage",
         "requestBody": {
-          "description": "Plant to add to the store",
+          "required": true,
           "content": {
             "application/json": {
               "schema": {
-                "$ref": "#/components/schemas/NewPlant"
+                "$ref": "#/components/schemas/ReportUsageRequest"
               }
             }
-          },
-          "required": true
+          }
         },
         "responses": {
           "200": {
-            "description": "plant response",
+            "description": "Usage reported successfully.",
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/Plant"
-                }
-              }
-            }
-          },
-          "400": {
-            "description": "unexpected error",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/Error"
+                  "$ref": "#/components/schemas/ReportUsageResponse"
+                },
+                "example": {
+                  "value": 150,
+                  "customerId": "customer_001",
+                  "featureId": "seats",
+                  "behaviour": "SET",
+                  "orgId": "1",
+                  "eventName": "aggregated.usage",
+                  "idempotencyKey": "597ee95063c744ed9bcc9b1cf5676a8a",
+                  "timestamp": "2025-05-22 08:27:45.430732"
                 }
               }
             }
@@ -96,122 +1172,317 @@
         }
       }
     },
-    "/plants/{id}": {
-      "delete": {
-        "description": "Deletes a single plant based on the ID supplied",
+    "/subscriptions/": {
+      "get": {
+        "tags": [
+          "Subscriptions"
+        ],
+        "summary": "List Subscriptions",
+        "description": "Retrieves a paginated list of subscriptions. You can filter the results by customer.",
+        "operationId": "listSubscriptions",
         "parameters": [
           {
-            "name": "id",
-            "in": "path",
-            "description": "ID of plant to delete",
-            "required": true,
+            "name": "customer_id",
+            "in": "query",
+            "required": false,
+            "description": "The client-defined unique identifier for the customer to filter subscriptions.",
             "schema": {
-              "type": "integer",
-              "format": "int64"
+              "type": "string"
+            }
+          },
+          {
+            "name": "page_size",
+            "in": "query",
+            "required": false,
+            "description": "Number of results to return per page.",
+            "schema": {
+              "type": "integer"
+            }
+          },
+          {
+            "name": "page",
+            "in": "query",
+            "required": false,
+            "description": "The initial index from which to return the results.",
+            "schema": {
+              "type": "integer"
             }
           }
         ],
         "responses": {
-          "204": {
-            "description": "Plant deleted",
-            "content": {}
-          },
-          "400": {
-            "description": "unexpected error",
+          "200": {
+            "description": "A paginated list of subscriptions.",
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/Error"
+                  "$ref": "#/components/schemas/SubscriptionListResponse"
+                },
+                "example": {
+                  "count": 1,
+                  "next": null,
+                  "previous": null,
+                  "results": [
+                    {
+                      "id": "09d706ca-58f3-4fb2-818f-5b8623d67e6e",
+                      "externalSubscriptionId": "sub_1RpoZoSBstCzyocS7iPmith3",
+                      "startDate": "2025-07-28",
+                      "endDate": null,
+                      "billingPeriodStartTime": "2025-07-28T10:46:34Z",
+                      "billingPeriodEndTime": "2025-08-28T10:46:34Z",
+                      "amount": "261.00",
+                      "recurrence": "month",
+                      "currency": "usd",
+                      "status": "active",
+                      "product": "Aphelo",
+                      "plan": {
+                        "name": "Premium",
+                        "identifier": "premium1"
+                      },
+                      "features": [
+                        {
+                          "id": "b417ae2f-35e2-48f2-a5c4-fdaa99b2b96a",
+                          "identifier": "products",
+                          "name": "Products",
+                          "description": "",
+                          "featureType": "CUSTOMIZABLE",
+                          "details": {},
+                          "isArchived": false,
+                          "metadata": {},
+                          "modifiedOn": "2025-06-14T11:36:26.062491Z",
+                          "meter": {},
+                          "featureDetails": {
+                            "units": {
+                              "plural": "counts",
+                              "singular": "count"
+                            }
+                          },
+                          "reset": null,
+                          "resetTime": null,
+                          "value": 100,
+                          "hardLimit": false
+                        }
+                      ],
+                      "trialDaysRemaining": 0,
+                      "customerId": "testuser"
+                    }
+                  ]
                 }
               }
             }
           }
         }
       }
-    }
-  },
-  "webhooks": {
-    "/plant/webhook": {
+    },
+    "/subscriptions/{subscriptionId}/update/": {
       "post": {
-        "description": "Information about a new plant added to the store",
+        "tags": [
+          "Subscriptions"
+        ],
+        "summary": "Update a subscription",
+        "description": "Updates an existing subscription to a new plan, charge period, and/or features.",
+        "operationId": "updateSubscription",
+        "parameters": [
+          {
+            "name": "subscriptionId",
+            "in": "path",
+            "required": true,
+            "description": "The unique identifier of the subscription to be updated. Example UUID from docs: 78058918-9746-4280-9b9b-1bd5115eec6e",
+            "example": "78058918-9746-4280-9b9b-1bd5115eec6e",
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
         "requestBody": {
-          "description": "Plant added to the store",
+          "required": true,
           "content": {
             "application/json": {
               "schema": {
-                "$ref": "#/components/schemas/NewPlant"
+                "$ref": "#/components/schemas/UpdateSubscriptionRequest"
               }
             }
           }
         },
         "responses": {
           "200": {
-            "description": "Return a 200 status to indicate that the data was received successfully"
-          }
-        }
-      }
-    }
-  },
-  "components": {
-    "schemas": {
-      "Plant": {
-        "required": [
-          "name"
-        ],
-        "type": "object",
-        "properties": {
-          "name": {
-            "description": "The name of the plant",
-            "type": "string"
-          },
-          "tag": {
-            "description": "Tag to specify the type",
-            "type": "string"
-          }
-        }
-      },
-      "NewPlant": {
-        "allOf": [
-          {
-            "$ref": "#/components/schemas/Plant"
-          },
-          {
-            "required": [
-              "id"
-            ],
-            "type": "object",
-            "properties": {
-              "id": {
-                "description": "Identification number of the plant",
-                "type": "integer",
-                "format": "int64"
+            "description": "UUID of the updated subscription",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/UpdateSubscriptionResponse"
+                },
+                "example": {
+                  "subscriptionId": "dffaf07e-4517-47db-ba3a-59a05aa2d465"
+                }
               }
             }
-          }
-        ]
-      },
-      "Error": {
-        "required": [
-          "error",
-          "message"
-        ],
-        "type": "object",
-        "properties": {
-          "error": {
-            "type": "integer",
-            "format": "int32"
-          },
-          "message": {
-            "type": "string"
           }
         }
       }
     },
-    "securitySchemes": {
-      "bearerAuth": {
-        "type": "http",
-        "scheme": "bearer"
+    "/subscriptions/{subscriptionId}/cancel/": {
+      "post": {
+        "tags": [
+          "Subscriptions"
+        ],
+        "summary": "Cancel a subscription",
+        "description": "Cancels an active subscription for a customer.",
+        "operationId": "cancelSubscription",
+        "parameters": [
+          {
+            "name": "subscriptionId",
+            "in": "path",
+            "required": true,
+            "description": "The unique identifier of the subscription to be cancelled. Example UUID from docs: 78058918-9746-4280-9b9b-1bd5115eec6e",
+            "example": "78058918-9746-4280-9b9b-1bd5115eec6e",
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CancelSubscriptionRequest"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Subscription cancellation processed successfully.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/CancelSubscriptionResponse"
+                },
+                "example": {
+                  "message": "Subscription cancellation processed successfully."
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/monetization/public-offering/{offering_id}/": {
+      "get": {
+        "tags": [
+          "Monetization"
+        ],
+        "summary": "Get Public Offering",
+        "description": "Retrieves the public details of a specific offering, which can be used to render a pricing page or paywall.",
+        "operationId": "getPublicOffering",
+        "parameters": [
+          {
+            "name": "offering_id",
+            "in": "path",
+            "required": true,
+            "description": "The unique identifier (UUID) for the offering.",
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          },
+          {
+            "name": "customer_id",
+            "in": "query",
+            "required": false,
+            "description": "Optional. The identifier for an existing customer to tailor the offering view (e.g., showing their current plan).",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful response with public offering details.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PublicOfferingResponse"
+                },
+                "example": {
+                  "id": "7b793738-9f99-43e0-a8af-7b72fc8f8886",
+                  "name": "Aphelo v1",
+                  "description": "",
+                  "pricingTable": {
+                    "name": "Aphelo Paywall",
+                    "description": "",
+                    "identifier": "aphelo-paywall",
+                    "style": { "priceColor": "#171923", "titleColor": "#171923", "buttonColor": "#F7FAFC", "dividerColor": "#E2E8F0", "featureColor": "#2D3748", "priceUnitColor": "#171923", "descriptionColor": "#718096", "pricePeriodColor": "#718096", "cardBackgroundColor": "#fff", "buttonBackgroundColor": "#1A202C", "buttonHoverBackgroundColor": "#1A202C" },
+                    "typography": { "priceFontSize": 32, "titleFontSize": 24, "featureFontSize": 16, "priceFontWeight": "bold", "titleFontWeight": "bold", "featureFontWeight": "normal", "priceUnitFontSize": 32, "descriptionFontSize": 16, "pricePeriodFontSize": 16, "priceUnitFontWeight": "bold", "descriptionFontWeight": "normal", "pricePeriodFontWeight": "normal" },
+                    "layout": { "gap": 24, "align": "center", "maxWidth": 400, "minWidth": 360 },
+                    "template": null,
+                    "descriptionTooltipEnabled": true,
+                    "pricingOptions": { "localization": true, "showDecimal": true, "showCurrencyCode": false, "showCurrencySymbol": true, "maximumDecimalDigits": 2, "minimumDecimalDigits": 2 }
+                  },
+                  "plans": [
+                    {
+                      "name": "Free",
+                      "identifier": "free",
+                      "details": { "stripeProductId": "prod_SUs8ZwzyrjlSAZ" },
+                      "isVisible": true,
+                      "features": [
+                        { "identifier": "apicalls", "displayName": "apicalls", "featureType": "METER", "value": 5000 },
+                        { "identifier": "products", "displayName": "Products", "featureType": "CUSTOMIZABLE", "value": 1 },
+                        { "identifier": "branding", "displayName": "branding", "featureType": "BOOLEAN", "value": false },
+                        { "identifier": "email-settings", "displayName": "Email settings", "featureType": "BOOLEAN", "value": true }
+                      ],
+                      "price": { "priceType": "FREE", "charges": [{ "chargePeriod": "YEARLY", "priceData": { "amount": 0.0 } }] }
+                    },
+                    {
+                      "name": "Basic",
+                      "identifier": "basic",
+                      "details": { "stripeProductId": "prod_SUsCWTpt2AkvJD" },
+                      "isVisible": true,
+                      "features": [
+                        { "identifier": "apicalls", "displayName": "apicalls", "featureType": "METER", "value": 50000 },
+                        { "identifier": "products", "displayName": "Products", "featureType": "CUSTOMIZABLE", "value": 5 },
+                        { "identifier": "branding", "displayName": "branding", "featureType": "BOOLEAN", "value": false },
+                        { "identifier": "email-settings", "displayName": "Email settings", "featureType": "BOOLEAN", "value": true }
+                      ],
+                      "price": { "priceType": "PAID", "charges": [{ "chargePeriod": "MONTHLY", "priceData": { "amount": 59.0 } }, { "chargePeriod": "YEARLY", "priceData": { "amount": 491.0 } }] }
+                    }
+                  ],
+                  "countryCode": "IN",
+                  "pricingLocale": "en-US",
+                  "currencyCode": "USD",
+                  "currencySymbol": "$",
+                  "baseCurrencyCode": "USD",
+                  "baseCurrencySymbol": "$",
+                  "subscription": { "planIdentifier": "basic", "features": [], "subscriptionId": "7e468572-cc01-424f-ba88-69917164538b", "chargePeriod": "MONTHLY", "hasPreviousSubscription": true },
+                  "isCustomerExists": true,
+                  "billingPeriods": [
+                    { "displayName": "Monthly", "chargePeriod": "MONTHLY" },
+                    { "displayName": "Yearly", "chargePeriod": "YEARLY" },
+                    { "displayName": "One Time", "chargePeriod": "ONE_TIME" }
+                  ]
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad Request, for example, if the offering does not exist or the request is malformed.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                },
+                "example": {
+                  "status": "Bad request",
+                  "message": "Offering does not exists"
+                }
+              }
+            }
+          }
+        }
       }
     }
   }
 }
+

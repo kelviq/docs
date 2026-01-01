@@ -1,0 +1,787 @@
+---
+title: "React UI"
+description: "Documentation for the kelviq React UI SDK - A comprehensive pricing table and paywall solution"
+icon: "react"
+---
+
+## 1. Overview
+
+The **kelviq React UI SDK** provides a complete React-based solution for integrating dynamic, customizable pricing tables and paywalls into web applications. It handles fetching offering data, displaying pricing plans with multiple billing periods, managing subscriptions, and processing checkouts with full localization support.
+
+---
+
+## 2. Installation
+
+Install the SDK using npm or yarn:
+
+```bash
+npm install @kelviq/react-ui
+# or
+yarn add @kelviq/react-ui
+```
+
+---
+
+## 3. Quick Start
+
+### Basic Setup
+
+Note: You must import the CSS file for the components to be styled correctly.
+
+```tsx
+import { KelviqProvider, PDPricingTable } from '@kelviq/react-ui';
+import '@kelviq/react-ui/dist/pd-react-ui.css';
+
+function App() {
+  return (
+    <KelviqProvider
+      accessToken="YOUR_ACCESS_TOKEN"
+      offeringId="YOUR_OFFERING_ID"
+      customerId="OPTIONAL_CUSTOMER_ID"
+    >
+      <PDPricingTable />
+    </KelviqProvider>
+  );
+}
+```
+
+### With Custom Event Handling
+
+```tsx
+import { KelviqProvider, PDPricingTable } from '@kelviq/react-ui';
+import '@kelviq/react-ui/dist/pd-react-ui.css';
+
+function App() {
+  const handleCustomPriceClick = (details) => {
+    console.log('Custom price plan clicked:', details);
+    // Handle custom pricing logic
+  };
+
+  return (
+    <KelviqProvider
+      accessToken="YOUR_ACCESS_TOKEN"
+      offeringId="YOUR_OFFERING_ID"
+      customerId="OPTIONAL_CUSTOMER_ID"
+    >
+      <PDPricingTable
+        onCustomPriceClick={handleCustomPriceClick}
+        customStyles={{
+          style: {
+            cardBackgroundColor: '#ffffff',
+            buttonBackgroundColor: '#007bff',
+            titleColor: '#333333'
+          }
+        }}
+      />
+    </KelviqProvider>
+  );
+}
+```
+
+---
+
+## 4. Core Components
+
+### 4.1. `KelviqProvider`
+
+The top-level provider component that initializes the SDK and manages the global state.
+
+#### Required Props
+
+| Prop | Type | Description |
+|------|------|-------------|
+| `accessToken` | `string` | Your kelviq client access token |
+| `offeringId` | `string` | The unique identifier for your offering |
+
+#### Optional Props
+
+| Prop | Type | Default | Description |
+|------|------|---------|-------------|
+| `customerId` | `string` | `undefined` | Customer identifier for personalized pricing |
+| `environment` | `sandbox\|production` | 'production' | The environment to use. If you want to use the sandbox, you must provide this. |
+| `checkoutSuccessUrl` | `string` | `window.location.href` | URL to redirect after successful checkout |
+| `apiConfig` | `KelviqAPIConfig` | `{}` | Advanced API configuration options |
+
+#### API Configuration Options
+
+```tsx
+interface KelviqAPIConfig {
+  onError?: (error: Error) => void;
+  maxRetries?: number; // Default: 3
+  timeout?: number; // Default: 5000ms
+  backoffBaseDelay?: number;
+  offeringApiUrl?: string;
+  subscriptionApiUrl?: string;
+  checkoutApiUrl?: string;
+}
+```
+
+### 4.2. `PDPricingTable`
+
+The main pricing table component that displays all plans and handles user interactions.
+
+#### Props
+
+| Prop | Type | Default | Description |
+|------|------|---------|-------------|
+| `customStyles` | `PricingTableStyle` | `{}` | Custom styling configuration |
+| `customActionButton` | `CustomActionButton` | `undefined` | Custom button component |
+| `customCheckIcon` | `React.ReactNode` | `undefined` | Custom check icon |
+| `customUnCheckIcon` | `React.ReactNode` | `undefined` | Custom uncheck icon |
+| `customTooltipIcon` | `React.ReactNode` | `undefined` | Custom tooltip icon |
+| `onCustomPriceClick` | `(details: PlanClickDetails) => void` | `undefined` | Callback for custom price plans |
+| `renderActionButtonAfter` | `features \| price` | `price` | Render the action button after the features or the price |
+| `insertElements.*` | `InsertElements` | `{}` | Insert custom elements anywhere in the pricing table |
+| `insertElements.beforePlanName` | `(plan: OfferingPlan, activePeriod: ChargePeriodEnum) => JSX.Element` | `undefined` | Insert custom elements before the plan name |
+| `insertElements.afterPlanName` | `(plan: OfferingPlan, activePeriod: ChargePeriodEnum) => JSX.Element` | `undefined` | Insert custom elements after the plan name |
+| `insertElements.beforePlanDescription` | `(plan: OfferingPlan, activePeriod: ChargePeriodEnum) => JSX.Element` | `undefined` | Insert custom elements before the plan description |
+| `insertElements.afterPlanDescription` | `(plan: OfferingPlan, activePeriod: ChargePeriodEnum) => JSX.Element` | `undefined` | Insert custom elements after the plan description |
+| `insertElements.beforePrice` | `(plan: OfferingPlan, activePeriod: ChargePeriodEnum) => JSX.Element` | `undefined` | Insert custom elements before the price |
+| `insertElements.afterPrice` | `(plan: OfferingPlan, activePeriod: ChargePeriodEnum) => JSX.Element` | `undefined` | Insert custom elements after the price |
+| `insertElements.beforeFeatures` | `(plan: OfferingPlan, activePeriod: ChargePeriodEnum) => JSX.Element` | `undefined` | Insert custom elements before the features |
+| `insertElements.afterFeatures` | `(plan: OfferingPlan, activePeriod: ChargePeriodEnum) => JSX.Element` | `undefined` | Insert custom elements after the features |
+| `insertElements.beforeActionButton` | `(plan: OfferingPlan, activePeriod: ChargePeriodEnum) => JSX.Element` | `undefined` | Insert custom elements before the action button |
+| `insertElements.afterActionButton` | `(plan: OfferingPlan, activePeriod: ChargePeriodEnum) => JSX.Element` | `undefined` | Insert custom elements after the action button |
+| `insertElements.beforeSwitch` | `(activePeriod: ChargePeriodEnum) => JSX.Element` | `undefined` | Insert custom elements before the switch |
+| `insertElements.afterSwitch` | `(activePeriod: ChargePeriodEnum) => JSX.Element` | `undefined` | Insert custom elements after the switch |
+
+#### Example Usage
+
+```tsx
+<PDPricingTable
+  onCustomPriceClick={(details) => {
+    console.log('Custom plan selected:', details.plan.displayName);
+    // Handle custom pricing logic
+  }}
+  customStyles={{
+    style: {
+      cardBackgroundColor: '#f8f9fa',
+      buttonBackgroundColor: '#28a745',
+      buttonColor: '#ffffff',
+      titleColor: '#212529'
+    },
+    typography: {
+      titleFontSize: 24,
+      titleFontWeight: '600'
+    },
+    layout: {
+      gap: 20,
+      minWidth: 280,
+      maxWidth: 400
+    }
+  }}
+  insertElements={{
+    afterPrice: (plan) => {
+        if(plan.shouldHighlight) {
+            return <div>Most popular plan</div>;
+        }
+        return null;
+    }
+  }}
+/>
+```
+
+### 4.3. `PDPlan`
+
+Renders a list of pricing plans with billing period switching.
+
+#### Props
+
+| Prop | Type | Required | Description |
+|------|------|----------|-------------|
+| `plans` | `OfferingPlan[]` | Yes | Array of plans to display |
+| `pricingTable` | `PricingTable` | Yes | Pricing table configuration |
+| `billingPeriods` | `BillingPeriod[]` | Yes | Available billing periods |
+| `countryCode` | `string` | Yes | Country code for localization |
+| `currencyCode` | `string` | Yes | Currency code (e.g., "USD") |
+| `currencySymbol` | `string` | Yes | Currency symbol (e.g., "$") |
+| `currencyConversionRate` | `number` | Yes | Currency conversion rate |
+| `pricingLocale` | `string` | Yes | Locale for price formatting |
+| `onPlanClick` | `(details: PlanClickDetails) => void` | Yes | Plan selection callback |
+| `customStyles` | `PricingTableStyle` | No | Custom styling |
+| `customActionButton` | `CustomActionButton` | No | Custom button component |
+| `actionButtonLoadingPlanIdentifier` | `string` | No | Loading state for specific plan |
+| `noStyles` | `boolean` | No | Disable default styling |
+
+### 4.4. `PDPlanItem`
+
+Displays a single pricing plan card.
+
+#### Props
+
+| Prop | Type | Required | Description |
+|------|------|----------|-------------|
+| `plan` | `OfferingPlan` | Yes | Plan data to display |
+| `pricingTable` | `PricingTable` | Yes | Pricing table configuration |
+| `period` | `ChargePeriodEnum` | Yes | Current billing period |
+| `countryCode` | `string` | Yes | Country code |
+| `currencyCode` | `string` | Yes | Currency code |
+| `currencySymbol` | `string` | Yes | Currency symbol |
+| `currencyConversionRate` | `number` | Yes | Conversion rate |
+| `pricingLocale` | `string` | Yes | Locale for formatting |
+| `onPdPlanItemClick` | `(details: PlanClickDetails) => void` | Yes | Click handler |
+| `customActionButton` | `CustomActionButton` | No | Custom button |
+| `actionButtonText` | `string` | No | Button text |
+| `actionButtonLoading` | `boolean` | No | Loading state |
+| `actionButtonDisabled` | `boolean` | No | Disabled state |
+| `isActive` | `boolean` | No | Active plan indicator |
+| `successText` | `string` | No | Success message |
+| `noStyles` | `boolean` | No | Disable styling |
+
+### 4.5. `PDPrice`
+
+Renders formatted price display with currency and period information.
+
+#### Props
+
+| Prop | Type | Required | Description |
+|------|------|----------|-------------|
+| `price` | `number` | Yes | Price amount |
+| `countryCode` | `string` | Yes | Country code |
+| `currencyCode` | `string` | Yes | Currency code |
+| `currencySymbol` | `string` | Yes | Currency symbol |
+| `currencyConversionRate` | `number` | Yes | Conversion rate |
+| `pricingLocale` | `string` | Yes | Locale for formatting |
+| `period` | `ChargePeriodEnum` | Yes | Billing period |
+| `showDecimal` | `boolean` | Yes | Show decimal places |
+| `showCurrencySymbol` | `boolean` | Yes | Show currency symbol |
+| `showCurrencyCode` | `boolean` | Yes | Show currency code |
+| `minimumFractionDigits` | `number` | Yes | Minimum decimal places |
+| `maximumFractionDigits` | `number` | Yes | Maximum decimal places |
+
+### 4.6. `PDFeatures`
+
+Renders the features list for a plan.
+
+#### Props
+
+| Prop | Type | Required | Description |
+|------|------|----------|-------------|
+| `features` | `OfferingFeature[]` | Yes | Array of features |
+| `period` | `ChargePeriodEnum` | Yes | Current billing period |
+| `customCheckIcon` | `React.ReactNode` | No | Custom check icon |
+| `customUnCheckIcon` | `React.ReactNode` | No | Custom uncheck icon |
+| `customTooltipIcon` | `React.ReactNode` | No | Custom tooltip icon |
+| `descriptionTooltipEnabled` | `boolean` | No | Enable tooltips |
+| `onUsageChange` | `(featureId: string, quantity: number) => void` | No | Usage change handler |
+
+---
+
+## 5. Data Types
+
+### Core Types
+
+```tsx
+// Billing periods
+enum ChargePeriodEnum {
+  ONE_TIME = 'ONE_TIME',
+  MONTHLY = 'MONTHLY',
+  YEARLY = 'YEARLY',
+  WEEKLY = 'WEEKLY',
+  DAILY = 'DAILY',
+  THREE_MONTHS = 'THREE_MONTHS',
+  SIX_MONTHS = 'SIX_MONTHS'
+}
+
+// Price types
+enum PriceTypeEnum {
+  FREE = 'FREE',
+  PAID = 'PAID',
+  CUSTOM = 'CUSTOM'
+}
+
+// Price models
+enum PriceModelEnum {
+  FLAT = 'FLAT',
+  PACKAGE = 'PACKAGE',
+  TIERED = 'TIERED',
+  VOLUME = 'VOLUME'
+}
+
+// Plan structure
+interface OfferingPlan {
+  id: string;
+  name: string;
+  displayName: string;
+  displayDescription: string;
+  identifier: string;
+  isArchived: boolean;
+  features: OfferingFeature[];
+  price: OfferingPlanPrice;
+  shouldHighlight: boolean;
+  enabled: boolean;
+}
+
+// Plan click details
+interface PlanClickDetails {
+  plan: OfferingPlan;
+  chargePeriod: ChargePeriodEnum;
+  usageMap: Record<string, number>;
+}
+
+// Pricing table style
+interface PricingTableStyle {
+  style: PricingTableColorConfig;
+  typography: PricingTableTypographyConfig;
+  layout: PricingTableLayoutConfig;
+}
+```
+
+### Color Configuration
+
+```tsx
+interface PricingTableColorConfig {
+  primaryColor: string;
+  primaryHoverColor: string;
+  onPrimaryColor: string;
+  secondaryColor: string;
+  cardBackgroundColor: string;
+  billingSwitchBackgroundColor: string;
+  billingSwitchColor: string;
+  billingSwitchSelectedColor: string;
+  titleColor: string;
+  descriptionColor: string;
+  priceColor: string;
+  priceUnitColor: string;
+  pricePeriodColor: string;
+  featureColor: string;
+  dividerColor: string;
+  buttonBackgroundColor: string;
+  buttonColor: string;
+  buttonHoverBackgroundColor: string;
+  advancedMode: boolean;
+}
+```
+
+### Typography Configuration
+
+```tsx
+interface PricingTableTypographyConfig {
+  titleFontSize: number;
+  titleFontWeight: string;
+  descriptionFontSize: number;
+  descriptionFontWeight: string;
+  priceFontSize: number;
+  priceFontWeight: string;
+  priceUnitFontSize: number;
+  priceUnitFontWeight: string;
+  featureFontSize: number;
+  featureFontWeight: string;
+  pricePeriodFontSize: number;
+  pricePeriodFontWeight: string;
+}
+```
+
+### Layout Configuration
+
+```tsx
+interface PricingTableLayoutConfig {
+  minWidth: number;
+  maxWidth: number;
+  gap: number;
+  align: 'start' | 'center' | 'end';
+}
+```
+
+---
+
+## 6. Styling and Customization
+
+### 6.1. CSS Variables
+
+The SDK uses CSS variables for styling. You can override these in your CSS:
+
+```css
+:root {
+  /* Card & Background */
+  --pd-card-bg: #ffffff;
+  --pd-card-border-width: 1px solid;
+  --pd-card-border-color: 1px solid;
+
+  /* Text Colors */
+  --pd-title-color: #171923;
+  --pd-description-color: #718096;
+  --pd-feature-color: #171923;
+
+  /* Price Colors */
+  --pd-price-color: #171923;
+  --pd-price-unit-color: #171923;
+  --pd-price-period-color: #718096;
+
+  /* Button Colors */
+  --pd-button-bg: #1A202C;
+  --pd-button-hover-bg: #1A202C;
+  --pd-button-color: #F7FAFC;
+
+  /* Billing Switch Colors */
+  --pd-billing-switch-bg: #1A202C;
+  --pd-billing-switch-color: #F7FAFC;
+  --pd-billing-switch-selected-color: #F7FAFC;
+
+  /* UI Elements */
+  --pd-divider-color: #E2E8F0;
+  --pd-tooltip-bg: #2D3748;
+  --pd-tooltip-color: #ffffff;
+
+  /* Typography - Title */
+  --pd-title-size: 24px;
+  --pd-title-weight: 600;
+
+  /* Typography - Description */
+  --pd-description-size: 16px;
+  --pd-description-weight: 400;
+
+  /* Typography - Price */
+  --pd-price-size: 28px;
+  --pd-price-weight: 700;
+  --pd-price-unit-size: 32px;
+  --pd-price-unit-weight: 700;
+  --pd-price-period-size: 16px;
+  --pd-price-period-weight: 400;
+
+  /* Typography - Feature */
+  --pd-feature-size: 14px;
+  --pd-feature-weight: 400;
+
+  /* Layout */
+  --pd-min-width: 360px;
+  --pd-max-width: 400px;
+  --pd-gap: 24px;
+  --pd-align: center;
+}
+```
+
+### 6.2. Custom Styles Object
+
+```tsx
+const customStyles: PricingTableStyle = {
+  style: {
+    cardBackgroundColor: '#ffffff',
+    buttonBackgroundColor: '#28a745',
+    buttonColor: '#ffffff',
+    titleColor: '#212529',
+    descriptionColor: '#6c757d',
+    priceColor: '#000000',
+    featureColor: '#495057'
+  },
+  typography: {
+    titleFontSize: 24,
+    titleFontWeight: '600',
+    descriptionFontSize: 14,
+    descriptionFontWeight: '400',
+    priceFontSize: 32,
+    priceFontWeight: '700'
+  },
+  layout: {
+    gap: 24,
+    minWidth: 300,
+    maxWidth: 450,
+    align: 'center'
+  }
+};
+```
+
+### 6.3. Custom Action Button
+
+```tsx
+const CustomButton: CustomActionButton = ({ onClick, children, plan, disabled }) => (
+  <button
+    onClick={onClick}
+    disabled={disabled}
+    className="my-custom-button"
+    style={{
+      backgroundColor: plan.shouldHighlight ? '#ff6b35' : '#007bff',
+      color: '#ffffff',
+      padding: '12px 24px',
+      border: 'none',
+      borderRadius: '6px',
+      cursor: disabled ? 'not-allowed' : 'pointer'
+    }}
+  >
+    {children}
+  </button>
+);
+
+<PDPricingTable customActionButton={CustomButton} />
+```
+
+### 6.4. noStyles Mode
+
+For complete styling control, use the `noStyles` prop:
+
+```tsx
+<PDPricingTable noStyles={true} />
+```
+
+### 6.5. CSS Class Reference
+
+The kelviq React UI components use consistent CSS class names that you can target for custom styling. All classes are prefixed with `pd-` to avoid naming conflicts.
+
+#### CSS Class Hierarchy
+
+```css
+.pd-plan                          /* Root container */
+├── .pd-plan-switch              /* Billing period switcher */
+│   └── .pd-switch               /* Switch wrapper */
+│       └── .pd-switch-button    /* Individual switch buttons */
+│           └── .pd-promo-caption /* Discount badges (20%, etc.) */
+├── .pd-plan-items              /* Plans container */
+    └── .pd-plan-item           /* Individual plan card */
+        ├── .pd-plan-item-header /* Plan title section */
+        │   ├── .pd-plan-item-heading    /* Plan name */
+        │   └── .pd-plan-item-subheading /* Plan description */
+        ├── .pd-plan-item-price /* Price section */
+        │   ├── .pd-price-container      /* Price wrapper */
+        │   │   ├── .pd-price-currency   /* Currency container */
+        │   │   │   ├── .pd-price-currency-symbol /* $ symbol */
+        │   │   │   └── .pd-price-currency-code   /* USD text */
+        │   │   ├── .pd-price-integer    /* Main price number */
+        │   │   ├── .pd-price-decimal-separator /* Decimal point */
+        │   │   └── .pd-price-decimal    /* Decimal digits */
+        │   └── .pd-plan-item-price-period /* /month text */
+        ├── .pd-separator           /* Divider line */
+        ├── .pd-plan-item-features  /* Features section */
+        │   └── .pd-features-list   /* Features list */
+        │       └── .pd-features-list-item /* Individual features */
+        │           ├── .pd-tooltip-wrapper /* Feature tooltips */
+        │           │   └── .pd-tooltip      /* Tooltip content */
+        │           ├── .pd-feature-quantity-input /* Quantity number input */
+        │           ├── .pd-feature-quantity-input-unit /* Input unit label */
+        │           └── .pd-feature-quantity-select-container /* Quantity dropdown */
+        │               ├── .pd-feature-quantity-select /* Select element */
+        │               └── .pd-feature-quantity-select-arrow /* Dropdown arrow */
+        └── .pd-plan-item-button    /* CTA button */
+```
+
+---
+
+## 7. Advanced Features
+
+### 7.1. Usage-Based Pricing
+
+The SDK supports metered billing and tiered pricing:
+
+```tsx
+// Features with usage tracking
+const features = [
+  {
+    identifier: 'api_calls',
+    displayName: 'API Calls',
+    priceModel: PriceModelEnum.VOLUME,
+    charges: [
+      {
+        chargePeriod: ChargePeriodEnum.MONTHLY,
+        tiers: [
+          { flatAmount: 0, unitAmount: 0.01, upTo: 1000 },
+          { flatAmount: 10, unitAmount: 0.008, upTo: 10000 },
+          { flatAmount: 82, unitAmount: 0.005, upTo: null }
+        ]
+      }
+    ]
+  }
+];
+```
+
+### 7.2. Custom Price Plans
+
+Handle custom pricing plans with the `onCustomPriceClick` callback:
+
+```tsx
+<PDPricingTable
+  onCustomPriceClick={(details) => {
+    // Open contact form or custom pricing modal
+    openCustomPricingModal(details.plan);
+  }}
+/>
+```
+
+### 7.3. Subscription Management
+
+The SDK automatically handles subscription updates:
+
+- **New Subscriptions**: Redirects to checkout
+- **Plan Upgrades/Downgrades**: Updates existing subscription
+- **Free Plan Upgrades**: Handles free trial to paid conversion
+
+### 7.4. Error Handling
+
+```tsx
+<KelviqProvider
+  accessToken="YOUR_TOKEN"
+  offeringId="YOUR_OFFERING"
+  apiConfig={{
+    onError: (error) => {
+      console.error('kelviq Error:', error);
+      // Show user-friendly error message
+      showErrorMessage('Unable to load pricing. Please try again later.');
+    },
+    maxRetries: 3,
+    timeout: 10000
+  }}
+>
+  <PDPricingTable />
+</KelviqProvider>
+```
+
+---
+
+## 8. Complete Example
+
+```tsx
+import React from 'react';
+import {
+  KelviqProvider,
+  PDPricingTable,
+  PricingTableStyle
+} from '@kelviq/react-ui';
+
+const App: React.FC = () => {
+  const customStyles: PricingTableStyle = {
+    style: {
+      cardBackgroundColor: '#ffffff',
+      buttonBackgroundColor: '#007bff',
+      buttonColor: '#ffffff',
+      buttonHoverBackgroundColor: '#0056b3',
+      titleColor: '#212529',
+      descriptionColor: '#6c757d',
+      priceColor: '#000000',
+      featureColor: '#495057',
+      dividerColor: '#dee2e6',
+      billingSwitchBackgroundColor: '#f8f9fa',
+      billingSwitchColor: '#6c757d',
+      billingSwitchSelectedColor: '#007bff'
+    },
+    typography: {
+      titleFontSize: 24,
+      titleFontWeight: '600',
+      descriptionFontSize: 14,
+      descriptionFontWeight: '400',
+      priceFontSize: 32,
+      priceFontWeight: '700',
+      priceUnitFontSize: 16,
+      priceUnitFontWeight: '400',
+      featureFontSize: 14,
+      featureFontWeight: '400',
+      pricePeriodFontSize: 14,
+      pricePeriodFontWeight: '400'
+    },
+    layout: {
+      gap: 24,
+      minWidth: 300,
+      maxWidth: 450,
+      align: 'center'
+    }
+  };
+
+  const handleCustomPriceClick = (details) => {
+    console.log('Custom plan selected:', details.plan.displayName);
+    // Open contact form or pricing calculator
+    window.open('/contact', '_blank');
+  };
+
+  return (
+    <div className="app">
+      <header>
+        <h1>Choose Your Plan</h1>
+        <p>Select the perfect plan for your needs</p>
+      </header>
+      
+      <KelviqProvider
+        accessToken="your-access-token"
+        offeringId="your-offering-id"
+        customerId="optional-customer-id"
+        checkoutSuccessUrl="https://yourapp.com/success"
+        apiConfig={{
+          onError: (error) => {
+            console.error('Pricing Error:', error);
+          },
+          timeout: 10000
+        }}
+      >
+        <PDPricingTable
+          customStyles={customStyles}
+          onCustomPriceClick={handleCustomPriceClick}
+        />
+      </KelviqProvider>
+    </div>
+  );
+};
+
+export default App;
+```
+
+---
+
+## 9. API Endpoints
+
+The SDK uses the following default API endpoints:
+
+- **Offering API**: `https://api.kelviq.com/api/v1/monetization/public-offering`
+- **Checkout API**: `https://api.kelviq.com/api/v1/checkout/`
+- **Subscription API**: `https://api.kelviq.com/api/v1/subscriptions`
+
+You can override these in the `apiConfig`:
+
+```tsx
+<KelviqProvider
+  apiConfig={{
+    offeringApiUrl: 'https://your-api.com/offerings',
+    checkoutApiUrl: 'https://your-api.com/checkout',
+    subscriptionApiUrl: 'https://your-api.com/subscriptions'
+  }}
+>
+```
+
+---
+
+## 10. Troubleshooting
+
+### Common Issues
+
+1. **Loading State**: Ensure your `accessToken` and `offeringId` are correct
+2. **Styling Issues**: Check CSS variable overrides and custom styles
+3. **API Errors**: Verify API endpoints and network connectivity
+4. **TypeScript Errors**: Ensure all required props are provided
+
+### Debug Mode
+
+Enable console logging for debugging:
+
+```tsx
+<KelviqProvider
+  apiConfig={{
+    onError: (error) => {
+      console.log('kelviq Debug:', {
+        error: error.message,
+        offeringId: 'your-offering-id',
+        timestamp: new Date().toISOString()
+      });
+    }
+  }}
+>
+```
+---
+
+## Using the Sandbox
+
+If you want to use the sandbox, you need to set the `environment` option to `sandbox` in the `KelviqProvider`.
+
+```tsx
+<KelviqProvider 
+  accessToken="YOUR_ACCESS_TOKEN"
+  offeringId="YOUR_OFFERING_ID" 
+  environment="sandbox">
+    {/* Your app components */}
+</KelviqProvider>
+```
+
+
+## 12. Support
+
+For technical support and questions:
+
+- **Documentation**: [docs.kelviq.com](https://docs.kelviq.com)
+- **GitHub Issues**: [github.com/kelviq/react-ui](https://github.com/kelviq/react-ui)
+- **Email**: support@kelviq.com
+
+---

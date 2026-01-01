@@ -1,0 +1,168 @@
+---
+title: "Stripe Entitlements vs kelviq Entitlements"
+description: "Stripe handles payments and basic feature access. kelviq expands that with usage-based limits, config-based features, and developer-first SDKs."
+---
+
+## Quick Comparison
+
+Here’s how **Stripe Entitlements** and **kelviq** compare across common use cases:
+
+| Capability | Stripe | kelviq | Notes |
+|------------|:------:|:-----------:|-------|
+| Boolean feature flag | ✅ | ✅ | Simple on/off access to features. |
+| Entitlement API (fetch by customer) | ✅ | ✅ | Return current entitlements based on customer ID. |
+| Plan-based entitlements | ✅ | ✅ | Attach features to a subscription plan. |
+| Config limits (e.g., *max team size = 5*) | ❌ | ✅ | Store and read numeric or text values. |
+| Metered quotas (API calls, minutes, GB) | ❌ | ✅ | Track `used`, `limit`, and `remaining`. |
+| Front-end SDK with hooks/components | ❌ | ✅ | Integrate access control directly in your UI. |
+| Usage reset by billing cycle | ❌ | ✅ | Automatically resets metered usage every cycle. |
+| Per-user overrides | ❌ | ✅ | Customize entitlements for individual users. |
+| Edit limits without redeploy | ❌ | ✅ | Update limits instantly from the dashboard. |
+
+---
+
+## Real-World Entitlement Examples
+
+Below is a list of common features, their typical data types, and which platform supports them. This helps clarify where Stripe ends and where kelviq begins.
+
+| Feature Name            | Type     | Description                                         | Example Value         | kelviq | Stripe |
+|-------------------------|----------|-----------------------------------------------------|-----------------------|:-----------:|:------:|
+| AI Assistant            | Boolean  | Toggle access to AI tools                           | `true` / `false`      | ✅          | ✅     |
+| Max Team Size           | Config   | Restrict number of team members                     | `5`, `50`, etc.       | ✅          | ❌     |
+| API Call Quota          | Metered  | Track and limit API usage                           | `used: 10,000`        | ✅          | ❌     |
+| Transcription Minutes   | Metered  | Monthly limit on transcription usage                | `remaining: 90 mins`  | ✅          | ❌     |
+| Projects Limit          | Config   | Restrict how many projects a user can create        | `3`, `unlimited`      | ✅          | ❌     |
+| Priority Support        | Boolean  | Enable premium support for select users             | `true`                | ✅          | ✅     |
+| Max Upload Size         | Config   | Limit upload size per file                          | `25MB`, `1GB`, etc.   | ✅          | ❌     |
+| AI Token Bucket         | Metered  | Control token usage for AI features                 | `used: 3,000`         | ✅          | ❌     |
+| Access to Beta Features | Boolean  | Enable early access to new features                 | `true`                | ✅          | ❌     |
+| Enable Custom Branding  | Boolean  | White-label the product experience                  | `true`                | ✅          | ✅     |
+
+---
+
+## Feature Implementation: Stripe vs kelviq
+
+Explore how the same feature would be implemented using Stripe Entitlements vs kelviq, so you can feel the difference in developer experience.
+
+### 1. AI Assistant (Boolean Feature)
+
+**Stripe (Manual Check)**
+
+```ts
+import Stripe from 'stripe';
+
+const stripe = new Stripe(process.env.STRIPE_SECRET_KEY);
+
+const entitlements = await stripe.entitlements.activeEntitlements.list({
+  customer: 'cus_123',
+});
+
+const hasAiAccess = entitlements.data.some(
+  (e) => e.entitlement_feature.lookup_key === 'ai-assistant'
+);
+
+if (hasAiAccess) {
+  enableAiAssistant();
+}
+````
+
+**kelviq**
+
+<Tabs>
+  <Tab title="React">
+
+```tsx
+import { ShowWhenBooleanEntitled } from '@kelviq/react-sdk';
+
+<ShowWhenBooleanEntitled featureKey="ai-assistant">
+  <AIButton />
+</ShowWhenBooleanEntitled>
+```
+
+  </Tab>
+  <Tab title="JavaScript">
+
+```ts
+import kelviqSDK from '@kelviq/js-sdk';
+
+const pd = kelviqSDK({
+  customerId: 'user_123',
+  accessToken: process.env.Kelviq_ACCESS_TOKEN,
+});
+
+if (pd.hasAccess('ai-assistant')) {
+  enableAiAssistant();
+}
+```
+
+  </Tab>
+</Tabs>
+
+---
+
+### 2. API Call Quota (Metered Limit)
+
+**Stripe**
+
+```ts
+// ❌ Not supported — you'd need to build custom metering logic.
+const used = await getApiUsage(user.id);
+const limit = 100000;
+
+if (used < limit) {
+  makeApiCall();
+} else {
+  showUpgradeBanner();
+}
+```
+
+**kelviq**
+
+```tsx
+const { data } = useMeteredEntitlement('api-call-quota');
+
+if (data?.remaining === null || data.remaining > 0) {
+  makeApiCall();
+}
+```
+
+---
+
+### 3. Project Limit (Config Feature)
+
+**Stripe**
+
+```ts
+// ❌ Not supported — you'd need to hardcode limits manually.
+const plan = user.stripePlanId;
+const maxProjects = plan === 'pro' ? 50 : 3;
+
+if (user.projects.length >= maxProjects) {
+  blockProjectCreation();
+}
+```
+
+**kelviq**
+
+```tsx
+const { data } = useConfigEntitlement('project-limit');
+
+if (data?.hasAccess && user.projects.length >= data.configuration) {
+  showProjectLimitWarning();
+}
+```
+
+---
+
+## 🚀 Why kelviq?
+
+Stripe’s entitlement system works well for simple use cases like turning a feature on/off based on a plan. But once you need configuration, metered usage, overrides, or frontend control — you hit limits fast.
+
+kelviq fills these gaps with:
+
+* **Deeper data types** like metered and configurable entitlements.
+* **Modern SDKs** for both frontend and backend.
+* **No-code plan editor** to change limits instantly.
+* **Better visibility** into who can access what.
+
+You still use Stripe for payments — and kelviq to power everything else around *what users get* after they pay.

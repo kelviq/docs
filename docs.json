@@ -1,87 +1,97 @@
 {
   "$schema": "https://mintlify.com/docs.json",
-  "theme": "mint",
-  "name": "Mint Starter Kit",
+  "theme": "palm",
+  "name": "Kelviq Documentation",
   "colors": {
-    "primary": "#16A34A",
-    "light": "#07C983",
-    "dark": "#15803D"
+    "primary": "#FF5722",
+    "light": "#FF8C66",
+    "dark": "#DC4100"
   },
   "favicon": "/favicon.svg",
+  "integrations": {
+    "posthog": {
+        "apiKey": "phc_Cq0jzkdypFlvn0Gh8aq2FhXhtJ88asNwTRBPJx8SvAH",
+        "apiHost": "https://us.i.posthog.com"
+    }
+  },
   "navigation": {
     "tabs": [
       {
-        "tab": "Guides",
+        "tab": "Documentation",
         "groups": [
           {
-            "group": "Getting started",
+            "group": "Get Started",
+            "pages": ["getstarted/introduction-to-kelviq", "getstarted/merchant-of-record", "getstarted/review-process"]
+          },
+          {
+            "group": "Quickstart",
+            "pages": ["quickstart/core-concepts", "quickstart/dashboard-setup", "quickstart/integrate-with-your-app"]
+          },
+          {
+            "group": "Product Catalog",
+            "pages": ["product-catalog/products", "product-catalog/plans" , "product-catalog/features"]
+          },
+          {
+            "group": "Monetization",
+            "pages": ["monetization/pricing-tables", "monetization/targeting-rules" , "monetization/offerings"]
+          },
+          {
+            "group": "Customers",
             "pages": [
-              "index",
-              "quickstart",
-              "development"
+              "customers/customers"
             ]
           },
           {
-            "group": "Customization",
-            "pages": [
-              "essentials/settings",
-              "essentials/navigation"
-            ]
-          },
-          {
-            "group": "Writing content",
-            "pages": [
-              "essentials/markdown",
-              "essentials/code",
-              "essentials/images",
-              "essentials/reusable-snippets"
-            ]
-          },
-          {
-            "group": "AI tools",
-            "pages": [
-              "ai-tools/cursor",
-              "ai-tools/claude-code",
-              "ai-tools/windsurf"
-            ]
+            "group": "Dynamic Pricing",
+            "pages": ["dynamic-pricing/tailor-pricing" , "dynamic-pricing/purchaisng-parity-power-pricing" , "dynamic-pricing/country-based", "dynamic-pricing/browser"]
           }
         ]
       },
       {
-        "tab": "API reference",
+        "tab": "Guides",
         "groups": [
           {
-            "group": "API documentation",
+            "group": "Usecases",
+            "pages": ["guides/usecases/hybridpricing", "guides/usecases/usage-based" , "guides/usecases/credit-based", "guides/usecases/freemium-plan", "guides/usecases/ai-task-agents", "guides/usecases/monetization-usage-based"]
+          },
+          {
+            "group": "Comparisons",
+            "pages": ["guides/stripe-vs-kelviq-entitlements", "guides/stripe-adaptive-pricing-vs-kelviq-localization"]
+          }
+        ]
+      },
+      
+      {
+        "tab": "APIs & SDKs",
+        "groups": [
+          {
+            "group": "Get Started",
             "pages": [
-              "api-reference/introduction"
+              "api-reference/authentication"
             ]
           },
           {
-            "group": "Endpoint examples",
+            "group": "API Documentation",
+            "openapi": "api-reference/openapi.json"
+          },
+          {
+            "group": "Backend Integration",
             "pages": [
-              "api-reference/endpoint/get",
-              "api-reference/endpoint/create",
-              "api-reference/endpoint/delete",
-              "api-reference/endpoint/webhook"
+              "api-reference/backend-integration/python-sdk",
+              "api-reference/backend-integration/node-sdk"
+            ]
+          },
+          {
+            "group": "Frontend Integration",
+            "pages": [
+              "frontend-integration/react-sdk",
+              "frontend-integration/react-ui",
+              "frontend-integration/js-sdk"
             ]
           }
         ]
       }
-    ],
-    "global": {
-      "anchors": [
-        {
-          "anchor": "Documentation",
-          "href": "https://mintlify.com/docs",
-          "icon": "book-open-cover"
-        },
-        {
-          "anchor": "Blog",
-          "href": "https://mintlify.com/blog",
-          "icon": "newspaper"
-        }
-      ]
-    }
+    ]
   },
   "logo": {
     "light": "/logo/light.svg",
@@ -91,32 +101,20 @@
     "links": [
       {
         "label": "Support",
-        "href": "mailto:hi@mintlify.com"
+        "href": "mailto:hi@kelviq.com"
       }
     ],
     "primary": {
       "type": "button",
       "label": "Dashboard",
-      "href": "https://dashboard.mintlify.com"
+      "href": "https://app.kelviq.com"
     }
-  },
-  "contextual": {
-    "options": [
-     "copy",
-     "view",
-     "chatgpt",
-     "claude",
-     "perplexity",
-     "mcp",
-     "cursor",
-     "vscode"
-   ]
   },
   "footer": {
     "socials": {
-      "x": "https://x.com/mintlify",
-      "github": "https://github.com/mintlify",
-      "linkedin": "https://linkedin.com/company/mintlify"
+      "x": "https://x.com/kelviqcom",
+      "github": "https://github.com/kelviq",
+      "linkedin": "https://www.linkedin.com/company/kelviq"
     }
   }
 }

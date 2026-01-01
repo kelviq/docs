@@ -1,0 +1,69 @@
+---
+title: "Purchasing Parity Power Pricing with Targeting Rules"
+description: "Learn how to configure Targeting Rules in kelviq to offer pricing adjusted for Purchasing Power Parity (PPP) and activate the rule via an Offering."
+---
+
+Purchasing Power Parity (PPP)-based pricing allows you to make your products more accessible globally by adjusting prices to reflect the relative purchasing power in different economic regions. This guide shows you how to set this up using Targeting Rules in kelviq and then activate your rule.
+
+**Key Concept:** kelviq allows targeting based on predefined "PPP groups" which categorize countries into economic tiers. You apply a pricing adjustment (e.g., a discount) to users falling into these groups. The rule is then made live via an Offering.
+
+---
+
+## Part 1: Creating a PPP-Based Discount Rule
+
+Let's create a rule that offers a **40% discount** to users in a hypothetical group like **"Developing regions (PPP 0.3-0.4)"**.
+
+### 1. Navigate to Targeting Rules
+1.  From the side navigation menu, go to **Monetization > Targeting rules**.
+
+### 2. Create a New Rule
+1.  Click the **+ Create rule** button.
+
+### 3. Define Rule Information
+1.  **Rule name**: Enter a descriptive name. For example: `PPP Discount - Developing Regions (40% Off)`.
+2.  **Select product**: Choose the product for which this pricing adjustment will apply (e.g., "My SaaS Product - Annual Plan").
+
+### 4. Set Conditions
+This is where you specify the PPP group to target.
+
+1.  Under the "If the customer matches..." section, click the first dropdown (or "Select condition").
+2.  From the list of attributes, choose **PPP group**.
+3.  Select the operator **is any of**.
+4.  In the "Select" values field, search for and select the specific PPP group. For our example, choose **Developing regions (PPP 0.3-0.4)**. (Note: The exact names of PPP groups will be available in your kelviq instance).
+
+### 5. Define the Pricing Adjustment (Action)
+Specify what happens when a customer meets the conditions.
+
+1.  From the action dropdown (e.g., "Then"), select **Decrease price by**.
+2.  Enter `40` in the percentage field.
+
+### 6. Save the Rule
+1.  Click the **Create rule** button at the bottom of the modal.
+
+**Result:** You have now created a rule that will apply a 40% discount to the selected product for users kelviq identifies as being in the "Developing regions (PPP 0.3-0.4)" group.
+
+---
+
+## Part 2: Activating Your PPP-Based Rule via an Offering
+
+A Targeting Rule is inactive until it's connected to an **Offering**. An Offering makes your product (with its associated rules) available to your users.
+
+1.  **Navigate to Offerings:**
+    * Go to **Monetization > Offerings**.
+
+2.  **Create or Edit an Offering:**
+    * Click **+ Create offering**. If you have an existing Offering you wish to use, you can edit it instead.
+
+3.  **Link the Targeting Rule:**
+    * In the "Create offering" (or "Edit offering") modal, you'll typically choose how the product is offered. Select the option that allows you to use a **Targeting rule**.
+    * From the rule selection dropdown, choose the `PPP Discount - Developing Regions (40% Off)` rule you just created.
+
+4.  **Configure Other Offering Details:**
+    * You might need to select a priicng table if this offering is presented through one, or configure other offering-specific settings.
+
+5.  **Save/Create the Offering:**
+    * Click **Create** (or "Update"). You will get an **Offering ID**.
+
+6.  **Integrate:** Use this Offering ID in your application's code. When your application requests this Offering, kelviq will evaluate the associated `PPP Discount - Developing Regions (40% Off)` rule for the current user and apply the discount if the conditions are met.
+
+Your PPP-based pricing adjustment is now live and active through this Offering!

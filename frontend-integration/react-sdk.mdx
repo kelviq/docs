@@ -1,0 +1,396 @@
+---
+title: "React SDK"
+description: "Documentation for the kelviq React SDK"
+icon: 'react'
+---
+
+The `@kelviq/react-sdk` provides a seamless way to integrate kelviq entitlement management into your React applications.
+
+## Overview
+
+- A **React Context Provider** (`KelviqProvider`) to initialize and configure the SDK.
+- **Hooks** to easily access entitlement status and data within your components.
+- **Conditional rendering components** to show or hide UI elements based on feature access.
+- Automatic and manual **data fetching** and caching mechanisms.
+
+The SDK fetches all entitlements for a given organization and customer, caches them, and makes them available throughout your application via React Context and custom hooks.
+
+## **2. Installation**
+
+Install the SDK using npm or yarn:
+
+``` bash
+npm install @kelviq/react-sdk
+# or
+yarn add @kelviq/react-sdk
+
+```
+
+You will also need `react` as a peer dependency.
+
+## **3. Setup & Configuration**
+
+### `KelviqProvider`
+
+The core of the SDK is the `KelviqProvider`. You need to wrap your application (or the relevant part of it) with this provider. It initializes the SDK and makes entitlement data available to its children components via context.
+
+``` tsx
+// In your App.tsx or main application entry point
+import React from 'react';
+import { KelviqProvider } from '@kelviq/react-sdk';
+
+const App = () => {
+  return (
+    <KelviqProvider
+      customerId="your-customer-id"
+      accessToken="your-access-token"
+    >
+      <MyAppContent />
+    </KelviqProvider>
+  );
+};
+
+const MyAppContent = () => {
+
+  return (
+    <div>
+      <h1>My Application</h1>
+    </div>
+  );
+
+};
+
+export default App;
+
+```
+
+### Required Props for `KelviqProvider`
+
+- `customerId: string`
+  - The ID of the customer for whom entitlements are being fetched. This will be sent as a query parameter (`customer_id`).
+- `accessToken: string | null`
+  - Your static API token or Bearer token for authenticating requests to the kelviq API. If provided, it will be included in the `Authorization: Bearer <accessToken>` header.
+
+### Optional Props for `KelviqProvider`
+<Expandable title="Optional Props">
+  
+- `apiUrl: string`
+  - The base URL for your kelviq API. For example, `https://edge.api.kelviq.com/api/v1`.
+- `environment: 'sandbox' | 'production'`
+  - The environment to use. If you want to use the sandbox, you must provide this.
+- `entitlementsPath: string`
+  - The specific path for the endpoint that returns all entitlements for a customer. This path will be appended to `apiUrl`. For example, `entitlement-check` or `user-entitlements`.
+- `config?: KelviqApiBehaviorOptions`
+  - An optional object to configure more advanced behaviors of the SDK.
+
+### **Configuration Object (**`config: KelviqApiBehaviorOptions`**)**
+
+This optional object can contain the following properties:
+
+- `onError?: (error: Error) => void`
+  - A callback function that will be invoked if an error occurs during the API request for entitlements.
+- `maxRetries?: number`
+  - The maximum number of times to retry a failed API request. Defaults to the value set in your `apiRequest` service (typically 3).
+- `timeout?: number`
+  - Timeout for API requests in milliseconds. Defaults to the value set in your `apiRequest` service (typically 5000ms).
+- `backoffBaseDelay?: number`
+  - Base delay (in milliseconds) for the exponential backoff strategy used in retries. Defaults to the value set in your `apiRequest` service (typically 1000ms).
+- `fetchEntitlementsOnMount?: boolean`
+  - Defaults to `true`. If true, entitlements are fetched automatically when the `KelviqProvider` mounts.
+  - Set to `false` if you want to control the initial fetch manually using the `refreshAllEntitlements` function from the `useKelviq` hook.
+</Expandable>
+
+
+## **4. Fetching Entitlements**
+
+### **Automatic Fetching on Mount**
+
+By default (`fetchEntitlementsOnMount: true` in the `config` prop, or if `config` or this specific option is omitted), the SDK will attempt to fetch all entitlements for the specified `customerId` as soon as the `KelviqProvider` is mounted.
+
+The `isLoading` state from `useKelviq()` will be `true` during this initial fetch.
+
+### **Manual Fetching**
+
+If `fetchEntitlementsOnMount` is set to `false`, or if you need to re-fetch entitlements at any point (e.g., after a user action that might change their entitlements), you can use the `refreshAllEntitlements` function.
+
+<Expandable title="Code Example">
+``` tsx
+import { useKelviq } from '@kelviq/react-sdk';
+
+function MyComponent() {
+  const { refreshAllEntitlements, isLoading, error } = useKelviq();
+
+  const handleRefresh = async () => {
+    try {
+      await refreshAllEntitlements();
+      console.log("Entitlements refreshed!");
+    } catch (e) {
+      console.error("Failed to refresh entitlements:", e);
+    }
+  };
+
+  return (
+    <div>
+      <button onClick={handleRefresh} disabled={isLoading}>
+        {isLoading ? 'Refreshing...' : 'Refresh Entitlements'}
+      </button>
+      {error && <p style={{ color: 'red' }}>Error: {error.message}</p>}
+      {/* ... rest of your component ... */}
+    </div>
+  );
+}
+
+```
+</Expandable>
+## **5. Accessing Entitlement Data (Hooks)**
+
+The SDK provides several hooks to access entitlement data and SDK state.
+
+### `useKelviq()`
+
+This is the primary hook to access the SDK's context.
+
+- **Returns:** `KelviqContextValue` object containing:
+  - `allEntitlements: AsyncState<EntitlementMap | null>`: The state object for all fetched entitlements.
+    - `data`: An `EntitlementMap` (a `Record<string, AnyEntitlement>`) where keys are `featureKey`s, or `null` if not loaded or error.
+    - `isLoading`: Boolean indicating if the `allEntitlements` data is currently being fetched/refreshed.
+    - `error`: An `Error` object if the last fetch failed, otherwise `null`.
+  - `refreshAllEntitlements: () => Promise<void>`: Function to manually trigger a re-fetch of all entitlements.
+  - `getEntitlement: <T extends AnyEntitlement>(featureKey: string, type: T['type']) => AsyncState<T | null>`: Function to get a specific entitlement's state from the cache.
+  - `hasAccess: (featureKey: string) => boolean | undefined`: A utility function to quickly check access for a feature. Returns `true` if access is granted, `false` if denied or feature not found, and `undefined` if data is loading or an error occurred.
+  - `isLoading: boolean`: A global loading state indicating if the SDK is performing its initial configured fetch or a refresh operation.
+  - `error: Error | null`: A global error state reflecting any error from the last fetch operation initiated by the provider.
+  - `customerId: string`: The customer ID passed to the provider.
+  - `apiUrl: string`: The base API URL passed to the provider.
+  - `entitlementsPath: string`: The entitlements path passed to the provider.
+
+### `useAllEntitlements()`
+
+A convenience hook that directly returns the `allEntitlements` state object.
+
+- **Returns:** `AsyncState<EntitlementMap | null>`
+
+``` tsx
+import { useAllEntitlements } from '@kelviq/react-sdk';
+
+function EntitlementsList() {
+  const { data: entitlementsMap, isLoading, error } = useAllEntitlements();
+
+  if (isLoading) return <p>Loading all entitlements...</p>;
+  if (error) return <p>Error loading entitlements: {error.message}</p>;
+  if (!entitlementsMap) return <p>No entitlements data.</p>;
+
+  return (
+    <ul>
+      {Object.values(entitlementsMap).map(ent => (
+        <li key={ent.featureKey}>
+          {ent.featureKey}: {ent.hasAccess ? 'Enabled' : 'Disabled'} ({ent.type})
+        </li>
+      ))}
+    </ul>
+  );
+}
+
+```
+
+### `useBooleanEntitlement(featureKey: string)`
+
+Fetches the state for a specific boolean entitlement from the cache.
+
+- **Arguments:**
+  - `featureKey: string`: The key of the boolean feature.
+- **Returns:** `AsyncState<BooleanEntitlement | null>`
+
+### `useConfigEntitlement(featureKey: string)`
+
+Fetches the state for a specific configuration entitlement from the cache.
+
+- **Arguments:**
+  - `featureKey: string`: The key of the configuration feature.
+- **Returns:** `AsyncState<ConfigEntitlement | null>` (where `ConfigEntitlement` has a `configuration: number | null` property).
+
+### `useMeteredEntitlement(featureKey: string)`
+
+Fetches the state for a specific metered entitlement from the cache.
+
+- **Arguments:**
+  - `featureKey: string`: The key of the metered feature.
+- **Returns:** `AsyncState<MeteredEntitlement | null>`
+
+**Example using a specific entitlement hook:**
+
+``` tsx
+import { useBooleanEntitlement } from '@kelviq/react-sdk';
+
+function FeatureSpecificComponent({ featureKey }: { featureKey: string }) {
+  const { data: entitlement, isLoading, error } = useBooleanEntitlement(featureKey);
+
+  if (isLoading) return <p>Loading feature {featureKey}...</p>;
+  if (error) return <p>Error loading feature {featureKey}: {error.message}</p>;
+
+  if (entitlement && entitlement.hasAccess) {
+    return <p>You have access to {featureKey}!</p>;
+  } else {
+    return <p>You do not have access to {featureKey}.</p>;
+  }
+}
+
+```
+
+## **6. Conditional Rendering Components**
+
+These components provide a declarative way to render UI based on entitlement status. They internally use the respective hooks.
+
+**Common Props:**
+
+- `featureKey: string`: The unique key of the feature to check.
+- `children: ReactNode | ((data: E) => ReactNode)`:
+  - If a `ReactNode`, it's rendered when the user is entitled and conditions are met.
+  - If a function (render prop), it's called with the entitlement data (`BooleanEntitlement`, `ConfigEntitlement`, or `MeteredEntitlement`) and its return value is rendered.
+- `fallback?: ReactNode`: Content to render if the user is not entitled, or if data is loading (and no `loadingComponent` is provided), or if an error occurs. Defaults to `null`.
+- `loadingComponent?: ReactNode`: Specific content to render while the entitlement data is loading. Overrides `fallback` during loading.
+
+### `ShowWhenBooleanEntitled`
+
+Renders children if the boolean feature is enabled (`hasAccess: true`).
+
+``` tsx
+import { ShowWhenBooleanEntitled } from '@kelviq/react-sdk';
+
+<ShowWhenBooleanEntitled
+  featureKey="enable-dark-mode"
+  loadingComponent={<p>Checking theme settings...</p>}
+  fallback={<p>Dark mode is not available.</p>}
+>
+  <button>Toggle Dark Mode</button>
+</ShowWhenBooleanEntitled>
+
+<ShowWhenBooleanEntitled featureKey="show-advanced-settings">
+  {(entitlementData) => (
+    <div>Advanced settings for {entitlementData.featureKey} are visible!</div>
+  )}
+</ShowWhenBooleanEntitled>
+
+```
+
+### `ShowWhenConfigEntitled`
+
+Renders children if the config feature is enabled and provides the numeric configuration value to the children render prop.
+
+- **Children Prop:** `(config: number) => ReactNode` (Required to be a function for this component).
+
+``` tsx
+import { ShowWhenConfigEntitled } from '@kelviq/react-sdk';
+
+<ShowWhenConfigEntitled
+  featureKey="max-items-per-page"
+  loadingComponent={<p>Loading display settings...</p>}
+  fallback={<p>Default item limit applies.</p>}
+>
+  {(maxItems) => <p>You can display up to {maxItems} items per page.</p>}
+</ShowWhenConfigEntitled>
+
+```
+
+### `ShowWhenMeteredEntitled`
+
+Renders children if the metered feature is enabled and, by default, if `remaining` usage is greater than 0 or unlimited (`limit` is `null`).
+
+- **Optional Prop:**
+  - `condition?: (data: MeteredEntitlement) => boolean`: A custom function to further determine if children should render based on the metered entitlement data.
+- **Children Prop:** Can be `ReactNode` or `(data: MeteredEntitlement) => ReactNode`.
+
+``` tsx
+import { ShowWhenMeteredEntitled } from '@kelviq/react-sdk';
+
+<ShowWhenMeteredEntitled
+  featureKey="api-calls-quota"
+  loadingComponent={<p>Loading API quota...</p>}
+  fallback={<p>API call limit reached or feature not available.</p>}
+>
+  {(meterData) => (
+    <div>
+      <p>API Calls Used: {meterData.used} / {meterData.limit === null ? 'Unlimited' : meterData.limit}</p>
+      <p>Remaining: {meterData.remaining === null ? 'Unlimited' : meterData.remaining}</p>
+    </div>
+  )}
+</ShowWhenMeteredEntitled>
+
+```
+
+## **7. Key Types**
+
+The SDK exports several types for better integration with TypeScript. Some key ones include:
+
+- `KelviqProviderOptions`: Configuration for the provider.
+- `KelviqContextValue`: The shape of the object returned by `useKelviq()`.
+- `AsyncState<T>`: Generic type for asynchronous data states.
+- `EntitlementMap`: The structure of the cached entitlements (`Record<string, AnyEntitlement>`).
+- `Entitlement`, `BooleanEntitlement`, `ConfigEntitlement`, `MeteredEntitlement`: Processed entitlement types.
+- `ApiRequestConfig`, `ApiResponse`: Interfaces related to the underlying `apiRequest` service.
+- `RawEntitlementsApiResponse` and related `Raw...` types: Represent the structure of the direct API response.
+
+You can import these types from `@kelviq/react-sdk/types` (assuming your `src/types/index.ts` re-exports them) or directly from the main SDK entry if configured.
+
+## **8. Error Handling**
+
+- **Provider Level:** The `onError` callback in `KelviqProviderOptions` can be used to globally handle errors that occur during the entitlement fetching process initiated by the provider.
+- **Hook Level:** Each hook (`useAllEntitlements`, `useBooleanEntitlement`, etc.) returns an `AsyncState` object which includes an `error: Error | null` property. You can check this to handle errors specific to that data slice.
+- **Context Level:** `useKelviq()` also returns a global `error: Error | null` state, reflecting errors from the provider's most recent fetch operation.
+
+## **9. Example Usage**
+
+A comprehensive example is provided within the comments of the SDK code, demonstrating provider setup and component usage. The core setup involves:
+
+1. Wrapping your application with `KelviqProvider` and providing the required props (`customerId`, `accessToken`)
+2. Using hooks like `useBooleanEntitlement` or conditional components like `ShowWhenBooleanEntitled` in your components to control UI and behavior based on entitlements.
+
+## **10. API Request Service**
+
+The SDK relies on an `apiRequest` function for making HTTP requests. The SDK's `KelviqProvider` passes configuration like `timeout`, `maxRetries`, `backoffBaseDelay`, and `accessToken` to this function.
+
+- **Your Responsibility:** You need to ensure that your project includes an implementation of this `apiRequest` service (e.g., in `src/services/makeRequest.service.ts`) that matches the `ApiRequestConfig` and `ApiResponse` interfaces used by the SDK. This service should handle actual HTTP communication, including appending query parameters passed via `ApiRequestConfig.queryParams` and using the `accessToken` to set the `Authorization` header.
+- The placeholder `apiRequest` function included in the SDK's source code is for demonstration and type-checking purposes only and will not make real API calls.
+
+## **11. Project Structure (for contributors/reference)**
+
+The SDK source code (`src/`) is organized as follows:
+
+- `components/`: Contains conditional rendering React components.
+  - `ShowWhenBooleanEntitled.tsx`
+  - `ShowWhenConfigEntitled.tsx`
+  - `ShowWhenMeteredEntitled.tsx`
+  - `ShowWhenEntitledInternal.tsx` (Internal helper, not typically exported)
+  - `index.ts` (Exports public components)
+- `context/`: Defines the React Context.
+  - `KelviqContext.ts`
+- `hooks/`: Contains all custom React Hooks.
+  - `useKelviq.ts`
+  - `useAllEntitlements.ts`
+  - `useBooleanEntitlement.ts`
+  - `useConfigEntitlement.ts`
+  - `useMeteredEntitlement.ts`
+  - `index.ts` (Exports all hooks)
+- `provider/`: Contains the main `KelviqProvider`.
+  - `KelviqProvider.tsx`
+- `types/`: Contains all TypeScript definitions.
+  - `api.types.ts` (Raw types from API)
+  - `sdk.types.ts` (Processed types for SDK and public use)
+  - `index.ts` (Re-exports all types)
+- `utils/`: Contains utility functions.
+  - `transformations.ts` (For `transformApiEntitlements`)
+  - `index.ts` (Exports utilities)
+- `index.ts`: The main entry point of the SDK, re-exporting all public APIs (provider, hooks, components, types).
+
+## Using the Sandbox
+
+If you want to use the sandbox, you need to set the `environment` option to `sandbox` in the `KelviqProvider`.
+
+```tsx
+<KelviqProvider 
+  customerId="YOUR_CUSTOMER_ID"
+  accessToken="YOUR_ACCESS_TOKEN"
+  environment="sandbox">
+      {/* Your app components */}
+</KelviqProvider>
+```

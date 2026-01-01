@@ -1,0 +1,723 @@
+---
+title: "Node SDK"
+description: "Documentation for the kelviq Node SDK"
+icon: 'node-js'
+---
+
+
+
+## Overview
+
+The kelviq Node SDK provides a convenient way to interact with the kelviq REST APIs from your Node application.
+
+
+Installation
+Install the kelviq SDK using npm or yarn:
+
+```shell
+npm install @kelviq/node-sdk
+```
+or
+
+```shell
+yarn add @kelviq/node-sdk
+```
+
+
+## Prerequisites
+
+Before you can initialize the client and use the SDK methods, you need a Server API Key.
+
+You can obtain this key from the kelviq application:
+
+    1. Navigate to Settings.
+    2. Go to the [Developers](https://app.kelviq.com/settings/developers) section.
+    3. Copy the Server API Key.
+
+Once copied, add this key to your environment variables or directly in your code (though environment variables are recommended for security).
+
+
+```typescript
+# Example of setting it in your code (ensure you handle this securely)
+ACCESS_TOKEN = "__YOUR_API_KEY__"
+```
+
+
+## Configuring the Client
+
+The SDK provides a main `kelviq` client class. You instantiate it directly with your configuration options.
+
+
+```typescript
+
+const ACCESS_TOKEN: string = "YOUR_SECRET_ACCESS_TOKEN";
+```
+
+
+#### How to Create a Client
+
+
+```typescript
+import { kelviq } from '@kelviq/node-sdk';
+
+const client = new kelviq({ accessToken: ACCESS_TOKEN });
+
+```
+
+
+
+
+
+## Supported Functionalities
+
+The SDK currently supports the following operations:
+
+    1. [Customers](/api-reference/backend-integration/node-sdk#customers)
+
+    2. [Checkout](/api-reference/backend-integration/node-sdk#checkout)
+
+    3. [Entitlements](/api-reference/backend-integration/node-sdk#entitlements)
+
+    4. [Reporting](/api-reference/backend-integration/node-sdk#reporting)
+
+    5. [Subscriptions](/api-reference/backend-integration/node-sdk#subscriptions)
+
+
+Further details on each method, including parameters and return values, should be added under each functionality.
+
+---
+
+## Customers
+
+The `customers` module allows you to manage customer records within kelviq. You can access these operations via the `customers` attribute on an initialized `kelviq` client instance.
+
+---
+
+### Creates a new customer
+
+```typescript
+const newCustomer = await client.customers.create({
+    customerId: "unique-customer-id-789",
+    email: "new.node.customer@example.com",
+    name: "Node SDK User",
+    metadata: { source: "sdk_import", priority: "high" }
+});
+```
+
+<Accordion title="Response">
+```json
+{
+  "id": "a1b2c3d4-e5f6-7890-1234-567890abcdef", // Server-generated UUID
+  "customerId": "unique-customer-id-789",
+  "name": "Node SDK Use",
+  "email": "new.node.customer@example.com",
+  "details": {}, // Or any server-added details
+  "metadata": {
+    "source": "sdk_import",
+    "priority": "high"
+  },
+  "createdOn": "2025-06-04T06:03:30.195790Z",
+  "modifiedOn": "2025-06-04T06:03:30.195831Z"
+}
+```
+</Accordion>
+
+**Required Parameters:**
+
+* `customerId` : A unique identifier for the customer that you define. This ID will be used to reference the customer in subsequent API calls.
+
+**Optional Parameters:**
+
+* `email` : The email address of the customer. Must be a valid email format.
+* `name` : The name of the customer.
+* `metadata` : A dictionary of custom key-value pairs to store additional information about the customer.
+
+
+**Returns:**
+An instance of `CustomerResponse` (Pydantic model), representing the newly created customer record. Key attributes include:
+
+* `id` : The server-generated unique UUID for the customer record.
+* `customerId` : The client-provided customer identifier.
+* `name` : The customer's name.
+* `email` : The customer's email.
+* `details` : Any server-added details about the customer (typically read-only).
+* `metadata` : The metadata associated with the customer.
+* `createdOn` : ISO 8601 timestamp of when the customer was created.
+* `modifiedOn` : ISO 8601 timestamp of when the customer was last modified.
+
+
+### Updates an existing customer
+
+This operation performs a partial update (PATCH), so you only need to provide the fields you want to change.
+
+
+
+```typescript
+const updatedCustomer = await client.customers.update({
+  customerId: "unique-customer-id-789",
+  name: "Node SDK User (Updated)",
+  metadata: { tier: "premium_plus" }
+});
+```
+
+
+
+<Accordion title="Response">
+```json
+{
+  "id": "a1b2c3d4-e5f6-7890-1234-567890abcdef", // Server-generated UUID
+  "customerId": "unique-customer-id-789",
+  "name": "Node SDK User (Updated)",
+  "email": "new.node.customer@example.com",
+  "details": {}, // Or any server-added details
+  "metadata": {
+    "tier": "premium_plus"
+  },
+  "createdOn": "2025-06-04T06:03:30.195790Z",
+  "modifiedOn": "2025-06-04T06:03:30.195831Z"
+
+}
+```
+</Accordion>
+
+
+**Parameters:**
+
+**Required Parameters:**
+
+* `customerId` : A unique identifier for the customer that you define. This ID will be used to reference the customer in subsequent API calls.
+
+**Optional Parameters:**
+
+* `email` : The email address of the customer. Must be a valid email format.
+* `name` : The name of the customer.
+* `metadata` : A dictionary of custom key-value pairs to store additional information about the customer.
+
+
+**Returns:**
+An instance of `CustomerResponse` (Pydantic model), representing the newly created customer record. Key attributes include:
+
+* `id` : The server-generated unique UUID for the customer record.
+* `customerId` : The client-provided customer identifier.
+* `name` : The customer's name.
+* `email` : The customer's email.
+* `details` : Any server-added details about the customer (typically read-only).
+* `metadata` : The metadata associated with the customer.
+* `createdOn` : ISO 8601 timestamp of when the customer was created.
+* `modifiedOn` : ISO 8601 timestamp of when the customer was last modified.
+
+---
+
+
+## Checkout
+
+The checkout module provides functionalities for creating and managing checkout sessions. You can access these operations via the checkout attribute on an initialized kelviq client instance.
+
+This operation creates a new checkout session for a customer, allowing them to proceed with a purchase or subscription.
+
+
+```typescript
+import { kelviq, CHARGE_PERIOD_CHOICES } from '@kelviq/node-sdk';
+
+const response = await client.checkout.createSession({
+  planIdentifier: "plan-pro-monthly",
+  chargePeriod: CHARGE_PERIOD_CHOICES.MONTHLY,
+  successUrl: "https://kelviq.com/checkout/success",
+  customerId: "cust_789",  // Recommended, otherwise it will create a new customer
+});
+
+```
+
+
+<Accordion title="Response">
+
+  ```json
+   {
+        "checkoutUrl": "https://checkout.stripe.com/c/pay/cs_test_b1sNi7D6u9iMCUFV1UZi9ZaiXKdOOmr3DCUW6XdCZIr5Id1F7#fid2cGd2ZndsdXsdjahsdkhsdhc%2FY2RpdmApJ3Zxd2x1YERmZmpwa3EnPydkZmZxWjRLZjV3X0BAckFBYGJKSEInKSdkdWxOYHwnPyd1blpxYHZxWjA0Tj1DSGdWRmwxYkdiMFxGQ29zf2BdTldOTGQzUlNqfWd9U1ZkanNHMlVnczxidEg0fFFqYVJNYzw8XEh2YVA8dkQ1bmA9NW5sS1c2PHE8hH89Q11Uf1E2NTVgY0M1Q0ZmYycpJ2N3amhWYHdzYHcnP3F3cGApJ2lkfGpwc",
+        "checkoutSessionId": "cs_test_b1sNi7D6u9iMCUFV1UZi9ZwerfaiXKdOOmr3DCUW6XdCZIr5Id1F7G",
+    }
+  ```
+</Accordion>
+
+
+**Required Parameters:**
+
+* `planIdentifier` : The identifier of the specific plan the customer is checking out with. planIdentifier is mandatory.
+
+* `successUrl` : The URL to which the user will be redirected after a successful checkout.
+
+* `chargePeriod` :  The billing cycle for the subscription. Must be one of:
+
+        * `"ONE_TIME"`
+
+        * `"MONTHLY"`
+
+        * `"YEARLY"`
+
+        * `"WEEKLY"`
+
+        * `"DAILY"`
+
+        * `"THREE_MONTHS"`
+
+        * `"SIX_MONTHS"`
+
+
+
+**Optional Parameters:**
+
+    * `offeringId` : The ID (uuid) of the offering the customer is checking out with.
+
+    * `pricingTableId` :  The id (uuid) of the pricing table being used for this checkout. (Considered only if `offeringId` is not provided)
+
+    * `ruleId` :  The id (uuid) of the pricing rule being applied. (Considered only if `offeringId` is not provided)
+
+    * `customerId` :  The ID of the customer initiating the checkout. (If not provided, a new customer will be created)
+
+    * `features`: **Required**. A list of dictionaries, where each dictionary represents a feature and its desired quantity. Each dictionary **must** have two keys:
+        * `"identifier"` : The unique identifier for the feature.
+        * `"quantity"`: The desired quantity for this feature.
+            * Example: `[{"identifier": "seats", "quantity": 10}, {"identifier": "api-calls-tier1", "quantity": 5000}]`
+
+    * `ipAddress` : The IP Address of the customer, used for location based pricing.
+
+
+**Returns**:
+
+An instance of CreateCheckoutSessionResponse (Pydantic model), which includes:
+
+    * `checkoutSessionId` : The unique ID for the created checkout session.
+
+    * `checkoutUrl` : The URL that the customer should be redirected to in order to complete the payment and activate the subscription/purchase.
+
+---
+
+
+## Entitlements
+
+The entitlements module allows you to check and retrieve customer entitlements for various features. These operations target a specific edge API endpoint (https://edge.api.kelviq.com by default) and use the GET HTTP method with query parameters.
+
+
+### Checks if a specific customer has access to a particular feature.
+This method directly returns a boolean indicating access status.
+
+
+```typescript
+const hasAccess = await client.entitlements.hasAccess({
+      customerId: "cust_node_ent_123",
+      featureId: "premium-reporting-node"
+    });
+```
+
+<Accordion title="Response">
+
+  ```shell
+   True
+  ```
+</Accordion>
+
+**Required Parameters**:
+
+    * `customerId` : The unique identifier for the customer.
+
+    * `featureId` : The unique identifier for the feature whose access is being checked.
+
+**Returns**:
+
+    * `bool`: True if the customer has access to the specified feature (considering feature type, limits, etc.), False otherwise or if the feature is not found in their entitlements.
+
+
+
+### Retrieves the detailed entitlement information for a specific feature for a given customer.
+
+
+```typescript
+const response = await client.entitlements.getEntitlement({
+    customerId: "cust_node_ent_123",
+    featureId: "premium-reporting-node"
+});
+```
+
+<Accordion title="Response">
+
+  ```json
+   {
+        "customerId": "cust_456",
+        "entitlements": [
+            {
+                "featureId": "advanced-analytics",
+                "featureType": "METER",
+                "hasAccess": true,
+                "resetAt": "2025-05-22 08:27:45",
+                "hardLimit": false,
+                "usageLimit": 3,
+                "currentUsage": 0,
+                "remaining": 3
+            }
+        ]
+   }
+  ```
+</Accordion>
+
+**Required Parameters**:
+
+    * `customerId` : The unique identifier for the customer.
+
+    * `featureId` : The unique identifier for the feature whose access is being checked.
+
+**Returns**:
+
+An instance of CheckEntitlementsResponse (Pydantic model). When querying for a specific featureId, the entitlements list within this response is typically expected to contain a single EntitlementDetail object corresponding to the requested feature if found. The structure includes:
+
+    * `customerId` : The customer's ID.
+
+    * `entitlements` (List[EntitlementDetail]): A list containing the details for the requested feature. Each EntitlementDetail has fields like:
+
+        * `featureId`: str
+
+        * `hasAccess`: bool
+
+        * `featureType`: str
+
+        * `resetAt`: str
+
+        * `hardLimit`: Optional[bool]
+
+        * `usageLimit`: Optional[int]
+
+        * `currentUsage`: Optional[int]
+
+        * `remaining`: Optional[int]
+
+
+### Retrieves all entitlements for a given customer.
+
+```typescript
+const response = await client.entitlements.getAllEntitlements({
+    customerId: "cust_node_ent_123"
+});
+```
+
+<Accordion title="Response">
+
+
+  ```json
+   {
+        "customerId": "cust_456",
+        "entitlements": [
+            {
+                "featureId": "advanced-analytics",
+                "featureType": "METER",
+                "hasAccess": true,
+                "resetAt": "2025-05-22 08:27:45",
+                "hardLimit": false,
+                "usageLimit": 3,
+                "currentUsage": 0,
+                "remaining": 3
+            }
+        ]
+    }
+  ```
+</Accordion>
+
+**Required Parameters**:
+
+    * `customerId` : The unique identifier for the customer.
+
+
+**Returns**:
+
+
+    * `customerId` : The customer's ID.
+
+    * `entitlements` (List[EntitlementDetail]): A list containing the details for the requested feature. Each EntitlementDetail has fields like:
+
+        * `featureId`: str
+
+        * `hasAccess`: bool
+
+        * `featureType`: str
+
+        * `resetAt`: str
+
+        * `hardLimit`: Optional[bool]
+
+        * `usageLimit`: Optional[int]
+
+        * `currentUsage`: Optional[int]
+
+        * `remaining`: Optional[int]
+
+---
+
+
+## Reporting
+
+### Reporting pre-aggregated usages for customer
+
+This endpoint is used for reporting the pre-aggregated feature usage from your application (client-level) to the kelviq application. It allows you to update the usage count for a specific feature associated with a customer.
+
+
+
+```typescript
+import { BEHAVIOUR_CHOICES } from '@kelviq/node-sdk';
+
+const response = await client.reporting.reportUsage({
+    value: 150,
+    customerId: "customer_001",
+    featureId: "seats",
+    behaviour: BEHAVIOUR_CHOICES.SET
+});
+```
+
+
+<Accordion title="Response">
+
+
+  ```json
+   {
+        "value": 150,
+        "customerId": "customer_001",
+        "featureId": "seats",
+        "behaviour": "SET",
+        "orgId": "1",
+        "eventName": "aggregated.usage",
+        "idempotencyKey": "597ee95063c744ed9bcc9b1cf5676a8a",
+        "timestamp": "2025-05-22 08:27:45.430732"
+    }
+  ```
+</Accordion>
+
+
+**Required Parameters**:
+
+    * `value`: The usage value being reported.
+
+    * `customerId` : The unique identifier for the customer associated with this usage.
+
+    * `featureId` : The unique identifier for the feature for which usage is being reported.
+
+    * `behaviour` parameter dictates how the usage is updated:
+
+        * `SET`: This will replace the current usage value for the feature with the new `value` provided.
+
+        * `DELTA`: This will increment the existing usage value for the feature by the amount specified in the `value` parameter
+
+
+**Returns**:
+
+An instance of ReportUsageResponse (Pydantic model), which includes:
+
+    * `value`: The usage value that was recorded.
+
+    * `customerId` : The customer ID associated with the usage.
+
+    * `featureId` : The feature Identifier for which usage was recorded.
+
+    * `behaviour` : The behaviour type ("SET" or "DELTA") that was processed.
+
+    * `orgId` : The organization ID associated with this record, as determined by the server.
+
+    * `eventName` : An internal event name generated by the server for this usage report (e.g., "aggregated.usage").
+
+    * `idempotencyKey` : A unique idempotency key generated by the server for this specific usage report instance.
+
+    * `timestamp` : The server-generated UTC timestamp (str format) indicating when the usage report was processed.
+
+
+{/* ### Reporting raw events for customer */}
+
+{/* Raw events are primarily used for metered billing scenarios, particularly when a customer is subscribed to a plan with usage-based billing (often referred to as "pay as you go"). Each event reported can contribute to the billable usage for that customer. */}
+
+
+{/* ```typescript */}
+{/* import { v4 as uuidv4 } from 'uuid'; */}
+{/* const timestampStr = new Date().toISOString().replace('T', ' ').replace('Z', '').padEnd(26, '0').slice(0, 26); */}
+
+{/* const response = await client.reporting.reportEvent({ */}
+{/*     customerId: "customer_node_002", */}
+{/*     eventName: "api_call_node", */}
+{/*     idempotencyKey: uuidv4(), */}
+{/*     timestamp: timestampStr, */}
+{/*     properties: { */}
+{/*         "featureId": "api-usage", */}
+{/*         "value": 2 */}
+{/*     } */}
+{/* }); */}
+
+{/* ``` */}
+
+{/* <Accordion title="Response"> */}
+
+
+{/*   ```json */}
+{/*    { */}
+{/*         "customerId": "customer_002", */}
+{/*         "eventName": "api_invoked", */}
+{/*         "idempotencyKey": "45f05c737a0b44d482c6042816d5645d", */}
+{/*         "timestamp": "2025-05-22 07:53:55.747959", */}
+{/*         "properties": { */}
+{/*             "featureId": "api-usage", */}
+{/*             "value": 2 */}
+{/*         }, */}
+{/*         "orgId": "1" */}
+{/*     } */}
+{/*   ``` */}
+{/* </Accordion> */}
+
+
+{/* **Required Parameters**: */}
+
+{/*     * `customerId` : The unique identifier for the customer who performed the event. */}
+
+{/*     * `eventName` : The name of the event (e.g., "user_login", "item_purchased", "feature_activated"). */}
+
+{/*     * `idempotencyKey` : A unique client-generated key to ensure that the event is processed at most once, even if the request is retried. A UUID is a good choice. */}
+
+{/*     * `timestamp` : The UTC timestamp indicating when the event occurred. This must be a str formatted as "%Y-%m-%d %H:%M:%S.%f" (e.g., "2025-05-23 10:30:00.123456"). */}
+
+{/*     * `properties` : A dictionary of additional custom properties associated with the event. Values can be strs, numbers, booleans. */}
+
+{/* **Returns**: */}
+
+{/* An instance of ReportEventResponse (Pydantic model), which includes: */}
+
+{/*     * `customerId` : The customer ID associated with the event. */}
+
+{/*     * `eventName` : The name of the event that was recorded. */}
+
+{/*     * `idempotencyKey` : The idempotency key that was used for the request. */}
+
+{/*     * `timestamp` : The timestamp (str format) that was recorded for the event. */}
+
+{/*     * `properties` : The custom properties associated with the event, if provided and returned by the server. */}
+
+{/*     * `orgId` : The organization ID associated with this record, as determined by the server. */}
+
+{/* --- */}
+
+
+## Subscriptions
+
+The subscriptions module allows you to manage customer subscriptions, including updates and cancellation. You can access these operations via the `subscriptions` attribute on an initialized kelviq client instance.
+
+
+### Updates an existing subscription to a new plan
+
+
+
+```typescript
+import { CHARGE_PERIOD_CHOICES } from '@kelviq/node-sdk';
+
+try:
+    const response = await client.subscription.update({
+      subscriptionId: "sub_node_78058918",
+      planIdentifier: "premium-plan-node",
+      chargePeriod: CHARGE_PERIOD_CHOICES.MONTHLY
+    });
+except Exception as e:
+    print(f"Error updating subscription: {e}")
+```
+
+
+<Accordion title="Response">
+
+  ```json
+   {
+      "subscriptionId": "dffaf07e-4517-47db-ba3a-59a05aa2d465"
+   }
+  ```
+</Accordion>
+
+**Required Parameters**:
+
+* `subscriptionId` :  The unique identifier of the subscription to be updated.
+* `planIdentifier` :  The identifier of the new plan.
+* `chargePeriod` :  The new charging period for the subscription. Must be one of:
+    * `"ONE_TIME"`
+    * `"MONTHLY"`
+    * `"YEARLY"`
+    * `"WEEKLY"`
+    * `"DAILY"`
+    * `"THREE_MONTHS"`
+    * `"SIX_MONTHS"`
+
+**Optional Parameters:**
+
+* `offeringId` :  The ID of the new offering, if applicable.
+* `pricingTableId` :  The ID of the new pricing table, if applicable.
+* `ruleId` :  The ID of the new pricing rule, if applicable.
+* `ipAddress` : The IP Address of the customer, used for location based pricing.
+* `features`:  A array of objects, where each dictionary represents a feature and its desired quantity to update for the subscription. Each dictionary **must** have two keys:
+    * `"identifier"` : The unique identifier for the feature.
+    * `"quantity"` : The desired quantity for this feature.
+        * Example: `[{'identifier': 'seats', 'quantity': 10}, {'identifier': 'projects', 'quantity': 5}]`
+
+**Returns**:
+
+An instance of `UpdateSubscriptionResponse`, which includes:
+
+* `subscriptionId` (str): UUID of the updated subscription.
+
+
+### Cancel an active subscription for a customer.
+
+
+```typescript
+import { CANCELLATION_TYPES } from '@kelviq/node-sdk';
+
+const response = await client.subscription.cancel({
+    subscriptionId: "sub_node_78058918",
+    cancellationType: CANCELLATION_TYPES.CURRENT_PERIOD_ENDS
+    // cancellationDate: "2025-12-31" // Required if cancellationType is SPECIFIC_DATE
+});
+```
+
+
+<Accordion title="Response">
+
+  ```json
+   {
+      "message": "Subscription cancellation processed successfully."
+   }
+  ```
+</Accordion>
+
+**Required Parameters**:
+
+* `subscriptionId` : The unique identifier of the subscription to be cancelled.
+
+* `cancellationType` : The type of cancellation to perform. Must be one of:
+
+    * `"IMMEDIATE"`: The subscription is cancelled immediately.
+    * `"CURRENT_PERIOD_ENDS"`: The subscription will remain active until the end of the current billing period and then cancel.
+    * `"SPECIFIC_DATE"`: The subscription will be cancelled on the specified `cancellationDate`.
+
+* `cancellationDate` : The specific date for cancellation if `cancellationType` is `"SPECIFIC_DATE"`. Must be in `YYYY-MM-DD` format. This parameter is **required** if `cancellationType` is `"SPECIFIC_DATE"`.
+
+**Returns**:
+
+An instance of `CancelSubscriptionResponse`, which includes:
+
+* `message` : A confirmation message indicating the result of the cancellation request.
+
+
+---
+## Using the Sandbox Environment
+
+For testing and development, you can configure the client to use the sandbox environment. This ensures that no production data is affected. To do this, set the environment option to 'sandbox' during client initialization.
+
+
+```typescript
+import { kelviq } from '@kelviq/node-sdk';
+
+const client = new kelviq({
+  accessToken: 'YOUR_SANDBOX_ACCESS_TOKEN',
+  environment: 'sandbox'
+});
+
+```
+
+<Info>
+The sandbox environment is completely separate from production. You will need to use a different set of API keys, and any data created (customers, subscriptions, etc.) will only exist in the sandbox.
+</Info>
