@@ -1037,6 +1037,12 @@
       }
     },
     "/entitlements/": {
+      "servers": [
+        {
+          "url": "https://edge.api.kelviq.com",
+          "description": "Edge API for Entitlements"
+        }
+      ],
       "get": {
         "tags": [
           "Entitlements"
@@ -1044,12 +1050,7 @@
         "summary": "Retrieve customer entitlements",
         "description": "Retrieves detailed entitlement information for a customer.\n- If `featureId` is provided as a query parameter, returns details for that specific feature.\n- If `featureId` is omitted, returns all entitlements for the customer.\n",
         "operationId": "getCustomerEntitlements",
-        "servers": [
-          {
-            "url": "https://edge.api.kelviq.com",
-            "description": "Edge API for Entitlements"
-          }
-        ],
+
         "parameters": [
           {
             "name": "customerId",

@@ -1,17 +1,17 @@
 ---
 title: "Python SDK"
-description: "Documentation for the kelviq Python SDK"
+description: "Documentation for the Kelviq Python SDK"
 icon: 'python'
 ---
 
 ## Overview
 
-The kelviq Python SDK provides a convenient way to interact with the kelviq REST APIs from your Python application. The SDK supports both synchronous and asynchronous operations.
+The Kelviq Python SDK provides a convenient way to interact with the Kelviq REST APIs from your Python application. The SDK supports both synchronous and asynchronous operations.
 
 
 ## Installation
 
-To install the kelviq SDK in your environment, run the following command:
+To install the Kelviq SDK in your environment, run the following command:
 
 ```shell
 pip install kelviq-sdk
@@ -21,7 +21,7 @@ pip install kelviq-sdk
 
 Before you can initialize the client and use the SDK methods, you need a Server API Key.
 
-You can obtain this key from the kelviq application:
+You can obtain this key from the Kelviq application:
 
     1. Navigate to Settings.
     2. Go to the [Developers](https://app.kelviq.com/settings/developers) section.
@@ -37,7 +37,7 @@ ACCESS_TOKEN = "__YOUR_API_KEY__"
 
 ## Configuring the Client
 
-The SDK supports both synchronous and asynchronous clients. The primary difference lies in how you create the client instance. Once created, both client types can invoke the same methods to communicate with the kelviq application.
+The SDK supports both synchronous and asynchronous clients. The primary difference lies in how you create the client instance. Once created, both client types can invoke the same methods to communicate with the Kelviq application.
 
 
 #### How to Create a Synchronous Client
@@ -45,9 +45,9 @@ The SDK supports both synchronous and asynchronous clients. The primary differen
 Use the synchronous client for traditional, blocking I/O operations.
 
 ```python
-from kelviq_sdk import kelviq
+from kelviq_sdk import Kelviq
 
-client = kelviq.create_sync_client(access_token=ACCESS_TOKEN)
+client = Kelviq.create_sync_client(access_token=ACCESS_TOKEN)
 ```
 
 #### How to Create an Asynchronous Client
@@ -55,9 +55,9 @@ Use the asynchronous client for non-blocking I/O operations, suitable for applic
 
 
 ```python
-from kelviq_sdk import kelviq
+from kelviq_sdk import Kelviq
 
-async_client = kelviq.create_async_client(access_token=ACCESS_TOKEN)
+async_client = Kelviq.create_async_client(access_token=ACCESS_TOKEN)
 ```
 
 
@@ -83,9 +83,9 @@ Further details on each method, including parameters and return values, should b
 
 ## Customers
 
-The `customers` module allows you to manage customer records within kelviq. You can access these operations via the `customers` attribute on an initialized `kelviq` client instance.
+The `customers` module allows you to manage customer records within Kelviq. You can access these operations via the `customers` attribute on an initialized `Kelviq` client instance.
 
-All methods are available in both synchronous and asynchronous versions, depending on how the `kelviq` client was instantiated.
+All methods are available in both synchronous and asynchronous versions, depending on how the `Kelviq` client was instantiated.
 
 ---
 
@@ -230,7 +230,7 @@ An instance of `CustomerResponse` (Pydantic model), representing the newly creat
 
 ## Checkout
 
-The checkout module provides functionalities for creating and managing checkout sessions. You can access these operations via the checkout attribute on an initialized kelviq client instance.
+The checkout module provides functionalities for creating and managing checkout sessions. You can access these operations via the checkout attribute on an initialized Kelviq client instance.
 
 `create_session(...)`
 This operation creates a new checkout session for a customer, allowing them to proceed with a purchase or subscription.
@@ -521,13 +521,13 @@ all_entitlements_response = await async_client.entitlements.get_all_entitlements
 
 ### Reporting pre-aggregated usages for customer
 
-This endpoint is used for reporting the pre-aggregated feature usage from your application (client-level) to the kelviq application. It allows you to update the usage count for a specific feature associated with a customer.
+This endpoint is used for reporting the pre-aggregated feature usage from your application (client-level) to the Kelviq application. It allows you to update the usage count for a specific feature associated with a customer.
 
 
 **Synchronous**:
 
 ```python
-# Assuming 'client' is your synchronous kelviq client
+# Assuming 'client' is your synchronous Kelviq client
 response = client.reporting.report_usage(
     value=150,
     customerId="customer_001",
@@ -539,7 +539,7 @@ response = client.reporting.report_usage(
 **Asynchronous**:
 
 ```python
-# Assuming 'async_client' is your asynchronous kelviq client
+# Assuming 'async_client' is your asynchronous Kelviq client
 response = await async_client.reporting.report_usage(
     value=75,
     customerId="customer_001",
@@ -611,7 +611,7 @@ An instance of ReportUsageResponse (Pydantic model), which includes:
 {/* ```python */}
 {/* import uuid */}
 
-{/* # Assuming 'client' is your synchronous kelviq client */}
+{/* # Assuming 'client' is your synchronous Kelviq client */}
 {/* response = client.reporting.report_event( */}
 {/*     customerId="customer_002", */}
 {/*     eventName="api_invoked", */}
@@ -627,7 +627,7 @@ An instance of ReportUsageResponse (Pydantic model), which includes:
 {/* ```python */}
 {/* import uuid */}
 
-{/* # Assuming 'async_client' is your asynchronous kelviq client */}
+{/* # Assuming 'async_client' is your asynchronous Kelviq client */}
 {/* response = await async_client.reporting.report_event( */}
 {/*     customerId="customer_002", */}
 {/*     eventName="api_invoked", */}
@@ -688,7 +688,7 @@ An instance of ReportUsageResponse (Pydantic model), which includes:
 
 ## Subscriptions
 
-The subscriptions module allows you to manage customer subscriptions, including updates and cancellation. You can access these operations via the `subscriptions` attribute on an initialized kelviq client instance.
+The subscriptions module allows you to manage customer subscriptions, including updates and cancellation. You can access these operations via the `subscriptions` attribute on an initialized Kelviq client instance.
 
 
 ### Updates an existing subscription to a new plan
@@ -697,7 +697,7 @@ The subscriptions module allows you to manage customer subscriptions, including 
 **Synchronous**:
 
 ```python
-# Assuming 'client' is your synchronous kelviq client
+# Assuming 'client' is your synchronous Kelviq client
 try:
     response = client.subscriptions.update(
         subscriptionId="78058918-9746-4280-9b9b-1bd5115eec6e",
@@ -713,7 +713,7 @@ except Exception as e:
 **Asynchronous**:
 
 ```python
-# Assuming 'async_client' is your asynchronous kelviq client
+# Assuming 'async_client' is your asynchronous Kelviq client
 try:
     response = await async_client.subscriptions.update(
         subscriptionId="78058918-9746-4280-9b9b-1bd5115eec6e",
@@ -776,7 +776,7 @@ An instance of `UpdateSubscriptionResponse`, which includes:
 **Synchronous**:
 
 ```python
-# Assuming 'client' is your synchronous kelviq client
+# Assuming 'client' is your synchronous Kelviq client
 try:
     response = client.subscriptions.cancel(
         subscriptionId="78058918-9746-4280-9b9b-1bd5115eec6e",
@@ -792,7 +792,7 @@ except Exception as e:
 **Asynchronous**:
 
 ```python
-# Assuming 'async_client' is your asynchronous kelviq client
+# Assuming 'async_client' is your asynchronous Kelviq client
 try:
     response = await async_client.subscriptions.cancel(
         subscriptionId="78058918-9746-4280-9b9b-1bd5115eec6e",
@@ -835,17 +835,17 @@ An instance of `CancelSubscriptionResponse`, which includes:
 ---
 ## Using the Sandbox Environment
 
-The SDK can connect to the kelviq sandbox environment, which is perfect for **testing and development**. All operations performed in the sandbox are isolated and will not affect your live production data.
+The SDK can connect to the Kelviq sandbox environment, which is perfect for **testing and development**. All operations performed in the sandbox are isolated and will not affect your live production data.
 
 To use the sandbox, simply pass the argument `environment="sandbox"` when creating the client.
 
 ### How to Create a Synchronous Client (Sandbox)
 
 ```python
-from kelviq_sdk import kelviq
+from kelviq_sdk import Kelviq
 
 # Note the 'environment' parameter
-client = kelviq.create_sync_client(
+client = Kelviq.create_sync_client(
     access_token=ACCESS_TOKEN,
     environment="sandbox"
 )

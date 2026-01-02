@@ -1,6 +1,6 @@
 ---
 title: "Node SDK"
-description: "Documentation for the kelviq Node SDK"
+description: "Documentation for the Kelviq Node SDK"
 icon: 'node-js'
 ---
 
@@ -8,11 +8,11 @@ icon: 'node-js'
 
 ## Overview
 
-The kelviq Node SDK provides a convenient way to interact with the kelviq REST APIs from your Node application.
+The Kelviq Node SDK provides a convenient way to interact with the Kelviq REST APIs from your Node application.
 
 
 Installation
-Install the kelviq SDK using npm or yarn:
+Install the Kelviq SDK using npm or yarn:
 
 ```shell
 npm install @kelviq/node-sdk
@@ -28,7 +28,7 @@ yarn add @kelviq/node-sdk
 
 Before you can initialize the client and use the SDK methods, you need a Server API Key.
 
-You can obtain this key from the kelviq application:
+You can obtain this key from the Kelviq application:
 
     1. Navigate to Settings.
     2. Go to the [Developers](https://app.kelviq.com/settings/developers) section.
@@ -45,7 +45,7 @@ ACCESS_TOKEN = "__YOUR_API_KEY__"
 
 ## Configuring the Client
 
-The SDK provides a main `kelviq` client class. You instantiate it directly with your configuration options.
+The SDK provides a main `Kelviq` client class. You instantiate it directly with your configuration options.
 
 
 ```typescript
@@ -58,9 +58,9 @@ const ACCESS_TOKEN: string = "YOUR_SECRET_ACCESS_TOKEN";
 
 
 ```typescript
-import { kelviq } from '@kelviq/node-sdk';
+import { Kelviq } from '@kelviq/node-sdk';
 
-const client = new kelviq({ accessToken: ACCESS_TOKEN });
+const client = new Kelviq({ accessToken: ACCESS_TOKEN });
 
 ```
 
@@ -89,7 +89,7 @@ Further details on each method, including parameters and return values, should b
 
 ## Customers
 
-The `customers` module allows you to manage customer records within kelviq. You can access these operations via the `customers` attribute on an initialized `kelviq` client instance.
+The `customers` module allows you to manage customer records within Kelviq. You can access these operations via the `customers` attribute on an initialized `Kelviq` client instance.
 
 ---
 
@@ -211,13 +211,13 @@ An instance of `CustomerResponse` (Pydantic model), representing the newly creat
 
 ## Checkout
 
-The checkout module provides functionalities for creating and managing checkout sessions. You can access these operations via the checkout attribute on an initialized kelviq client instance.
+The checkout module provides functionalities for creating and managing checkout sessions. You can access these operations via the checkout attribute on an initialized Kelviq client instance.
 
 This operation creates a new checkout session for a customer, allowing them to proceed with a purchase or subscription.
 
 
 ```typescript
-import { kelviq, CHARGE_PERIOD_CHOICES } from '@kelviq/node-sdk';
+import { Kelviq, CHARGE_PERIOD_CHOICES } from '@kelviq/node-sdk';
 
 const response = await client.checkout.createSession({
   planIdentifier: "plan-pro-monthly",
@@ -455,7 +455,7 @@ const response = await client.entitlements.getAllEntitlements({
 
 ### Reporting pre-aggregated usages for customer
 
-This endpoint is used for reporting the pre-aggregated feature usage from your application (client-level) to the kelviq application. It allows you to update the usage count for a specific feature associated with a customer.
+This endpoint is used for reporting the pre-aggregated feature usage from your application (client-level) to the Kelviq application. It allows you to update the usage count for a specific feature associated with a customer.
 
 
 
@@ -599,7 +599,7 @@ An instance of ReportUsageResponse (Pydantic model), which includes:
 
 ## Subscriptions
 
-The subscriptions module allows you to manage customer subscriptions, including updates and cancellation. You can access these operations via the `subscriptions` attribute on an initialized kelviq client instance.
+The subscriptions module allows you to manage customer subscriptions, including updates and cancellation. You can access these operations via the `subscriptions` attribute on an initialized Kelviq client instance.
 
 
 ### Updates an existing subscription to a new plan
@@ -709,9 +709,9 @@ For testing and development, you can configure the client to use the sandbox env
 
 
 ```typescript
-import { kelviq } from '@kelviq/node-sdk';
+import { Kelviq } from '@kelviq/node-sdk';
 
-const client = new kelviq({
+const client = new Kelviq({
   accessToken: 'YOUR_SANDBOX_ACCESS_TOKEN',
   environment: 'sandbox'
 });
