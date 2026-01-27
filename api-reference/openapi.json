@@ -359,18 +359,81 @@
     }
   },
       "LicenseActivationResponse": {
+    "type": "object",
+    "properties": {
+      "instanceId": { "type": "string", "format": "uuid" },
+      "activatedAt": { "type": "string", "format": "date-time" },
+      "expiresOn": { "type": "string", "format": "date-time", "nullable": true },
+      "license": { "$ref": "#/components/schemas/LicenseDetails" }
+    },
+    "example": {
+      "instanceId": "8f3e2b1a-5c6d-4e9f-8a0b-1c2d3e4f5g6h",
+      "activatedAt": "2026-01-27T10:33:00Z",
+      "expiresOn": "2027-01-27T10:33:00Z",
+      "license": {
+        "id": "7be7a5b6-7a0e-4178-a085-8ef48f0649ab",
+        "licenseKey": "LIC-A8D5F89E-B46B-472C-9BED-66EE2545B85E",
+        "activatedOn": "2026-01-22T03:26:56.836323Z",
+        "expiresOn": "2026-01-23T03:26:56.836323Z",
+        "currentActivationCount": 0,
+        "customer": {
+          "customerId": "cfa95cf8c8d24e8b9d3d2d1ada98a94d",
+          "name": "Geo",
+          "email": "hazelmathew7+100@gmail.com"
+        }
+      }
+    }
+  },
+      "LicenseDetails": {
+    "type": "object",
+    "properties": {
+      "id": { "type": "string", "format": "uuid" },
+      "licenseKey": { "type": "string" },
+      "activatedOn": { "type": "string", "format": "date-time", "nullable": true },
+      "expiresOn": { "type": "string", "format": "date-time", "nullable": true },
+      "currentActivationCount": { "type": "integer" },
+      "customer": {
         "type": "object",
         "properties": {
-          "instanceId": { "type": "string", "format": "uuid" },
-          "activatedAt": { "type": "string", "format": "date-time" },
-          "expiresOn": { "type": "string", "format": "date-time", "nullable": true }
-        },
-        "example": {
-          "instanceId": "8f3e2b1a-5c6d-4e9f-8a0b-1c2d3e4f5g6h",
-          "activatedAt": "2026-01-27T10:33:00Z",
-          "expiresOn": "2027-01-27T10:33:00Z"
+          "customerId": { "type": "string" },
+          "name": { "type": "string" },
+          "email": { "type": "string", "format": "email" }
         }
       },
+      "plan": {
+        "type": "object",
+        "properties": {
+          "identifier": { "type": "string" },
+          "name": { "type": "string" },
+          "description": { "type": "string" },
+          "product": {
+            "type": "object",
+            "properties": {
+              "id": { "type": "string", "format": "uuid" },
+              "identifier": { "type": "string" },
+              "name": { "type": "string" },
+              "taxCode": { "type": "string" },
+              "createdOn": { "type": "string", "format": "date-time" },
+              "modifiedOn": { "type": "string", "format": "date-time" }
+            }
+          },
+          "version": { "type": "integer" },
+          "isLatest": { "type": "boolean" },
+          "license": {
+            "type": "object",
+            "properties": {
+              "enabled": { "type": "boolean" },
+              "hasExpiry": { "type": "boolean" },
+              "durationUnit": { "type": "string" },
+              "durationValue": { "type": "integer" },
+              "activationLimit": { "type": "integer" },
+              "activationLimitEnabled": { "type": "boolean" }
+            }
+          }
+        }
+      }
+    }
+  },
       "LicenseDeactivation": {
         "type": "object",
         "properties": {
@@ -1210,40 +1273,64 @@
       }
     },
     "/license/activate/": {
-    "post": {
-      "operationId": "licenseActivate",
-      "tags": ["License"],
-      "summary": "Activate License",
-      "requestBody": {
-        "required": true,
-        "content": {
-          "application/json": {
-            "schema": { "$ref": "#/components/schemas/LicenseActivation" },
-            "example": {
-              "licenseKey": "KLVQ-PRO-1234-ABCD-9999",
-              "customerId": "cust_45678",
-              "instanceName": "Geo's MacBook Pro"
-            }
-          }
-        }
-      },
-      "responses": {
-        "200": {
-          "description": "Activation successful",
+      "post": {
+        "operationId": "licenseActivate",
+        "tags": ["License"],
+        "summary": "Activate License",
+        "description": "Authenticate using your Client API Key as a Bearer token.",
+        "requestBody": {
+          "required": true,
           "content": {
             "application/json": {
-              "schema": { "$ref": "#/components/schemas/LicenseActivationResponse" },
+              "schema": { "$ref": "#/components/schemas/LicenseActivation" },
               "example": {
-                "instanceId": "8f3e2b1a-5c6d-4e9f-8a0b-1c2d3e4f5g6h",
-                "activatedAt": "2026-01-27T10:33:00Z",
-                "expiresOn": "2027-01-27T10:33:00Z"
+                "licenseKey": "LIC-A8D5F89E-B46B-472C-9BED-66EE2545B85E",
+                "customerId": "cfa95cf8c8d24e8b9d3d2d1ada98a94d",
+                "instanceName": "Geo's Workstation",
+                "metadata": { "os": "macOS", "version": "14.2" }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Activation successful",
+            "content": {
+              "application/json": {
+                "schema": { "$ref": "#/components/schemas/LicenseActivationResponse" },
+                "example": {
+                  "instanceId": "8f3e2b1a-5c6d-4e9f-8a0b-1c2d3e4f5g6h",
+                  "activatedAt": "2026-01-27T10:33:00Z",
+                  "expiresOn": "2026-01-28T10:33:00Z",
+                  "license": {
+                    "id": "7be7a5b6-7a0e-4178-a085-8ef48f0649ab",
+                    "licenseKey": "LIC-A8D5F89E-B46B-472C-9BED-66EE2545B85E",
+                    "activatedOn": "2026-01-22T03:26:56Z",
+                    "expiresOn": "2026-01-23T03:26:56Z",
+                    "currentActivationCount": 1,
+                    "customer": {
+                      "customerId": "cfa95cf8c8d24e8b9d3d2d1ada98a94d",
+                      "name": "Geo",
+                      "email": "geo@kelviq.com"
+                    },
+                    "plan": {
+                      "identifier": "pro-yearly",
+                      "name": "Pro Yearly",
+                      "product": {
+                        "id": "d970ab2d-834f-4c52-8742-2e6ed7e8a31f",
+                        "identifier": "kelviq-engine",
+                        "name": "Kelviq Engine",
+                        "taxCode": "software"
+                      }
+                    }
+                  }
+                }
               }
             }
           }
         }
       }
-    }
-  },
+    },
     "/license/deactivate/": {
     "post": {
       "operationId": "licenseDeactivate",
