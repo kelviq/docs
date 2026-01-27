@@ -1,0 +1,332 @@
+---
+title: 'License Key Management'
+description: 'Generate and manage license keys for your products'
+---
+
+License keys are a powerful way to authenticate and authorize usage of your software products. Kelviq can automatically generate unique license keys for each customer purchase, including activation limits and expiration dates.
+
+## Overview
+
+When you enable license key generation for a plan, Kelviq will:
+- Generate a unique license key for each customer purchase
+- Enforce activation limits (number of devices/installations)
+- Track activation timestamps
+- Handle automatic expiration
+- Provide easy revocation on refunds
+
+License keys work great for:
+- Desktop software licensing
+- SaaS seat-based access
+- Enterprise software deployments
+- Multi-device software licenses
+
+## Enabling License Keys for a Plan
+
+License keys are configured at the plan level. Each plan can have different license settings.
+
+### Steps to Enable
+
+1. **Go to your plan** → Open the plan you want to add licensing to
+2. **Find the "License" tab** → Scroll to the License section
+3. **Toggle "Generate License Keys"** → Enable the feature
+4. **Configure settings** (see below)
+5. **Save plan**
+
+### License Configuration Options
+
+<Card title="Activation Limit" icon="lock">
+  Controls the maximum number of times a license can be activated.
+  - **Minimum:** 1 (license can only be used on one device)
+  - **Default:** No limit
+  - Enable the toggle to enforce a specific activation limit
+</Card>
+
+<Card title="Duration & Expiry" icon="hourglass">
+  Controls when a license expires.
+  - **Duration Value:** A number (1, 5, 30, etc.)
+  - **Duration Unit:** Day, Week, Month, or Year
+  - **Example:** 1 Year = license expires after 12 months of activation
+  - Disable to allow perpetual (non-expiring) licenses
+</Card>
+
+## License Configuration Examples
+
+### Example 1: Perpetual License
+
+Use case: Customers buy "lifetime" access to your software
+
+```
+Activation Limit: Enabled - 2
+Expiry: Disabled (no expiration)
+```
+
+Result: License can be activated on 2 devices and never expires.
+
+### Example 2: Annual Subscription License
+
+Use case: Customers subscribe and get annual access
+
+```
+Activation Limit: Disabled (unlimited activations)
+Duration: 1 Year
+```
+
+Result: License can be activated on unlimited devices but expires after 1 year.
+
+### Example 3: Single-Device License
+
+Use case: Customers buy a license for a single computer
+
+```
+Activation Limit: Enabled - 1
+Duration: Disabled (no expiration)
+```
+
+Result: License can only be activated once and never expires.
+
+### Example 4: Team License
+
+Use case: Team of 5 people get access to your software
+
+```
+Activation Limit: Enabled - 5
+Duration: 1 Year
+```
+
+Result: License can be activated on 5 devices and expires after 1 year.
+
+## How Licenses Are Generated
+
+### Purchase Flow
+
+1. **Customer purchases** → Completes checkout for a plan with licensing enabled
+2. **License generated** → Kelviq automatically creates a unique license key
+3. **Customer notified** → License key sent via email and available in order details
+4. **Customer activates** → Customer uses the license key to activate your software
+
+### License Key Format
+
+License keys are generated as unique identifiers with the format:
+```
+XXXX-XXXX-XXXX-XXXX
+```
+
+Example:
+```
+A7F2-9K4L-5M8N-2P9Q
+```
+
+Each license key is unique per order. Customers cannot reuse the same key across multiple orders.
+
+## Accessing License Keys
+
+### For Customers
+
+Customers can view their license keys in the Kelviq dashboard:
+
+1. **Order details** → Click on their purchase order
+2. **License section** → View the license key with copy button
+3. **Current activations** → See how many devices the license is activated on
+
+### Via API
+
+Retrieve license information programmatically:
+
+<Tabs>
+  <Tab title="Python">
+    ```python
+    from kelviq_sdk import KelviqClient
+
+    client = KelviqClient(api_key="your_server_key")
+
+    # Get order details with license info
+    order = client.orders.get(order_id="ord_123")
+
+    if order.license:
+        print(f"License Key: {order.license['license_key']}")
+        print(f"Activated on: {order.license['activated_on']}")
+        print(f"Expires on: {order.license['expires_on']}")
+        print(f"Current activations: {order.license['current_activation_count']}")
+    ```
+  </Tab>
+  <Tab title="Node.js">
+    ```javascript
+    const { KelviqClient } = require('kelviq-sdk');
+
+    const client = new KelviqClient({ apiKey: 'your_server_key' });
+
+    const order = await client.orders.get('ord_123');
+
+    if (order.license) {
+      console.log(`License Key: ${order.license.license_key}`);
+      console.log(`Activated: ${order.license.current_activation_count} times`);
+      console.log(`Expires: ${order.license.expires_on}`);
+    }
+    ```
+  </Tab>
+</Tabs>
+
+## License Validation in Your Software
+
+To use license keys, you'll need to validate them in your application. Kelviq provides SDKs for this purpose.
+
+### Validate License on Startup
+
+<Tabs>
+  <Tab title="Python">
+    ```python
+    from kelviq_sdk import KelviqClient
+
+    client = KelviqClient(api_key="your_server_key")
+
+    def validate_license(license_key):
+        try:
+            # Validate and get license details
+            license_data = client.licenses.validate(license_key)
+
+            if license_data['status'] == 'active':
+                print("License is valid!")
+                return True
+            else:
+                print(f"License is {license_data['status']}")
+                return False
+
+        except Exception as e:
+            print(f"License validation failed: {e}")
+            return False
+
+    # In your app startup
+    if validate_license("A7F2-9K4L-5M8N-2P9Q"):
+        # License valid, allow app to run
+        run_application()
+    else:
+        # License invalid, show error
+        show_license_error()
+    ```
+  </Tab>
+  <Tab title="Node.js">
+    ```javascript
+    const { KelviqClient } = require('kelviq-sdk');
+
+    const client = new KelviqClient({ apiKey: 'your_server_key' });
+
+    async function validateLicense(licenseKey) {
+      try {
+        const licenseData = await client.licenses.validate(licenseKey);
+
+        if (licenseData.status === 'active') {
+          console.log('License is valid!');
+          return true;
+        } else {
+          console.log(`License is ${licenseData.status}`);
+          return false;
+        }
+      } catch (error) {
+        console.error('License validation failed:', error);
+        return false;
+      }
+    }
+
+    // In your app startup
+    const isValid = await validateLicense('A7F2-9K4L-5M8N-2P9Q');
+    if (isValid) {
+      runApplication();
+    } else {
+      showLicenseError();
+    }
+    ```
+  </Tab>
+</Tabs>
+
+## License Lifecycle
+
+### States
+
+**Active**
+- License is valid and can be used
+- Activation count is below limit (if enforced)
+- Expiration date is in the future (if set)
+
+**Expired**
+- License duration has passed
+- Cannot be activated or used
+
+**Revoked**
+- License was revoked due to refund or cancellation
+- Cannot be used
+
+**Deactivated**
+- Customer deactivated the license on a device
+- Device no longer has access
+
+### Activation Tracking
+
+Each time a user activates a license on a device:
+- Activation count increases
+- Activation timestamp is recorded
+- If activation limit is reached, no further activations allowed
+
+## Refunds and License Revocation
+
+When a customer's order is refunded:
+
+1. **License status changes** → License is marked as revoked
+2. **Activations stopped** → New activations are rejected
+3. **Running instances** → Existing running instances may continue until restart (backend dependent)
+4. **Validation fails** → License key validation returns "revoked" status
+
+<Warning>
+  Your application should periodically validate licenses (e.g., on app startup, daily check) to ensure revoked licenses are detected.
+</Warning>
+
+## Licensing Best Practices
+
+### Security
+
+- **Validate server-side** - Always validate licenses on your servers, not just client-side
+- **Hash license keys** - Don't log or transmit license keys in plain text
+- **Secure storage** - Store license keys securely (encrypted) if saving locally
+- **Periodic validation** - Re-validate licenses periodically, not just on first run
+
+### User Experience
+
+- **Clear messaging** - Show why a license is invalid (expired, revoked, wrong key)
+- **Grace period** - Consider a grace period for expired licenses (e.g., 7-day warning)
+- **Help links** - Provide links to get a new license or contact support
+- **Easy input** - Make license key input easy (copy/paste, auto-formatting)
+
+### Business
+
+- **Trial licenses** - Create separate plans for trials with short expiry (e.g., 14-30 days)
+- **Upgrade path** - Make it easy for customers to upgrade their license
+- **Multiple licenses** - Allow customers to purchase multiple licenses for different devices/teams
+- **Renewal reminders** - Send email reminders before licenses expire
+
+## Common Questions
+
+<Accordion title="Can a customer get a new license key if they lose theirs?">
+  No, license keys are tied to orders. Customers should keep their license keys safe. You could implement a "license recovery" feature in your app that lets customers prove ownership and retrieve their key.
+</Accordion>
+
+<Accordion title="What happens if a customer reinstalls or updates their software?">
+  As long as the activation limit hasn't been reached, they can reactivate on the same device. Consider providing a way to deactivate and reactivate.
+</Accordion>
+
+<Accordion title="Can I disable or revoke a specific license manually?">
+  Not through the dashboard. However, you can revoke licenses via API using your server key if needed for support cases.
+</Accordion>
+
+<Accordion title="Do license keys require internet connectivity?">
+  Kelviq doesn't enforce this, but best practice is to validate licenses online periodically. You might allow offline usage with periodic sync as a fallback.
+</Accordion>
+
+<Accordion title="Can I have licenses with no activation limit?">
+  Yes, leave the "Activation Limit" toggle disabled. The license can be activated unlimited times.
+</Accordion>
+
+## Next Steps
+
+- [Digital downloads](/product-catalog/digital-downloads) - Deliver files with each purchase
+- [Entitlements](/product-catalog/entitlements) - Control feature access per plan
+- [Webhooks](/webhooks/webhooks) - Track license events
+- [Error codes](/api-reference/errors) - Handle validation errors

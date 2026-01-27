@@ -1,0 +1,154 @@
+---
+title: "Fees"
+description: "Kelviq's transparent pricing structure"
+---
+
+Kelviq operates as a [Merchant of Record](/getstarted/merchant-of-record), handling payments, tax compliance, and global selling on your behalf. Our pricing is simple and all-inclusive—no hidden fees, no monthly minimums.
+
+## What's Included
+
+Your transaction fee covers everything you need to sell globally:
+
+- Payment processing (cards, wallets, local payment methods)
+- Sales tax, VAT, and GST calculation, collection, and remittance
+- Fraud protection and chargeback handling
+- Localized pricing in 135+ currencies
+- Compliance with regional regulations
+- Usage metering and billing
+- License key generation
+- Digital product and file delivery
+- Feature and entitlement management
+- Customer billing portal
+
+## Transaction Fees
+
+Fees are charged only on successful transactions:
+
+| Fee Type | Rate | Description |
+|----------|------|-------------|
+| Base fee | 3.5% + $0.40 | Applied to every transaction |
+| International cards | +1.5% | Cards issued outside the US |
+| Recurring billing | +0.7% | Subscription and renewal charges |
+
+<Note>
+Fees are calculated on the transaction amount before tax.
+</Note>
+
+## Fee Examples
+
+<AccordionGroup>
+  <Accordion title="One-time purchase (domestic card)">
+    **$100 product, US customer, US-issued card**
+
+    | Component | Calculation | Amount |
+    |-----------|-------------|--------|
+    | Base fee | $100 × 3.5% | $3.50 |
+    | Fixed fee | — | $0.40 |
+    | **Total fee** | | **$3.90** |
+
+    You receive: $96.10
+  </Accordion>
+
+  <Accordion title="One-time purchase (international card)">
+    **$100 product, UK customer, UK-issued card**
+
+    | Component | Calculation | Amount |
+    |-----------|-------------|--------|
+    | Base fee | $100 × 3.5% | $3.50 |
+    | Fixed fee | — | $0.40 |
+    | International | $100 × 1.5% | $1.50 |
+    | **Total fee** | | **$5.40** |
+
+    You receive: $94.60
+  </Accordion>
+
+  <Accordion title="Subscription (domestic card)">
+    **$50/month subscription, US customer, US-issued card**
+
+    | Component | Calculation | Amount |
+    |-----------|-------------|--------|
+    | Base fee | $50 × 3.5% | $1.75 |
+    | Fixed fee | — | $0.40 |
+    | Recurring | $50 × 0.7% | $0.35 |
+    | **Total fee** | | **$2.50** |
+
+    You receive: $47.50 per month
+  </Accordion>
+
+  <Accordion title="Subscription (international card)">
+    **$50/month subscription, German customer, German-issued card**
+
+    | Component | Calculation | Amount |
+    |-----------|-------------|--------|
+    | Base fee | $50 × 3.5% | $1.75 |
+    | Fixed fee | — | $0.40 |
+    | International | $50 × 1.5% | $0.75 |
+    | Recurring | $50 × 0.7% | $0.35 |
+    | **Total fee** | | **$3.25** |
+
+    You receive: $46.75 per month
+  </Accordion>
+</AccordionGroup>
+
+## Refunds
+
+When you issue a refund to a customer, the original transaction fee is **retained**. This applies to both full and partial refunds.
+
+| Scenario | What happens |
+|----------|--------------|
+| Full refund | Customer receives full amount; original fee retained |
+| Partial refund | Customer receives partial amount; proportional fee retained |
+
+<Warning>
+Our payment partners charge non-refundable processing fees on the original transaction. We pass this cost structure through to maintain transparent pricing.
+</Warning>
+
+## Disputes & Chargebacks
+
+When a customer disputes a charge with their bank, a **$15 fee** applies regardless of the dispute outcome.
+
+| Outcome | Fee | Transaction amount |
+|---------|-----|-------------------|
+| You win | $15 | Returned to you |
+| You lose | $15 | Refunded to customer |
+
+### Reducing Disputes
+
+<CardGroup cols={2}>
+  <Card title="Clear billing descriptors" icon="receipt">
+    Use a recognizable business name on statements so customers remember the purchase.
+  </Card>
+  <Card title="Proactive support" icon="headset">
+    Make it easy for customers to contact you before they escalate to their bank.
+  </Card>
+  <Card title="Accurate descriptions" icon="file-lines">
+    Set clear expectations about what customers are purchasing and delivery timelines.
+  </Card>
+  <Card title="Easy cancellation" icon="ban">
+    For subscriptions, provide a simple way to cancel to prevent "friendly fraud" disputes.
+  </Card>
+</CardGroup>
+
+## FAQ
+
+<AccordionGroup>
+  <Accordion title="When are fees deducted?">
+    Fees are deducted automatically from each transaction before the payout reaches your account.
+  </Accordion>
+
+  <Accordion title="Are there monthly fees or minimums?">
+    No. You only pay when you make a sale. There are no setup fees, monthly fees, or minimum transaction requirements.
+  </Accordion>
+
+  <Accordion title="How is 'international' determined?">
+    A transaction is considered international when the customer's card is issued outside the United States. Since Kelviq is the Merchant of Record registered in the US, this applies regardless of where your business is located.
+  </Accordion>
+
+  <Accordion title="Do fees apply to free trials?">
+    No. Fees only apply to successful paid transactions. $0 trial authorizations do not incur fees.
+  </Accordion>
+
+  <Accordion title="What about failed transactions?">
+    No fees are charged for declined or failed transactions.
+  </Accordion>
+</AccordionGroup>

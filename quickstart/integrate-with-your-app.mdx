@@ -12,7 +12,7 @@ After setting up your product and plans in the dashboard, you can bring them int
 ## 1. Create a customer (optional)
 
 Typically, you create a customer record when someone signs up in your app.
-When they subscribe in Stripe, kelviq maps that subscription to the customer record automatically.
+When they complete a purchase, Kelviq maps the transaction to the customer record automatically.
 
 This is optional, but creating a customer in kelviq makes it easy to track subscriptions and usage in the dashboard.
 
@@ -40,66 +40,37 @@ const newCustomer = await client.customers.create({
 
 ---
 
-## 2. Pricing table and offerings
+## 2. Checkout links
 
-You can build your own checkout flow, or you can use the **prebuilt Pricing Table**.
-The Pricing Table reflects changes from the dashboard automatically.
+Every plan in Kelviq has a checkout link that you can use to send customers directly to checkout.
 
-### Create a Pricing Table
+### Get a checkout link
 
-1. In the dashboard, go to [**Monetization → Pricing tables**](https://app.kelviq.com/pricing-tables)
-2. Click **Create pricing table**
-3. Give it a name and link it to your product
-4. Customize if needed, then **Save**
+1. In the dashboard, go to your **Product → Plan**
+2. Click **Get Link** in the top right
+3. Copy the checkout URL
 
-### Create an Offering
+### Using checkout links
 
-An **Offering** bundles a Pricing Table with rules.
-Any updates in the dashboard are reflected instantly in your app without code changes.
+You can use checkout links in multiple ways:
 
-1. In the dashboard, go to [**Monetization → Offerings**](https://app.kelviq.com/offerings)
-2. Click **Create offering**
-3. Select a Pricing Table and give it a name
-4. Click **Create**
+- **Direct link** — Share the URL in emails, landing pages, or marketing campaigns
+- **Button on your site** — Link your "Buy Now" or "Get Access" buttons to the checkout URL
+- **With customer ID** — Append `?customer_id=unique-customer-001` to link the purchase to an existing customer
+
+```html
+<a href="https://checkout.kelviq.com/your-plan-id?customer_id=unique-customer-001">
+  Buy Now
+</a>
+```
+
+When a customer completes checkout, their subscription and entitlements are automatically available in Kelviq.
 
 ---
 
-## 3. Embed the Pricing Table in your app
+## 3. Check feature access
 
-Install the React UI SDK:
-
-```bash
-npm install @kelviq/react-ui
-```
-
-Wrap your app with the provider:
-
-```tsx
-import { KelviqProvider, KQPricingTable } from '@kelviq/react-ui';
-import '@kelviq/react-ui/dist/kq-react-ui.css';
-
-export default function App() {
-  return (
-    <KelviqProvider
-      accessToken="YOUR_ACCESS_TOKEN"    // from dashboard → settings → developers
-      offeringId="YOUR_OFFERING_ID"      // from dashboard → offerings
-      customerId="unique-customer-001"   // required when embedding in-app, links existing subscriptions
-    >
-      <KQPricingTable />
-      <OtherComponents />
-    </KelviqProvider>
-  );
-}
-```
-
-✅ Passing `customerId` is **required** if you embed the Pricing Table inside your app.
-This ensures existing subscriptions are recognized, and upgrades/downgrades work correctly for that user.
-
----
-
-## 4. Check feature access
-
-Once a customer subscribes, their entitlements are available in the SDK.
+Once a customer completes a purchase, their entitlements are available in the SDK.
 You can check feature access in the frontend (React SDK) or backend (Node SDK).
 In all examples we’ll keep using the same customer ID: `unique-customer-001`.
 
@@ -152,16 +123,16 @@ if (file.sizeMB > ent.value) {
 
 ---
 
-## 5. Report usage (metered features)
+## 4. Report usage (metered features)
 
-For metered features (like API calls, tokens, or seats), send usage events from your backend.
+For metered features (like downloads, exports, AI generations, or API calls), send usage events from your backend.
 
 ```ts
 import { BEHAVIOUR_CHOICES } from '@kelviq/node-sdk';
 
 await client.reporting.reportUsage({
   customerId: "unique-customer-001",
-  featureId: "api_calls",
+  featureId: "downloads",
   value: 1,
   behaviour: BEHAVIOUR_CHOICES.INCREMENT, // or SET
 });

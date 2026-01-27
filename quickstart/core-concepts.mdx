@@ -2,8 +2,7 @@
 title: 'Core concepts'
 ---
 
-kelviq builds on top of Stripe by adding a few key building blocks.  
-Understanding these will make it easier to design your pricing and integrate the SDK.
+Understanding these core concepts will make it easier to design your pricing and integrate the SDK.
 
 ---
 
@@ -43,21 +42,28 @@ Entitlements can be boolean (on/off), metered (usage limits), or config (custom 
 
 ---
 
-## Customers
+## Digital downloads 
 
-A customer is a person or company that subscribes to your product.  
+A digital download is a file that your customers can download after purchasing.
 
-Typically, you create a customer record when someone signs up in your app.  
-When they subscribe in Stripe, kelviq maps that subscription to the customer record automatically.
+Examples: e-books, software, music, videos.
 
 ---
 
-## Sync with Stripe
+## License keys
 
-kelviq works on top of Stripe.  
-Everything you create in kelviq — products, plans, features, entitlements, promotions — is synced to Stripe when you publish changes.  
+A license key is a code that your customers can use to activate a digital download.
 
-You don’t need to set up anything manually in Stripe. Just connect once, and kelviq keeps data in sync.
+Examples: software activation, game keys, e-books.
+
+---
+
+## Customers
+
+A customer is a person or company that purchases your product.
+
+Typically, you create a customer record when someone signs up in your app.
+When they complete a purchase, Kelviq maps the transaction to the customer record automatically.
 
 ---
 
