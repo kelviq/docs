@@ -1,0 +1,260 @@
+---
+title: 'Entitlements'
+description: 'Manage feature access for your customers'
+---
+
+Entitlements define what features and functionality your customers can access based on their plan. Kelviq handles automatic entitlement creation and enforcement.
+
+## Understanding Entitlements
+
+An **entitlement** is a customer's right to use a feature. When a customer purchases a plan, Kelviq automatically creates entitlements for all features linked to that plan.
+
+**Example:**
+- Plan: "Professional ($29/month)"
+- Features in plan: "Priority support", "Custom branding", "10 projects"
+- Customer purchases plan → Customer gets entitlements for all 3 features
+
+## Entitlement Types
+
+Features in Kelviq can be configured as different types, each with different entitlement behaviors:
+
+<CardGroup cols={2}>
+  <Card title="Boolean (Switch)" icon="toggle-on">
+    On/off features. Either the customer has access or doesn't.
+
+    Example: "Priority support", "Custom branding"
+  </Card>
+  <Card title="Customizable" icon="sliders">
+    Features with numeric limits that you define per plan.
+
+    Example: "Max projects" (5, 10, unlimited)
+  </Card>
+</CardGroup>
+
+## Checking Entitlements in Your App
+
+Your application needs to check entitlements before allowing customers to use features.
+
+### Check if Customer Has Access
+
+Use `hasAccess` to quickly check if a customer can use a feature:
+
+<Tabs>
+  <Tab title="Python">
+    ```python
+    from kelviq_sdk import Kelviq
+
+    client = Kelviq.create_sync_client(access_token="your_server_api_key")
+
+    # Check if customer has access to a feature
+    has_access = client.entitlements.has_access(
+        customerId="unique-customer-001",
+        featureId="priority-support"
+    )
+
+    if has_access:
+        # Grant access to the feature
+        print("Customer has access to priority support")
+    else:
+        # Show upgrade prompt
+        print("Upgrade required for priority support")
+    ```
+  </Tab>
+  <Tab title="Node.js">
+    ```typescript
+    import { Kelviq } from '@kelviq/node-sdk';
+
+    const client = new Kelviq({ accessToken: 'your_server_api_key' });
+
+    // Check if customer has access to a feature
+    const hasAccess = await client.entitlements.hasAccess({
+        customerId: "unique-customer-001",
+        featureId: "priority-support"
+    });
+
+    if (hasAccess) {
+        // Grant access to the feature
+        console.log("Customer has access to priority support");
+    } else {
+        // Show upgrade prompt
+        console.log("Upgrade required for priority support");
+    }
+    ```
+  </Tab>
+</Tabs>
+
+### Get Detailed Entitlement Info
+
+Use `getEntitlement` to get full details about a specific entitlement:
+
+<Tabs>
+  <Tab title="Python">
+    ```python
+    from kelviq_sdk import Kelviq
+
+    client = Kelviq.create_sync_client(access_token="your_server_api_key")
+
+    # Get detailed entitlement for a feature
+    response = client.entitlements.get_entitlement(
+        customerId="unique-customer-001",
+        featureId="max-projects"
+    )
+
+    for entitlement in response.entitlements:
+        print(f"Feature: {entitlement.featureId}")
+        print(f"Has Access: {entitlement.hasAccess}")
+        print(f"Type: {entitlement.featureType}")
+        if entitlement.usageLimit:
+            print(f"Limit: {entitlement.usageLimit}")
+    ```
+  </Tab>
+  <Tab title="Node.js">
+    ```typescript
+    import { Kelviq } from '@kelviq/node-sdk';
+
+    const client = new Kelviq({ accessToken: 'your_server_api_key' });
+
+    // Get detailed entitlement for a feature
+    const response = await client.entitlements.getEntitlement({
+        customerId: "unique-customer-001",
+        featureId: "max-projects"
+    });
+
+    response.entitlements.forEach(entitlement => {
+        console.log(`Feature: ${entitlement.featureId}`);
+        console.log(`Has Access: ${entitlement.hasAccess}`);
+        console.log(`Type: ${entitlement.featureType}`);
+        if (entitlement.usageLimit) {
+            console.log(`Limit: ${entitlement.usageLimit}`);
+        }
+    });
+    ```
+  </Tab>
+</Tabs>
+
+### Get All Entitlements for a Customer
+
+Use `getAllEntitlements` to retrieve all entitlements for a customer:
+
+<Tabs>
+  <Tab title="Python">
+    ```python
+    from kelviq_sdk import Kelviq
+
+    client = Kelviq.create_sync_client(access_token="your_server_api_key")
+
+    # Get all entitlements for a customer
+    response = client.entitlements.get_all_entitlements(
+        customerId="unique-customer-001"
+    )
+
+    print(f"Customer: {response.customerId}")
+    for entitlement in response.entitlements:
+        print(f"- {entitlement.featureId}: {'Yes' if entitlement.hasAccess else 'No'}")
+    ```
+  </Tab>
+  <Tab title="Node.js">
+    ```typescript
+    import { Kelviq } from '@kelviq/node-sdk';
+
+    const client = new Kelviq({ accessToken: 'your_server_api_key' });
+
+    // Get all entitlements for a customer
+    const response = await client.entitlements.getAllEntitlements({
+        customerId: "unique-customer-001"
+    });
+
+    console.log(`Customer: ${response.customerId}`);
+    response.entitlements.forEach(entitlement => {
+        console.log(`- ${entitlement.featureId}: ${entitlement.hasAccess ? 'Yes' : 'No'}`);
+    });
+    ```
+  </Tab>
+</Tabs>
+
+## Entitlement Response Structure
+
+When you retrieve entitlements, each entitlement includes:
+
+| Field | Type | Description |
+|-------|------|-------------|
+| `featureId` | string | The feature identifier |
+| `featureType` | string | Type of feature (e.g., "BOOLEAN", "CUSTOMIZABLE") |
+| `hasAccess` | boolean | Whether the customer has access |
+| `usageLimit` | number | The limit value (for customizable features) |
+| `currentUsage` | number | Current usage count (if applicable) |
+| `remaining` | number | Remaining usage (if applicable) |
+
+## Monitoring Entitlements
+
+### Dashboard View
+
+View customer entitlements in the dashboard:
+
+1. **Go to Customers** → Select a customer
+2. **Entitlements tab** → See all features and current status
+3. **Override status** → See if any entitlements have been customized
+
+## Entitlement Changes
+
+When a customer's subscription changes, their entitlements automatically update:
+
+### Plan Upgrade
+```
+Old Plan: Basic (5 projects)
+New Plan: Pro (20 projects)
+Result: Entitlement limit changes to 20 immediately
+```
+
+### Plan Downgrade
+```
+Old Plan: Pro (20 projects)
+New Plan: Basic (5 projects)
+Result: Entitlement limit changes to 5
+```
+
+### Subscription Cancellation
+```
+Status: Cancelled
+Result: All entitlements become inactive
+Effect: Customer cannot use any features
+```
+
+## Best Practices
+
+### Entitlement Checks
+
+- **Check early** - Verify entitlements before allowing access to features
+- **Cache wisely** - Cache entitlement checks for performance, but refresh periodically
+- **Graceful handling** - Handle "no access" gracefully with upgrade prompts
+
+### Feature Design
+
+- **Clear naming** - Use descriptive feature identifiers (e.g., "max-team-members" not "limit1")
+- **Logical grouping** - Group related features in the same plan tier
+- **Scalable limits** - Make limits increase with plan tiers
+
+## Common Questions
+
+<Accordion title="What happens when a customer's plan expires?">
+  When a subscription is cancelled or expires, all entitlements become inactive. The customer cannot use any features. You should check entitlement status in your app before granting access.
+</Accordion>
+
+<Accordion title="Can I give a customer extra access without changing their plan?">
+  Yes, you can customize entitlements for individual customers from the dashboard. This is useful for trials, promotions, or special agreements.
+</Accordion>
+
+<Accordion title="Are entitlement checks real-time?">
+  Yes, entitlement checks return the current state. When plans are changed or overrides are applied, subsequent checks reflect the new state immediately.
+</Accordion>
+
+<Accordion title="How do I handle customers without a subscription?">
+  Customers without an active subscription will have `hasAccess: false` for all features. Your app should handle this by showing appropriate messaging or free tier functionality.
+</Accordion>
+
+## Next Steps
+
+- [Features](/product-catalog/features) - Learn how to create features
+- [Plans](/product-catalog/plans) - Configure features in plans
+- [Python SDK](/api-reference/backend-integration/python-sdk) - Full Python SDK reference
+- [Node SDK](/api-reference/backend-integration/node-sdk) - Full Node SDK reference

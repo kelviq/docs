@@ -69,280 +69,57 @@ Click on any draft plan to navigate to its detail page. From here, you will set 
 <img height="200" src="/images/set-price,add-features.png" />
 </Frame>
 
-### Step 1: Set the Price
+### Step 1: Configure Pricing
 
-Click the **"Set price"** button to begin. 
+Click the **Price** section to open the pricing configuration panel.
 
-<Frame>
-<img height="200" src="/images/set-price-button.png" />
-</Frame>
+#### Free vs Paid Plans
 
-A modal will appear asking you to choose the fundamental plan type.
+At the top right of the pricing configuration, you'll see a **Free plan** toggle:
 
-<Frame>
-<img height="200" src="/images/set-price-modal.png" />
-</Frame>
+- **Free plan ON**: Users will not be charged. This is ideal for lead generation, freemium tiers, or starter plans. When enabled, you'll see a "Free plan active" confirmation.
+- **Free plan OFF**: Configure paid pricing options as described below.
 
+#### Billing Cycles
 
-You have three options for the plan type:
+Select one or more billing cycles for your plan:
 
-<CardGroup cols={3}>
-  <Card title="Free">
-    Customers can subscribe to this plan without any charge. Ideal for "Freemium" or "Starter" tiers.
-  </Card>
-  <Card title="Paid">
-    Customers will be charged for this plan based on the pricing you configure (e.g., a recurring fee or usage).
-  </Card>
-  <Card title="Enterprise/Custom">
-    For plans that require custom contracts and manual invoicing.
-  </Card>
-</CardGroup>
+- **Monthly** — Recurring monthly charge
+- **Yearly** — Recurring annual charge (often discounted)
+- **3 Months** — Quarterly billing
+- **One Time** — Single purchase, no recurring billing
 
-If you select the Free plan, you'll see a success message and can continue with setup.
-<Note>To offer a **free trial** for a limited time, you must select the **Paid** plan type.</Note>
+For each selected billing cycle, enter the price in USD.
 
+#### Free Trial
 
-### Step 2: Configure the Pricing Model (for Paid Plans)
+For paid plans, you can offer a free trial period:
 
-If you selected a **Paid** plan, you will first define the **Billing Cycle**. After setting the cycle, you can add different types of charges. The decision process for structuring these charges can be visualized as follows:
+1. Toggle **Free trial** on
+2. Enter the trial duration in days (e.g., 7, 14, or 30)
 
-```mermaid
-graph TD
-    A[Start: Paid Plan Selected] --> B[Define Billing Cycle: Monthly, Yearly]
-    B --> C{Choose Primary Charge Type}
-    C -->|Fixed| D[Fixed Charge: Set recurring fee]
-    C -->|Usage-Based| E[Usage-Based Charge]
-    E --> F{Select Metering Approach}
-    F -->|Prepaid| G[Prepaid Commitment]
-    G --> H[Select Prepaid Model: Per-unit, Package, Tiered, etc.]
-    F -->|Pay-as-you-go| I[Pay-as-you-go PAYG]
-    I --> J[Select PAYG Model: Flat Rate, Tiered, Package, etc.]
-    C -->|Optional| K[Add Free Trial]
-```
+Customers can use the plan without charge during the trial period. Billing begins automatically when the trial ends.
 
-<CardGroup cols={1}>
-  <Card title="Fixed Charges" icon="tag" href="#fixed-charges">
-    A recurring flat fee that customers are billed for each billing period. This is often used as the base price for a subscription tier.
-  </Card>
-  <Card title="Usage-Based Charges" icon="chart-bar" href="#usage-based-charges">
-    Fees that customers pay based on their consumption of specific features. You can add one or more usage-based charges to a plan.
-  </Card>
-  <Card title="Free Trial" icon="gift" href="#free-trial">
-    Allows customers to use a paid plan for free for a specific duration.
-  </Card>
-</CardGroup>
+#### Regional Pricing
 
----
+To offer localized prices in different currencies:
 
-## Charge Type Details
+1. Click **+ Add Region** in the Regional Pricing section
+2. Select a currency (e.g., United Arab Emirates Dirham, Euro, Indian Rupee)
+3. Enter prices for each billing cycle in that currency
+4. Click **Add Currency**
 
-This section provides detailed configuration steps for each charge type.
+You can add multiple regional prices and edit or remove them at any time. This allows you to set specific prices for different markets rather than relying on automatic currency conversion.
 
-### Fixed Charges
+#### Saving Your Pricing
 
-A **Fixed Charge** is a recurring flat fee that customers are billed for each billing period. It serves as the stable, predictable base price of a plan.
-
-<Info>
-A plan can only have one fixed charge. Prices are initially set in USD and can be localized into other currencies later.
-</Info>
-
-To add a fixed charge:
-1. From the plan's detail page, click **"+ Configure pricing"** and select **"Fixed charges"**.
-2. Enter the charge amount for each allowed billing period, for example, `$10` for monthly and `$100` for yearly.
-3. Click **"Save"** to save the charge.
-
-<Frame>
-<img height="200" src="/images/set-fixed-charge.png" />
-</Frame>
-
-### Usage-Based Charges
-
-**Usage-Based Charges** are fees that customers pay for their consumption of specific product features. A single plan can have multiple distinct usage-based charges.
-
-The first step is always to **Choose a billable feature** you want to charge for. If the feature doesn't exist yet, you can type its name in the dropdown and create it on the fly.
-
-<Frame>
-<img height="200" src="/images/new-billable-feature.png" />
-</Frame>
-
-Once a feature is selected, you must choose how customers will be charged for it:
-
-<Frame>
-<img height="200" src="/images/select-charge-type.png" />
-</Frame>
-
-
-#### Prepaid Commitment
-Customers are billed **upfront** for a specified quantity of usage (like seats or API calls). This model is ideal for creating predictable, recurring revenue from committed customer spend.
-
-<Info>
-  **Proration for Upgrades:** When a customer increases their commitment mid-billing period, they are immediately charged a prorated amount for the remainder of the current period. The full, increased amount is charged in subsequent billing cycles.
-</Info>
-
-<Tabs>
-<Tab title="Flat Rate">
-  <p>Customers commit to a number of units and pay a single, fixed rate for each unit.</p>
-  <p>For example, if the price is `$10` per seat, a customer who commits to `5` seats will pay `$50` at the start of each billing period.</p>
-  <p>To configure this, enter the flat rate per unit. You can also define if usage resets each billing period and set optional minimum or maximum commitment limits. Click `Add` to save.</p>
-  <Frame>
-  <img height="200" src="/images/flat-rate-prepaid-model.png" /> 
-  </Frame>
-</Tab>
-<Tab title="Package">
-  <p>Customers commit to one or more packages of units, where each package contains a predefined number of units for a set price.</p>
-  <p>For example, if you sell seats in packages of `5` for `$40`, a customer needing `8` seats must commit to two packages (a total of 10 seats) and will pay `$80` upfront.</p>
-  <p>To configure this, enter the number of units per package and the price per package. Click `Add` to save.</p>
-  <Frame>
-  <img height="200" src="/images/package-prepaid-model.png" />    
-  </Frame>
-</Tab>
-<Tab title="Tiered">
-  <p>The price per unit typically decreases as the committed usage quantity enters higher tiers. For each tier, you define a unit price for the items falling into that tier. Additionally, kelviq allows you to set an optional <strong>flat fee for each tier</strong>, which is added to the per-unit calculation for that tier's portion of the usage.</p>
-  <p>The total commitment cost is calculated by summing the costs from each tier the usage passes through.</p>
-  <p><strong>Example:</strong> A customer commits to 50 units.</p>
-  <ul>
-      <li>Tier 1 (covers units 1-10): Optional Tier Flat Fee is `$12`, Per-unit Price is `$10`.</li>
-      <li>Tier 2 (covers units 11-50): Optional Tier Flat Fee is `$10`, Per-unit Price is `$15`.</li>
-  </ul>
-  <p>Calculation:</p>
-  <ul>
-      <li>Cost for Tier 1 (first 10 units): Tier 1 Flat Fee (`$12`) + (10 units multiplied by `$10`/unit) = `$112`.</li>
-      <li>Cost for Tier 2 (next 40 units): Tier 2 Flat Fee (`$10`) + (40 units multiplied by `$15`/unit) = `$610`.</li>
-  </ul>
-  <p>Total commitment cost = `$112 + $610 = $722`.</p>
-  <p>To configure this, define the usage range, per-unit price, and the optional flat fee for each tier. Click `Add` to save.</p>
-  <Frame>
-  <img height="200" src="/images/tiered-prepaid-model.png" />    
-  </Frame>
-</Tab>
-<Tab title="Volume">
-  <p>The price for ALL committed units is determined by the single pricing tier that the total committed volume falls into. You can also add an optional <strong>flat fee specific to that tier</strong>, which is added to the total calculated volume charge.</p>
-  <p><strong>Example:</strong></p>
-  <ul>
-    <li>Tier 1 (1-10 units): Per-unit Price is `$10`, Optional Tier Flat Fee is `$0`.</li>
-    <li>Tier 2 (11-50 units): Per-unit Price is `$8`, Optional Tier Flat Fee is `$20`.</li>
-  </ul>
-  <p>A customer commits to `15` units. This entire commitment falls into Tier 2.</p>
-  <p>Calculation:</p>
-  <ul>
-    <li>Base Volume Charge: (15 units multiplied by `$8`/unit) = `$120`.</li>
-    <li>Tier 2 Flat Fee: `$20`.</li>
-  </ul>
-  <p>Total commitment cost = `$120 + $20 = $140`.</p>
-  <p>To configure this, define the usage range, the single price per unit for all units within that tier, and the optional tier flat fee. Click `Add` to save.</p>
-  <Frame>
-  <img height="200" src="/images/volume-prepaid-model.png" />  
-  </Frame>
-</Tab>
-<Tab title="Stair-step">
-  <p>Customers pay a single flat fee for a commitment to a range of usage. This model is typically all-inclusive for the defined step. (`Coming soon`)</p>
-  <p><strong>Example (Conceptual):</strong> A commitment for "up to 1000 API calls" could cost `$29`, while the next tier for "1001 to 5000 API calls" costs `$79`.</p>
-  <p>(The concept of an *additional* flat fee on top of the tier's primary flat fee is less common for standard stair-step but could be modeled if needed by adjusting the tier's main price).</p>
-  <p>To configure this, define the usage range and the total flat price for that range. Click `Add` to save.</p>
-</Tab>
-</Tabs>
-
-#### Pay-as-you-go (PAYG) `Coming soon 🚧`
-Customers are billed **at the end** of the period based purely on their actual consumption. This model is perfect for variable resources where upfront commitment is difficult, such as for AI tokens, compute time, or data storage.
-
-<Info>
-Pay-as-you-go charges can only be added to plans with a **monthly** billing period.
-</Info>
-
-<Tabs>
-<Tab title="Flat Rate">
-  <p>Customers are charged the same fixed price for every unit they consume. Billing occurs at the end of the period based on actual usage.</p>
-  <p>For example, if you set a price of `$0.01` for every API call, a customer who makes `5,300` calls is billed `$53` at the end of the month.</p>
-  <p>To configure this, enter the price per unit. Click `Add` to save.</p>
-  <Frame>
-  <img height="200" src="/images/flat-rate-payg-model.png" /> 
-  </Frame>
-</Tab>
-<Tab title="Package">
-  <p>Customers pay for their usage in discrete blocks. Even partial use of a block incurs the cost of the full block. Billing is based on the number of blocks consumed at the end of the period.</p>
-  <p>For example, if data storage is sold in `10 GB` blocks for `$5` each, a customer who uses `12 GB` of data is billed for two blocks. Since they consumed part of a second block, they pay for the full two blocks, for a total of `$10` at the end of the period.</p>
-  <p>To configure this, enter the number of units per block and the price per block. Click `Add` to save.</p>
-  <Frame>
-  <img height="200" src="/images/package-payg-model.png" />   
-  </Frame>
-</Tab>
-<Tab title="Tiered">
-  <p>The unit price for consumed usage typically decreases as consumption enters higher tiers. For each tier, you define a unit price for items consumed within that tier's range. kelviq also allows an optional <strong>flat fee for each tier</strong>, which is added to the per-unit calculation if usage occurs in that tier. Billing happens at the end of the period based on total consumption across tiers.</p>
-  <p>The total PAYG bill is calculated by summing the costs from each tier that usage passed through.</p>
-  <p><strong>Example:</strong> A customer consumes 50 units in a month.</p>
-  <ul>
-    <li>Tier 1 (covers units 1-10): Optional Tier Flat Fee is `$12`, Per-unit Price is `$10`.</li>
-    <li>Tier 2 (covers units 11-50): Optional Tier Flat Fee is `$10`, Per-unit Price is `$15`.</li>
-  </ul>
-  <p>Calculation:</p>
-  <ul>
-    <li>Cost for Tier 1 (first 10 units consumed): Tier 1 Flat Fee (`$12`) + (10 units multiplied by `$10`/unit) = `$112`.</li>
-    <li>Cost for Tier 2 (next 40 units consumed): Tier 2 Flat Fee (`$10`) + (40 units multiplied by `$15`/unit) = `$610`.</li>
-  </ul>
-  <p>Total PAYG bill = `$112 + $610 = $722`.</p>
-  <p>To configure this, add tiers and define the per-unit price and optional flat fee for each one. Click `Add` to save.</p>
-  <Frame>
-  <img height="200" src="/images/tiered-payg-model.png" />   
-  </Frame>
-</Tab>
-<Tab title="Volume">
-  <p>The unit price for ALL units consumed is determined by the single pricing tier that the total consumption reaches. An optional <strong>flat fee specific to that tier</strong> can also be added to the total calculated volume charge. Billing occurs at the end of the period.</p>
-  <p><strong>Example:</strong></p>
-  <ul>
-    <li>Tier 1 (1-1000 tokens): Per-unit Price is `$0.02`, Optional Tier Flat Fee is `$0`.</li>
-    <li>Tier 2 (1001-10000 tokens): Per-unit Price is `$0.01`, Optional Tier Flat Fee is `$5`.</li>
-  </ul>
-  <p>A customer consumes `2,500` tokens in a month. This entire consumption falls into Tier 2.</p>
-  <p>Calculation:</p>
-  <ul>
-    <li>Base Volume Charge: (2,500 tokens multiplied by `$0.01`/token) = `$25`.</li>
-    <li>Tier 2 Flat Fee: `$5`.</li>
-  </ul>
-  <p>Total PAYG bill = `$25 + $5 = $30`.</p>
-  <p>To configure this, add tiers and define the single price per unit for that tier, along with the optional tier flat fee. Click `Add` to save.</p>
-  <Frame>
-  <img height="200" src="/images/volume-payg-model.png" />     
-  </Frame>
-</Tab>
-<Tab title="Stair-step">
-  <p>Customers are charged a single, predictable flat fee based on the highest usage tier they reach during the billing period. This simplifies billing to a few possible amounts. Billing occurs at the end of the period. (`Coming soon`)</p>
-  <p><strong>Example (Conceptual):</strong> If the fee for `1-1000` API calls is `$29` and the fee for `1001-5000` calls is `$79`, a customer who makes `1,200` calls is billed `$79` at the end of the period.</p>
-  <p>(The concept of an *additional* flat fee on top of the tier's primary flat fee is less common for standard stair-step but could be modeled if needed by adjusting the tier's main price).</p>
-  <p>To configure this, define the usage range for each tier and the total flat price for that tier. Click `Add` to save.</p>
-</Tab>
-</Tabs>
-
-#### Adding Multiple Charges
-To add another usage-based charge, click the **"+ Add more"** button after saving the previous one. When finished, click **"Continue"**.
-
-### Free Trial
-
-Paid plans can be configured to start with a free trial, giving customers a risk-free way to try your product. These settings can be changed at any time without engineering resources.
-
-#### Defining an Initial Trial
-1.  After configuring all charges for a plan, you can enable a trial by checking the **"Provide free trial"** box.
-2.  Enter the duration of the trial, for example, `7`, `14`, or `30` days.
-
-<Frame>
-<img height="200" src="/images/free-trial-config.png" />    
-</Frame>
-
-#### Editing or Removing a Trial
-You can modify the trial for a plan at any time:
-1.  Navigate to the plan's detail page and find the **Price** section.
-2.  Click the edit icon (pencil) and select **"Edit"**.
-3.  To change the trial, update the configuration. To remove it, uncheck the "Provide free trial" box.
-4.  Click **"Save changes"**.
-
-<Frame>
-<img height="200" src="/images/edit-trial.png" />    
-</Frame>
+Click **Save** to apply your pricing configuration. The plan will display your configured price options (e.g., "One Time: $239" or "Monthly: $10, Yearly: $100").
 
 ---
 
 ## Assigning Features to Plans
 
-Once a plan's pricing is configured, the next step is to define the functionality that customers on this plan are entitled to use. In kelviq, the combination of a **feature** and its specific configuration (e.g., on/off, a numeric limit) is called an **entitlement**.
+Once a plan's pricing is configured, the next step is to define the functionality that customers on this plan are entitled to use. In Kelviq, the combination of a **feature** and its specific configuration (e.g., on/off, a numeric limit) is called an **entitlement**.
 
 On the plan's detail page, under the "Entitlements" section, you can see all the entitlements assigned to that plan.
 
@@ -365,7 +142,7 @@ On the plan's detail page, under the "Entitlements" section, you can see all the
 
 ### Features Types
 
-kelviq provides several ways to configure features to support various business models.
+Kelviq provides several ways to configure features to support various business models.
 
 <CardGroup cols={3}>
   <Card title="Switch (Boolean)">
@@ -383,7 +160,7 @@ kelviq provides several ways to configure features to support various business m
 This is the simplest entitlement. It acts as a toggle for a feature.
 
 * **Allowed:** The customer has full access to the feature. For example, enabling "Premium Support" or "Dark Mode".
-* **Not Allowed:** The customer does not have access. In a UI powered by kelviq, the feature might appear disabled or be hidden behind an upsell prompt.
+* **Not Allowed:** The customer does not have access. In a UI powered by Kelviq, the feature might appear disabled or be hidden behind an upsell prompt.
 
 <Frame>
 <img height="200" src="/images/switch-boolean-config.png" />    
@@ -403,8 +180,8 @@ You can also toggle **"Enable unlimited usage"**, which effectively grants infin
 #### Metered
 A metered entitlement links a feature to its consumption, which is essential for usage-based billing.
 
-* **Pre-aggregated usage:** Your application is responsible for counting usage and reporting the total to kelviq periodically. Good examples include total `GB of storage used`, the number of `active projects` in an account, or the `minutes of video rendered`.
-* **Raw events:** Your application sends individual event records to kelviq (e.g., an event for each API request), and kelviq calculates the total usage.
+* **Pre-aggregated usage:** Your application is responsible for counting usage and reporting the total to Kelviq periodically. Good examples include total `GB of storage used`, the number of `active projects` in an account, or the `minutes of video rendered`.
+* **Raw events:** Your application sends individual event records to Kelviq (e.g., an event for each API request), and Kelviq calculates the total usage.
 
 When configuring a metered entitlement, you can grant unlimited usage or set a specific limit. You can also define if the **usage count should reset** each billing period.
 
@@ -412,7 +189,7 @@ The most critical setting for a metered limit is **Limit Enforcement**. This is 
 
 | Toggle State for "Hard Limit" | Effective Behavior | Description                                                                                                                               | Customer Experience                                                                                                                               | Use Case Examples                                                                                                                             |
 | :------------------------------------------------------------ | :----------------- | :---------------------------------------------------------------------------------------------------------------------------------------- | :------------------------------------------------------------------------------------------------------------------------------------------------ | :-------------------------------------------------------------------------------------------------------------------------------------------- |
-| **ON (Default)** | **Hard Limit** | Access **is** blocked when the usage limit is reached (i.e., balance is zero). kelviq will deny further attempts to use the feature.        | The customer is stopped from further usage and is typically shown a message prompting them to upgrade their plan or purchase more units to continue. | Controlling costs strictly, protecting critical resources, ensuring users do not exceed prepaid allowances without an explicit top-up or upgrade. |
+| **ON (Default)** | **Hard Limit** | Access **is** blocked when the usage limit is reached (i.e., balance is zero). Kelviq will deny further attempts to use the feature.        | The customer is stopped from further usage and is typically shown a message prompting them to upgrade their plan or purchase more units to continue. | Controlling costs strictly, protecting critical resources, ensuring users do not exceed prepaid allowances without an explicit top-up or upgrade. |
 | **OFF** | **Soft Limit** | Access is **not** blocked when the usage limit is reached. Usage can go into a negative balance or accrue as overage.                       | The customer can continue using the feature without interruption. This overage can be tracked for insights, to encourage an upgrade, or billed separately if an overage pricing model is configured. | Promoting user growth, avoiding service disruption for non-critical features, or implementing a pay-as-you-go overage model on top of a base allowance. |
 
 <Frame>
@@ -422,19 +199,12 @@ The most critical setting for a metered limit is **Limit Enforcement**. This is 
 
 
 ### Defining the Entitlement Order
-The order of entitlement is critical as it determines their default display order in **pricing tables** that are rendered using kelviq. You can reorder entitlements to highlight your most important entitlements first. This ordering can be managed in two places:
 
-1.  **From the Plan Details Page:** In the "Entitlements" section of a plan, you can change the order by using the drag-and-drop handle that appears on the left of each entitlement row. This sets the default order for this specific plan.
+You can reorder entitlements to highlight your most important features first. In the "Entitlements" section of a plan, use the drag-and-drop handle on the left of each entitlement row to change the order.
 
-    <Frame>
-    <img height="200" src="/images/reorder-features.png" />   
-    </Frame>
-
-2.  **From the Pricing Table Editor:** You can also override the default order for a specific pricing table directly within the Pricing Table editor, using a similar drag-and-drop interface.
-
-    <Frame>
-    <img height="200" src="/images/reorder-pricing-table.png" /> 
-    </Frame>
+<Frame>
+<img height="200" src="/images/reorder-features.png" />
+</Frame>
 
 ### Removing Entitlements from a Plan
 1.  On the plan's detail page, find the entitlement you wish to remove in the "Entitlement" list.
@@ -446,32 +216,6 @@ The order of entitlement is critical as it determines their default display orde
 <img height="200" src="/images/remove-feature.png" />     
 </Frame>
 
-### Customizing Entitlement Display Text
-
-While entitlements have a default name, you often need more customer-friendly or descriptive text for your pricing tables. kelviq allows you to override the default text for any entitlement on a specific pricing table.
-
-1.  From the sidebar, navigate to **Monetization > Pricing Tables**.
-2.  Select the pricing table you wish to edit from the list.
-3.  In the pricing table editor, find the plan you want to modify and locate its feature list.
-4.  Click the **three-dot menu icon** next to the feature you want to customize and select **"Edit"**.
-
-    <Frame>
-    <img height="200" src="/images/edit-feature.png" /> 
-    </Frame>
-
-5.  A form will appear with the following fields:
-    * **Customer display text:** This is the main text the customer will see for the feature in the pricing table (e.g., changing "api_calls_limit" to "Monthly API Requests").
-    * **Tooltip description:** Add a longer, more descriptive explanation that will appear when a customer hovers over an info icon next to the feature.
-
-    <Tip>
-    The original default text for both fields is shown at the bottom of the form. You can easily copy this value if you ever need to revert back to the default.
-    </Tip>
-
-    <Frame>
-    <img height="200" src="/images/edit-feature-display.png" />  
-    </Frame>
-
-6.  Click **"Save"** to apply the changes to your pricing table.
 ---
 ## Publishing and Managing Plans
 
@@ -493,7 +237,7 @@ The plan is now live and can be integrated into your pricing tables and checkout
 
 ### Editing Published Plans
 
-One of the core strengths of kelviq is the ability to make rapid changes to live plans without requiring engineering resources. This allows your product and growth teams to iterate on your pricing and packaging quickly.
+One of the core strengths of Kelviq is the ability to make rapid changes to live plans without requiring engineering resources. This allows your product and growth teams to iterate on your pricing and packaging quickly.
 
 When you publish an update to a plan, you can decide how the changes are applied:
 
@@ -510,7 +254,7 @@ When you publish an update to a plan, you can decide how the changes are applied
     </Frame>
 
 3.  Apply any changes to the plan's pricing, features, or other details.
-4.  Once a change is made, the plan will have unpublished updates. kelviq clearly indicates this with an **"Unpublished changes"** badge and a **yellow border** around the plan details section.
+4.  Once a change is made, the plan will have unpublished updates. Kelviq clearly indicates this with an **"Unpublished changes"** badge and a **yellow border** around the plan details section.
 
 5.  To make your changes live, click the **"Publish updates"** button in the top corner of the page. This will open a dialog where you can confirm the changes and choose how to roll them out.
 

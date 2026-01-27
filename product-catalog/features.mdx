@@ -4,7 +4,7 @@ title: 'Features'
 
 ## What is a Feature?
 
-In kelviq, a **Feature** is a distinct piece of functionality in your product that can be packaged, monetized, and controlled. It is the core capability that you offer to your users. Think of features as the "nouns" of your product, such as:
+In Kelviq, a **Feature** is a distinct piece of functionality in your product that can be packaged, monetized, and controlled. It is the core capability that you offer to your users. Think of features as the "nouns" of your product, such as:
 
 * "Premium Analytics"
 * "API Access"
@@ -46,17 +46,14 @@ You can create and manage all features from one central location.
 
 ## Feature Types
 
-kelviq supports three types of features to model any business logic.
+Kelviq supports two types of features to model your business logic.
 
-<CardGroup cols={3}>
+<CardGroup cols={2}>
   <Card title="Switch (Boolean)" icon="toggle-off">
     The simplest type: the feature is either completely ON or OFF for a given plan.
   </Card>
   <Card title="Customizable" icon="gear">
-    Access is defined by a specific numeric limit (e.g., 10 seats).
-  </Card>
-  <Card title="Metered" icon="chart-bar">
-    Access is based on consumption, tracked via pre-aggregated totals or as raw events.
+    Access is defined by a specific numeric limit (e.g., 10 downloads, 5 projects).
   </Card>
 </CardGroup>
 
@@ -64,124 +61,33 @@ kelviq supports three types of features to model any business logic.
 
 A Switch feature is for simple, all-or-nothing access. It's perfect for functionality that doesn't have a quantity associated with it.
 
-* **Examples:** "Enable Single Sign-On (SSO)," "Access to Advanced Reporting," "White-labeling."
+* **Examples:** "Priority Support," "Access to Bonus Content," "Community Access," "Custom Branding"
 
 To create one, select **Switch/boolean** as the feature type and click **"Create"**.
 
 <Frame>
     <img height="200" src="/images/switch-boolean.png" />
-</Frame> 
+</Frame>
 
 ### Customizable
 
 A Customizable feature grants access up to a specific numeric limit that you define when adding it to a plan.
 
-* **Examples:** Maximum number of `team members`, `projects`, or `connected accounts`.
+* **Examples:** Number of `downloads`, maximum `projects`, `storage limit` (10 GB, 100 GB)
 
 To create one, select **Customizable** as the feature type.
 
 #### Feature Units
-For Customizable and Metered features, you can define how the unit of value is described to customers.
+For Customizable features, you can define how the unit of value is described to customers.
 * Click the pencil icon next to the "Feature unit" field.
 * Enter the singular and plural forms (e.g., "Project" and "Projects"). This ensures the unit is displayed grammatically correct in all UIs.
 
 <Frame>
     <img height="200" src="/images/input-fields.png" />
-</Frame> 
+</Frame>
 
 After configuring units, click **"Create"**.
 
-### Metered
-
-A Metered feature is for anything you want to bill based on consumption. This is the foundation of usage-based billing. kelviq supports two ways to track usage:
-
-* **Pre-aggregated usage:** Your application sends kelviq a total usage count periodically. Think of this as telling us the final score of a game.
-* **Raw events:** Your application sends individual events as they happen, and kelviq aggregates them for you. This is like sending us the play-by-play so we can calculate the score.
-
-#### Pre-aggregated Usage
-Select this option when your system already calculates total usage for a user.
-
-1.  Select **Metered** as the feature type, then choose **Pre-aggregated usage**.
-2.  Optionally, customize the initial **Feature unit** (singular/plural).
-3.  You can also toggle on **"Use different feature units for customers"**. When this is enabled, it reveals options to edit the base **Feature unit** (e.g., `call`/`calls`), a customer-facing **Customer unit value** (e.g., `k call`/`k calls`), and the **Internal unit conversion** rate between them. For a detailed explanation of how this conversion works, refer to the "Understanding Unit Conversion" section.
-4.  Click **"Create"** to finish.
-
-<Frame>
-    <img height="200" src="/images/pre-aggregated.png" />
-</Frame> 
-
-#### Raw Usage
-Select this option when you want kelviq to calculate usage totals based on an event stream. The creation process involves several key stages:
-```mermaid
-graph LR
-    A[Start: Select Raw usage] --> B["Step 1<br/>Configure Base<br/>Units, Optional Unit Conversion"]
-    B --> C[Click Continue]
-    C --> D["Step 2<br/>Define Event Filters<br/>Name, Properties, AND/OR Logic"]
-    D --> E["Step 3<br/>Configure Aggregation<br/>Method, Event Property if needed"]
-    E --> F[Click Create Feature]
-    F --> G[Feature Ready]
-```
-
-
-1.  Select **Metered** as the feature type, then choose **Raw usage**.
-2.  Optionally, customize the initial **Feature unit**. You can also toggle on **"Use different feature units for customers"** to reveal and set the base **Feature unit**, a customer-facing **Customer unit value**, and the **Internal unit conversion** rate.
-3.  Click **"Continue"**. This will take you to the event configuration screen.
-4.  **Define Event Filters:** Specify which events should count towards usage. You can filter by `event name` and add other properties from the event payload.
-    * Conditions *inside* a single filter group must *all* be true **(AND)**.
-    * You can add *more* filter groups. An event only needs to match one of these *entire groups* **(OR)**.
-
-    <Frame>
-    <img height="200" src="/images/define-event-filters.png" />
-    </Frame> 
-
-
-5.  **Configure Aggregation:** Specify how kelviq should calculate a single value from the filtered events. All methods besides `Count` require you to select an event property to aggregate.
-    * **Example:** To bill for data transfer, you could `Sum` the value of the `bytes_transferred` property on each event.
-
-    <Frame>
-    <img height="200" src="/images/configure-aggregation.png" />
-    </Frame> 
-
-6.  Click **"Create"** to save the feature and its aggregation rules. You will see a success screen.
-
-<Frame>
-    <img height="200" src="/images/raw-usage-success-screen.png" />
-</Frame> 
-
----
-
-## Understanding Unit Conversion
-
-For metered features, you can present usage to customers in a more readable format than what you use for internal tracking. For example, you might track usage by the `call` but want customers to see their usage and pricing in terms of `thousands of calls`.
-
-The relationship and flow of data for unit conversion can be visualized as:
-
-```mermaid
-flowchart LR
-    A["System Reports Usage (Base Units)"] --> B["Base Feature Unit (e.g., calls)"];
-    B -- "Conversion Rate (e.g., 1000 base = 1 customer_unit)" --> C["Customer Unit Value (e.g., k calls)"];
-    C --> D["Displayed to Customer / Billed (Rounded Up)"];
-```
-
-To do this, toggle on **"Use different feature units for customers"** during feature creation or editing. This reveals three key fields to configure this relationship:
-
-* **Feature unit:** This is the base unit that your system reports to kelviq (e.g., singular `call`, plural `calls`).
-* **Customer unit value:** This is the customer-facing unit name (e.g., singular `k call`, plural `k calls`).
-* **Internal unit conversion:** This is the conversion rate. For example: `1` customer-facing "k call" equals `1000` base "calls".
-
-<Warning>
-**Important:** Changing the conversion rate is only possible when there are no active subscriptions using this feature.
-</Warning>
-
-When this setup is enabled, your system reports usage to kelviq in the base unit (`calls`), but all displays within kelviq (like paywalls and customer portals) and data sent to billing systems will use the customer-facing unit (`k calls`).
-
-<Info>
-  **Billing and Rounding:** When integrated with a billing provider, the customer-facing units are **rounded up** to the nearest integer. If a customer uses 200 calls (which is `0.2` k calls, if 1 k call = 1000 calls), they will be billed for the full `1` k call.
-</Info>
-
-<Frame>
-    <img height="200" src="/images/unit-conversion.png" />
-</Frame> 
 ---
 
 ## Managing Features

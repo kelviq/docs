@@ -21,7 +21,7 @@
         "groups": [
           {
             "group": "Get Started",
-            "pages": ["getstarted/introduction-to-kelviq", "getstarted/merchant-of-record", "getstarted/review-process"]
+            "pages": ["getstarted/introduction-to-kelviq", "getstarted/merchant-of-record", "getstarted/fees", "getstarted/review-process"]
           },
           {
             "group": "Quickstart",
@@ -29,34 +29,26 @@
           },
           {
             "group": "Product Catalog",
-            "pages": ["product-catalog/products", "product-catalog/plans" , "product-catalog/features"]
+            "pages": [
+              "product-catalog/products",
+              "product-catalog/plans",
+              "product-catalog/features",
+              "product-catalog/digital-downloads",
+              "product-catalog/license-keys",
+              "product-catalog/entitlements"
+            ]
           },
           {
-            "group": "Monetization",
-            "pages": ["monetization/pricing-tables", "monetization/targeting-rules" , "monetization/offerings"]
+            "group": "Checkout",
+            "pages": [
+              "checkout/checkout-configuration"
+            ]
           },
           {
             "group": "Customers",
             "pages": [
               "customers/customers"
             ]
-          },
-          {
-            "group": "Dynamic Pricing",
-            "pages": ["dynamic-pricing/tailor-pricing" , "dynamic-pricing/purchaisng-parity-power-pricing" , "dynamic-pricing/country-based", "dynamic-pricing/browser"]
-          }
-        ]
-      },
-      {
-        "tab": "Guides",
-        "groups": [
-          {
-            "group": "Usecases",
-            "pages": ["guides/usecases/hybridpricing", "guides/usecases/usage-based" , "guides/usecases/credit-based", "guides/usecases/freemium-plan", "guides/usecases/ai-task-agents", "guides/usecases/monetization-usage-based"]
-          },
-          {
-            "group": "Comparisons",
-            "pages": ["guides/stripe-vs-kelviq-entitlements", "guides/stripe-adaptive-pricing-vs-kelviq-localization"]
           }
         ]
       },

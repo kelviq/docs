@@ -1,43 +1,128 @@
-# Mintlify Starter Kit
+# Kelviq Documentation
 
-Use the starter kit to get your docs deployed and ready to customize.
+Complete documentation for Kelviq, the SaaS monetization and subscription management platform.
 
-Click the green **Use this template** button at the top of this repo to copy the Mintlify starter kit. The starter kit contains examples with
+## Getting Started
 
-- Guide pages
-- Navigation
-- Customizations
-- API reference pages
-- Use of popular components
+### For Product Teams
+- [Introduction to Kelviq](getstarted/introduction-to-kelviq.mdx) - Overview and features
+- [Getting Started](quickstart/dashboard-setup.mdx) - Dashboard setup and first steps
+- [Review Process](getstarted/review-process.mdx) - Business verification and compliance
 
-**[Follow the full quickstart guide](https://starter.mintlify.com/quickstart)**
+### For Developers
+- [Core Concepts](quickstart/core-concepts.mdx) - Key terminology and architecture
+- [Integration Guide](quickstart/integrate-with-your-app.mdx) - How to integrate Kelviq
+- [API Reference](api-reference/openapi.json) - Complete API documentation
 
-## Development
+## Key Features
 
-Install the [Mintlify CLI](https://www.npmjs.com/package/mint) to preview your documentation changes locally. To install, use the following command:
+### Product Management
+- **[Products](/product-catalog/products)** - Create and manage your digital products
+- **[Plans & Pricing](/product-catalog/plans)** - Configure flexible pricing models
+- **[Features](/product-catalog/features)** - Define feature access and limits
+- **[Digital Downloads](/product-catalog/digital-downloads)** - Deliver files after purchase
+- **[License Keys](/product-catalog/license-keys)** - Manage software licensing
+- **[Entitlements](/product-catalog/entitlements)** - Control feature access per customer
 
-```
+### Monetization
+- **[Checkout](/checkout/checkout-configuration)** - Configure and customize checkout
+- **[Customers](customers/customers)** - Manage customer subscriptions
+- **[Webhooks](webhooks/webhooks)** - Real-time event notifications
+- **[Webhooks](webhooks/webhooks)** - Real-time event notifications
+
+### Developer Tools
+- **[Authentication](api-reference/authentication)** - API key setup
+- **[Error Codes](api-reference/errors)** - Error handling reference
+- **[Python SDK](api-reference/backend-integration/python-sdk)** - Backend integration
+- **[Node.js SDK](api-reference/backend-integration/node-sdk)** - Backend integration
+- **[React SDK](frontend-integration/react-sdk)** - Frontend integration
+- **[React UI](frontend-integration/react-ui)** - Pre-built components
+
+## Common Tasks
+
+- [Set up a free trial](product-catalog/plans) for your first plan
+- [Configure multi-currency pricing](product-catalog/plans) with regional pricing
+- [Deliver digital files](product-catalog/digital-downloads) to customers
+- [Generate license keys](product-catalog/license-keys) automatically
+- [Track feature usage](product-catalog/entitlements) per customer
+- [Listen to webhooks](webhooks/webhooks) for real-time events
+
+## Troubleshooting
+
+Having issues? Check the [Troubleshooting Guide](troubleshooting/common-issues) for solutions to common problems.
+
+## Support
+
+- **Documentation** - You're reading it!
+- **API Docs** - [Full API Reference](api-reference/openapi.json)
+- **Email Support** - hi@kelviq.com
+- **Status Page** - status.kelviq.com
+
+## Local Development
+
+To preview documentation changes locally:
+
+### Install Mintlify CLI
+```bash
 npm i -g mint
 ```
 
-Run the following command at the root of your documentation, where your `docs.json` is located:
-
-```
+### Run dev server
+```bash
 mint dev
 ```
 
-View your local preview at `http://localhost:3000`.
+### View preview
+Open `http://localhost:3000` in your browser.
 
-## Publishing changes
+## Deploying Changes
 
-Install our GitHub app from your [dashboard](https://dashboard.mintlify.com/settings/organization/github-app) to propagate changes from your repo to your deployment. Changes are deployed to production automatically after pushing to the default branch.
+Changes to the `main` branch are automatically deployed to production.
 
-## Need help?
+To preview changes before deployment:
+1. Create a branch
+2. Make changes
+3. Create a pull request
+4. Preview changes in the Mintlify dashboard
+5. Merge to deploy
 
-### Troubleshooting
+## Documentation Structure
 
-- If your dev environment isn't running: Run `mint update` to ensure you have the most recent version of the CLI.
-- If a page loads as a 404: Make sure you are running in a folder with a valid `docs.json`.
+```
+/docs
+├── getstarted/          # Getting started guides
+├── quickstart/          # Quickstart and core concepts
+├── product-catalog/     # Product management docs
+├── checkout/            # Checkout configuration
+├── customers/           # Customer management
+├── api-reference/       # API docs and error codes
+├── webhooks/            # Webhook documentation
+├── frontend-integration/# Frontend SDKs
+├── troubleshooting/     # Troubleshooting guides
+└── docs.json           # Navigation and config
+```
 
-### Resources
-- [Mintlify documentation](https://mintlify.com/docs)
+## Contributing
+
+To contribute to Kelviq docs:
+
+1. Make your changes in the appropriate directory
+2. Test locally with `mint dev`
+3. Create a pull request
+4. After approval, merge to `main`
+5. Changes deploy automatically
+
+### Style Guide
+
+- Use clear, developer-friendly language
+- Include code examples for API features
+- Use Mintlify components for formatting
+- Link to related documentation
+- Keep sections concise and focused
+
+## Need Help?
+
+- **Can't find something?** - Use the search feature (top of page)
+- **Having issues?** - Check [Troubleshooting](troubleshooting/common-issues)
+- **Want to report a bug?** - Email hi@kelviq.com
+- **Have suggestions?** - We'd love your feedback!
