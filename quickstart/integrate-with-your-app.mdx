@@ -75,8 +75,8 @@ npm install @kelviq/react-ui
 Wrap your app with the provider:
 
 ```tsx
-import { KelviqProvider, PDPricingTable } from '@kelviq/react-ui';
-import '@kelviq/react-ui/dist/pd-react-ui.css';
+import { KelviqProvider, KQPricingTable } from '@kelviq/react-ui';
+import '@kelviq/react-ui/dist/kq-react-ui.css';
 
 export default function App() {
   return (
@@ -85,7 +85,7 @@ export default function App() {
       offeringId="YOUR_OFFERING_ID"      // from dashboard → offerings
       customerId="unique-customer-001"   // required when embedding in-app, links existing subscriptions
     >
-      <PDPricingTable />
+      <KQPricingTable />
       <OtherComponents />
     </KelviqProvider>
   );

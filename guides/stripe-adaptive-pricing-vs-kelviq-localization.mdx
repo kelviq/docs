@@ -10,7 +10,7 @@ description: "Stripe shows local prices on hosted pages. kelviq brings true pric
 - Show localized product prices directly on your **custom website**
 - Detect **visitor location**, convert currency, and apply region based pricing
 - Prevent abuse using **VPN, proxy, and Tor detection**
-- Integrate with your UI using components like `<PDPricingTable>` and `<PDPrice>`
+- Integrate with your UI using components like `<KQPricingTable>` and `<KQPrice>`
 - Make changes from the dashboard (no redeploy required)
 
 ---
@@ -22,7 +22,7 @@ description: "Stripe shows local prices on hosted pages. kelviq brings true pric
 | Works on hosted checkout | ✅ | ✅ | Stripe only supports its hosted pages |
 | Works on your own website | ❌ | ✅ | kelviq shows localized prices before checkout |
 | Works with subscriptions | ❌ | ✅ | Stripe supports only one time payments |
-| Pricing UI components | ❌ | ✅ | `<PDPricingTable>`, `<PDPrice>`, and SDK API |
+| Pricing UI components | ❌ | ✅ | `<KQPricingTable>`, `<KQPrice>`, and SDK API |
 | Dashboard to manage localization | ❌ | ✅ | Configure geo rules without code |
 | Detects VPN, proxy, Tor | ❌ | ✅ | Protects from discounted abuse |
 | JS SDK for dynamic pricing | ❌ | ✅ | Lightweight and async |
@@ -50,18 +50,18 @@ No frontend API or SDK is available to show the adjusted amount before checkout.
 You can use the kelviq SDK and components to display region specific pricing
 
 ```tsx
-import { PDPricingTable, PDPrice } from '@kelviq/react-ui';
+import { KQPricingTable, KQPrice } from '@kelviq/react-ui';
 
 <KelviqProvider
     accessToken={process.env.Kelviq_ACCESS_TOKEN}
 >
     // Automatically uses the price from the current region
-    <PDPricingTable />
+    <KQPricingTable />
 </KelviqProvider>
 
 // Or use inline price rendering
 // Automatically uses the price from the current region
-<PDPrice />
+<KQPrice />
 ```
 
 ```text

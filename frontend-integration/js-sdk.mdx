@@ -40,18 +40,18 @@ Get started with the SDK in just a few lines of code.
 import kelviqSDK from '@kelviq/js-sdk';
 
 // Initialize the SDK
-const pd = kelviqSDK({
+const kq = kelviqSDK({
   customerId: "your-customer-id",
   accessToken: "your-access-token",
 });
 
 // Check if user has access to a feature
-if (pd.hasAccess('premium-features')) {
+if (kq.hasAccess('premium-features')) {
   console.log("User has access to premium features!");
 }
 
 // Get specific entitlement details
-const emailLimit = pd.getEntitlement('email-sends', 'metered');
+const emailLimit = kq.getEntitlement('email-sends', 'metered');
 if (emailLimit && emailLimit.hasAccess) {
   console.log(`Emails remaining: ${emailLimit.remaining}`);
 }
@@ -68,7 +68,7 @@ Create and configure your SDK instance with the required parameters.
 
 ```typescript
 // Initialize the SDK
-const pd = kelviqSDK({
+const kq = kelviqSDK({
   customerId: "your-customer-id",
   accessToken: "your-access-token",
 });
@@ -92,7 +92,7 @@ const pd = kelviqSDK({
 Check if the user has access to a specific feature.
 
 ```typescript
-if (pd.hasAccess('premium-features')) {
+if (kq.hasAccess('premium-features')) {
   // Show premium features
   showPremiumUI();
 }
@@ -104,19 +104,19 @@ Get detailed entitlement information for a specific feature.
 
 ```typescript
 // Boolean entitlement
-const canUseAnalytics = pd.getEntitlement('analytics', 'boolean');
+const canUseAnalytics = kq.getEntitlement('analytics', 'boolean');
 if (canUseAnalytics?.hasAccess) {
   enableAnalytics();
 }
 
 // Configurable entitlement
-const storageLimit = pd.getEntitlement('storage-limit', 'customizable');
+const storageLimit = kq.getEntitlement('storage-limit', 'customizable');
 if (storageLimit?.hasAccess && storageLimit.configuration) {
   setStorageLimit(storageLimit.configuration);
 }
 
 // Metered entitlement
-const emailQuota = pd.getEntitlement('email-sends', 'metered');
+const emailQuota = kq.getEntitlement('email-sends', 'metered');
 if (emailQuota?.hasAccess && emailQuota.remaining !== null && emailQuota.remaining > 0) {
   console.log(`Emails remaining: ${emailQuota.remaining}`);
 }
@@ -127,7 +127,7 @@ if (emailQuota?.hasAccess && emailQuota.remaining !== null && emailQuota.remaini
 Get all cached entitlements.
 
 ```typescript
-const allEntitlements = pd.getAllEntitlements();
+const allEntitlements = kq.getAllEntitlements();
 if (allEntitlements) {
   Object.entries(allEntitlements).forEach(([featureId, entitlement]) => {
     console.log(`${featureId}: ${entitlement.hasAccess ? 'Access granted' : 'Access denied'}`);
@@ -142,7 +142,7 @@ Manually fetch or refresh entitlements from the server.
 ```typescript
 // Fetch fresh data
 try {
-  const entitlements = await pd.fetchAllEntitlements(true);
+  const entitlements = await kq.fetchAllEntitlements(true);
   console.log('Entitlements refreshed:', entitlements);
 } catch (error) {
   console.error('Failed to refresh entitlements:', error);
@@ -154,7 +154,7 @@ try {
 Check if entitlements are currently being fetched.
 
 ```typescript
-if (pd.isLoading()) {
+if (kq.isLoading()) {
   showLoadingSpinner();
 } else {
   hideLoadingSpinner();
@@ -166,7 +166,7 @@ if (pd.isLoading()) {
 Get the last error that occurred during entitlement fetching.
 
 ```typescript
-const lastError = pd.getLastError();
+const lastError = kq.getLastError();
 if (lastError) {
   console.error('Last SDK error:', lastError.message);
 }
@@ -177,7 +177,7 @@ if (lastError) {
 Clear the cached entitlements.
 
 ```typescript
-pd.clearCache();
+kq.clearCache();
 // Next call to hasAccess or getEntitlement will trigger a new fetch
 ```
 
@@ -208,12 +208,12 @@ Control access to features based on user entitlements.
 
 ```typescript
 // Simple feature gate
-if (pd.hasAccess('beta-features')) {
+if (kq.hasAccess('beta-features')) {
   showBetaFeatures();
 }
 
 // Conditional rendering
-const canUseAdvancedSearch = pd.hasAccess('advanced-search');
+const canUseAdvancedSearch = kq.hasAccess('advanced-search');
 return (
   <div>
     <BasicSearch />
@@ -227,7 +227,7 @@ return (
 Implement usage limits and quota management.
 
 ```typescript
-const apiCalls = pd.getEntitlement('api-calls', 'metered');
+const apiCalls = kq.getEntitlement('api-calls', 'metered');
 if (apiCalls?.hasAccess) {
   if (apiCalls.remaining === null || apiCalls.remaining > 0) {
     // Allow API call
@@ -244,7 +244,7 @@ if (apiCalls?.hasAccess) {
 Apply dynamic configuration based on user entitlements.
 
 ```typescript
-const teamSizeEntitlement = pd.getEntitlement('max-team-size', 'customizable');
+const teamSizeEntitlement = kq.getEntitlement('max-team-size', 'customizable');
 
 if (teamSizeEntitlement?.hasAccess && teamSizeEntitlement.configuration) {
   const maxTeamSize = teamSizeEntitlement.configuration;
@@ -263,7 +263,7 @@ if (teamSizeEntitlement?.hasAccess && teamSizeEntitlement.configuration) {
 Robust error handling for production applications.
 
 ```typescript
-const pd = kelviqSDK({
+const kq = kelviqSDK({
   customerId: "user123",
   accessToken: "token456",
   onError: (error) => {
@@ -277,7 +277,7 @@ const pd = kelviqSDK({
 
 // Handle fetch errors
 try {
-  await pd.fetchAllEntitlements();
+  await kq.fetchAllEntitlements();
 } catch (error) {
   console.error('Failed to load entitlements:', error);
   // Fallback to default behavior
@@ -314,7 +314,7 @@ async function customApiRequest<T>(config: ApiRequestConfig): Promise<ApiRespons
 }
 
 // Use custom API request
-const pd = kelviqSDK({
+const kq = kelviqSDK({
   customerId: "user123",
   accessToken: "token456"
 }, customApiRequest);
@@ -339,10 +339,10 @@ const options: KelviqClientOptions = {
   accessToken: "token456"
 };
 
-const pd = kelviqSDK(options);
+const kq = kelviqSDK(options);
 
 // Type-safe entitlement access
-const emailQuota: MeteredEntitlement | null = pd.getEntitlement('emails', 'metered');
+const emailQuota: MeteredEntitlement | null = kq.getEntitlement('emails', 'metered');
 ```
 
 
@@ -355,7 +355,7 @@ Advanced options for customizing SDK behavior and API integration.
 Configure API request behavior and retry logic.
 
 ```typescript
-const pd = kelviqSDK({
+const kq = kelviqSDK({
   customerId: "user123",
   accessToken: "token456",
   apiConfig: {
@@ -371,7 +371,7 @@ const pd = kelviqSDK({
 Implement sophisticated error handling and recovery strategies.
 
 ```typescript
-const pd = kelviqSDK({
+const kq = kelviqSDK({
   customerId: "user123",
   accessToken: "token456",
   onError: (error) => {
@@ -380,7 +380,7 @@ const pd = kelviqSDK({
     
     // Retry logic
     if (error.message.includes('network')) {
-      setTimeout(() => pd.fetchAllEntitlements(), 5000);
+      setTimeout(() => kq.fetchAllEntitlements(), 5000);
     }
   }
 });
@@ -392,7 +392,7 @@ Additional configuration options for specialized use cases.
 
 Default values are:
 ```typescript
-const pd = kelviqSDK({
+const kq = kelviqSDK({
   customerId: "",
   accessToken: "",
   apiUrl: "https://edge.api.kelviq.com/api/v1",
@@ -419,7 +419,7 @@ const pd = kelviqSDK({
 If you want to use the sandbox, you need to set the `environment` option to `sandbox` in the `init` function.
 
 ```typescript
-const pd = kelviqSDK({
+const kq = kelviqSDK({
   customerId: "your-customer-id",
   accessToken: "your-access-token",
   environment: "sandbox"

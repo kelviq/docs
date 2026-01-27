@@ -29,8 +29,8 @@ yarn add @kelviq/react-ui
 Note: You must import the CSS file for the components to be styled correctly.
 
 ```tsx
-import { KelviqProvider, PDPricingTable } from '@kelviq/react-ui';
-import '@kelviq/react-ui/dist/pd-react-ui.css';
+import { KelviqProvider, KQPricingTable } from '@kelviq/react-ui';
+import '@kelviq/react-ui/dist/kq-react-ui.css';
 
 function App() {
   return (
@@ -39,7 +39,7 @@ function App() {
       offeringId="YOUR_OFFERING_ID"
       customerId="OPTIONAL_CUSTOMER_ID"
     >
-      <PDPricingTable />
+      <KQPricingTable />
     </KelviqProvider>
   );
 }
@@ -48,8 +48,8 @@ function App() {
 ### With Custom Event Handling
 
 ```tsx
-import { KelviqProvider, PDPricingTable } from '@kelviq/react-ui';
-import '@kelviq/react-ui/dist/pd-react-ui.css';
+import { KelviqProvider, KQPricingTable } from '@kelviq/react-ui';
+import '@kelviq/react-ui/dist/kq-react-ui.css';
 
 function App() {
   const handleCustomPriceClick = (details) => {
@@ -63,7 +63,7 @@ function App() {
       offeringId="YOUR_OFFERING_ID"
       customerId="OPTIONAL_CUSTOMER_ID"
     >
-      <PDPricingTable
+      <KQPricingTable
         onCustomPriceClick={handleCustomPriceClick}
         customStyles={{
           style: {
@@ -116,7 +116,7 @@ interface KelviqAPIConfig {
 }
 ```
 
-### 4.2. `PDPricingTable`
+### 4.2. `KQPricingTable`
 
 The main pricing table component that displays all plans and handles user interactions.
 
@@ -148,7 +148,7 @@ The main pricing table component that displays all plans and handles user intera
 #### Example Usage
 
 ```tsx
-<PDPricingTable
+<KQPricingTable
   onCustomPriceClick={(details) => {
     console.log('Custom plan selected:', details.plan.displayName);
     // Handle custom pricing logic
@@ -181,7 +181,7 @@ The main pricing table component that displays all plans and handles user intera
 />
 ```
 
-### 4.3. `PDPlan`
+### 4.3. `KQPlan`
 
 Renders a list of pricing plans with billing period switching.
 
@@ -203,7 +203,7 @@ Renders a list of pricing plans with billing period switching.
 | `actionButtonLoadingPlanIdentifier` | `string` | No | Loading state for specific plan |
 | `noStyles` | `boolean` | No | Disable default styling |
 
-### 4.4. `PDPlanItem`
+### 4.4. `KQPlanItem`
 
 Displays a single pricing plan card.
 
@@ -219,7 +219,7 @@ Displays a single pricing plan card.
 | `currencySymbol` | `string` | Yes | Currency symbol |
 | `currencyConversionRate` | `number` | Yes | Conversion rate |
 | `pricingLocale` | `string` | Yes | Locale for formatting |
-| `onPdPlanItemClick` | `(details: PlanClickDetails) => void` | Yes | Click handler |
+| `onKQPlanItemClick` | `(details: PlanClickDetails) => void` | Yes | Click handler |
 | `customActionButton` | `CustomActionButton` | No | Custom button |
 | `actionButtonText` | `string` | No | Button text |
 | `actionButtonLoading` | `boolean` | No | Loading state |
@@ -228,7 +228,7 @@ Displays a single pricing plan card.
 | `successText` | `string` | No | Success message |
 | `noStyles` | `boolean` | No | Disable styling |
 
-### 4.5. `PDPrice`
+### 4.5. `KQPrice`
 
 Renders formatted price display with currency and period information.
 
@@ -249,7 +249,7 @@ Renders formatted price display with currency and period information.
 | `minimumFractionDigits` | `number` | Yes | Minimum decimal places |
 | `maximumFractionDigits` | `number` | Yes | Maximum decimal places |
 
-### 4.6. `PDFeatures`
+### 4.6. `KQFeatures`
 
 Renders the features list for a plan.
 
@@ -394,60 +394,60 @@ The SDK uses CSS variables for styling. You can override these in your CSS:
 ```css
 :root {
   /* Card & Background */
-  --pd-card-bg: #ffffff;
-  --pd-card-border-width: 1px solid;
-  --pd-card-border-color: 1px solid;
+  --kq-card-bg: #ffffff;
+  --kq-card-border-width: 1px solid;
+  --kq-card-border-color: 1px solid;
 
   /* Text Colors */
-  --pd-title-color: #171923;
-  --pd-description-color: #718096;
-  --pd-feature-color: #171923;
+  --kq-title-color: #171923;
+  --kq-description-color: #718096;
+  --kq-feature-color: #171923;
 
   /* Price Colors */
-  --pd-price-color: #171923;
-  --pd-price-unit-color: #171923;
-  --pd-price-period-color: #718096;
+  --kq-price-color: #171923;
+  --kq-price-unit-color: #171923;
+  --kq-price-period-color: #718096;
 
   /* Button Colors */
-  --pd-button-bg: #1A202C;
-  --pd-button-hover-bg: #1A202C;
-  --pd-button-color: #F7FAFC;
+  --kq-button-bg: #1A202C;
+  --kq-button-hover-bg: #1A202C;
+  --kq-button-color: #F7FAFC;
 
   /* Billing Switch Colors */
-  --pd-billing-switch-bg: #1A202C;
-  --pd-billing-switch-color: #F7FAFC;
-  --pd-billing-switch-selected-color: #F7FAFC;
+  --kq-billing-switch-bg: #1A202C;
+  --kq-billing-switch-color: #F7FAFC;
+  --kq-billing-switch-selected-color: #F7FAFC;
 
   /* UI Elements */
-  --pd-divider-color: #E2E8F0;
-  --pd-tooltip-bg: #2D3748;
-  --pd-tooltip-color: #ffffff;
+  --kq-divider-color: #E2E8F0;
+  --kq-tooltip-bg: #2D3748;
+  --kq-tooltip-color: #ffffff;
 
   /* Typography - Title */
-  --pd-title-size: 24px;
-  --pd-title-weight: 600;
+  --kq-title-size: 24px;
+  --kq-title-weight: 600;
 
   /* Typography - Description */
-  --pd-description-size: 16px;
-  --pd-description-weight: 400;
+  --kq-description-size: 16px;
+  --kq-description-weight: 400;
 
   /* Typography - Price */
-  --pd-price-size: 28px;
-  --pd-price-weight: 700;
-  --pd-price-unit-size: 32px;
-  --pd-price-unit-weight: 700;
-  --pd-price-period-size: 16px;
-  --pd-price-period-weight: 400;
+  --kq-price-size: 28px;
+  --kq-price-weight: 700;
+  --kq-price-unit-size: 32px;
+  --kq-price-unit-weight: 700;
+  --kq-price-period-size: 16px;
+  --kq-price-period-weight: 400;
 
   /* Typography - Feature */
-  --pd-feature-size: 14px;
-  --pd-feature-weight: 400;
+  --kq-feature-size: 14px;
+  --kq-feature-weight: 400;
 
   /* Layout */
-  --pd-min-width: 360px;
-  --pd-max-width: 400px;
-  --pd-gap: 24px;
-  --pd-align: center;
+  --kq-min-width: 360px;
+  --kq-max-width: 400px;
+  --kq-gap: 24px;
+  --kq-align: center;
 }
 ```
 
@@ -502,7 +502,7 @@ const CustomButton: CustomActionButton = ({ onClick, children, plan, disabled })
   </button>
 );
 
-<PDPricingTable customActionButton={CustomButton} />
+<KQPricingTable customActionButton={CustomButton} />
 ```
 
 ### 6.4. noStyles Mode
@@ -510,47 +510,47 @@ const CustomButton: CustomActionButton = ({ onClick, children, plan, disabled })
 For complete styling control, use the `noStyles` prop:
 
 ```tsx
-<PDPricingTable noStyles={true} />
+<KQPricingTable noStyles={true} />
 ```
 
 ### 6.5. CSS Class Reference
 
-The kelviq React UI components use consistent CSS class names that you can target for custom styling. All classes are prefixed with `pd-` to avoid naming conflicts.
+The kelviq React UI components use consistent CSS class names that you can target for custom styling. All classes are prefixed with `kq-` to avoid naming conflicts.
 
 #### CSS Class Hierarchy
 
 ```css
-.pd-plan                          /* Root container */
-├── .pd-plan-switch              /* Billing period switcher */
-│   └── .pd-switch               /* Switch wrapper */
-│       └── .pd-switch-button    /* Individual switch buttons */
-│           └── .pd-promo-caption /* Discount badges (20%, etc.) */
-├── .pd-plan-items              /* Plans container */
-    └── .pd-plan-item           /* Individual plan card */
-        ├── .pd-plan-item-header /* Plan title section */
-        │   ├── .pd-plan-item-heading    /* Plan name */
-        │   └── .pd-plan-item-subheading /* Plan description */
-        ├── .pd-plan-item-price /* Price section */
-        │   ├── .pd-price-container      /* Price wrapper */
-        │   │   ├── .pd-price-currency   /* Currency container */
-        │   │   │   ├── .pd-price-currency-symbol /* $ symbol */
-        │   │   │   └── .pd-price-currency-code   /* USD text */
-        │   │   ├── .pd-price-integer    /* Main price number */
-        │   │   ├── .pd-price-decimal-separator /* Decimal point */
-        │   │   └── .pd-price-decimal    /* Decimal digits */
-        │   └── .pd-plan-item-price-period /* /month text */
-        ├── .pd-separator           /* Divider line */
-        ├── .pd-plan-item-features  /* Features section */
-        │   └── .pd-features-list   /* Features list */
-        │       └── .pd-features-list-item /* Individual features */
-        │           ├── .pd-tooltip-wrapper /* Feature tooltips */
-        │           │   └── .pd-tooltip      /* Tooltip content */
-        │           ├── .pd-feature-quantity-input /* Quantity number input */
-        │           ├── .pd-feature-quantity-input-unit /* Input unit label */
-        │           └── .pd-feature-quantity-select-container /* Quantity dropdown */
-        │               ├── .pd-feature-quantity-select /* Select element */
-        │               └── .pd-feature-quantity-select-arrow /* Dropdown arrow */
-        └── .pd-plan-item-button    /* CTA button */
+.kq-plan                          /* Root container */
+├── .kq-plan-switch              /* Billing period switcher */
+│   └── .kq-switch               /* Switch wrapper */
+│       └── .kq-switch-button    /* Individual switch buttons */
+│           └── .kq-promo-caption /* Discount badges (20%, etc.) */
+├── .kq-plan-items              /* Plans container */
+    └── .kq-plan-item           /* Individual plan card */
+        ├── .kq-plan-item-header /* Plan title section */
+        │   ├── .kq-plan-item-heading    /* Plan name */
+        │   └── .kq-plan-item-subheading /* Plan description */
+        ├── .kq-plan-item-price /* Price section */
+        │   ├── .kq-price-container      /* Price wrapper */
+        │   │   ├── .kq-price-currency   /* Currency container */
+        │   │   │   ├── .kq-price-currency-symbol /* $ symbol */
+        │   │   │   └── .kq-price-currency-code   /* USD text */
+        │   │   ├── .kq-price-integer    /* Main price number */
+        │   │   ├── .kq-price-decimal-separator /* Decimal point */
+        │   │   └── .kq-price-decimal    /* Decimal digits */
+        │   └── .kq-plan-item-price-period /* /month text */
+        ├── .kq-separator           /* Divider line */
+        ├── .kq-plan-item-features  /* Features section */
+        │   └── .kq-features-list   /* Features list */
+        │       └── .kq-features-list-item /* Individual features */
+        │           ├── .kq-tooltip-wrapper /* Feature tooltips */
+        │           │   └── .kq-tooltip      /* Tooltip content */
+        │           ├── .kq-feature-quantity-input /* Quantity number input */
+        │           ├── .kq-feature-quantity-input-unit /* Input unit label */
+        │           └── .kq-feature-quantity-select-container /* Quantity dropdown */
+        │               ├── .kq-feature-quantity-select /* Select element */
+        │               └── .kq-feature-quantity-select-arrow /* Dropdown arrow */
+        └── .kq-plan-item-button    /* CTA button */
 ```
 
 ---
@@ -587,7 +587,7 @@ const features = [
 Handle custom pricing plans with the `onCustomPriceClick` callback:
 
 ```tsx
-<PDPricingTable
+<KQPricingTable
   onCustomPriceClick={(details) => {
     // Open contact form or custom pricing modal
     openCustomPricingModal(details.plan);
@@ -619,7 +619,7 @@ The SDK automatically handles subscription updates:
     timeout: 10000
   }}
 >
-  <PDPricingTable />
+  <KQPricingTable />
 </KelviqProvider>
 ```
 
@@ -631,7 +631,7 @@ The SDK automatically handles subscription updates:
 import React from 'react';
 import {
   KelviqProvider,
-  PDPricingTable,
+  KQPricingTable,
   PricingTableStyle
 } from '@kelviq/react-ui';
 
@@ -698,7 +698,7 @@ const App: React.FC = () => {
           timeout: 10000
         }}
       >
-        <PDPricingTable
+        <KQPricingTable
           customStyles={customStyles}
           onCustomPriceClick={handleCustomPriceClick}
         />
