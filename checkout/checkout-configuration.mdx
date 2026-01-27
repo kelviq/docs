@@ -59,7 +59,7 @@ Include multiple plans in a single checkout to let customers choose their tier.
   - Disabled plans don't appear in checkout
 </Card>
 
-### Example: SaaS Pricing
+### Example: Multi-Plan Pricing
 
 Your product has 3 plans: Free, Pro, Enterprise
 
@@ -93,11 +93,10 @@ Plans in Kelviq can support multiple billing periods:
 
 | Period | Duration | Use Case |
 |--------|----------|----------|
-| **Monthly** | 1 month | Subscription SaaS, recurring billing |
-| **Quarterly** | 3 months | Medium-term commitments |
-| **Semi-annual** | 6 months | Longer commitments, volume discounts |
-| **Yearly** | 12 months | Annual billing, biggest discounts |
-| **One-time** | One-off payment | Digital products, courses, lifetime access |
+| **Monthly** | 1 month | Recurring subscriptions |
+| **3 Months** | 3 months | Quarterly billing |
+| **Yearly** | 12 months | Annual billing, often with discounts |
+| **One Time** | One-off payment | Digital products, courses, lifetime access |
 
 ### Setting Default Billing Period
 
@@ -271,39 +270,45 @@ View checkout sessions in the dashboard:
 3. **Filter by status** → Open, Success, Closed
 4. **Conversion metrics** → Track conversion rates
 
-### API Access
+### Create Checkout Sessions via API
+
+You can programmatically create checkout sessions using the SDK:
 
 <Tabs>
   <Tab title="Python">
     ```python
-    from kelviq_sdk import KelviqClient
+    from kelviq_sdk import Kelviq
 
-    client = KelviqClient(api_key="your_server_key")
+    client = Kelviq.create_sync_client(access_token="your_server_api_key")
 
-    # Get checkout session details
-    session = client.checkout.get_session(session_id="chs_123")
+    # Create a checkout session
+    response = client.checkout.create_session(
+        planIdentifier="plan-pro-monthly",
+        chargePeriod="MONTHLY",
+        customerId="cust_123",
+        successUrl="https://yoursite.com/checkout/success"
+    )
 
-    print(f"Status: {session['status']}")  # open, success, closed
-    print(f"Plan: {session['selected_data']['plan_identifier']}")
-    print(f"Customer: {session['customer']['email']}")
-    print(f"Amount: {session['total_amount']} {session['currency']}")
-
-    # List open checkouts
-    open_sessions = client.checkout.list_sessions(status="open")
-    print(f"Open checkouts: {len(open_sessions)}")
+    print(f"Checkout URL: {response.checkoutUrl}")
+    print(f"Session ID: {response.checkoutSessionId}")
     ```
   </Tab>
   <Tab title="Node.js">
-    ```javascript
-    const { KelviqClient } = require('kelviq-sdk');
+    ```typescript
+    import { Kelviq, CHARGE_PERIOD_CHOICES } from '@kelviq/node-sdk';
 
-    const client = new KelviqClient({ apiKey: 'your_server_key' });
+    const client = new Kelviq({ accessToken: 'your_server_api_key' });
 
-    const session = await client.checkout.getSession('chs_123');
+    // Create a checkout session
+    const response = await client.checkout.createSession({
+        planIdentifier: "plan-pro-monthly",
+        chargePeriod: CHARGE_PERIOD_CHOICES.MONTHLY,
+        customerId: "cust_123",
+        successUrl: "https://yoursite.com/checkout/success"
+    });
 
-    console.log(`Status: ${session.status}`);
-    console.log(`Plan: ${session.selected_data.plan_identifier}`);
-    console.log(`Customer: ${session.customer.email}`);
+    console.log(`Checkout URL: ${response.checkoutUrl}`);
+    console.log(`Session ID: ${response.checkoutSessionId}`);
     ```
   </Tab>
 </Tabs>
@@ -322,12 +327,12 @@ Product: My Course
 Link: ?enabled=full_access&plan_identifier=full_access&charge_period=one_time
 ```
 
-### Example 2: Tiered SaaS
+### Example 2: Tiered Plans
 
 Multiple plans, multiple billing periods:
 
 ```
-Product: API Platform
+Product: Pro Templates
 ├─ Plan 1: Starter ($9/month or $90/year)
 ├─ Plan 2: Professional ($29/month or $290/year)
 └─ Plan 3: Enterprise (Custom pricing)
