@@ -343,6 +343,84 @@
           }
         }
       },
+      "LicenseActivation": {
+    "type": "object",
+    "properties": {
+      "licenseKey": { "type": "string" },
+      "customerId": { "type": "string" },
+      "instanceName": { "type": "string" },
+      "metadata": { "type": "object", "additionalProperties": {} }
+    },
+    "required": ["licenseKey"],
+    "example": {
+      "licenseKey": "KLVQ-PRO-1234-ABCD-9999",
+      "customerId": "cust_45678",
+      "instanceName": "Geo's MacBook Pro"
+    }
+  },
+      "LicenseActivationResponse": {
+        "type": "object",
+        "properties": {
+          "instanceId": { "type": "string", "format": "uuid" },
+          "activatedAt": { "type": "string", "format": "date-time" },
+          "expiresOn": { "type": "string", "format": "date-time", "nullable": true }
+        },
+        "example": {
+          "instanceId": "8f3e2b1a-5c6d-4e9f-8a0b-1c2d3e4f5g6h",
+          "activatedAt": "2026-01-27T10:33:00Z",
+          "expiresOn": "2027-01-27T10:33:00Z"
+        }
+      },
+      "LicenseDeactivation": {
+        "type": "object",
+        "properties": {
+          "licenseKey": { "type": "string" },
+          "instanceId": { "type": "string", "format": "uuid" }
+        },
+        "required": ["instanceId", "licenseKey"],
+        "example": {
+          "licenseKey": "KLVQ-PRO-1234-ABCD-9999",
+          "instanceId": "8f3e2b1a-5c6d-4e9f-8a0b-1c2d3e4f5g6h"
+        }
+      },
+      "LicenseDeactivationResponse": {
+        "type": "object",
+        "properties": {
+          "message": { "type": "string" },
+          "deactivatedAt": { "type": "string", "format": "date-time" }
+        },
+        "example": {
+          "message": "License instance deactivated successfully.",
+          "deactivatedAt": "2026-01-27T10:35:00Z"
+        }
+      },
+      "LicenseValidate": {
+        "type": "object",
+        "properties": {
+          "licenseKey": { "type": "string" },
+          "instanceId": { "type": "string", "format": "uuid" }
+        },
+        "required": ["licenseKey"],
+        "example": {
+          "licenseKey": "KLVQ-PRO-1234-ABCD-9999",
+          "instanceId": "8f3e2b1a-5c6d-4e9f-8a0b-1c2d3e4f5g6h"
+        }
+      },
+      "LicenseValidationResponse": {
+    "type": "object",
+    "properties": {
+      "valid": { "type": "boolean" },
+      "code": { "type": "string" },
+      "detail": { "type": "string" },
+      "metadata": { "type": "object", "additionalProperties": true }
+    },
+    "example": {
+      "valid": true,
+      "code": "VALID",
+      "detail": "Instance ID valid for this license.",
+      "metadata": { "os": "macOS", "arch": "arm64" }
+    }
+  },
       "ReportUsageRequest": {
         "type": "object",
         "required": [
@@ -1131,6 +1209,109 @@
         }
       }
     },
+    "/license/activate/": {
+    "post": {
+      "operationId": "licenseActivate",
+      "tags": ["License"],
+      "summary": "Activate License",
+      "requestBody": {
+        "required": true,
+        "content": {
+          "application/json": {
+            "schema": { "$ref": "#/components/schemas/LicenseActivation" },
+            "example": {
+              "licenseKey": "KLVQ-PRO-1234-ABCD-9999",
+              "customerId": "cust_45678",
+              "instanceName": "Geo's MacBook Pro"
+            }
+          }
+        }
+      },
+      "responses": {
+        "200": {
+          "description": "Activation successful",
+          "content": {
+            "application/json": {
+              "schema": { "$ref": "#/components/schemas/LicenseActivationResponse" },
+              "example": {
+                "instanceId": "8f3e2b1a-5c6d-4e9f-8a0b-1c2d3e4f5g6h",
+                "activatedAt": "2026-01-27T10:33:00Z",
+                "expiresOn": "2027-01-27T10:33:00Z"
+              }
+            }
+          }
+        }
+      }
+    }
+  },
+    "/license/deactivate/": {
+    "post": {
+      "operationId": "licenseDeactivate",
+      "tags": ["License"],
+      "summary": "Deactivate License",
+      "requestBody": {
+        "required": true,
+        "content": {
+          "application/json": {
+            "schema": { "$ref": "#/components/schemas/LicenseDeactivation" },
+            "example": {
+              "licenseKey": "KLVQ-PRO-1234-ABCD-9999",
+              "instanceId": "8f3e2b1a-5c6d-4e9f-8a0b-1c2d3e4f5g6h"
+            }
+          }
+        }
+      },
+      "responses": {
+        "200": {
+          "description": "Deactivation successful",
+          "content": {
+            "application/json": {
+              "schema": { "$ref": "#/components/schemas/LicenseDeactivationResponse" },
+              "example": {
+                "message": "License instance deactivated successfully.",
+                "deactivatedAt": "2026-01-27T10:35:00Z"
+              }
+            }
+          }
+        }
+      }
+    }
+  },
+    "/license/validate/": {
+    "post": {
+      "operationId": "licenseValidate",
+      "tags": ["License"],
+      "summary": "Validate License",
+      "requestBody": {
+        "required": true,
+        "content": {
+          "application/json": {
+            "schema": { "$ref": "#/components/schemas/LicenseValidate" },
+            "example": {
+              "licenseKey": "KLVQ-PRO-1234-ABCD-9999",
+              "instanceId": "8f3e2b1a-5c6d-4e9f-8a0b-1c2d3e4f5g6h"
+            }
+          }
+        }
+      },
+      "responses": {
+        "200": {
+          "description": "Validation successful",
+          "content": {
+            "application/json": {
+              "schema": { "$ref": "#/components/schemas/LicenseValidationResponse" },
+              "example": {
+                "valid": true,
+                "code": "VALID",
+                "detail": "Instance ID valid for this license.",
+                "metadata": { "os": "macOS", "arch": "arm64" }
+              }
+            }
+          }
+        }
+      }
+    }
+  },
     "/report/usage/": {
       "post": {
         "tags": [
