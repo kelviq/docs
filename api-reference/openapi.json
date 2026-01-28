@@ -375,7 +375,9 @@
         "licenseKey": "LIC-A8D5F89E-B46B-472C-9BED-66EE2545B85E",
         "activatedOn": "2026-01-22T03:26:56.836323Z",
         "expiresOn": "2026-01-23T03:26:56.836323Z",
-        "currentActivationCount": 0,
+        "activationUsage": 0,
+        "activationLimit": 2,
+        "enabled": true,
         "customer": {
           "customerId": "cfa95cf8c8d24e8b9d3d2d1ada98a94d",
           "name": "Geo",
@@ -391,7 +393,9 @@
       "licenseKey": { "type": "string" },
       "activatedOn": { "type": "string", "format": "date-time", "nullable": true },
       "expiresOn": { "type": "string", "format": "date-time", "nullable": true },
-      "currentActivationCount": { "type": "integer" },
+      "activationUsage": { "type": "integer" },
+      "activationLimit": { "type": "integer" },
+      "enabled": { "type": "boolean" },
       "customer": {
         "type": "object",
         "properties": {
@@ -418,18 +422,7 @@
             }
           },
           "version": { "type": "integer" },
-          "isLatest": { "type": "boolean" },
-          "license": {
-            "type": "object",
-            "properties": {
-              "enabled": { "type": "boolean" },
-              "hasExpiry": { "type": "boolean" },
-              "durationUnit": { "type": "string" },
-              "durationValue": { "type": "integer" },
-              "activationLimit": { "type": "integer" },
-              "activationLimitEnabled": { "type": "boolean" }
-            }
-          }
+          "isLatest": { "type": "boolean" }
         }
       }
     }
@@ -1307,7 +1300,9 @@
                     "licenseKey": "LIC-A8D5F89E-B46B-472C-9BED-66EE2545B85E",
                     "activatedOn": "2026-01-22T03:26:56Z",
                     "expiresOn": "2026-01-23T03:26:56Z",
-                    "currentActivationCount": 1,
+                    "activationUsage": 1,
+                    "activationLimit": 4,
+                    "enabled": true,
                     "customer": {
                       "customerId": "cfa95cf8c8d24e8b9d3d2d1ada98a94d",
                       "name": "Geo",
