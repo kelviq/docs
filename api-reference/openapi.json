@@ -1270,7 +1270,7 @@
         "operationId": "licenseActivate",
         "tags": ["License"],
         "summary": "Activate License",
-        "description": "Authenticate using your Client API Key as a Bearer token.",
+        "description": "Activates a license key for a specific instance.",
         "requestBody": {
           "required": true,
           "content": {
@@ -1286,7 +1286,7 @@
           }
         },
         "responses": {
-          "200": {
+          "201": {
             "description": "Activation successful",
             "content": {
               "application/json": {
@@ -1322,6 +1322,47 @@
                 }
               }
             }
+          },
+          "400": {
+            "description": "Bad Request - Validation failed (e.g., missing licenseKey).",
+            "content": {
+              "application/json": {
+                "example": {
+                  "licenseKey": ["This field is required."]
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Forbidden - License expired or activation limit reached.",
+            "content": {
+              "application/json": {
+                "examples": {
+                  "expired": {
+                    "value": { "error": "This license has expired." }
+                  },
+                  "limit_reached": {
+                    "value": { "error": "Activation limit reached (10/10)." }
+                  }
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Not Found - Invalid license key or customer ID mapping.",
+            "content": {
+              "application/json": {
+                "example": { "error": "Invalid license key or customer ID." }
+              }
+            }
+          },
+          "500": {
+            "description": "Internal Server Error - Processing error during database transaction.",
+            "content": {
+              "application/json": {
+                "example": { "error": "An error occurred during activation processing." }
+              }
+            }
           }
         }
       }
@@ -1355,38 +1396,24 @@
               }
             }
           }
-        }
-      }
-    }
-  },
-    "/license/validate/": {
-    "post": {
-      "operationId": "licenseValidate",
-      "tags": ["License"],
-      "summary": "Validate License",
-      "requestBody": {
-        "required": true,
-        "content": {
-          "application/json": {
-            "schema": { "$ref": "#/components/schemas/LicenseValidate" },
-            "example": {
-              "licenseKey": "KLVQ-PRO-1234-ABCD-9999",
-              "instanceId": "8f3e2b1a-5c6d-4e9f-8a0b-1c2d3e4f5g6h"
+        },
+        "400": {
+            "description": "Bad Request - Validation error (e.g., missing required fields).",
+            "content": {
+              "application/json": {
+                "example": {
+                  "licenseKey": ["This field is required."],
+                  "instanceId": ["This field is required."]
+                }
+              }
             }
-          }
-        }
-      },
-      "responses": {
-        "200": {
-          "description": "Validation successful",
+          },
+        "404": {
+          "description": "Not Found - The combination of licenseKey and instanceId does not exist.",
           "content": {
             "application/json": {
-              "schema": { "$ref": "#/components/schemas/LicenseValidationResponse" },
               "example": {
-                "valid": true,
-                "code": "VALID",
-                "detail": "Instance ID valid for this license.",
-                "metadata": { "os": "macOS", "arch": "arm64" }
+                "error": "Invalid license key or instance ID."
               }
             }
           }
@@ -1394,6 +1421,78 @@
       }
     }
   },
+    "/license/validate/": {
+      "post": {
+        "operationId": "licenseValidate",
+        "tags": ["License"],
+        "summary": "Validate License",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": { "$ref": "#/components/schemas/LicenseValidate" },
+              "example": {
+                "licenseKey": "KLVQ-PRO-1234-ABCD-9999",
+                "instanceId": "8f3e2b1a-5c6d-4e9f-8a0b-1c2d3e4f5g6h"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Validation successful",
+            "content": {
+              "application/json": {
+                "schema": { "$ref": "#/components/schemas/LicenseValidationResponse" },
+                "example": {
+                  "valid": true,
+                  "code": "VALID",
+                  "detail": "Instance ID valid for this license.",
+                  "metadata": { "os": "macOS", "arch": "arm64" }
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad Request - Request body failed validation.",
+            "content": {
+              "application/json": {
+                "example": {
+                  "licenseKey": ["This field is required."]
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Not Found - The license key or instance ID was not found in the database.",
+            "content": {
+              "application/json": {
+                "examples": {
+                  "invalid_key": {
+                    "summary": "License key not found",
+                    "value": {
+                      "valid": false,
+                      "code": "INVALID_KEY",
+                      "detail": "License key not found.",
+                      "metadata": {}
+                    }
+                  },
+                  "instance_not_found": {
+                    "summary": "Instance not found for key",
+                    "value": {
+                      "valid": false,
+                      "code": "INSTANCE_NOT_FOUND",
+                      "detail": "Instance ID invalid for this license.",
+                      "metadata": {}
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
     "/report/usage/": {
       "post": {
         "tags": [
