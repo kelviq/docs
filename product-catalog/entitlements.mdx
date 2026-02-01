@@ -1,260 +1,433 @@
 ---
 title: 'Entitlements'
-description: 'Manage feature access for your customers'
+description: 'Control feature access for your customers'
 ---
 
-Entitlements define what features and functionality your customers can access based on their plan. Kelviq handles automatic entitlement creation and enforcement.
+# Entitlements
 
-## Understanding Entitlements
+Entitlements are the modern way to control feature access in your application. Instead of checking which plan a customer is on, you check which features they have access to. This fundamental shift gives you unprecedented flexibility to experiment with pricing, create custom deals, and iterate on your product—all without changing code.
 
-An **entitlement** is a customer's right to use a feature. When a customer purchases a plan, Kelviq automatically creates entitlements for all features linked to that plan.
+<Info>
+For SDK installation and API reference, see:
+- [Node SDK Documentation](https://docs.kelviq.com/api-reference/backend-integration/node-sdk)
+- [Entitlements API Reference](https://docs.kelviq.com/api-reference/entitlements/retrieve-customer-entitlements)
+</Info>
 
-**Example:**
-- Plan: "Professional ($29/month)"
-- Features in plan: "Priority support", "Custom branding", "10 projects"
-- Customer purchases plan → Customer gets entitlements for all 3 features
+---
 
-## Entitlement Types
+## Why Entitlements?
 
-Features in Kelviq can be configured as different types, each with different entitlement behaviors:
+### The Problem with Plan-Based Access
 
-<CardGroup cols={2}>
-  <Card title="Boolean (Switch)" icon="toggle-on">
-    On/off features. Either the customer has access or doesn't.
+Traditional SaaS applications check access like this:
 
-    Example: "Priority support", "Custom branding"
-  </Card>
-  <Card title="Customizable" icon="sliders">
-    Features with numeric limits that you define per plan.
+```javascript
+// ❌ The old way - hardcoded, brittle, requires code changes
+if (user.plan === 'pro' || user.plan === 'enterprise') {
+  showAdvancedAnalytics();
+}
 
-    Example: "Max projects" (5, 10, unlimited)
-  </Card>
-</CardGroup>
-
-## Checking Entitlements in Your App
-
-Your application needs to check entitlements before allowing customers to use features.
-
-### Check if Customer Has Access
-
-Use `hasAccess` to quickly check if a customer can use a feature:
-
-<Tabs>
-  <Tab title="Python">
-    ```python
-    from kelviq_sdk import Kelviq
-
-    client = Kelviq.create_sync_client(access_token="your_server_api_key")
-
-    # Check if customer has access to a feature
-    has_access = client.entitlements.has_access(
-        customerId="unique-customer-001",
-        featureId="priority-support"
-    )
-
-    if has_access:
-        # Grant access to the feature
-        print("Customer has access to priority support")
-    else:
-        # Show upgrade prompt
-        print("Upgrade required for priority support")
-    ```
-  </Tab>
-  <Tab title="Node.js">
-    ```typescript
-    import { Kelviq } from '@kelviq/node-sdk';
-
-    const client = new Kelviq({ accessToken: 'your_server_api_key' });
-
-    // Check if customer has access to a feature
-    const hasAccess = await client.entitlements.hasAccess({
-        customerId: "unique-customer-001",
-        featureId: "priority-support"
-    });
-
-    if (hasAccess) {
-        // Grant access to the feature
-        console.log("Customer has access to priority support");
-    } else {
-        // Show upgrade prompt
-        console.log("Upgrade required for priority support");
-    }
-    ```
-  </Tab>
-</Tabs>
-
-### Get Detailed Entitlement Info
-
-Use `getEntitlement` to get full details about a specific entitlement:
-
-<Tabs>
-  <Tab title="Python">
-    ```python
-    from kelviq_sdk import Kelviq
-
-    client = Kelviq.create_sync_client(access_token="your_server_api_key")
-
-    # Get detailed entitlement for a feature
-    response = client.entitlements.get_entitlement(
-        customerId="unique-customer-001",
-        featureId="max-projects"
-    )
-
-    for entitlement in response.entitlements:
-        print(f"Feature: {entitlement.featureId}")
-        print(f"Has Access: {entitlement.hasAccess}")
-        print(f"Type: {entitlement.featureType}")
-        if entitlement.usageLimit:
-            print(f"Limit: {entitlement.usageLimit}")
-    ```
-  </Tab>
-  <Tab title="Node.js">
-    ```typescript
-    import { Kelviq } from '@kelviq/node-sdk';
-
-    const client = new Kelviq({ accessToken: 'your_server_api_key' });
-
-    // Get detailed entitlement for a feature
-    const response = await client.entitlements.getEntitlement({
-        customerId: "unique-customer-001",
-        featureId: "max-projects"
-    });
-
-    response.entitlements.forEach(entitlement => {
-        console.log(`Feature: ${entitlement.featureId}`);
-        console.log(`Has Access: ${entitlement.hasAccess}`);
-        console.log(`Type: ${entitlement.featureType}`);
-        if (entitlement.usageLimit) {
-            console.log(`Limit: ${entitlement.usageLimit}`);
-        }
-    });
-    ```
-  </Tab>
-</Tabs>
-
-### Get All Entitlements for a Customer
-
-Use `getAllEntitlements` to retrieve all entitlements for a customer:
-
-<Tabs>
-  <Tab title="Python">
-    ```python
-    from kelviq_sdk import Kelviq
-
-    client = Kelviq.create_sync_client(access_token="your_server_api_key")
-
-    # Get all entitlements for a customer
-    response = client.entitlements.get_all_entitlements(
-        customerId="unique-customer-001"
-    )
-
-    print(f"Customer: {response.customerId}")
-    for entitlement in response.entitlements:
-        print(f"- {entitlement.featureId}: {'Yes' if entitlement.hasAccess else 'No'}")
-    ```
-  </Tab>
-  <Tab title="Node.js">
-    ```typescript
-    import { Kelviq } from '@kelviq/node-sdk';
-
-    const client = new Kelviq({ accessToken: 'your_server_api_key' });
-
-    // Get all entitlements for a customer
-    const response = await client.entitlements.getAllEntitlements({
-        customerId: "unique-customer-001"
-    });
-
-    console.log(`Customer: ${response.customerId}`);
-    response.entitlements.forEach(entitlement => {
-        console.log(`- ${entitlement.featureId}: ${entitlement.hasAccess ? 'Yes' : 'No'}`);
-    });
-    ```
-  </Tab>
-</Tabs>
-
-## Entitlement Response Structure
-
-When you retrieve entitlements, each entitlement includes:
-
-| Field | Type | Description |
-|-------|------|-------------|
-| `featureId` | string | The feature identifier |
-| `featureType` | string | Type of feature (e.g., "BOOLEAN", "CUSTOMIZABLE") |
-| `hasAccess` | boolean | Whether the customer has access |
-| `usageLimit` | number | The limit value (for customizable features) |
-| `currentUsage` | number | Current usage count (if applicable) |
-| `remaining` | number | Remaining usage (if applicable) |
-
-## Monitoring Entitlements
-
-### Dashboard View
-
-View customer entitlements in the dashboard:
-
-1. **Go to Customers** → Select a customer
-2. **Entitlements tab** → See all features and current status
-3. **Override status** → See if any entitlements have been customized
-
-## Entitlement Changes
-
-When a customer's subscription changes, their entitlements automatically update:
-
-### Plan Upgrade
-```
-Old Plan: Basic (5 projects)
-New Plan: Pro (20 projects)
-Result: Entitlement limit changes to 20 immediately
+if (user.plan === 'enterprise') {
+  enableSSO();
+}
 ```
 
-### Plan Downgrade
+This approach has serious limitations:
+
+- **Code changes required** for any pricing restructure
+- **Deployment needed** to move a feature between plans
+- **Engineering bottleneck** for every pricing experiment
+- **Webhook complexity** to sync subscription state
+- **Stale cache issues** when plans change
+- **Custom deals are painful** requiring one-off code
+
+### The Entitlements Approach
+
+With Kelviq, you check features directly:
+
+```javascript
+// ✅ The Kelviq way - flexible, decoupled, no code changes needed
+const hasAnalytics = await client.entitlements.hasAccess({
+  customerId: "cust_123",
+  featureId: "advanced-analytics"
+});
+
+if (hasAnalytics) {
+  showAdvancedAnalytics();
+}
 ```
-Old Plan: Pro (20 projects)
-New Plan: Basic (5 projects)
-Result: Entitlement limit changes to 5
+
+Now you can:
+- Move features between plans without code changes
+- Create custom enterprise deals in minutes
+- A/B test pricing without deployments
+- Let Sales and Product iterate independently
+
+---
+
+## How It Works
+
+### The Flow
+
+1) Setup plans and features on Kelviq Dashboard 
+1) When a customer completes checkout, their entitlements are automatically assigned.
+1) Your app checks access via SDK
+1) Customer gets immediate access
+
+
+### No Webhooks Required
+
+When a customer completes checkout:
+
+1. Payment is processed
+2. Entitlements are assigned **automatically**
+3. Your app checks access via SDK
+4. Customer gets immediate access
+
+You don't need to:
+- Build webhook handlers
+- Sync subscription state to your database
+- Handle race conditions
+- Manage cache invalidation
+
+---
+
+## Feature Types
+
+Kelviq supports three types of features to cover all access control scenarios.
+
+### Boolean Features
+
+Simple on/off access control.
+
+**Use for:**
+- Feature flags (SSO, API access, white-labeling)
+- Premium features (advanced analytics, custom branding)
+- Access gates (admin panel, beta features)
+
+**Example configuration:**
+
+| Feature | Starter | Pro | Enterprise |
+|---------|---------|-----|------------|
+| Basic Dashboard | ✓ | ✓ | ✓ |
+| Advanced Analytics | ✗ | ✓ | ✓ |
+| SSO | ✗ | ✗ | ✓ |
+| White Label | ✗ | ✗ | ✓ |
+
+### Meter Features
+
+Usage-based features with limits and tracking.
+
+**Use for:**
+- API calls, requests, or operations
+- Storage (GB, files, records)
+- Team members or seats
+- Messages, emails, or notifications
+- AI tokens or credits
+
+**Configuration options:**
+
+| Option | Description |
+|--------|-------------|
+| **Limit** | Maximum usage allowed (or unlimited) |
+| **Reset Period** | When usage resets (monthly, weekly, daily, never) |
+| **Hard Limit** | Block access when limit reached |
+| **Soft Limit** | Allow overages but notify/warn |
+| **Rollover** | Carry unused quota to next period |
+
+**Example configuration:**
+
+| Feature | Starter | Pro | Enterprise |
+|---------|---------|-----|------------|
+| API Calls | 1,000/mo | 100,000/mo | Unlimited |
+| Storage | 5 GB | 100 GB | 1 TB |
+| Team Members | 3 | 25 | Unlimited |
+
+### Customizable Features
+
+Dynamic values that aren't simple on/off or numeric limits.
+
+**Use for:**
+- Configuration values
+- Tier-specific settings
+- Dynamic feature behavior
+
+---
+
+## Soft Limits vs. Hard Limits
+
+Choose the right enforcement strategy for each feature.
+
+### Hard Limits
+
+Block access completely when the limit is reached.
+
+**Best for:**
+- Cost-sensitive features (AI tokens, bandwidth)
+- Preventing abuse
+- Strict contractual limits
+
+### Soft Limits
+
+Allow continued access but notify the user.
+
+**Best for:**
+- Driving upgrades without blocking users
+- Features where occasional overages are acceptable
+- Better user experience during high-usage periods
+
+---
+
+## Checkout Integration
+
+When a customer goes through checkout, entitlements are automatically assigned. The key is passing the customer ID.
+
+### Passing Customer ID
+
+When creating a checkout session, include the customer identifier:
+
+```javascript
+import { Kelviq, CHARGE_PERIOD_CHOICES } from '@kelviq/node-sdk';
+
+const response = await client.checkout.createSession({
+  planIdentifier: "plan-pro-monthly",
+  chargePeriod: CHARGE_PERIOD_CHOICES.MONTHLY,
+  successUrl: "https://yourapp.com/checkout/success",
+  customerId: "cust_789",  // Your customer ID - recommended
+});
 ```
 
-### Subscription Cancellation
+<Tip>
+Always pass a `customerId` when creating checkout sessions. If you don't, a new customer will be created automatically, which may lead to duplicate customer records.
+</Tip>
+
+For complete checkout API options, see the [Node SDK Documentation](https://docs.kelviq.com/api-reference/backend-integration/node-sdk#checkout).
+
+### New vs. Existing Customers
+
+| Scenario | What Happens |
+|----------|--------------|
+| **New customer ID** | Customer created automatically, entitlements assigned |
+| **Existing customer** | Entitlements updated based on new purchase |
+| **Upgrade** | New plan entitlements replace old ones |
+| **Downgrade** | Adjusted at end of current billing period |
+
+### Automatic Assignment
+
+After successful payment:
+
+1. Customer record is created/updated
+2. Plan entitlements are assigned instantly
+3. No webhook processing needed
+4. Customer can access features immediately
+
+---
+
+## SDK Integration
+
+### Quick Start
+
+Install the SDK and start checking entitlements in minutes.
+
+<CodeGroup>
+
+```bash npm
+npm install @kelviq/node-sdk
 ```
-Status: Cancelled
-Result: All entitlements become inactive
-Effect: Customer cannot use any features
+
+```bash yarn
+yarn add @kelviq/node-sdk
 ```
 
-## Best Practices
+</CodeGroup>
 
-### Entitlement Checks
+```javascript
+import { Kelviq } from '@kelviq/node-sdk';
 
-- **Check early** - Verify entitlements before allowing access to features
-- **Cache wisely** - Cache entitlement checks for performance, but refresh periodically
-- **Graceful handling** - Handle "no access" gracefully with upgrade prompts
+const client = new Kelviq({ 
+  accessToken: process.env.KELVIQ_ACCESS_TOKEN 
+});
+```
 
-### Feature Design
+<Note>
+Get your API key from **Settings → [Developers](https://app.kelviq.com/settings/developers)** in the Kelviq dashboard.
+</Note>
 
-- **Clear naming** - Use descriptive feature identifiers (e.g., "max-team-members" not "limit1")
-- **Logical grouping** - Group related features in the same plan tier
-- **Scalable limits** - Make limits increase with plan tiers
+### Checking Feature Access
 
-## Common Questions
+```javascript
+// Check boolean feature access
+const hasAccess = await client.entitlements.hasAccess({
+  customerId: "cust_123",
+  featureId: "advanced-analytics"
+});
 
-<Accordion title="What happens when a customer's plan expires?">
-  When a subscription is cancelled or expires, all entitlements become inactive. The customer cannot use any features. You should check entitlement status in your app before granting access.
-</Accordion>
+if (hasAccess) {
+  showAdvancedAnalytics();
+} else {
+  showUpgradePrompt();
+}
+```
 
-<Accordion title="Can I give a customer extra access without changing their plan?">
-  Yes, you can customize entitlements for individual customers from the dashboard. This is useful for trials, promotions, or special agreements.
-</Accordion>
+### Reporting Usage
 
-<Accordion title="Are entitlement checks real-time?">
-  Yes, entitlement checks return the current state. When plans are changed or overrides are applied, subsequent checks reflect the new state immediately.
-</Accordion>
+For meter features, report usage after each consumption:
 
-<Accordion title="How do I handle customers without a subscription?">
-  Customers without an active subscription will have `hasAccess: false` for all features. Your app should handle this by showing appropriate messaging or free tier functionality.
-</Accordion>
+```javascript
+import { BEHAVIOUR_CHOICES } from '@kelviq/node-sdk';
 
-## Next Steps
+// Increment usage by a value (DELTA)
+await client.reporting.reportUsage({
+  value: 1,
+  customerId: "cust_123",
+  featureId: "api-calls",
+  behaviour: BEHAVIOUR_CHOICES.DELTA  // Adds to current usage
+});
 
-- [Features](/product-catalog/features) - Learn how to create features
-- [Plans](/product-catalog/plans) - Configure features in plans
-- [Python SDK](/api-reference/backend-integration/python-sdk) - Full Python SDK reference
-- [Node SDK](/api-reference/backend-integration/node-sdk) - Full Node SDK reference
+// Or set absolute value (SET)
+await client.reporting.reportUsage({
+  value: 150,
+  customerId: "cust_123",
+  featureId: "seats",
+  behaviour: BEHAVIOUR_CHOICES.SET  // Replaces current usage
+});
+```
+
+<Info>
+For complete SDK reference including all methods and parameters, see the [Node SDK Documentation](https://docs.kelviq.com/api-reference/backend-integration/node-sdk).
+</Info>
+
+
+<Warning>
+The sandbox environment is completely separate from production. Use different API keys and note that sandbox data won't appear in production.
+</Warning>
+
+---
+
+## Managing Customer Entitlements
+
+### Viewing Customer Entitlements
+
+In the Kelviq dashboard:
+
+1. Navigate to **Customers**
+2. Select a customer
+3. View their **Features** section
+
+You'll see:
+- All entitled features
+- Current usage vs. limits
+- Reset dates for meters
+- Whether values are overridden
+
+### Overriding Entitlements
+
+Sometimes you need to give a specific customer different access than their plan provides.
+
+**Common scenarios:**
+- Sales gave a prospect extra API calls for a POC
+- Customer needs temporary limit increase
+- VIP customer gets special access
+- Compensating for a service issue
+
+**To override:**
+
+1. Go to the customer's detail page
+2. Find the feature in the Features section
+3. Click the menu (⋯) → **Override usage**
+4. Set the new value
+5. Save
+
+Overrides are:
+- Per-customer (don't affect the plan)
+- Marked with an override indicator
+- Can be reverted anytime
+
+### Resetting Usage
+
+For meter features, you can reset a customer's usage:
+
+1. Go to the customer's detail page
+2. Find the meter feature
+3. Click the menu (⋯) → **Reset usage**
+
+This sets their current usage back to 0, giving them their full quota again.
+
+---
+
+## Plan Inheritance
+
+Create plan hierarchies to reduce duplication and maintain consistency.
+
+### How It Works
+
+```
+Enterprise Plan
+    └── inherits from → Pro Plan
+                            └── inherits from → Starter Plan
+```
+
+When you set up inheritance:
+- Child plan automatically gets parent's features
+- You can override specific values in the child
+- Changes to parent propagate to children (unless overridden)
+
+### Override Indicators
+
+| Icon | Meaning |
+|------|---------|
+| 🔗 Inherited | Value comes from parent plan, stays in sync |
+| ⚡ Overridden | Value was customized, no longer syncs with parent |
+
+### Use Cases
+
+**Tiered plans:**
+- Starter: 1,000 API calls
+- Pro: inherits Starter + overrides API calls to 100,000 + adds analytics
+- Enterprise: inherits Pro + overrides to unlimited + adds SSO
+
+**Regional plans:**
+- US Pro: standard features
+- EU Pro: inherits US Pro + adds GDPR compliance features
+
+---
+
+## Subscription Lifecycle
+
+### What Happens During...
+
+#### Successful Purchase
+- Entitlements assigned immediately
+- Customer can access features right away
+- No webhook handling required
+
+#### Upgrade
+- New plan entitlements replace old ones
+- Happens immediately
+- Usage meters may reset or carry over (configurable)
+
+#### Downgrade
+- New entitlements take effect at end of billing period
+- Customer keeps current access until then
+- Prevents mid-cycle disruption
+
+#### Cancellation
+- Entitlements remain active until period ends
+- Customer can use features they paid for
+- Access revoked when subscription expires
+
+#### Failed Payment
+- Grace period begins (configurable)
+- Customer retains access during grace period
+- After grace period: access revoked
+- Entitlements restored when payment succeeds
+
+#### Refund
+- Entitlements revoked immediately
+- Customer loses access to plan features
+
+<Info>
+Manage subscriptions programmatically using the [Subscriptions API](https://docs.kelviq.com/api-reference/backend-integration/node-sdk#subscriptions).
+</Info>
+
+---
