@@ -1,0 +1,161 @@
+---
+title: 'Plans'
+description: 'Configure pricing, features, and deliverables'
+---
+
+A plan is the commercial package you offer to customers. It bundles your pricing logic with the actual value you deliver, such as software downloads, community access, or feature limits.
+
+You can create multiple plans for a single product. For example, you might have a "Starter" plan for hobbyists and a "Pro" plan for businesses.
+
+## Plan structure
+
+Every plan consists of configurable components that define what the user gets.
+
+<CardGroup cols={2}>
+  <Card title="Pricing" icon="tag">
+    Define the cost. Choose between recurring subscriptions (monthly/yearly) or one-time lifetime payments.
+  </Card>
+  <Card title="License keys" icon="key">
+    Issue software licenses. Generate unique keys upon purchase and enforce activation limits.
+  </Card>
+  <Card title="Entitlements" icon="sliders">
+    Set limits. Control access to specific features, API quotas, or seat limits via the SDK.
+  </Card>
+  <Card title="Downloads" icon="download">
+    Attach files. Upload software binaries, e-books, or course content.
+  </Card>
+  <Card title="Links" icon="link">
+    Grant access. Direct customers to private Discord servers or Notion templates.
+  </Card>
+</CardGroup>
+
+## Plan lifecycle
+
+You manage plans through a simple status flow.
+
+* **Draft**
+    The default state for new plans. These are not visible to customers.
+* **Published**
+    The plan is live and checkout is enabled.
+* **Unpublished changes**
+    A draft version of an existing published plan. You are editing a copy, so your live plan remains safe until you hit publish again.
+* **Archived**
+    The plan is hidden from new customers but remains active for existing subscribers.
+
+---
+
+## Create a plan
+
+You create plans directly inside a product container.
+
+<Steps>
+  <Step title="Start creation">
+    Navigate to the **Product detail page** and click **+ Create plan**.
+    <Frame>
+      <img height="200" src="/images/create-plan.png" />
+    </Frame>
+  </Step>
+  <Step title="Define basics">
+    Fill in the plan details.
+    * **Plan name:** The public name (e.g. "Pro", "Starter").
+    * **Identifier:** The unique ID used in your code. You can override the auto-generated ID.
+    * **Description:** Optional text shown on invoices and checkout.
+    <Frame>
+      <img height="200" src="/images/create-plan-modal.png" />
+    </Frame>
+    <Tip>
+      Enable the **Create more** toggle to quickly add multiple plans in a row without closing the modal.
+    </Tip>
+  </Step>
+  <Step title="Save draft">
+    Click **Create**. The plan will appear in your list with a **Draft** badge.
+  </Step>
+</Steps>
+
+---
+
+## Configure pricing
+
+Click on any draft plan to enter the configuration view. The first step is to set how you charge.
+
+<Frame>
+  <img height="200" src="/images/configure-price.png" />
+</Frame>
+
+### Free vs. Paid
+Use the toggle in the top right to switch between a free or paid plan.
+<Frame>
+  <img height="200" src="/images/free-paid.png" />
+</Frame>
+* **Free plan:** Users are not charged. Useful for lead magnets or open-source tiers.
+* **Paid plan:** Unlocks the billing configuration options below.
+
+### Billing cycles
+Select the intervals you want to offer. You can enable multiple intervals for a single plan.
+<Frame>
+  <img height="200" src="/images/billing-cycle.png" />
+</Frame>
+* **Monthly / Yearly:** Standard recurring subscriptions.
+* **3 Months:** Quarterly billing.
+* **One time:** A single non-recurring payment (lifetime deal).
+
+### Regional pricing
+You can set specific prices for different regions rather than relying on auto-conversion.
+1. Click **+ Add Region**.
+2. Select the currency (e.g. EUR, INR).
+3. Enter the price for that market.
+
+---
+
+## Add deliverables
+
+Configure what the customer receives immediately after purchase. These assets are delivered directly via the customer portal or email.
+
+### Digital downloads
+Upload files that are securely delivered after purchase.
+1. Expand the **Digital downloads** accordion.
+2. Drag and drop your files (up to 5GB total).
+3. Customers will see these in their portal immediately after checkout.
+
+### License keys
+If you are selling software that requires activation, you can issue unique license keys.
+1. Expand the **License keys** accordion.
+2. **Activation limit:** Set how many machines or instances can use a single key (e.g. 1 for personal, 5 for team).
+3. **License duration:** Define how long the key remains valid (e.g. 1 Year).
+
+### External links
+Provide access to resources hosted elsewhere.
+1. Expand the **Links** accordion.
+2. Add the **Link name** (e.g. Private Discord community).
+3. Add the **Link URL**.
+
+---
+
+## Feature & limits
+Configure feature access, usage quotas, and API limits.
+
+* **Toggle features:** Turn specific capabilities on or off (e.g. "SSO Access").
+* **Numeric limits:** Set quotas (e.g. "5 Projects", "10,000 API calls").
+
+---
+
+## Publishing & Versioning
+
+We protect your live customers by creating a separate version when you edit a plan.
+
+### How it works
+* **Safe editing**
+    When you edit a **Published** plan, we automatically create a new **Unpublished** version. Your live plan remains untouched so customers can keep buying without interruption.
+* **Unpublished changes**
+    You will see a yellow badge indicating you are working on a draft version. You can make as many changes as you want here without affecting the live site.
+* **Publishing**
+    When you click **Publish**, this new version replaces the old one.
+
+### Pushing updates
+Because the new version replaces the old one, you need to decide what happens to your current subscribers.
+
+When you click **Publish**, we will ask you to confirm the rollout strategy.
+* **For price changes:** You decide whether to grandfather existing users on the old price or migrate them to the new one.
+* **For feature changes:** You decide whether to push the new entitlements to existing users immediately or keep them on their legacy configuration.
+
+If you change your mind while editing, you can click **Discard** to delete the unpublished version and revert to the live state.

@@ -1,0 +1,119 @@
+---
+title: 'Dashboard setup'
+---
+
+Before you can integrate kelviq into your app, you need to configure your **products, plans, and features** in the dashboard.  
+This setup defines how your pricing and entitlements will work.
+
+---
+
+## Create a product
+
+1. In the sidebar, go to **Products → Create product**
+2. Enter a product name (e.g., "Design Course", "Pro Plan", "Premium Templates")
+3. Click **Save** — you'll be redirected to the product page  
+
+---
+
+## Create a plan
+
+From the product page:  
+
+1. Click **Create plan**  
+2. Enter a plan name (e.g., “Basic Plan”)  
+3. Click **Save** — you’ll be redirected to the plan details page  
+
+---
+
+## Add pricing to the plan
+
+From the plan page, click the **Price** section to configure pricing:
+
+1. Select billing cycles: **Monthly**, **Yearly**, **3 Months**, or **One Time**
+2. Enter prices for each selected billing cycle
+3. (Optional) Enable **Free trial** and set the trial period in days
+4. Click **Save**
+
+### Regional pricing
+
+To offer localized prices in different currencies:
+
+1. In the Price section, click **Add Region** under Regional Pricing
+2. Select a currency (e.g., Indian Rupee, Euro)
+3. Enter prices for each billing cycle in that currency
+4. Click **Add Currency**
+
+This allows you to set specific prices for different markets rather than relying on automatic currency conversion.
+
+---
+
+## Add digital downloads
+
+If your plan includes downloadable content (e-books, software, course materials):
+
+1. Click the **Digital downloads** section
+2. Upload files that customers will receive after purchase
+3. Files are securely delivered to customers upon successful payment
+
+---
+
+## Add license keys
+
+To automatically generate unique license keys for each purchase:
+
+1. Click the **License keys** section
+2. Toggle license key generation **on**
+3. Keys are automatically created and delivered to customers after purchase
+
+You can use these keys to validate customers in your application.
+
+---
+
+## Add features and limits
+
+Click the **Features & limits** section to configure feature access and usage quotas for this plan.
+
+1. Click **Add feature**
+2. A modal will open where you can create or select features
+3. Configure the feature value for this plan
+
+### Feature types
+
+Features are created independently and can be attached to multiple plans with different values:
+
+- **Switch (Boolean)** — on or off
+  Examples: priority support, bonus content access, community access, custom branding
+
+- **Customizable** — a fixed numeric limit, no usage reporting
+  Examples: number of downloads, max projects, storage limit (10 GB, 100 GB)
+
+- **Metered** — tracked consumption, usage events sent to Kelviq, resets each billing cycle
+  Examples: API calls, AI generations, video renders, exports per month
+
+Once added, features appear in the plan's feature list. You can reorder or remove them as needed.  
+
+---
+
+## Publish the plan
+
+The last step is to publish your plan, so customers can see it and purchase it.
+
+---
+
+## Next steps
+
+Your plan is now set up and synced with Stripe.
+Next, you can integrate Kelviq into your app:
+
+- Use **checkout links** to let customers purchase your plans
+- Create a customer in Kelviq when a user signs up in your app
+- Use the Kelviq **SDK** to check feature access and track usage
+
+---
+
+## Need help?
+
+Have questions, need help with implementation, or want a walkthrough?  
+Email us at **hi@kelviq.com** or [book a demo](https://tidycal.com/neravath/15-minute-meeting).
+
+---

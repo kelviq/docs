@@ -1,0 +1,114 @@
+---
+title: 'Features'
+---
+
+## What is a Feature?
+
+In Kelviq, a **Feature** is a distinct piece of functionality in your product that can be packaged, monetized, and controlled. It is the core capability that you offer to your users. Think of features as the "nouns" of your product, such as:
+
+* "Premium Analytics"
+* "API Access"
+* "Team Seats"
+* "Dark Mode"
+
+While a feature is the *thing* itself, an **Entitlement** is the *rule* that grants that feature to a customer as part of a **Plan**. The entitlement defines *how* a plan gets access to a feature—whether it's turned on or off, or available up to a certain limit.
+
+<Frame>
+<img height="200" src="/images/feature-list.png" />
+</Frame>
+This guide focuses on creating and managing the features themselves, which are the fundamental building blocks of your entire monetization strategy.
+
+---
+
+## Creating a Feature
+
+You can create and manage all features from one central location.
+
+1.  From the main sidebar, navigate to **Product Catalog > Features**.
+2.  Click the **"+ Create feature"** button in the top-right corner.
+
+ <Frame>
+<img height="200" src="/images/create-feature.png" />
+</Frame>
+
+3.  In the "Create feature" modal, fill in the following primary details:
+    * **Feature name:** A customer-friendly name. Think of this as the default label your customers will see in paywalls and other UIs.
+    * **Identifier:** A unique ID used to reference this feature in your code. This is auto-generated from the name but can be overridden at the time of creation.
+    * **Description (optional):** An internal description for your team's reference.
+
+    <Frame>
+    <img height="200" src="/images/feature-modal.png" />
+    </Frame>
+
+4.  Select a **Feature type**, which determines how access and usage of the feature are controlled.
+
+---
+
+## Feature Types
+
+Kelviq supports two types of features to model your business logic.
+
+<CardGroup cols={2}>
+  <Card title="Switch (Boolean)" icon="toggle-off">
+    The simplest type: the feature is either completely ON or OFF for a given plan.
+  </Card>
+  <Card title="Customizable" icon="gear">
+    Access is defined by a specific numeric limit (e.g., 10 downloads, 5 projects).
+  </Card>
+</CardGroup>
+
+### Switch / Boolean
+
+A Switch feature is for simple, all-or-nothing access. It's perfect for functionality that doesn't have a quantity associated with it.
+
+* **Examples:** "Priority Support," "Access to Bonus Content," "Community Access," "Custom Branding"
+
+To create one, select **Switch/boolean** as the feature type and click **"Create"**.
+
+<Frame>
+    <img height="200" src="/images/switch-boolean.png" />
+</Frame>
+
+### Customizable
+
+A Customizable feature grants access up to a specific numeric limit that you define when adding it to a plan.
+
+* **Examples:** Number of `downloads`, maximum `projects`, `storage limit` (10 GB, 100 GB)
+
+To create one, select **Customizable** as the feature type.
+
+#### Feature Units
+For Customizable features, you can define how the unit of value is described to customers.
+* Click the pencil icon next to the "Feature unit" field.
+* Enter the singular and plural forms (e.g., "Project" and "Projects"). This ensures the unit is displayed grammatically correct in all UIs.
+
+<Frame>
+    <img height="200" src="/images/input-fields.png" />
+</Frame>
+
+After configuring units, click **"Create"**.
+
+---
+
+## Managing Features
+
+
+### Archiving Features
+
+When you no longer want to offer a feature to new customers, you can archive it.
+
+<Warning>
+It's not possible to archive a feature if it's currently used by any **published** plan. To archive it, you must first remove it from those plans and publish the updates.
+</Warning>
+
+When a feature is archived:
+* It will no longer appear in the main feature list.
+* It cannot be added to any new plans or add-ons.
+* **Existing customers** who already have the feature through an active subscription **will not be affected.**
+* The feature's unique identifier is still considered "in-use" and cannot be used for a new feature.
+
+To archive a feature, click the **three-dot menu** from the feature list and select **"Archive"**. Confirm the action in the dialog.
+
+<Frame>
+    <img height="200" src="/images/archiving-features.png" />
+</Frame> 

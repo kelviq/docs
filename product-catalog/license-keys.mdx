@@ -1,0 +1,317 @@
+---
+title: 'License Key Management'
+description: 'Generate and manage license keys for your products'
+---
+
+
+License keys allow you to generate unique activation keys for each customer purchase. This guide covers how to enable and configure licenses on your plans, manage them from orders, and how your customers can activate and validate licenses using the API.
+
+---
+
+## Table of Contents
+
+1. [Enabling Licenses on a Plan](#1-enabling-licenses-on-a-plan)
+2. [Managing Licenses from Order Details](#2-managing-licenses-from-order-details)
+3. [License API for Developers](#3-license-api-for-developers)
+   - [Activate a License](#31-activate-a-license)
+   - [Validate a License](#32-validate-a-license)
+   - [Deactivate a License](#33-deactivate-a-license)
+4. [Common Workflows](#4-common-workflows)
+
+---
+
+## 1. Enabling Licenses on a Plan
+
+License keys are configured at the **plan level**. When enabled, every order placed for that plan will automatically generate a unique license key for the customer.
+
+### How to Enable Licenses
+
+1. Navigate to **Products** → Select your product → Select the plan you want to configure
+2. Scroll down to the **License keys** section
+3. Toggle the switch to **enable** license keys
+
+### Configuration Options
+
+Once enabled, you can configure the following settings:
+
+#### Activation Limit
+
+Control how many times a single license key can be activated across different devices.
+
+| Setting | Description |
+|---------|-------------|
+| **Enabled** | Limit activations to a specific number (e.g., 5 devices) |
+| **Disabled** | Unlimited activations allowed |
+
+> **Use case**: Set a limit of 3 if you want customers to use the license on up to 3 computers.
+
+#### License Expiry
+
+Define how long the license key remains valid after purchase.
+
+| Setting | Description |
+|---------|-------------|
+| **Enabled** | License expires after a specified duration |
+| **Disabled** | License never expires |
+
+When expiry is enabled, you can set:
+- **Duration value**: A number (e.g., 1, 6, 12)
+- **Duration unit**: Days, Months, or Years
+
+> **Example**: Setting duration to `12 Months` means the license expires 12 months after the purchase date.
+
+### Save Your Configuration
+
+After configuring the settings, click **Save Changes**. All future orders for this plan will use these license settings.
+
+---
+
+## 2. Managing Licenses from Order Details
+
+Once a customer places an order for a plan with licenses enabled, you can manage their license from the **Order Details** page.
+
+### Viewing License Information
+
+Navigate to **Orders** → Click on an order to view details. The license section displays:
+
+- **License Key**: The unique key assigned to this order
+- **Expiry Date**: When the license expires (or "Never expires")
+- **Activation Status**: Active count vs. limit (e.g., "2/5 activations" or "3/Unlimited")
+- **License Status**: Active or Deactivated
+
+### Available Actions
+
+Click the **⋮** menu button on the license card to access these options:
+
+#### 🔄 Regenerate Key
+
+Creates a brand new license key and invalidates the old one.
+
+- The old key will immediately stop working
+- Customer must use the new key for future activations
+- Existing activations will stop working
+
+> ⚠️ **Warning**: This action cannot be undone. Use when a key has been compromised or shared inappropriately.
+
+#### ✏️ Edit Activation Limit
+
+Modify how many devices can use this specific license.
+
+- Toggle activation limit on/off
+- Set a specific number (1-100 activations)
+- Changes apply immediately
+
+> **Use case**: Upgrade a customer from 3 seats to 10 seats without issuing a new license.
+
+#### 📅 Manage Expiry
+
+Update the license expiration date.
+
+- Toggle expiry on/off
+- Set a specific expiration date using the calendar picker
+- Extend or shorten the validity period
+
+> **Use case**: Extend a license by 3 months as a courtesy for a loyal customer.
+
+#### ⛔ Deactivate License
+
+Permanently disable the entire license.
+
+- All existing activations will stop working
+- Customers will no longer be able to activate or validate the key
+- The license key becomes invalid
+
+> ⚠️ **Warning**: This action cannot be undone. Use for refunds or policy violations.
+
+### Viewing Active Activations
+
+Click on the license card to view the **License Details** page, which shows:
+
+- All instances where the license is currently activated
+- Instance name or ID
+- Last seen timestamp (when the license was last validated)
+- Activation metadata (device info, if provided)
+
+#### Revoking Individual Activations
+
+For each active instance, you can click **Revoke** to:
+- Remove that specific instance's access
+- Free up an activation slot
+- The license remains valid for other instances
+
+> **Use case**: Customer got a new computer and wants to transfer their license. Revoke the old instance to free up a slot.
+
+---
+
+## 3. License API for Developers
+
+Your customers (or their software) can interact with licenses using these API endpoints. Use these to integrate license checking into your application.
+
+### 3.1 Activate a License
+
+Activates a license key on a specific device/instance.
+
+**Endpoint**: `POST /license/activate`
+
+**When to use**: 
+- When the user enters their license key for the first time
+- When your application is installed on a new device
+
+**What it does**:
+- Validates the license key exists and is valid
+- Checks if activation limit has been reached
+- Creates a new activation instance
+- Returns activation details including instance ID
+
+**Key behaviors**:
+- Fails if the license is expired
+- Fails if the license is deactivated
+- Fails if activation limit is reached
+- Succeeds and increments the activation count
+
+📖 **Full documentation**: [Activate License API](https://docs.kelviq.com/api-reference/license/activate-license)
+
+---
+
+### 3.2 Validate a License
+
+Checks if a license is valid and currently active.
+
+**Endpoint**: `POST /license/validate`
+
+**When to use**:
+- On application startup to verify the license
+- Periodically during runtime
+- Before granting access to licensed features
+- When checking license status without activating
+
+**What it does**:
+- Confirms the license key exists
+- Checks if the license is active (not deactivated)
+- Verifies the license hasn't expired
+- Returns current license status and metadata
+
+**Response includes**:
+- License validity status
+- Expiration date
+- Activation count and limit
+- License metadata
+
+📖 **Full documentation**: [Validate License API](https://docs.kelviq.com/api-reference/license/validate-license)
+
+---
+
+### 3.3 Deactivate a License
+
+Removes an activation from a specific device/instance.
+
+**Endpoint**: `POST /license/deactivate`
+
+**When to use**:
+- When the user uninstalls your application
+- When transferring a license to another device
+- When the user explicitly signs out
+
+**What it does**:
+- Removes the device/instance from active activations
+- Decrements the activation count
+- Frees up a slot for activation on another device
+- The license itself remains valid
+
+**Key behaviors**:
+- Requires both the license key and instance ID
+- Only deactivates the specific instance, not the entire license
+- The license can be re-activated on the same or different device
+
+📖 **Full documentation**: [Deactivate License API](https://docs.kelviq.com/api-reference/license/deactivate-license)
+
+---
+
+## 4. Common Workflows
+
+### Workflow A: New Customer Purchase
+
+```
+1. Customer purchases a plan with licenses enabled
+2. Order is created → License key is automatically generated
+3. Customer receives license key (via email, dashboard, etc.)
+4. Customer enters key in your application
+5. Application calls Activate API
+6. License is now active on customer's device
+```
+
+### Workflow B: Customer Switches Devices
+
+```
+1. Customer uninstalls app from old device (calls Deactivate API)
+2. Activation slot is freed
+3. Customer installs app on new device
+4. Customer enters same license key
+5. Application calls Activate API
+6. License is now active on the new device
+```
+
+### Workflow C: Validating on Application Startup
+
+```
+1. Application launches
+2. Check if license was previously activated (stored locally)
+3. Call Validate API with the license key
+4. If valid → Grant access to features
+5. If invalid/expired → Prompt user to renew or re-enter key
+```
+
+### Workflow D: Admin Extends a License
+
+```
+1. Customer requests extension
+2. Admin opens Order Details
+3. Click license menu → "Manage expiry"
+4. Select new expiration date
+5. Save changes
+6. Customer's next validation will reflect the new expiry
+```
+
+### Workflow E: Handling a Compromised Key
+
+```
+1. Admin notices suspicious activity (too many activations)
+2. Open Order Details → View License Details
+3. Revoke unauthorized instances
+4. If key is widely leaked: Regenerate the key
+5. Send new key to legitimate customer
+6. Old key stops working immediately
+```
+
+---
+
+## Quick Reference
+
+| Task | Where | Action |
+|------|-------|--------|
+| Enable licenses for a plan | Plan Details | Toggle "License keys" switch |
+| Set activation limit (plan) | Plan Details → License keys | Enable limit + set number |
+| Set expiry duration (plan) | Plan Details → License keys | Enable expiry + set duration |
+| View customer's license | Order Details | See license card |
+| Copy license key | Order Details | Click on license key |
+| Regenerate key | Order Details → License menu | "Regenerate key" |
+| Change activation limit | Order Details → License menu | "Edit activation limit" |
+| Change expiry date | Order Details → License menu | "Manage expiry" |
+| View all activations | Order Details | Click license card |
+| Revoke a device | License Details | Click "Revoke" on instance |
+| Deactivate entire license | Order Details → License menu | "Deactivate" |
+
+---
+
+## Important Notes
+
+⚠️ **Irreversible Actions**:
+- **Regenerating a key**: The old key immediately stops working. All existing activations are invalidated.
+- **Deactivating a license**: The license is permanently disabled and cannot be reactivated.
+
+✅ **Best Practices**:
+- Set reasonable activation limits based on your pricing model
+- Use the Validate API on application startup for security
+- Store the instance ID locally after activation for proper deactivation
+- Communicate expiry dates clearly to customers before they expire
+- Consider grace periods before fully blocking expired licenses

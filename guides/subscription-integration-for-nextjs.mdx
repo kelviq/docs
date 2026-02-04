@@ -1,0 +1,529 @@
+---
+title: "Subscription Integration for Next.js"
+description: "A step-by-step guide to add subscription billing and entitlements to your Next.js app."
+---
+
+Integrate Kelviq subscription billing into your Next.js application using the App Router and React SDK.
+
+---
+
+## Prerequisites
+
+- Next.js 14+ with App Router
+- A Kelviq account with plans configured
+- API keys from **Settings → Developers** in the dashboard
+
+---
+
+## Step 1: Get Your API Keys
+
+1. Sign up at [dashboard.kelviq.com](https://dashboard.kelviq.com)
+2. Navigate to **Settings → API Keys**
+3. Copy two keys:
+   - **Server API Key** — For API routes (keep secret)
+   - **Client API Key** — For React SDK (safe to expose)
+
+### Add to Environment Variables
+
+Add these to your `.env.local` file:
+
+```env
+# Backend (server-side only)
+KELVIQ_API_KEY=server-xxxxxxxx
+
+# API URLs
+KELVIQ_API_BASE_URL=https://api.kelviq.com/api/v1
+
+# Frontend (can be exposed to client)
+NEXT_PUBLIC_KELVIQ_CLIENT_KEY=client-xxxxxxxx
+NEXT_PUBLIC_KELVIQ_EDGE_URL=https://edge.api.kelviq.com/api/v1/
+
+# Your app URL (for redirects)
+NEXT_PUBLIC_APP_URL=https://yourdomain.com
+```
+
+<Warning>
+Never expose your server API key to the frontend or commit it to version control.
+</Warning>
+
+---
+
+## Step 2: Define Your Plans
+
+### In Kelviq Dashboard
+
+1. Go to **Plans** section
+2. Create each subscription tier with:
+   - **Plan Identifier**: `base`, `pro`, `enterprise` (code-friendly names)
+   - **Price**: Monthly/yearly pricing
+   - **Features**: List of included features
+
+### Define Entitlements
+
+For each plan, configure entitlements (feature access):
+
+| Type | Description | Example |
+|------|-------------|---------|
+| **Boolean (FLAG)** | Feature is on/off | `export-data` |
+| **Metered (METER)** | Feature has usage limits | `max-projects: 10` |
+| **Config (CUSTOMIZABLE)** | Feature has configurable value | `team-size: 5` |
+
+**Example Plan Structure:**
+
+| Feature | Base ($9/mo) | Pro ($49/mo) | Enterprise ($199/mo) |
+|---------|--------------|--------------|----------------------|
+| max-projects | 10 | 100 | Unlimited |
+| export-data | No | Yes | Yes |
+| team-size | 1 | 5 | 50 |
+
+---
+
+## Step 3: Install the React SDK
+
+```bash
+npm install @kelviq/react-sdk
+```
+
+---
+
+## Step 4: Create Customers (Optional)
+
+You have two options for creating customers in Kelviq:
+
+### Option 1: Auto-create during checkout
+
+Skip this step entirely. When creating a checkout session, pass the customer's `email` or `customerId` — Kelviq will automatically create the customer record if it doesn't exist.
+
+### Option 2: Create customer explicitly
+
+Create a customer record when a user signs up. This gives you more control and lets you track customers before they subscribe.
+
+**Create API Route** — `app/api/customer/route.ts`:
+
+```typescript
+import { NextRequest, NextResponse } from "next/server";
+
+export async function POST(request: NextRequest) {
+  const { customerId, name, email } = await request.json();
+
+  const response = await fetch(
+    `${process.env.KELVIQ_API_BASE_URL}/customers/`,
+    {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: `Bearer ${process.env.KELVIQ_API_KEY}`,
+      },
+      body: JSON.stringify({ customerId, name, email }),
+    }
+  );
+
+  const data = await response.json();
+  return NextResponse.json(data, { status: response.status });
+}
+```
+
+**Call from Client Component:**
+
+```typescript
+async function createKelviqCustomer(userId: string) {
+  await fetch("/api/customer", {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({
+      customerId: userId,  // Your internal user ID
+      name: "John Doe",
+      email: "john@example.com",
+    }),
+  });
+}
+```
+
+<Tip>
+Pre-creating customers is useful when you want to track users in the Kelviq dashboard before they subscribe, or when you need to store additional customer metadata.
+</Tip>
+
+---
+
+## Step 5: Implement Checkout
+
+Allow users to subscribe to a plan.
+
+### Create Checkout API Route
+
+Create `app/api/checkout/route.ts`:
+
+```typescript
+import { NextRequest, NextResponse } from "next/server";
+
+export async function POST(request: NextRequest) {
+  const { planIdentifier, customerId, chargePeriod } = await request.json();
+
+  const response = await fetch(
+    `${process.env.KELVIQ_API_BASE_URL}/checkout/`,
+    {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: `Bearer ${process.env.KELVIQ_API_KEY}`,
+      },
+      body: JSON.stringify({
+        planIdentifier,
+        chargePeriod: chargePeriod || "MONTHLY",
+        customerId,           // Customer auto-created if new
+        successUrl: `${process.env.NEXT_PUBLIC_APP_URL}/success`,
+      }),
+    }
+  );
+
+  const data = await response.json();
+  return NextResponse.json(data);
+}
+```
+
+### Pricing Page
+
+Create `app/pricing/page.tsx`:
+
+```tsx
+"use client";
+
+const plans = [
+  { id: "base", name: "Base", price: 9 },
+  { id: "pro", name: "Pro", price: 49 },
+  { id: "enterprise", name: "Enterprise", price: 199 },
+];
+
+export default function PricingPage() {
+  const handleSubscribe = async (planId: string) => {
+    const response = await fetch("/api/checkout", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        planIdentifier: planId,
+        customerId: getCurrentUserId(), // Your auth system
+      }),
+    });
+
+    const { checkoutUrl } = await response.json();
+    window.location.href = checkoutUrl;
+  };
+
+  return (
+    <div>
+      {plans.map(plan => (
+        <div key={plan.id}>
+          <h3>{plan.name}</h3>
+          <p>${plan.price}/month</p>
+          <button onClick={() => handleSubscribe(plan.id)}>
+            Subscribe
+          </button>
+        </div>
+      ))}
+    </div>
+  );
+}
+```
+
+<Expandable title="Success Page Example">
+
+Create `app/success/page.tsx`:
+
+```tsx
+export default function SuccessPage() {
+  return (
+    <div>
+      <h1>Payment Successful!</h1>
+      <p>Your subscription is now active.</p>
+      <a href="/dashboard">Go to Dashboard</a>
+    </div>
+  );
+}
+```
+
+</Expandable>
+
+---
+
+## Step 6: Manage Subscriptions
+
+### Fetch Current Subscription
+
+Create `app/api/subscriptions/route.ts`:
+
+```typescript
+import { NextRequest, NextResponse } from "next/server";
+
+export async function GET(request: NextRequest) {
+  const customerId = request.nextUrl.searchParams.get("customerId");
+
+  const response = await fetch(
+    `${process.env.KELVIQ_API_BASE_URL}/subscriptions/?customer_id=${customerId}`,
+    {
+      headers: {
+        Authorization: `Bearer ${process.env.KELVIQ_API_KEY}`,
+      },
+    }
+  );
+
+  const data = await response.json();
+  return NextResponse.json(data);
+}
+```
+
+### Update Subscription (Upgrade/Downgrade)
+
+Create `app/api/subscriptions/update/route.ts`:
+
+```typescript
+import { NextRequest, NextResponse } from "next/server";
+
+export async function POST(request: NextRequest) {
+  const { subscriptionId, planIdentifier, chargePeriod } = await request.json();
+
+  const response = await fetch(
+    `${process.env.KELVIQ_API_BASE_URL}/subscriptions/${subscriptionId}/update/`,
+    {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: `Bearer ${process.env.KELVIQ_API_KEY}`,
+      },
+      body: JSON.stringify({
+        planIdentifier,
+        chargePeriod: chargePeriod || "MONTHLY",
+      }),
+    }
+  );
+
+  const data = await response.json();
+  return NextResponse.json(data);
+}
+```
+
+### Handle Upgrades/Downgrades in Client
+
+```typescript
+async function handlePlanChange(newPlanId: string) {
+  // Fetch current subscription
+  const res = await fetch(`/api/subscriptions?customerId=${userId}`);
+  const { results } = await res.json();
+  const current = results.find(s => s.status === "active");
+
+  if (current) {
+    // Update existing subscription
+    await fetch("/api/subscriptions/update", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        subscriptionId: current.id,
+        planIdentifier: newPlanId,
+        chargePeriod: "MONTHLY",
+      }),
+    });
+
+    alert("Plan updated!");
+  } else {
+    // No subscription, redirect to checkout
+  }
+}
+```
+
+---
+
+## Step 7: Gate Features with Entitlements
+
+Dynamically enable/disable features based on subscription.
+
+### Setup KelviqProvider
+
+Wrap your app in `app/layout.tsx`:
+
+```tsx
+import { KelviqProvider } from "@kelviq/react-sdk";
+
+export default function RootLayout({ children }: { children: React.ReactNode }) {
+  return (
+    <html lang="en">
+      <body>
+        <KelviqProvider
+          customerId={getCurrentUserId()}
+          accessToken={process.env.NEXT_PUBLIC_KELVIQ_CLIENT_KEY!}
+          apiUrl={process.env.NEXT_PUBLIC_KELVIQ_EDGE_URL!}
+        >
+          {children}
+        </KelviqProvider>
+      </body>
+    </html>
+  );
+}
+```
+
+### Access Entitlements in Components
+
+```tsx
+"use client";
+
+import { useKelviq, useAllEntitlements } from "@kelviq/react-sdk";
+
+export function MyFeature() {
+  const { isLoading, error } = useKelviq();
+  const entitlementsState = useAllEntitlements();
+  const entitlements = entitlementsState?.data;
+
+  if (isLoading) return <div>Loading...</div>;
+  if (error) return <div>Error loading features</div>;
+
+  // Boolean entitlement example
+  const canExport = entitlements?.["export-data"]?.hasAccess ?? false;
+
+  // Metered entitlement example
+  const maxProjects = entitlements?.["max-projects"]?.limit;
+  const currentProjects = entitlements?.["max-projects"]?.used ?? 0;
+  const remainingProjects = entitlements?.["max-projects"]?.remaining;
+
+  // Config entitlement example
+  const teamSize = entitlements?.["team-size"]?.limit ?? 1;
+
+  return (
+    <div>
+      {/* Boolean: Show/hide feature */}
+      {canExport ? (
+        <button onClick={handleExport}>Export Data</button>
+      ) : (
+        <div>
+          Export locked. <a href="/pricing">Upgrade to unlock</a>
+        </div>
+      )}
+
+      {/* Metered: Check usage limits */}
+      <div>
+        <p>Projects: {currentProjects} / {maxProjects ?? "Unlimited"}</p>
+        <button
+          disabled={maxProjects !== null && currentProjects >= maxProjects}
+          onClick={createProject}
+        >
+          {remainingProjects > 0 ? "Create Project" : "Limit Reached"}
+        </button>
+      </div>
+
+      {/* Config: Use value */}
+      <p>Team size: {teamSize} members</p>
+    </div>
+  );
+}
+```
+
+### Entitlement Response Structure (React SDK)
+
+```typescript
+interface Entitlement {
+  featureKey: string;
+  type: "BOOLEAN" | "METER" | "CUSTOMIZABLE";
+  hasAccess: boolean;
+  limit: number | null;     // For METER and CUSTOMIZABLE
+  used: number;             // For METER
+  remaining: number | null; // For METER (null = unlimited)
+}
+```
+
+---
+
+## Common Patterns
+
+<Accordion title="Pattern 1: Feature Lock UI">
+
+```tsx
+"use client";
+
+import { useAllEntitlements } from "@kelviq/react-sdk";
+
+function LockedFeature({ featureId }: { featureId: string }) {
+  const entitlements = useAllEntitlements()?.data;
+  const hasAccess = entitlements?.[featureId]?.hasAccess ?? false;
+
+  if (!hasAccess) {
+    return (
+      <div className="locked">
+        <span>Feature locked</span>
+        <a href="/pricing">Upgrade to unlock</a>
+      </div>
+    );
+  }
+
+  return null;
+}
+
+// Usage
+<LockedFeature featureId="export-data" />
+```
+
+</Accordion>
+
+<Accordion title="Pattern 2: Usage Indicator">
+
+```tsx
+"use client";
+
+import { useAllEntitlements } from "@kelviq/react-sdk";
+
+function UsageBar({ featureId }: { featureId: string }) {
+  const entitlements = useAllEntitlements()?.data;
+  const feature = entitlements?.[featureId];
+
+  const current = feature?.used ?? 0;
+  const max = feature?.limit;
+  const percentage = max ? (current / max) * 100 : 0;
+
+  return (
+    <div>
+      <p>{current} / {max ?? "Unlimited"} used</p>
+      {max && (
+        <div className="progress-bar">
+          <div style={{ width: `${percentage}%` }} />
+        </div>
+      )}
+    </div>
+  );
+}
+```
+
+</Accordion>
+
+<Accordion title="Pattern 3: Conditional Rendering">
+
+```tsx
+"use client";
+
+import { useAllEntitlements } from "@kelviq/react-sdk";
+
+function DashboardFeatures() {
+  const entitlements = useAllEntitlements()?.data;
+
+  const canExport = entitlements?.["export-data"]?.hasAccess;
+  const canInviteTeam = entitlements?.["team-features"]?.hasAccess;
+  const maxProjects = entitlements?.["max-projects"]?.limit;
+
+  return (
+    <div>
+      <h1>Dashboard</h1>
+
+      {canExport && <ExportButton />}
+      {canInviteTeam && <TeamInviteSection />}
+
+      <ProjectList max={maxProjects} />
+    </div>
+  );
+}
+```
+
+</Accordion>
+
+---
+
+## Need Help?
+
+Have questions or need implementation support?
+
+- Email us at **hi@kelviq.com**
+- [Book a demo](https://tidycal.com/neravath/15-minute-meeting)

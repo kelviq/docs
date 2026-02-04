@@ -1,0 +1,148 @@
+---
+title: 'Integrate with your app'
+---
+
+After setting up your product and plans in the dashboard, you can bring them into your app using the kelviq SDKs and UI components.
+
+> Note: In this guide we use the **Node SDK** and **React SDK** as examples.  
+> Other SDKs like Python, JavaScript, are also available — the steps are the same.
+
+---
+
+## 1. Create a customer (optional)
+
+Typically, you create a customer record when someone signs up in your app.
+When they complete a purchase, Kelviq maps the transaction to the customer record automatically.
+
+This is optional, but creating a customer in kelviq makes it easy to track subscriptions and usage in the dashboard.
+
+### Install the Node SDK
+
+```bash
+npm install @kelviq/node-sdk
+````
+
+```ts
+import { kelviq } from "@kelviq/node-sdk";
+
+// API keys are under Settings → Developers in the dashboard
+const client = new kelviq({
+  accessToken: process.env.Kelviq_SERVER_API_KEY!,
+});
+
+// Create a customer on signup
+const newCustomer = await client.customers.create({
+  customerId: "unique-customer-001",
+  email: "customer@example.com",
+  name: "Node SDK User",
+});
+```
+
+---
+
+## 2. Checkout links
+
+Every plan in Kelviq has a checkout link that you can use to send customers directly to checkout.
+
+### Get a checkout link
+
+1. In the dashboard, go to your **Product → Plan**
+2. Click **Get Link** in the top right
+3. Copy the checkout URL
+
+### Using checkout links
+
+You can use checkout links in multiple ways:
+
+- **Direct link** — Share the URL in emails, landing pages, or marketing campaigns
+- **Button on your site** — Link your "Buy Now" or "Get Access" buttons to the checkout URL
+- **With customer ID** — Append `?customer_id=unique-customer-001` to link the purchase to an existing customer
+
+```html
+<a href="https://checkout.kelviq.com/your-plan-id?customer_id=unique-customer-001">
+  Buy Now
+</a>
+```
+
+When a customer completes checkout, their subscription and entitlements are automatically available in Kelviq.
+
+---
+
+## 3. Check feature access
+
+Once a customer completes a purchase, their entitlements are available in the SDK.
+You can check feature access in the frontend (React SDK) or backend (Node SDK).
+In all examples we’ll keep using the same customer ID: `unique-customer-001`.
+
+### React: show or hide UI based on entitlements
+
+```tsx
+import { ShowWhenBooleanEntitled } from '@kelviq/react-sdk';
+
+<ShowWhenBooleanEntitled
+  featureKey="enable-dark-mode"
+  loadingComponent={<p>Checking…</p>}
+  fallback={<p>Dark mode not available</p>}
+>
+  <button>Toggle Dark Mode</button>
+</ShowWhenBooleanEntitled>
+```
+
+### React: read all entitlements
+
+```tsx
+import { useAllEntitlements } from '@kelviq/react-sdk';
+
+function EntitlementsList() {
+  const { data: entitlements } = useAllEntitlements();
+
+  return (
+    <ul>
+      {Object.values(entitlements).map(ent => (
+        <li key={ent.featureKey}>
+          {ent.featureKey}: {ent.hasAccess ? 'Enabled' : 'Disabled'} ({ent.type})
+        </li>
+      ))}
+    </ul>
+  );
+}
+```
+
+### Backend check with Node
+
+```ts
+const ent = await client.entitlements.get({
+  customerId: "unique-customer-001",
+  featureKey: "max_upload_size_mb",
+});
+
+if (file.sizeMB > ent.value) {
+  throw new Error("Upgrade required");
+}
+```
+
+---
+
+## 4. Report usage (metered features)
+
+For metered features (like downloads, exports, AI generations, or API calls), send usage events from your backend.
+
+```ts
+import { BEHAVIOUR_CHOICES } from '@kelviq/node-sdk';
+
+await client.reporting.reportUsage({
+  customerId: "unique-customer-001",
+  featureId: "downloads",
+  value: 1,
+  behaviour: BEHAVIOUR_CHOICES.INCREMENT, // or SET
+});
+```
+
+---
+
+## Need help?
+
+Have questions, need help with implementation, or want a walkthrough?  
+Email us at **hi@kelviq.com** or [book a demo](https://tidycal.com/neravath/15-minute-meeting).
+
+---

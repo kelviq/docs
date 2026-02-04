@@ -1,0 +1,43 @@
+---
+title: 'Authentication'
+---
+
+kelviq API uses API keys to authenticate requests. All API requests must be made over HTTPS; calls made over plain HTTP will fail. API requests without authentication will also fail.
+
+## API Keys
+
+kelviq provides two types of API keys for different use cases.
+
+<CardGroup cols={2}>
+  <Card title="Client API Key">
+    Used for frontend applications where the key is publicly accessible.
+  </Card>
+  <Card title="Server API Key">
+    Used for backend implementations. This key has more privileges and must be kept secret.
+  </Card>
+</CardGroup>
+
+<Info>
+  **Environment Scoping:** API keys are scoped per environment. This means your **production** and **sandbox** environments will have separate and distinct API keys.
+</Info>
+
+<Warning>
+  **Important Security Notice:** Do not share your **Server API Key** in any publicly accessible areas such as frontend code, client-side applications, or public repositories.
+</Warning>
+
+### Obtaining Your API Key
+
+You can get your API key from the kelviq application dashboard.
+
+1.  Navigate to **Settings**.
+2.  Go to the [**Developers**](https://app.kelviq.com/settings/developers) section.
+3.  Copy your **Server API Key** to use in your application.
+
+---
+
+## Authorization
+
+To authenticate your requests, pass your **Server API Key** as a Bearer token in the `Authorization` header.
+
+```bash
+Authorization: Bearer YOUR_API_KEY

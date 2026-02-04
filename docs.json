@@ -1,0 +1,120 @@
+{
+  "$schema": "https://mintlify.com/docs.json",
+  "theme": "palm",
+  "name": "Kelviq Documentation",
+  "colors": {
+    "primary": "#FF5722",
+    "light": "#FF8C66",
+    "dark": "#DC4100"
+  },
+  "favicon": "/favicon.svg",
+  "integrations": {
+    "posthog": {
+        "apiKey": "phc_Cq0jzkdypFlvn0Gh8aq2FhXhtJ88asNwTRBPJx8SvAH",
+        "apiHost": "https://us.i.posthog.com"
+    }
+  },
+  "navigation": {
+    "tabs": [
+      {
+        "tab": "Documentation",
+        "groups": [
+          {
+            "group": "Get Started",
+            "pages": ["getstarted/introduction-to-kelviq", "getstarted/merchant-of-record", "getstarted/fees", "getstarted/review-process"]
+          },
+          {
+            "group": "Quickstart",
+            "pages": ["quickstart/core-concepts", "quickstart/dashboard-setup", "quickstart/integrate-with-your-app"]
+          },
+          {
+            "group": "Product Catalog",
+            "pages": [
+              "product-catalog/products",
+              "product-catalog/plans",
+              "product-catalog/features",
+              "product-catalog/digital-downloads",
+              "product-catalog/license-keys",
+              "product-catalog/links",
+              "product-catalog/entitlements"
+            ]
+          },
+          {
+            "group": "Checkout",
+            "pages": [
+              "checkout/checkout-configuration"
+            ]
+          },
+          {
+            "group": "Guides",
+            "pages": [
+              "guides/subscription-integration",
+              "guides/subscription-integration-for-nextjs"
+            ]
+          },
+          {
+            "group": "Customers",
+            "pages": [
+              "customers/customers"
+            ]
+          }
+        ]
+      },
+      
+      {
+        "tab": "APIs & SDKs",
+        "groups": [
+          {
+            "group": "Get Started",
+            "pages": [
+              "api-reference/authentication"
+            ]
+          },
+          {
+            "group": "API Documentation",
+            "openapi": "api-reference/openapi.json"
+          },
+          {
+            "group": "Backend Integration",
+            "pages": [
+              "api-reference/backend-integration/python-sdk",
+              "api-reference/backend-integration/node-sdk"
+            ]
+          },
+          {
+            "group": "Frontend Integration",
+            "pages": [
+              "frontend-integration/react-sdk",
+              "frontend-integration/react-ui",
+              "frontend-integration/js-sdk"
+            ]
+          }
+        ]
+      }
+    ]
+  },
+  "logo": {
+    "light": "/logo/light.svg",
+    "dark": "/logo/dark.svg"
+  },
+  "navbar": {
+    "links": [
+      {
+        "label": "Support",
+        "href": "mailto:hi@kelviq.com"
+      }
+    ],
+    "primary": {
+      "type": "button",
+      "label": "Dashboard",
+      "href": "https://app.kelviq.com"
+    }
+  },
+  "footer": {
+    "socials": {
+      "x": "https://x.com/kelviqcom",
+      "github": "https://github.com/kelviq",
+      "linkedin": "https://www.linkedin.com/company/kelviq"
+    }
+  }
+}

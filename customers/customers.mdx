@@ -1,0 +1,123 @@
+---
+title: 'Customers'
+---
+Managing customers is at the heart of kelviq. Each customer connects directly to their subscriptions, the plans behind those subscriptions, and the features they’re entitled to. Understanding these relationships is key to managing the full customer lifecycle. The diagram below gives you a high-level view of how everything ties together:
+
+```mermaid
+erDiagram
+    CUSTOMER ||--|{ SUBSCRIPTION : "has"
+    SUBSCRIPTION }|--|| PLAN : "is_based_on"
+    PLAN ||--|{ ENTITLEMENT : "defines_access_via"
+    FEATURE ||--o{ ENTITLEMENT : "is_granted_through"
+```
+
+This guide provides a complete overview of how to view, add, edit, and understand individual customer details and their associated subscriptions, entitlements, and usage within kelviq.
+## Viewing the List of Customers
+
+To access and manage your customer data, select the **Customers** section from the main left navigation pane in the kelviq dashboard.
+
+This action displays the "Customers" list page. From this screen, you can:
+* **Search:** Use the search bar to quickly find a specific customer by name, email, or identifier.
+* **Add a new customer:** Click the "+ New customer" button to create a new customer record.
+* **Manage individual customers:** Click on any customer's row in the list to navigate to their detailed information page.
+
+<Frame>
+        <img height="200" src="/images/customers-list.png" />
+</Frame>  
+---
+
+## Adding a New Customer
+
+To manually add a new customer record to kelviq:
+
+1.  On the "Customers" list page, click the **"+ New customer"** button, located in the top-right corner.
+2.  The "Create customer" modal window will appear. You need to fill in the following details:
+    * **Customer name *:** (Required) Enter the full name of the individual customer or their company name.
+    * **Identifier:** This unique ID is used by kelviq to reference the customer internally and via the API. It is auto-generated based on the customer name; however, you can edit it before creation. It's recommended to use this identifier to link to an existing customer ID in your own system if applicable.
+    * **Email address (optional):** Enter the customer's primary email address.
+<Frame>
+        <img height="200" src="/images/create-customer-modal.png" />
+</Frame> 
+3.  **Create multiple customers:** If you need to add several customers consecutively, enable the **"Create more"** toggle switch (this is off by default). When "Create more" is enabled, after you click "Create," the modal will remain open and reset its fields, allowing you to immediately enter the next customer's details.
+4.  Once all required details for a customer are entered, click the **"Create"** button located at the bottom-right corner of the modal.
+5.  Upon successful creation, a success toast notification will briefly appear. If the "Create more" toggle was not enabled, the modal will close, and the newly added customer will appear in the "Customers" list.
+
+---
+
+## Managing Existing Customers
+
+From the "Customers" list page, you can perform several actions on existing customer records, including editing their information or archiving them.
+
+### Editing a Customer
+
+To modify a customer's details:
+
+1.  Navigate to the "Customers" list page.
+2.  Locate the customer whose information you wish to edit. You can use the search bar if needed.
+3.  Click the **three-dot menu icon** (...) on the right side of that customer's row in the list.
+4.  Select the **"Edit"** option from the dropdown menu that appears.
+<Frame>
+        <img height="200" src="/images/edit-customer.png" />
+</Frame> 
+5.  The "Edit customer" modal will appear. In this modal, you can change the **Customer name** and **Email address**. The Identifier is not editable after creation.
+<Frame>
+        <img height="200" src="/images/edit-customer-modal.png" />
+</Frame> 
+6.  After making your changes, click **"Update"** to apply them.
+
+### Archiving a Customer
+
+Archiving a customer makes them inactive in the system and revokes their access.
+
+1.  Navigate to the "Customers" list page.
+2.  Locate the customer you wish to archive.
+3.  Click the **three-dot menu icon** (...) on the right side of that customer's row.
+4.  Select the **"Archive"** option from the dropdown menu.
+<Frame>
+        <img height="200" src="/images/edit-customer-modal.png" />
+</Frame> 
+5.  A confirmation modal will appear with the message: "Are you sure you want to archive this customer? Once archived, they will lose access to all features."
+<Frame>
+        <img height="200" src="/images/archive-customer-confirmation modal.png" />
+</Frame> 
+6.  To proceed, click the **"Confirm"** button on the modal. The customer will then be archived.
+
+<Warning>
+**Important:** You cannot archive a customer who has an active or paid subscription. You must first cancel or otherwise resolve their existing subscriptions before you can archive their record.
+</Warning>
+
+---
+
+## Customer Details Page
+
+To view and manage all information and activity related to a specific customer, click on their row in the "Customers" list page. This action navigates you to their individual "Customer Details" page.
+
+<Frame>
+        <img height="200" src="/images/customer-details.png" />
+</Frame> 
+
+This page consolidates all data, including:
+
+* **Billing ID:** The customer's unique billing identifier, if applicable (e.g., the ID from a connected payment gateway like Stripe).
+* **Created / Last updated date:** Timestamps indicating when the customer record was created in kelviq and when it was last modified.
+
+### Subscriptions
+This section lists all current and past subscriptions associated with the customer.
+* If the customer has no subscriptions, this section will display an empty state message.
+* For each subscription, key details such as the plan name, current status (e.g., Active, Trialing, Canceled), and relevant term dates (start, end, renewal) are displayed.
+<Frame>
+        <img height="200" src="/images/subscription-details.png" />
+</Frame>
+* You will be able to add a new subscription directly to the customer from this page. (`This functionality is currently in development`)
+### Entitlements
+This section provides a clear overview of all the specific features and their configurations (entitlements) that the customer currently has access to, derived from their active subscriptions.
+<Frame>
+        <img height="200" src="/images/entitlements-details.png" />
+</Frame>
+### Usage
+This section offers insights into how the customer is consuming their metered (usage-based) entitlements.
+* You will see a graph and/or tabular data representing usage over time for relevant features.
+* You can hover over specific points on the graph or elements in the data tables to see more detailed usage information for specific entitlements or particular time periods.
+<Frame>
+        <img height="200" src="/images/ent-full-details.png" />
+</Frame>
