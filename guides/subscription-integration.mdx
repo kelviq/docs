@@ -1,0 +1,296 @@
+---
+title: "Subscription Integration"
+description: "A simple guide to add subscription billing to your SaaS in 5 API calls."
+---
+
+Add subscription billing to your SaaS with just a few API calls. This guide covers the REST API — for framework-specific guides, see [Next.js Integration](/guides/subscription-integration-for-nextjs).
+
+---
+
+## Overview
+
+Kelviq handles your subscription billing with these endpoints:
+
+| Step | Endpoint | Purpose |
+|------|----------|---------|
+| 1 | Create Customer | Register user (optional) |
+| 2 | Create Checkout | Start payment flow |
+| 3 | Get Subscription | Check active plans |
+| 4 | Update Subscription | Upgrade/downgrade |
+| 5 | Check Entitlements | Gate features |
+
+---
+
+## Step 1: Create Customer (Optional)
+
+You have two options for creating customers:
+
+### Option 1: Auto-create during checkout
+
+Skip this step. Pass `email` or `customerId` in the checkout request — Kelviq will auto-create the customer.
+
+### Option 2: Create customer explicitly
+
+Create a customer record when a user signs up.
+
+```javascript
+const response = await fetch("https://api.kelviq.com/api/v1/customers/", {
+  method: "POST",
+  headers: {
+    "Content-Type": "application/json",
+    "Authorization": "Bearer YOUR_SERVER_API_KEY"
+  },
+  body: JSON.stringify({
+    customerId: "user-123",
+    name: "John Doe",
+    email: "john@example.com"
+  })
+});
+
+const customer = await response.json();
+```
+
+<Tip>
+Pre-creating customers is useful when you want to track users in the dashboard before they subscribe.
+</Tip>
+
+---
+
+## Step 2: Create Checkout Session
+
+When a user wants to subscribe, create a checkout session and redirect them.
+
+### Request
+
+```javascript
+const response = await fetch("https://api.kelviq.com/api/v1/checkout/", {
+  method: "POST",
+  headers: {
+    "Content-Type": "application/json",
+    "Authorization": "Bearer YOUR_SERVER_API_KEY"
+  },
+  body: JSON.stringify({
+    planIdentifier: "pro",
+    chargePeriod: "MONTHLY",
+    customerId: "user-123",
+    successUrl: "https://yourapp.com/success"
+  })
+});
+
+const { checkoutUrl } = await response.json();
+```
+
+### Response
+
+```json
+{
+  "checkoutUrl": "https://www.kelviq.com/checkout/cs_fBhCIBerpe1pAsRW6P4wYc8WHqMdfdr457hd3oOLjhAFx/",
+  "checkoutSessionId": "cs_test_b1sNi7D6u9iMCUFV1UZi9ZwerfaiXKdOOmr3DCUW6XdCZIr5Id1F7G"
+}
+```
+
+<Note>
+Redirect user to `checkoutUrl` → They complete payment → Redirected back to your `successUrl`
+</Note>
+
+### Required Parameters
+
+| Parameter | Description |
+|-----------|-------------|
+| `planIdentifier` | The identifier of the plan (e.g., `"pro"`, `"enterprise"`) |
+| `chargePeriod` | Billing cycle: `"MONTHLY"`, `"YEARLY"`, `"ONE_TIME"`, `"WEEKLY"`, `"DAILY"`, `"THREE_MONTHS"`, `"SIX_MONTHS"` |
+| `successUrl` | URL to redirect after successful payment |
+
+### Optional Parameters
+
+| Parameter | Description |
+|-----------|-------------|
+| `customerId` | Your customer ID (auto-creates if new) |
+| `offeringId` | UUID of the offering |
+| `pricingTableId` | UUID of the pricing table |
+| `ipAddress` | Customer IP for location-based pricing |
+
+---
+
+## Step 3: Get Subscription Details
+
+Check if a customer has an active subscription.
+
+### Request
+
+```javascript
+const response = await fetch(
+  "https://api.kelviq.com/api/v1/subscriptions/?customer_id=user-123",
+  {
+    headers: {
+      "Authorization": "Bearer YOUR_SERVER_API_KEY"
+    }
+  }
+);
+
+const { results } = await response.json();
+const activeSubscription = results.find(s => s.status === "active");
+```
+
+### Response
+
+```json
+{
+  "count": 1,
+  "next": null,
+  "previous": null,
+  "results": [
+    {
+      "id": "09d706ca-58f3-4fb2-818f-5b8623d67e6e",
+      "status": "active",
+      "plan": {
+        "name": "Pro Plan",
+        "identifier": "pro"
+      },
+      "amount": "49.00",
+      "recurrence": "month",
+      "currency": "usd",
+      "startDate": "2024-01-01",
+      "endDate": null,
+      "customerId": "user-123"
+    }
+  ]
+}
+```
+
+---
+
+## Step 4: Update Subscription
+
+Allow users to upgrade or downgrade their plan.
+
+### Request
+
+```javascript
+const response = await fetch(
+  "https://api.kelviq.com/api/v1/subscriptions/09d706ca-58f3-4fb2-818f-5b8623d67e6e/update/",
+  {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+      "Authorization": "Bearer YOUR_SERVER_API_KEY"
+    },
+    body: JSON.stringify({
+      planIdentifier: "enterprise",
+      chargePeriod: "MONTHLY"
+    })
+  }
+);
+
+const data = await response.json();
+```
+
+### Response
+
+```json
+{
+  "subscriptionId": "09d706ca-58f3-4fb2-818f-5b8623d67e6e"
+}
+```
+
+### Required Parameters
+
+| Parameter | Description |
+|-----------|-------------|
+| `planIdentifier` | The identifier of the new plan |
+| `chargePeriod` | Billing cycle: `"MONTHLY"`, `"YEARLY"`, etc. |
+
+---
+
+## Step 5: Check Entitlements
+
+Check what features a customer has access to based on their subscription.
+
+### Request
+
+```javascript
+const response = await fetch(
+  "https://edge.api.kelviq.com/api/v1/entitlements/?customerId=user-123",
+  {
+    headers: {
+      "Authorization": "Bearer YOUR_CLIENT_API_KEY"
+    }
+  }
+);
+
+const { entitlements } = await response.json();
+```
+
+<Warning>
+Use your **Client API Key** for this endpoint, not your Server API Key.
+</Warning>
+
+### Response
+
+```json
+{
+  "customerId": "user-123",
+  "entitlements": [
+    {
+      "featureId": "export-data",
+      "featureType": "BOOLEAN",
+      "hasAccess": true
+    },
+    {
+      "featureId": "max-projects",
+      "featureType": "METER",
+      "hasAccess": true,
+      "usageLimit": 100,
+      "currentUsage": 45,
+      "remaining": 55
+    },
+    {
+      "featureId": "team-size",
+      "featureType": "CUSTOMIZABLE",
+      "hasAccess": true,
+      "usageLimit": 5
+    }
+  ]
+}
+```
+
+### Entitlement Types
+
+| Type | Description | Fields |
+|------|-------------|--------|
+| **BOOLEAN** | Feature on/off | `hasAccess` |
+| **METER** | Usage-based limits | `usageLimit`, `currentUsage`, `remaining` |
+| **CUSTOMIZABLE** | Configurable value | `usageLimit` |
+
+---
+
+## Complete Flow
+
+```
+1. User signs up
+   → Create customer via API (or auto-create via email)
+
+2. User visits pricing page
+   → Create checkout session
+   → Redirect to checkout URL
+   → User completes payment
+   → Redirect back to your app
+
+3. In your app
+   → Get subscription details
+   → Check entitlements
+   → Show/hide features based on access
+
+4. User wants to upgrade
+   → Update subscription via API
+   → Entitlements update automatically
+```
+
+---
+
+## Need Help?
+
+Have questions or need implementation support?
+
+- Email us at **hi@kelviq.com**
+- [Book a demo](https://tidycal.com/neravath/15-minute-meeting)

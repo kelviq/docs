@@ -46,6 +46,13 @@
             ]
           },
           {
+            "group": "Guides",
+            "pages": [
+              "guides/subscription-integration",
+              "guides/subscription-integration-for-nextjs"
+            ]
+          },
+          {
             "group": "Customers",
             "pages": [
               "customers/customers"
