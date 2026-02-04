@@ -1,64 +1,54 @@
 ---
 title: 'Products'
+description: 'Create and manage your high-level product containers'
 ---
 
-## What is a Product?
+A product is the top-level container for what you sell. It groups together your pricing plans, features, and assets into a single family.
 
-In Kelviq, a **Product** is a broad offering or product family that you provide to your customers. It acts as a high-level container that encompasses all of its related components, such as different pricing **Plans**, optional **Add-ons**, and the specific **Features** included in each.
-
-Before you can define what your customers will pay for, you first need to create a Product.
+Before you can create plans or configure billing logic, you need to define the product they belong to.
 
 <Frame>
-<img height="200" src="/images/product-empty-screen.png" />
+  <img height="200" src="/images/product-empty-screen.png" />
 </Frame>
 
----
+## Create a product
 
-## Creating a Product
+Follow these steps to set up a new product.
 
-Follow these steps to create your first product. Once created, you can see all your products in a list.
+<Steps>
+  <Step title="Go to Products">
+    Navigate to **Product Catalog > Products** in the sidebar.
+  </Step>
+  <Step title="Start creation">
+    Click **+ Create product** in the top right corner.
+    <Frame>
+      <img height="200" src="/images/create-new-product.png" />
+    </Frame>
+  </Step>
+  <Step title="Enter details">
+    Fill out the basic information for your product.
+
+    * **Product name**
+      The public name shown to customers (e.g. "Pro Templates").
+    * **Identifier**
+      The unique ID used to reference this product in your API or SDK.
+      <Note>
+        You can override the auto-generated ID to match an existing ID in your internal database.
+      </Note>
+    * **Description**
+      A short summary of the offering.
+    * **Media**
+      Upload up to 10 images to showcase the product on your checkout page. We recommend a 4:3 aspect ratio (1600 x 1200px).
+  </Step>
+  <Step title="Finish">
+    Click **Create**. You will be redirected to the product details page.
+  </Step>
+</Steps>
 
 <Frame>
-<img height="200" src="/images/existing-products-list.png" />
+  <img height="200" src="/images/product-created.png" />
 </Frame>
 
-1.  **Navigate to the Products Page**
-    From the main sidebar, go to **Product Catalog > Products**.
+## Next steps
 
-2.  **Start Product Creation**
-    Click the **"+ Create product"** button, located in the top-right corner.
-
-3.  **Enter Product Details**
-    A form will appear asking for the following information:
-    - **Product name:** The public name of your product (e.g., "Design Course", "Pro Templates").
-    - **Identifier:** A unique identifier for the product. This is auto-generated but you can override it.
-    - **Media:** Upload images to showcase your product on the checkout page and customer portal. You can upload up to 10 images (1600 x 1200 recommended, 4:3 aspect ratio, up to 10MB each).
-    - **Description (optional):** A brief description of the product shown to customers.
-
-    <Note>
-      The **Identifier** is used to reference this product in your codebase via the API or SDKs. To link a product in Kelviq to an existing product in your system, you can override the auto-generated identifier with your own.
-    </Note>
-
-4.  **Confirm Creation**
-    Click the **"Create"** button to finalize the product.
-
-5.  **Success!**
-    You will see a success message, and you will be taken to the product's detail page. You are now ready to define its pricing.
-
-<Frame>
-<img height="200" src="/images/product-created.png" />
-</Frame>
-
----
-
-## Next Steps: Modeling Your Pricing
-
-Now that your product is created, you are ready to package its functionality into **Plans** and **Add-ons** (coming soon).
-
-From the product's detail screen, you can create and manage these pricing components. This view also serves as a preview of the pricing tables that your customers will see on your website or in your app.
-
-Kelviq supports all billing periods, including weekly, monthly, yearly, and even lifetime deals. When multiple billing periods are defined for a plan, they are neatly organized into tabs for your customers.
-
-
-
-
+Now that you have a product container, you can define the pricing plans and deliverables inside it.

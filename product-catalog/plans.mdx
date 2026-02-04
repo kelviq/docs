@@ -1,304 +1,161 @@
 ---
 title: 'Plans'
+description: 'Configure pricing, features, and deliverables'
 ---
 
-## What is a Plan?
+A plan is the commercial package you offer to customers. It bundles your pricing logic with the actual value you deliver, such as software downloads, community access, or feature limits.
 
-A **Plan** is the commercial package that you offer to your customers. It defines exactly how you monetize your product by bringing together a specific **pricing model**, a set of **features**, and optional **add-ons**. This document provides a complete guide to the entire lifecycle of a plan, from creation and configuration to publishing and management.
+You can create multiple plans for a single product. For example, you might have a "Starter" plan for hobbyists and a "Pro" plan for businesses.
 
----
+## Plan structure
 
-## Viewing All Plans
+Every plan consists of configurable components that define what the user gets.
 
-To see a comprehensive list of all plans from all of your products, select the **Plans** sub-section from the **Product Catalog** in the left navigation pane. This global view is useful for managing your entire pricing structure in one place.
-
-<Frame>
-<img height="200" src="/images/global-plans-list.png" />
-</Frame>
-
----
-
-## Creating a Plan
-
-You can create a plan from two primary locations:
-
-1.  Directly from a **Product's detail page** to ensure it's linked to that specific product.
-2.  From the global **Plans** tab in the main sidebar navigation.
-
-This guide follows the recommended flow of creating a plan from within a product.
-
-### Step 1: Start from the Product Page
-
-After creating a product, you will see a prompt to create your first plan. Click the **"+ Create plan"** button.
-
-<Frame>
-<img height="200" src="/images/create-plan-details-page.png" />
-</Frame>
-
-### Step 2: Define the Plan Details
-
-A "Create plan" modal will appear. Fill in the following details:
-
-* **Plan name:** The public name for the plan (e.g., "Starter", "Pro", "Basic").
-* **Identifier:** A unique ID for the plan, used to reference it in your code. This is auto-generated but can be overridden.
-* **Description:** An optional description that appears on customer-facing elements like invoices and checkout pages.
-
-<Tip>
-  To create multiple plans quickly, keep the **"Create more"** toggle enabled. When you click "Create", the modal will reset, ready for the next plan's details.
-</Tip>
-
-<Frame>
-<img height="200" src="/images/create-plan-modal.png" />
-</Frame>
-
-### Step 3: Review Your Draft Plans
-
-Once created, your plans will appear on the product's detail page in a **Draft** state. A draft plan is not yet live and can be safely configured before you publish it.
-
-<Frame>
-<img height="200" src="/images/draft-state-plans.png" />
-</Frame>
-
----
-
-## Configuring a Plan
-
-Click on any draft plan to navigate to its detail page. From here, you will set its price, add features, and associate add-ons.
-
-<Frame>
-<img height="200" src="/images/set-price,add-features.png" />
-</Frame>
-
-### Step 1: Configure Pricing
-
-Click the **Price** section to open the pricing configuration panel.
-
-#### Free vs Paid Plans
-
-At the top right of the pricing configuration, you'll see a **Free plan** toggle:
-
-- **Free plan ON**: Users will not be charged. This is ideal for lead generation, freemium tiers, or starter plans. When enabled, you'll see a "Free plan active" confirmation.
-- **Free plan OFF**: Configure paid pricing options as described below.
-
-#### Billing Cycles
-
-Select one or more billing cycles for your plan:
-
-- **Monthly** — Recurring monthly charge
-- **Yearly** — Recurring annual charge (often discounted)
-- **3 Months** — Quarterly billing
-- **One Time** — Single purchase, no recurring billing
-
-For each selected billing cycle, enter the price in USD.
-
-#### Free Trial
-
-For paid plans, you can offer a free trial period:
-
-1. Toggle **Free trial** on
-2. Enter the trial duration in days (e.g., 7, 14, or 30)
-
-Customers can use the plan without charge during the trial period. Billing begins automatically when the trial ends.
-
-#### Regional Pricing
-
-To offer localized prices in different currencies:
-
-1. Click **+ Add Region** in the Regional Pricing section
-2. Select a currency (e.g., United Arab Emirates Dirham, Euro, Indian Rupee)
-3. Enter prices for each billing cycle in that currency
-4. Click **Add Currency**
-
-You can add multiple regional prices and edit or remove them at any time. This allows you to set specific prices for different markets rather than relying on automatic currency conversion.
-
-#### Saving Your Pricing
-
-Click **Save** to apply your pricing configuration. The plan will display your configured price options (e.g., "One Time: $239" or "Monthly: $10, Yearly: $100").
-
----
-
-## Assigning Features to Plans
-
-Once a plan's pricing is configured, the next step is to define the functionality that customers on this plan are entitled to use. In Kelviq, the combination of a **feature** and its specific configuration (e.g., on/off, a numeric limit) is called an **entitlement**.
-
-On the plan's detail page, under the "Entitlements" section, you can see all the entitlements assigned to that plan.
-
-<Frame>
-<img height="200" src="/images/features-section.png" />   
-</Frame>
-
-### Adding Entitlements to a Plan
-
-1.  Click the **"+ Add"** button under the "Entitlements" section of the selected plan.
-2.  Search for the features you'd like to assign to the plan and select them from the list.
-    <Tip>
-      If a feature you need doesn't exist yet, you can type its name and select **"Create new feature"** directly from the dropdown menu without leaving the page.
-    </Tip>
-    <Frame>
-    <img height="200" src="/images/feature-search.png" /> 
-    </Frame>
-3.  Apply the relevant configuration for each selected feature (see Features Types below).
-4.  Confirm the action by clicking the **"Add"** button. The features are now assigned to the plan.
-
-### Features Types
-
-Kelviq provides several ways to configure features to support various business models.
-
-<CardGroup cols={3}>
-  <Card title="Switch (Boolean)">
-    Simple on/off access. Perfect for features that are either entirely included or excluded from a plan.
+<CardGroup cols={2}>
+  <Card title="Pricing" icon="tag">
+    Define the cost. Choose between recurring subscriptions (monthly/yearly) or one-time lifetime payments.
   </Card>
-  <Card title="Customizable (Limit)">
-    Access is governed by a numeric limit that you define.
+  <Card title="License keys" icon="key">
+    Issue software licenses. Generate unique keys upon purchase and enforce activation limits.
   </Card>
-  <Card title="Metered (Usage)">
-    Access is tied to consumption, which can be reported as a pre-aggregated total or as raw events.
+  <Card title="Entitlements" icon="sliders">
+    Set limits. Control access to specific features, API quotas, or seat limits via the SDK.
+  </Card>
+  <Card title="Downloads" icon="download">
+    Attach files. Upload software binaries, e-books, or course content.
+  </Card>
+  <Card title="Links" icon="link">
+    Grant access. Direct customers to private Discord servers or Notion templates.
   </Card>
 </CardGroup>
 
-#### Switch / Boolean
-This is the simplest entitlement. It acts as a toggle for a feature.
+## Plan lifecycle
 
-* **Allowed:** The customer has full access to the feature. For example, enabling "Premium Support" or "Dark Mode".
-* **Not Allowed:** The customer does not have access. In a UI powered by Kelviq, the feature might appear disabled or be hidden behind an upsell prompt.
+You manage plans through a simple status flow.
 
-<Frame>
-<img height="200" src="/images/switch-boolean-config.png" />    
-</Frame>
-
-#### Customizable
-This entitlement grants access to a feature up to a specific numeric limit you define.
-
-You must enter a numeric value for the limit. For example, allowing up to `10` team members, a `500 MB` maximum file upload size, or `3` connected social media accounts.
-
-You can also toggle **"Enable unlimited usage"**, which effectively grants infinite access to the feature for that plan.
-
-<Frame>
-<img height="200" src="/images/customizable-config.png" />  
-</Frame>
-
-#### Metered
-A metered entitlement links a feature to its consumption, which is essential for usage-based billing.
-
-* **Pre-aggregated usage:** Your application is responsible for counting usage and reporting the total to Kelviq periodically. Good examples include total `GB of storage used`, the number of `active projects` in an account, or the `minutes of video rendered`.
-* **Raw events:** Your application sends individual event records to Kelviq (e.g., an event for each API request), and Kelviq calculates the total usage.
-
-When configuring a metered entitlement, you can grant unlimited usage or set a specific limit. You can also define if the **usage count should reset** each billing period.
-
-The most critical setting for a metered limit is **Limit Enforcement**. This is controlled by a toggle labeled **"Hard Limit (disable usage at zero balance)"**. The state of this toggle determines what happens when a customer consumes all of their allowance. By default, this toggle is **ON** (Hard Limit enabled).
-
-| Toggle State for "Hard Limit" | Effective Behavior | Description                                                                                                                               | Customer Experience                                                                                                                               | Use Case Examples                                                                                                                             |
-| :------------------------------------------------------------ | :----------------- | :---------------------------------------------------------------------------------------------------------------------------------------- | :------------------------------------------------------------------------------------------------------------------------------------------------ | :-------------------------------------------------------------------------------------------------------------------------------------------- |
-| **ON (Default)** | **Hard Limit** | Access **is** blocked when the usage limit is reached (i.e., balance is zero). Kelviq will deny further attempts to use the feature.        | The customer is stopped from further usage and is typically shown a message prompting them to upgrade their plan or purchase more units to continue. | Controlling costs strictly, protecting critical resources, ensuring users do not exceed prepaid allowances without an explicit top-up or upgrade. |
-| **OFF** | **Soft Limit** | Access is **not** blocked when the usage limit is reached. Usage can go into a negative balance or accrue as overage.                       | The customer can continue using the feature without interruption. This overage can be tracked for insights, to encourage an upgrade, or billed separately if an overage pricing model is configured. | Promoting user growth, avoiding service disruption for non-critical features, or implementing a pay-as-you-go overage model on top of a base allowance. |
-
-<Frame>
-<img height="200" src="/images/metered-config.png" />
-</Frame>
-
-
-
-### Defining the Entitlement Order
-
-You can reorder entitlements to highlight your most important features first. In the "Entitlements" section of a plan, use the drag-and-drop handle on the left of each entitlement row to change the order.
-
-<Frame>
-<img height="200" src="/images/reorder-features.png" />
-</Frame>
-
-### Removing Entitlements from a Plan
-1.  On the plan's detail page, find the entitlement you wish to remove in the "Entitlement" list.
-2.  Click the **three-dot menu icon** on the right side of the Entitlement's row.
-3.  Select the **"Remove"** action from the dropdown menu.
-4.  A confirmation dialog will appear. Click **"Remove"** to permanently remove the entitlement from the plan.
-
-<Frame>
-<img height="200" src="/images/remove-feature.png" />     
-</Frame>
+* **Draft**
+    The default state for new plans. These are not visible to customers.
+* **Published**
+    The plan is live and checkout is enabled.
+* **Unpublished changes**
+    A draft version of an existing published plan. You are editing a copy, so your live plan remains safe until you hit publish again.
+* **Archived**
+    The plan is hidden from new customers but remains active for existing subscribers.
 
 ---
-## Publishing and Managing Plans
 
-This section guides you through the final steps of the plan lifecycle: making your plans live and managing all subsequent updates.
+## Create a plan
 
-### Publishing a Plan
+You create plans directly inside a product container.
 
-After a plan has been fully configured with its pricing, features, and entitlements, it remains in a **Draft** state. To make it available for new customer subscriptions, you must publish it.
+<Steps>
+  <Step title="Start creation">
+    Navigate to the **Product detail page** and click **+ Create plan**.
+    <Frame>
+      <img height="200" src="/images/create-plan.png" />
+    </Frame>
+  </Step>
+  <Step title="Define basics">
+    Fill in the plan details.
+    * **Plan name:** The public name (e.g. "Pro", "Starter").
+    * **Identifier:** The unique ID used in your code. You can override the auto-generated ID.
+    * **Description:** Optional text shown on invoices and checkout.
+    <Frame>
+      <img height="200" src="/images/create-plan-modal.png" />
+    </Frame>
+    <Tip>
+      Enable the **Create more** toggle to quickly add multiple plans in a row without closing the modal.
+    </Tip>
+  </Step>
+  <Step title="Save draft">
+    Click **Create**. The plan will appear in your list with a **Draft** badge.
+  </Step>
+</Steps>
 
-1.  Navigate to the draft plan you want to make live.
-2.  Click the **"Publish"** button, typically located in the top-right corner of the plan details page.
-3.  A confirmation dialog will appear. Review the summary and confirm the action.
+---
 
-The plan is now live and can be integrated into your pricing tables and checkout flows.
+## Configure pricing
+
+Click on any draft plan to enter the configuration view. The first step is to set how you charge.
 
 <Frame>
-<img height="200" src="/images/publish-plan.png" />     
+  <img height="200" src="/images/configure-price.png" />
 </Frame>
 
-### Editing Published Plans
-
-One of the core strengths of Kelviq is the ability to make rapid changes to live plans without requiring engineering resources. This allows your product and growth teams to iterate on your pricing and packaging quickly.
-
-When you publish an update to a plan, you can decide how the changes are applied:
-
-* **For New Customers Only:** This is the standard for most pricing changes. Any customer who subscribed before this update will remain on their original plan and price. All new subscribers will get the updated plan.
-* **For New AND Existing Customers:** This is ideal for additive changes that benefit all users. For example, when you add a valuable new feature to a plan, you can roll it out to every existing subscriber on that plan simultaneously.
-
-#### Making and Publishing Changes
-
-1.  To edit a live plan, navigate to the side panel in **Product Catalog > Plans**.
-2.  Click the **three-dot menu icon** on the relevant plan and select the **"Edit"** action.
-
-    <Frame>
-    <img height="200" src="/images/edit-plan.png" /> 
-    </Frame>
-
-3.  Apply any changes to the plan's pricing, features, or other details.
-4.  Once a change is made, the plan will have unpublished updates. Kelviq clearly indicates this with an **"Unpublished changes"** badge and a **yellow border** around the plan details section.
-
-5.  To make your changes live, click the **"Publish updates"** button in the top corner of the page. This will open a dialog where you can confirm the changes and choose how to roll them out.
-
-    <Frame>
-    <img height="200" src="/images/publish-updates.png" /> 
-    </Frame>
-
-#### Restoring a Previous Version
-If you make a mistake or wish to discard your unpublished changes, you can easily revert to the last published version.
-
-1.  On a plan's detail page that has unpublished changes, click the **three-dot menu icon** located next to the "Publish updates" button.
-2.  Select the **"Restore last published version"** option from the dropdown menu.
-
-    <Frame>
-    <img height="200" src="/images/restore-version.png" />    
-    </Frame>
-
-3.  A confirmation modal will appear, asking if you are sure. Click **"Restore version"** to confirm the action.
-
-All of your pending changes will be discarded, and the plan will instantly revert to its last live state.
-
+### Free vs. Paid
+Use the toggle in the top right to switch between a free or paid plan.
 <Frame>
-<img height="200" src="/images/restore-version-confirmation.png" />    
+  <img height="200" src="/images/free-paid.png" />
 </Frame>
+* **Free plan:** Users are not charged. Useful for lead magnets or open-source tiers.
+* **Paid plan:** Unlocks the billing configuration options below.
 
-#### Visualizing the Plan Lifecycle
+### Billing cycles
+Select the intervals you want to offer. You can enable multiple intervals for a single plan.
+<Frame>
+  <img height="200" src="/images/billing-cycle.png" />
+</Frame>
+* **Monthly / Yearly:** Standard recurring subscriptions.
+* **3 Months:** Quarterly billing.
+* **One time:** A single non-recurring payment (lifetime deal).
 
-The lifecycle of a plan involves several key states, from its creation as a draft to being published and subsequently updated. The following diagram illustrates these transitions:
+### Regional pricing
+You can set specific prices for different regions rather than relying on auto-conversion.
+1. Click **+ Add Region**.
+2. Select the currency (e.g. EUR, INR).
+3. Enter the price for that market.
 
-```mermaid
-stateDiagram-v2
-    [*] --> Draft : New Plan Created
-    Draft --> Published : User clicks "Publish"
-    Published: Plan is live
+---
 
-    Published --> HasUnpublishedChanges : User starts editing a live plan
-    HasUnpublishedChanges: Edits are pending, previous version is still live
+## Add deliverables
 
-    HasUnpublishedChanges --> Published : User clicks "Publish updates" (Plan is live with new changes)
-    HasUnpublishedChanges --> Published : User clicks "Restore last published version" (Pending edits discarded, previous live version remains)
+Configure what the customer receives immediately after purchase. These assets are delivered directly via the customer portal or email.
 
-    %% Optional: If a plan can be explicitly taken offline or archived from a published state
-    %% Published --> Archived : User archives plan
-    %% Archived --> [*]
+### Digital downloads
+Upload files that are securely delivered after purchase.
+1. Expand the **Digital downloads** accordion.
+2. Drag and drop your files (up to 5GB total).
+3. Customers will see these in their portal immediately after checkout.
 
-    Published --> [*] : (Plan is live and may be edited again)
-```
+### License keys
+If you are selling software that requires activation, you can issue unique license keys.
+1. Expand the **License keys** accordion.
+2. **Activation limit:** Set how many machines or instances can use a single key (e.g. 1 for personal, 5 for team).
+3. **License duration:** Define how long the key remains valid (e.g. 1 Year).
+
+### External links
+Provide access to resources hosted elsewhere.
+1. Expand the **Links** accordion.
+2. Add the **Link name** (e.g. Private Discord community).
+3. Add the **Link URL**.
+
+---
+
+## Feature & limits
+Configure feature access, usage quotas, and API limits.
+
+* **Toggle features:** Turn specific capabilities on or off (e.g. "SSO Access").
+* **Numeric limits:** Set quotas (e.g. "5 Projects", "10,000 API calls").
+
+---
+
+## Publishing & Versioning
+
+We protect your live customers by creating a separate version when you edit a plan.
+
+### How it works
+* **Safe editing**
+    When you edit a **Published** plan, we automatically create a new **Unpublished** version. Your live plan remains untouched so customers can keep buying without interruption.
+* **Unpublished changes**
+    You will see a yellow badge indicating you are working on a draft version. You can make as many changes as you want here without affecting the live site.
+* **Publishing**
+    When you click **Publish**, this new version replaces the old one.
+
+### Pushing updates
+Because the new version replaces the old one, you need to decide what happens to your current subscribers.
+
+When you click **Publish**, we will ask you to confirm the rollout strategy.
+* **For price changes:** You decide whether to grandfather existing users on the old price or migrate them to the new one.
+* **For feature changes:** You decide whether to push the new entitlements to existing users immediately or keep them on their legacy configuration.
+
+If you change your mind while editing, you can click **Discard** to delete the unpublished version and revert to the live state.
