@@ -36,7 +36,8 @@
               "product-catalog/digital-downloads",
               "product-catalog/license-keys",
               "product-catalog/links",
-              "product-catalog/entitlements"
+              "product-catalog/entitlements",
+              "product-catalog/discounts"
             ]
           },
           {
@@ -46,16 +47,37 @@
             ]
           },
           {
+            "group": "Sales",
+            "pages": [
+              "sales/orders",
+              "sales/checkout-sessions"
+            ]
+          },
+          {
+            "group": "Coustomers-management",
+            "pages": [
+              "coustomers-management/overview"
+            ]
+          },
+          {
+            "group": "Payouts",
+            "pages": [
+              "payouts/overview",
+              "payouts/transactions",
+              "payouts/payout-account"
+            ]
+          },
+          {
+            "group": "Customer-portal",
+            "pages": [
+              "customer-portal/overview"
+            ]
+          },
+          {
             "group": "Guides",
             "pages": [
               "guides/subscription-integration",
               "guides/subscription-integration-for-nextjs"
-            ]
-          },
-          {
-            "group": "Customers",
-            "pages": [
-              "customers/customers"
             ]
           }
         ]

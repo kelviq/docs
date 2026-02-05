@@ -1,12 +1,11 @@
 ---
-title: 'Checkout Configuration & Customization'
+title: 'Configuration & Customization'
 description: 'Configure and customize checkout experiences for your customers'
 ---
 
 Checkout in Kelviq allows you to collect payments from customers. You can generate checkout links for your products, customize the checkout experience, and support multiple payment options and billing periods.
 
 ## Overview
-
 Kelviq's checkout system:
 - **Powers your sales** - Collect payments and create customer subscriptions
 - **Integrates with Stripe** - Uses Stripe as the payment processor
@@ -17,6 +16,9 @@ Kelviq's checkout system:
 ## Generating Checkout Links
 
 Checkout links are generated at the **product level**. Each link can include one or more plans.
+<Frame>
+      <img height="200" src="/images/accessing-checkout.png" />
+</Frame>
 
 ### Quick Start
 
@@ -25,7 +27,9 @@ Checkout links are generated at the **product level**. Each link can include one
 3. **Select plans** → Choose which plans to include
 4. **Configure options** → Set defaults and features
 5. **Copy link** → Share with customers
-
+<Frame>
+      <img height="200" src="/images/generate-checkout.png" />
+</Frame>
 ### Link Format
 
 Generated checkout links follow this pattern:
@@ -197,6 +201,9 @@ Configure in your checkout link via API or dashboard:
 ### Discount Code Integration
 
 Allow customers to apply discount codes at checkout:
+<Frame>
+      <img height="200" src="/images/generate-checkout-discounts.png" />
+</Frame>
 
 ```
 Customer at checkout:
@@ -264,11 +271,18 @@ closed
 ### Monitoring Checkouts
 
 View checkout sessions in the dashboard:
+<Frame>
+      <img height="200" src="/images/checkout-sessions.png" />
+</Frame>
 
-1. **Go to Analytics** → Checkout section
+1. **Go to Sales** → Checkout sessions
 2. **View sessions** → See all active and completed checkouts
-3. **Filter by status** → Open, Success, Closed
+3. **Filter by status** → Open, Success, Closed, Expired
 4. **Conversion metrics** → Track conversion rates
+
+<Frame>
+      <img height="200" src="/images/checkout-sessions-detials.png" />
+</Frame>
 
 ### Create Checkout Sessions via API
 
