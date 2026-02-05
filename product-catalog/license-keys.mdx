@@ -7,7 +7,9 @@ description: 'Generate and manage license keys for your products'
 License keys allow you to generate unique activation keys for each customer purchase. This guide covers how to enable and configure licenses on your plans, manage them from orders, and how your customers can activate and validate licenses using the API.
 
 ---
-
+<Frame>
+      <img height="200" src="/images/accessing-key.png" />
+</Frame>
 ## Table of Contents
 
 1. [Enabling Licenses on a Plan](#1-enabling-licenses-on-a-plan)
@@ -23,8 +25,10 @@ License keys allow you to generate unique activation keys for each customer purc
 ## 1. Enabling Licenses on a Plan
 
 License keys are configured at the **plan level**. When enabled, every order placed for that plan will automatically generate a unique license key for the customer.
-
 ### How to Enable Licenses
+<Frame>
+      <img height="200" src="/images/enable-key.png" />
+</Frame>
 
 1. Navigate to **Products** → Select your product → Select the plan you want to configure
 2. Scroll down to the **License keys** section
@@ -37,7 +41,9 @@ Once enabled, you can configure the following settings:
 #### Activation Limit
 
 Control how many times a single license key can be activated across different devices.
-
+<Frame>
+      <img height="200" src="/images/set-limit.png" />
+</Frame>
 | Setting | Description |
 |---------|-------------|
 | **Enabled** | Limit activations to a specific number (e.g., 5 devices) |
@@ -48,7 +54,9 @@ Control how many times a single license key can be activated across different de
 #### License Expiry
 
 Define how long the license key remains valid after purchase.
-
+<Frame>
+      <img height="200" src="/images/set-duration.png" />
+</Frame>
 | Setting | Description |
 |---------|-------------|
 | **Enabled** | License expires after a specified duration |
@@ -70,9 +78,13 @@ After configuring the settings, click **Save Changes**. All future orders for th
 
 Once a customer places an order for a plan with licenses enabled, you can manage their license from the **Order Details** page.
 
+
 ### Viewing License Information
 
 Navigate to **Orders** → Click on an order to view details. The license section displays:
+<Frame>
+      <img height="200" src="/images/managing-licenses-from-order-details.png" />
+</Frame>
 
 - **License Key**: The unique key assigned to this order
 - **Expiry Date**: When the license expires (or "Never expires")
@@ -82,9 +94,14 @@ Navigate to **Orders** → Click on an order to view details. The license sectio
 ### Available Actions
 
 Click the **⋮** menu button on the license card to access these options:
+<Frame>
+      <img height="200" src="/images/available-actions.png" />
+</Frame>
 
 #### 🔄 Regenerate Key
-
+<Frame>
+      <img height="200" src="/images/regenerat-key.png" />
+</Frame>
 Creates a brand new license key and invalidates the old one.
 
 - The old key will immediately stop working
@@ -95,6 +112,9 @@ Creates a brand new license key and invalidates the old one.
 
 #### ✏️ Edit Activation Limit
 
+<Frame>
+      <img height="200" src="/images/edit-activation-limit-1.png" />
+</Frame>
 Modify how many devices can use this specific license.
 
 - Toggle activation limit on/off
@@ -104,7 +124,9 @@ Modify how many devices can use this specific license.
 > **Use case**: Upgrade a customer from 3 seats to 10 seats without issuing a new license.
 
 #### 📅 Manage Expiry
-
+<Frame>
+      <img height="200" src="/images/manage-expiry.png" />
+</Frame>
 Update the license expiration date.
 
 - Toggle expiry on/off
@@ -133,7 +155,9 @@ Click on the license card to view the **License Details** page, which shows:
 - Activation metadata (device info, if provided)
 
 #### Revoking Individual Activations
-
+<Frame>
+      <img height="200" src="/images/revoke-license.png" />
+</Frame>
 For each active instance, you can click **Revoke** to:
 - Remove that specific instance's access
 - Free up an activation slot

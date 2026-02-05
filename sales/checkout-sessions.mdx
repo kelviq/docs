@@ -1,0 +1,60 @@
+---
+title: 'Checkout Sessions'
+description: 'Monitor live traffic and debug failed purchase attempts'
+---
+
+While the **Orders** page tracks successful revenue, the **Checkout Sessions** page tracks every single attempt.
+
+This is your granular, real-time log of what is happening on your payment page right now. It is essential for debugging failed transactions and recovering abandoned carts.
+
+## Accessing sessions
+
+<Steps>
+  <Step title="Navigate">
+    Go to **Sales > Checkout sessions** in the sidebar.
+  </Step>
+  <Step title="Filter">
+    Use the status tabs to isolate specific types of traffic:
+    * **Open:** Customers currently on the payment page.
+    * **Succeeded:** Completed purchases.
+    * **Failed:** Declined cards or errors.
+    * **Expired:** Sessions where the customer left without paying.
+  </Step>
+</Steps>
+
+<Frame>
+  <img height="200" src="/images/checkout-sessions-list.png" alt="List of checkout sessions showing status and customer emails" />
+</Frame>
+
+## Session details
+
+Click on any session to see the raw data. This is useful if you need to understand *why* a transaction failed (e.g. "Card expired" vs "Insufficient funds").
+
+<Frame>
+  <img height="200" src="/images/checkout-session-detail.png" alt="Detailed view of a checkout session including timeline" />
+</Frame>
+
+### Customer & context
+See exactly who is attempting to buy and where they are coming from.
+* **Customer info:** Email address, location, and IP address.
+* **Product:** The specific item or license they are trying to purchase.
+* **Device:** The payment method and device type used.
+
+### The timeline
+The timeline allows you to reconstruct the customer's journey step-by-step.
+1. **Session created:** The moment they clicked your buy button.
+2. **Details provided:** When they filled in their email or card info.
+3. **Outcome:** The specific failure reason (e.g. `card_declined`) or success message.
+
+## Actions & recovery
+
+This page gives you tools to assist customers who are stuck.
+
+* **Recover sales**
+  If you see a **Failed** session, you can use the email address to reach out and offer support.
+* **Share portal access**
+  For successful sessions, you can copy the **Portal Link** directly from the details view and send it to the customer manually.
+* **Resend receipt**
+  Trigger a new email receipt if the customer missed the first one.
+* **View order**
+  Click the **Order** button to jump straight to the official revenue record in the Orders page.
