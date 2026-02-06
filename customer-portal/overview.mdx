@@ -1,62 +1,96 @@
 ---
-title: 'Overview'
-description: 'A self-serve hub for your customers to manage subscriptions and access content'
+title: 'Customer portal'
+description: 'A self-serve hub for your customers to manage subscriptions and access content.'
 ---
 
-Kelviq provides a fully hosted customer portal out of the box.
+Kelviq provides a hosted customer portal.
 
-This is a self-serve environment where your customers can manage their own subscriptions, access files, and handle billing details. You do not need to build any of this yourself. It ensures you don't have to manually handle support tickets for basic tasks like upgrading plans or downloading invoices.
+This is a self-serve environment. Your customers manage their own subscriptions, access files, and handle billing details. You don't need to build this. It ensures you don't have to manually answer support tickets for basic tasks like upgrading plans or downloading invoices.
 
-## Access & authentication
+## Access and login
 
-The portal allows passwordless, secure access.
+The portal uses passwordless, secure access.
 
 <Steps>
-  <Step title="Purchase & Invite">
-    The moment a customer completes a purchase, they receive access to the portal.
+  <Step title="Purchase and invite">
+    When a customer completes a purchase, they get access immediately.
   </Step>
   <Step title="Login">
     Customers enter their email address on your portal login page.
   </Step>
   <Step title="Secure entry">
-    We send a one-time access code to their email. They enter this code to log in securely without needing to remember a password.
+    We send a one-time access code to their email. They enter this code to log in. No passwords to remember.
   </Step>
 </Steps>
 
-## What customers can do
+<Frame>
+  <img height="200" src="/images/portal-login.png" />
+</Frame>
 
-Once logged in, the dashboard is divided into three core sections.
+## My orders
 
-### My orders
-This is the home for everything the customer owns. They can click on any specific product to see the details.
+This is the home screen. It lists everything the customer owns. They can click on a specific product to see details.
+
+<Frame>
+  <img height="200" src="/images/orders-list.png" />
+</Frame>
+
+### Product details
+Inside a specific product, customers find their deliverables.
 
 * **Digital downloads**
-  Access and download files, e-books, or software binaries immediately.
+  Access files, e-books, or software binaries.
 * **External links**
-  Access private links to communities (Discord) or Notion templates.
+  Private links to Discord servers or Notion templates.
 * **License management**
-  View license keys. If you enforce seat limits, customers can view which devices are active and remotely revoke licenses to free up seats for new team members.
-* **Usage tracking**
-  For metered products, customers can view real-time usage graphs. They can track API calls, storage used, or any other metric you bill for.
+  View license keys. If you enforce seat limits, customers can see active devices and revoke licenses to free up seats for new team members.
 
-### Subscription management
-Customers have full control over their lifecycle without contacting support.
+<Frame>
+  <img height="200" src="/images/product-downloads.png" />
+</Frame>
+
+### Usage tracking
+For metered products, customers see real-time data. They can track API calls, storage used, or any metric you bill for. This transparency helps prevent billing disputes.
+
+<Frame>
+  <img height="200" src="/images/usage-graph.png" />
+</Frame>
+
+## Subscription management
+
+Customers have control over their lifecycle without contacting you.
 
 * **Change plans**
-  Upgrade to a higher tier or downgrade to a lower one.
-* **Pause & cancel**
-  Pause a subscription temporarily or cancel it entirely.
+  Upgrade to a higher tier or downgrade.
+* **Pause and cancel**
+  Pause a subscription temporarily or stop it entirely.
 * **Payment methods**
-  Update credit card details or switch payment methods for future renewals.
+  Update credit card details or switch methods for future renewals.
 
-### Billing & settings
-A dedicated section for compliance and account administration.
+<Frame>
+  <img height="200" src="/images/update-payment-modal.png" />
+</Frame>
 
-* **Invoices & receipts**
-  View payment history. Customers can download PDF invoices and receipts for their own accounting.
+## Billing settings
+
+This section handles compliance and admin tasks.
+
+### Invoices and receipts
+Customers can view their full payment history. They can download PDF invoices and receipts for their own accounting.
+
+<Frame>
+  <img height="200" src="/images/invoices-tab.png" />
+</Frame>
+
+### Account details
+This is where they manage the legal side of the account.
+* **Tax IDs**
+  Update billing addresses and VAT/Tax IDs.
 * **Refund status**
   Track the status of partial or full refunds.
-* **Account details**
-  Update billing addresses and tax IDs.
 * **Account transfer**
-  Transfer the ownership of the account and subscription to another email address.
+  Transfer ownership of the account and subscription to a different email address.
+
+<Frame>
+  <img height="200" src="/images/billing-settings.png" />
+</Frame>
