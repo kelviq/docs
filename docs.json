@@ -84,7 +84,7 @@
       },
       
       {
-        "tab": "APIs & SDKs",
+        "tab": "API Reference",
         "groups": [
           {
             "group": "Get Started",
@@ -95,7 +95,12 @@
           {
             "group": "API Documentation",
             "openapi": "api-reference/openapi.json"
-          },
+          }
+        ]
+      },
+      {
+        "tab": "SDKs",
+        "groups": [
           {
             "group": "Backend Integration",
             "pages": [
