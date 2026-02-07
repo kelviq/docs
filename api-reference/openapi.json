@@ -20,6 +20,44 @@
       }
     },
     "schemas": {
+      "BillingAddress": {
+        "type": "object",
+        "nullable": true,
+        "description": "The billing address of the customer.",
+        "properties": {
+          "country": {
+            "type": "string",
+            "description": "The country code (e.g., ISO 3166-1 alpha-2).",
+            "example": "IN"
+          },
+          "line1": {
+            "type": "string",
+            "description": "Address line 1.",
+            "example": "123 Main Street"
+          },
+          "line2": {
+            "type": "string",
+            "nullable": true,
+            "description": "Address line 2.",
+            "example": "Apt 4B"
+          },
+          "postalCode": {
+            "type": "string",
+            "description": "The postal or ZIP code.",
+            "example": "560001"
+          },
+          "city": {
+            "type": "string",
+            "description": "The city name.",
+            "example": "Bangalore"
+          },
+          "state": {
+            "type": "string",
+            "description": "The state or province.",
+            "example": "Karnataka"
+          }
+        }
+      },
       "ErrorResponse": {
         "type": "object",
         "properties": {
@@ -82,6 +120,9 @@
               "priority": "high"
             }
           },
+          "billingAddress": {
+            "$ref": "#/components/schemas/BillingAddress"
+          },
           "createdOn": {
             "type": "string",
             "nullable": false,
@@ -131,6 +172,9 @@
               "source": "sdk_import",
               "priority": "low"
             }
+          },
+          "billingAddress": {
+            "$ref": "#/components/schemas/BillingAddress"
           }
         }
       },
@@ -163,6 +207,9 @@
               "priority": "very_high",
               "status": "active"
             }
+          },
+          "billingAddress": {
+            "$ref": "#/components/schemas/BillingAddress"
           }
         }
       },
@@ -218,6 +265,26 @@
             ],
             "example": "MONTHLY"
           },
+          "customerId": {
+            "type": "string",
+            "nullable": true,
+            "description": "The ID of the customer initiating the checkout. (If not provided, a new customer might be created depending on server logic).",
+            "example": "cust_789"
+          },
+          "features": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/FeatureInput"
+            },
+            "nullable": true,
+            "description": "A list of features and their desired quantities. SDK documentation notes this as '**Required**', but usage may vary based on examples.",
+            "example": [
+              {
+                "identifier": "seats",
+                "quantity": 5
+              }
+            ]
+          },
           "offeringId": {
             "type": "string",
             "format": "uuid",
@@ -238,26 +305,6 @@
             "nullable": true,
             "description": "The ID (uuid) of the pricing rule being applied (considered if offeringId is not provided).",
             "example": "f2ebc23f-3f79-4cf4-b17e-fe8e30a42ab2"
-          },
-          "customerId": {
-            "type": "string",
-            "nullable": true,
-            "description": "The ID of the customer initiating the checkout. (If not provided, a new customer might be created depending on server logic).",
-            "example": "cust_789"
-          },
-          "features": {
-            "type": "array",
-            "items": {
-              "$ref": "#/components/schemas/FeatureInput"
-            },
-            "nullable": true,
-            "description": "A list of features and their desired quantities. SDK documentation notes this as '**Required**', but usage may vary based on examples.",
-            "example": [
-              {
-                "identifier": "seats",
-                "quantity": 5
-              }
-            ]
           },
           "ipAddress": {
             "type": "string",
@@ -477,6 +524,206 @@
       "metadata": { "os": "macOS", "arch": "arm64" }
     }
   },
+      "CreateSubscriptionRequest": {
+        "type": "object",
+        "required": [
+          "planIdentifier",
+          "chargePeriod",
+          "customerId"
+        ],
+        "properties": {
+          "planIdentifier": {
+            "type": "string",
+            "description": "The identifier of the specific plan the customer is subscribing to.",
+            "example": "plan-pro-monthly"
+          },
+          "successUrl": {
+            "type": "string",
+            "format": "url",
+            "nullable": true,
+            "description": "The URL to which the user will be redirected after a successful subscription creation. Optional.",
+            "example": "https://kelviq.com/subscription/success"
+          },
+          "chargePeriod": {
+            "type": "string",
+            "description": "The billing cycle for the subscription.",
+            "enum": [
+              "ONE_TIME",
+              "MONTHLY",
+              "YEARLY",
+              "WEEKLY",
+              "DAILY",
+              "THREE_MONTHS",
+              "SIX_MONTHS"
+            ],
+            "example": "MONTHLY"
+          },
+          "customerId": {
+            "type": "string",
+            "nullable": true,
+            "description": "The ID of the customer creating the subscription.",
+            "example": "cust_789"
+          },
+          "features": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/FeatureInput"
+            },
+            "nullable": true,
+            "description": "A list of features and their desired quantities.",
+            "example": [
+              {
+                "identifier": "seats",
+                "quantity": 5
+              }
+            ]
+          },
+          "ipAddress": {
+            "type": "string",
+            "nullable": true,
+            "description": "The IP Address of the customer, used for location-based pricing.",
+            "example": "103.154.35.20"
+          },
+          "offeringId": {
+            "type": "string",
+            "format": "uuid",
+            "nullable": true,
+            "description": "The ID (uuid) of the offering the customer is subscribing with.",
+            "example": "96d3a293-34ac-48a5-b73d-976b15781afd"
+          },
+          "pricingTableId": {
+            "type": "string",
+            "format": "uuid",
+            "nullable": true,
+            "description": "The ID (uuid) of the pricingTable being used (considered if offeringId is not provided).",
+            "example": "6db2717a-4e43-4ae1-a293-6c0a775f6264"
+          },
+          "ruleId": {
+            "type": "string",
+            "format": "uuid",
+            "nullable": true,
+            "description": "The ID (uuid) of the pricing rule being applied (considered if offeringId is not provided).",
+            "example": "f2ebc23f-3f79-4cf4-b17e-fe8e30a42ab2"
+          }
+        }
+      },
+      "CreateSubscriptionResponse": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "format": "uuid",
+            "description": "The unique identifier of the created subscription.",
+            "example": "520ca8a5-9fc0-4d6a-bc7a-2ba331595441"
+          },
+          "startDate": {
+            "type": "string",
+            "format": "date",
+            "description": "The start date of the subscription.",
+            "example": "2026-02-07"
+          },
+          "endDate": {
+            "type": "string",
+            "format": "date",
+            "nullable": true,
+            "description": "The end date of the subscription, if applicable.",
+            "example": null
+          },
+          "billingPeriodStartTime": {
+            "type": "string",
+            "format": "date-time",
+            "description": "The start time of the current billing period.",
+            "example": "2026-02-07T06:02:05Z"
+          },
+          "billingPeriodEndTime": {
+            "type": "string",
+            "format": "date-time",
+            "description": "The end time of the current billing period.",
+            "example": "2026-02-08T06:02:05Z"
+          },
+          "amount": {
+            "type": "string",
+            "description": "The subscription amount.",
+            "example": "2000.00"
+          },
+          "recurrence": {
+            "type": "string",
+            "description": "The recurrence interval of the subscription.",
+            "example": "month"
+          },
+          "currency": {
+            "type": "string",
+            "description": "The currency of the subscription.",
+            "example": "USD"
+          },
+          "status": {
+            "type": "string",
+            "description": "The current status of the subscription.",
+            "example": "trialing"
+          },
+          "product": {
+            "type": "object",
+            "properties": {
+              "name": {
+                "type": "string",
+                "description": "The name of the product.",
+                "example": "Invoice Test"
+              },
+              "id": {
+                "type": "string",
+                "format": "uuid",
+                "description": "The unique identifier of the product.",
+                "example": "88e437b8-6017-405b-9328-e0f4e140bb79"
+              },
+              "identifier": {
+                "type": "string",
+                "description": "The identifier of the product.",
+                "example": "invoice-test"
+              }
+            }
+          },
+          "plan": {
+            "type": "object",
+            "properties": {
+              "name": {
+                "type": "string",
+                "description": "The name of the plan.",
+                "example": "iUltra"
+              },
+              "identifier": {
+                "type": "string",
+                "description": "The identifier of the plan.",
+                "example": "i-ultra"
+              }
+            }
+          },
+          "features": {
+            "type": "array",
+            "items": {},
+            "description": "List of features included in the subscription."
+          },
+          "trialDaysRemaining": {
+            "type": "integer",
+            "description": "Number of trial days remaining.",
+            "example": 1
+          },
+          "customerId": {
+            "type": "string",
+            "description": "The customer identifier associated with this subscription.",
+            "example": "geojacob"
+          }
+        }
+      },
+      "DetailErrorResponse": {
+        "type": "object",
+        "properties": {
+          "detail": {
+            "type": "string",
+            "description": "A human-readable error message.",
+            "example": "Customer does not exist."
+          }
+        }
+      },
       "ReportUsageRequest": {
         "type": "object",
         "required": [
@@ -657,6 +904,20 @@
             "description": "The new charging period for the subscription.",
             "example": "YEARLY"
           },
+          "features": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/FeatureInput"
+            },
+            "nullable": true,
+            "description": "List of features and quantities to update for the subscription.",
+            "example": [
+              {
+                "identifier": "seats",
+                "quantity": 10
+              }
+            ]
+          },
           "offeringId": {
             "type": "string",
             "format": "uuid",
@@ -683,20 +944,6 @@
             "nullable": true,
             "description": "The IP Address of the customer, for location-based pricing.",
             "example": "103.154.35.20"
-          },
-          "features": {
-            "type": "array",
-            "items": {
-              "$ref": "#/components/schemas/FeatureInput"
-            },
-            "nullable": true,
-            "description": "List of features and quantities to update for the subscription.",
-            "example": [
-              {
-                "identifier": "seats",
-                "quantity": 10
-              }
-            ]
           }
         }
       },
@@ -1067,6 +1314,14 @@
                     "source": "sdk_import",
                     "priority": "high"
                   },
+                  "billingAddress": {
+                    "country": "IN",
+                    "line1": "123 Main Street",
+                    "line2": "Apt 4B",
+                    "postalCode": "560001",
+                    "city": "Bangalore",
+                    "state": "Karnataka"
+                  },
                   "createdOn": "2025-06-04T06:03:30.195790Z",
                   "modifiedOn": "2025-06-04T06:03:30.195831Z"
                 }
@@ -1124,6 +1379,14 @@
                     "source": "sdk_import",
                     "priority": "high",
                     "status": "active"
+                  },
+                  "billingAddress": {
+                    "country": "IN",
+                    "line1": "123 Main Street",
+                    "line2": "Apt 4B",
+                    "postalCode": "560001",
+                    "city": "Bangalore",
+                    "state": "Karnataka"
                   },
                   "createdOn": "2025-06-04T06:03:30.195790Z",
                   "modifiedOn": "2025-06-04T06:03:30.195831Z"
@@ -1528,6 +1791,74 @@
                   "eventName": "aggregated.usage",
                   "idempotencyKey": "597ee95063c744ed9bcc9b1cf5676a8a",
                   "timestamp": "2025-05-22 08:27:45.430732"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/subscriptions/create/": {
+      "post": {
+        "tags": [
+          "Subscriptions"
+        ],
+        "summary": "Create a subscription",
+        "description": "Creates a new subscription for a customer directly, without requiring a checkout session.",
+        "operationId": "createSubscription",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CreateSubscriptionRequest"
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "Subscription Created",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/CreateSubscriptionResponse"
+                },
+                "example": {
+                  "id": "520ca8a5-9fc0-4d6a-bc7a-2ba331595441",
+                  "startDate": "2026-02-07",
+                  "endDate": null,
+                  "billingPeriodStartTime": "2026-02-07T06:02:05Z",
+                  "billingPeriodEndTime": "2026-02-08T06:02:05Z",
+                  "amount": "2000.00",
+                  "recurrence": "month",
+                  "currency": "USD",
+                  "status": "trialing",
+                  "product": {
+                    "name": "Invoice Test",
+                    "id": "88e437b8-6017-405b-9328-e0f4e140bb79",
+                    "identifier": "invoice-test"
+                  },
+                  "plan": {
+                    "name": "iUltra",
+                    "identifier": "i-ultra"
+                  },
+                  "features": [],
+                  "trialDaysRemaining": 1,
+                  "customerId": "geojacob"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad Request - Validation or business logic error.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/DetailErrorResponse"
+                },
+                "example": {
+                  "detail": "Customer does not exist."
                 }
               }
             }
