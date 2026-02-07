@@ -222,7 +222,7 @@ import { Kelviq, CHARGE_PERIOD_CHOICES } from '@kelviq/node-sdk';
 const response = await client.checkout.createSession({
   planIdentifier: "plan-pro-monthly",
   chargePeriod: CHARGE_PERIOD_CHOICES.MONTHLY,
-  successUrl: "https://kelviq.com/checkout/success",
+  successUrl: "https://yourwebsite.com/checkout/success",
   customerId: "cust_789",  // Recommended, otherwise it will create a new customer
 });
 
@@ -233,7 +233,7 @@ const response = await client.checkout.createSession({
 
   ```json
    {
-        "checkoutUrl": "https://checkout.stripe.com/c/pay/cs_test_b1sNi7D6u9iMCUFV1UZi9ZaiXKdOOmr3DCUW6XdCZIr5Id1F7#fid2cGd2ZndsdXsdjahsdkhsdhc%2FY2RpdmApJ3Zxd2x1YERmZmpwa3EnPydkZmZxWjRLZjV3X0BAckFBYGJKSEInKSdkdWxOYHwnPyd1blpxYHZxWjA0Tj1DSGdWRmwxYkdiMFxGQ29zf2BdTldOTGQzUlNqfWd9U1ZkanNHMlVnczxidEg0fFFqYVJNYzw8XEh2YVA8dkQ1bmA9NW5sS1c2PHE8hH89Q11Uf1E2NTVgY0M1Q0ZmYycpJ2N3amhWYHdzYHcnP3F3cGApJ2lkfGpwc",
+        "checkoutUrl": "https://www.kelviq.com/checkout/cs_fBhCIBerpe1pAsRW6P4wYc8WHqMdfdr457hd3oOLjhAFx/",
         "checkoutSessionId": "cs_test_b1sNi7D6u9iMCUFV1UZi9ZwerfaiXKdOOmr3DCUW6XdCZIr5Id1F7G",
     }
   ```

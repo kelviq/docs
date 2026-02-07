@@ -1,0 +1,15 @@
+/* Make tables full width */
+table {
+  width: 100% !important;
+  display: table !important;
+}
+
+/* Ensure table cells expand properly */
+th,
+td {
+  white-space: normal;
+}
+
+table tr th {
+  text-align: left;
+}

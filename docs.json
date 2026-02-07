@@ -2,6 +2,7 @@
   "$schema": "https://mintlify.com/docs.json",
   "theme": "palm",
   "name": "Kelviq Documentation",
+  "css": "/custom.css",
   "colors": {
     "primary": "#FF5722",
     "light": "#FF8C66",
@@ -35,7 +36,9 @@
               "product-catalog/features",
               "product-catalog/digital-downloads",
               "product-catalog/license-keys",
-              "product-catalog/entitlements"
+              "product-catalog/links",
+              "product-catalog/entitlements",
+              "product-catalog/discounts"
             ]
           },
           {
@@ -45,16 +48,44 @@
             ]
           },
           {
-            "group": "Customers",
+            "group": "Sales",
             "pages": [
-              "customers/customers"
+              "sales/orders",
+              "sales/checkout-sessions"
+            ]
+          },
+          {
+            "group": "Coustomers-management",
+            "pages": [
+              "coustomers-management/overview"
+            ]
+          },
+          {
+            "group": "Payouts",
+            "pages": [
+              "payouts/overview",
+              "payouts/transactions",
+              "payouts/payout-account"
+            ]
+          },
+          {
+            "group": "Customer-portal",
+            "pages": [
+              "customer-portal/overview"
+            ]
+          },
+          {
+            "group": "Guides",
+            "pages": [
+              "guides/subscription-integration",
+              "guides/subscription-integration-for-nextjs"
             ]
           }
         ]
       },
       
       {
-        "tab": "APIs & SDKs",
+        "tab": "API Reference",
         "groups": [
           {
             "group": "Get Started",
@@ -65,7 +96,12 @@
           {
             "group": "API Documentation",
             "openapi": "api-reference/openapi.json"
-          },
+          }
+        ]
+      },
+      {
+        "tab": "SDKs",
+        "groups": [
           {
             "group": "Backend Integration",
             "pages": [

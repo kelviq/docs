@@ -1,0 +1,126 @@
+---
+title: 'Customers'
+description: 'View and manage customer details, subscriptions, and entitlements.'
+---
+
+Managing customers sits at the center of Kelviq. Each customer connects directly to their subscriptions, the plans behind them, and the features they own. You need to understand these relationships to handle the full customer lifecycle.
+
+## View customer list
+
+Select **Customers** in the main navigation to see your list.
+
+You can do a few things here.
+* **Search** by name, email, or identifier.
+* **Add a new customer** with the button in the top right.
+* **Manage a customer** by clicking their row to see details.
+
+<Frame>
+  <img height="200" src="/images/customers-list.png" />
+</Frame>
+
+## Add a new customer
+
+You can create records manually.
+
+<Steps>
+  <Step title="Open the modal">
+    Click **+ New customer** in the top right of the list page.
+  </Step>
+  <Step title="Fill in details">
+    You need to provide a few key pieces of info.
+    * **Customer name** is required. Use the person's full name or company name.
+    * **Identifier** is the unique ID the API uses. We auto-generate this based on the name, but you can edit it. Linking this to the ID in your own database is usually a good idea.
+    * **Email address** is optional.
+  </Step>
+  <Step title="Create">
+    Click **Create** to finish.
+    
+    If you are adding a batch of people, toggle on **Create more**. This keeps the window open so you can add the next one immediately.
+  </Step>
+</Steps>
+
+<Frame>
+  <img height="200" src="/images/create-customer-modal.png" />
+</Frame>
+
+## Manage existing customers
+
+You can edit details or revoke access from the list view.
+
+### Edit a customer
+Click the **three dots** on the right side of the customer row and select **Edit**.
+
+<Frame>
+  <img height="200" src="/images/edit-customer.png" />
+</Frame>
+
+You can update the **Customer name** and **Email address**. The Identifier is fixed after creation and cannot be changed.
+
+
+### Archive a customer
+Archiving makes a customer inactive and revokes their access. Click the **three dots** and select **Archive**.
+
+<Frame>
+  <img height="200" src="/images/archive-customer.png" />
+</Frame>
+You will see a confirmation warning. Click **Confirm** to proceed.
+
+<Warning>
+  You cannot archive a customer with an active subscription. You must cancel their subscription first.
+</Warning>
+
+## Customer details
+
+Click on any customer row to open their full profile.
+
+This page holds the source of truth for that user. You can see their unique Billing ID and timestamps for when they joined or were last updated.
+
+<Frame>
+  <img height="200" src="/images/customer-details.png" />
+</Frame>
+
+### Subscriptions
+
+This section lists active and past plans. It shows the status, such as Active or Canceled, and the relevant dates.
+
+**Add a subscription**
+You can manually subscribe a customer to a plan from here.
+
+<Frame>
+  <img height="200" src="/images/add-subscription.png" />
+</Frame>
+
+1.  Click **Add subscription**.
+2.  Set the **Billing period** and **Currency**.
+3.  Select the **Features** included in this specific sub.
+4.  Set the **Usage limits** or allowances.
+5.  Choose a **Start date**. You can also adjust the **Free trial** period here.
+
+**Edit a subscription**
+You can also modify an existing subscription. Click on the subscription card to update terms, change status, or extend trial dates.
+
+
+### Entitlements
+
+This view shows exactly what the customer can do right now based on their plan.
+
+**Overrides**
+You often need to make exceptions for specific users. You can do that here without changing the underlying plan.
+* Change the value of a specific feature.
+* Update the usage limit for a metered feature.
+
+Changes made here apply only to this specific customer.
+
+<Frame>
+  <img height="200" src="/images/entitlements-details.png" />
+</Frame>
+
+### Usage
+
+This tracks consumption for usage-based billing.
+* Graphs show usage trends over time.
+* Hover over the data to see exact numbers for specific periods.
+
+<Frame>
+  <img height="200" src="/images/entitlements-full-details.png" />
+</Frame>

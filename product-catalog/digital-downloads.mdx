@@ -1,222 +1,120 @@
 ---
-title: 'Digital Downloads & File Delivery'
+title: 'Digital Downloads'
 description: 'Enable customers to download digital files after purchase'
 ---
 
-Digital downloads allow you to deliver files to customers immediately after they purchase your products. This is ideal for software, ebooks, courses, templates, and any other digital assets.
+Digital Downloads allow you to attach downloadable files to your plans. Customers who purchase your plan can access these files after completing their purchase.
 
 ## Overview
 
-When you attach files to a plan, customers who purchase that plan automatically gain access to download those files. Files are securely stored on Amazon S3 and delivered via presigned URLs, ensuring secure and efficient delivery.
+Use Digital Downloads to deliver:
+- **Course content** – PDFs, videos, or supplementary materials
+- **E-books** – Digital books in PDF, EPUB, or other formats
+- **Software** – Installers, license files, or application packages
+- **Templates** – Design files, spreadsheets, or document templates
+- **Any other digital content** your customers need
 
-**Key features:**
-- Upload files directly from your dashboard (up to 5GB per file)
-- Support for any file type
-- Secure presigned S3 URLs for downloads
-- Access revocation on refunds or cancellations
-- File ordering and organization
-- Enable/disable files without deletion
+## Accessing Digital Downloads
+<Frame>
+      <img height="200" src="/images/accessing-digital-downloads.png" />
+</Frame>
+1. Navigate to **Products** in the sidebar
+2. Select the product containing your plan
+3. Click on the plan you want to edit
+4. Scroll down to the **Digital downloads** section
+5. Click the expand arrow to open the section
 
-## Uploading Files to Plans
+## Uploading Files
 
-Files are attached at the plan level, not the product level. This means different plans for the same product can include different files.
+### How to Upload
+<Frame>
+      <img height="200" src="/images/uploading-files.png" />
+</Frame>
 
-### Steps to Upload Files
+1. Open the **Digital downloads** section
+2. Click anywhere in the upload area, or drag and drop files directly
+3. Select one or more files from your computer
+4. Files will begin uploading automatically
+5. Once complete, files appear in the **Uploads** list
 
-1. **Navigate to your plan** → Click on the plan you want to add files to
-2. **Go to the "Files" tab** → Scroll down to the Files section
-3. **Click "Upload File"** → Select a file from your computer (or drag and drop)
-4. **Wait for upload** → The file will be uploaded directly to Amazon S3
-5. **Confirm the file appears** → Once uploaded, the file will appear in your files list
+### Upload Progress
+<Frame>
+      <img height="200" src="/images/upload-progress.png" />
+</Frame>
+While uploading, you'll see:
+- File name and size
+- Progress bar showing upload percentage
+- Status indicator (uploading, complete, or error)
 
 ### File Size Limits
 
-- **Maximum file size:** 5GB per file
-- For files larger than 5GB, consider splitting them or hosting them separately and providing download links instead
+- **Maximum file size**: 5 GB per file
+- **Multiple files**: You can upload multiple files at once
 
 ### Supported File Types
 
-Kelviq supports **any file type** including:
-- Software installers (.exe, .dmg, .msi, .zip)
-- Documents (.pdf, .docx, .xlsx)
-- Media (.mp4, .mp3, .zip archives)
-- Code (.js, .py, .zip bundles)
-- Course materials (.zip packages)
-- Design files (.figma, .sketch, .psd)
+All file types are supported, including:
+- Documents: PDF, DOCX, TXT, etc.
+- Images: PNG, JPG, GIF, SVG, etc.
+- Videos: MP4, MOV, AVI, etc.
+- Audio: MP3, WAV, FLAC, etc.
+- Archives: ZIP, RAR, 7Z, etc.
+- Software: EXE, DMG, APP, etc.
+- Any other file format
 
-<Warning>
-  Files are delivered as-is without virus scanning. Ensure you scan all files for security before uploading, especially if accepting user-uploaded files.
-</Warning>
+## Managing Files
+Each uploaded file has a toggle switch and a menu button (**⋯**) with additional options.
 
-## File Management
+### Enable/Disable Files
 
-### Organizing Files
+You can temporarily hide files from customers without deleting them:
+<Frame>
+      <img height="200" src="/images/enable-disable-files.png" />
+</Frame>
 
-Each file in a plan has:
-- **File name** - Display name for customers
-- **Order number** - Controls the order files appear to customers
-- **Enabled toggle** - Turn files on/off without deleting them
+1. Find the file in the uploads list
+2. Click the toggle switch next to the file
+3. **Enabled** (toggle on): Customers can download this file
+4. **Disabled** (toggle off): File is hidden from customers
 
-### Changing File Order
+This is useful when you need to temporarily remove access to a file or prepare files before making them available.
 
-You can reorder files by dragging them in the files list or by editing the order number for each file. Files are displayed to customers in order from lowest to highest number.
+### File Actions Menu
 
-### Enabling/Disabling Files
+Click the menu button (**⋯**) next to any file to access additional options:
+<Frame>
+      <img height="200" src="/images/managing-files.png" />
+</Frame>
 
-Use the toggle switch next to each file to enable or disable it. Disabled files:
-- Won't appear in the customer's download list
-- Won't be deleted
-- Can be re-enabled at any time
+#### Download
 
-### Removing Files
+Use the **Download** option to: 
+- Verify that the file uploaded correctly
+- Check file contents before enabling for customers
+- Save a local backup of uploaded files
 
-Click the delete button next to a file to permanently remove it. Once deleted, the file cannot be recovered, though customers who previously purchased it may still have downloads in their browser history.
+To download a file:
+1. Click the **⋯** menu button next to the file
+2. Select **Download**
+3. The file will download to your computer
 
-<Tip>
-  If you might want to offer a file again in the future, disable it instead of deleting it. You can re-enable it without re-uploading.
-</Tip>
+#### Delete
 
-## How Customers Access Files
+To permanently remove a file:
 
-### After Purchase
+1. Click the **⋯** menu button next to the file
+2. Select **Delete**
+3. The file will be permanently removed
 
-When a customer completes a purchase:
+> **Note**: Deleted files cannot be recovered. Make sure you have a backup before deleting.
 
-1. **Order confirmation** → Customer receives an order confirmation email
-2. **Dashboard access** → Customer can view their order in their Kelviq account
-3. **Download files** → In the order details, customer sees all attached files with download buttons
-4. **Direct download** → Clicking "Download" triggers the file download
 
-### Download Security
+## Customer Experience
 
-Files are delivered via **presigned S3 URLs**, which:
-- Expire after a single download or short time period
-- Include authentication to prevent unauthorized access
-- Are unique per download request
-- Don't expose your S3 bucket to the public
+After a successful purchase, customers can:
 
-### File Access Management
+1. Access the order confirmation page
+2. View all downloadable files associated with their purchased plan
+3. Click to download each file directly
 
-Customers can download files as long as their order is in an active state:
-
-**Active statuses** (downloads available):
-- `COMPLETE` - Payment received, files available
-
-**Revoked statuses** (downloads disabled):
-- `REFUNDED` - Full refund issued
-- `PARTIAL_REFUND` - Partial refund issued
-- `CANCELLED` - Order cancelled
-- `ARCHIVED` - Order archived
-
-When an order is refunded or cancelled, the customer's file access is automatically revoked. They'll see a message: "Your access to the file has been revoked."
-
-## Integration with Your App
-
-### Checking Downloaded Files
-
-You don't need to do anything special in your app. File delivery happens entirely in the Kelviq dashboard and email notifications. However, you can:
-
-1. **Listen to webhooks** - Track when customers download files via webhook events
-2. **Check order status** - Use the API to verify an order is complete before granting access
-3. **Send custom emails** - Customize how download links are communicated to customers
-
-### API Integration
-
-Fetch order details including download URLs:
-
-<Tabs>
-  <Tab title="Python">
-    ```python
-    from kelviq_sdk import KelviqClient
-
-    client = KelviqClient(api_key="your_server_key")
-
-    # Fetch order details
-    order = client.orders.get(order_id="ord_123")
-
-    # Check if order is complete
-    if order.status == "COMPLETE":
-        print(f"Customer can download {len(order.files)} files")
-        for file in order.files:
-            print(f"- {file['name']}: {file['download_url']}")
-    ```
-  </Tab>
-  <Tab title="Node.js">
-    ```javascript
-    const { KelviqClient } = require('kelviq-sdk');
-
-    const client = new KelviqClient({ apiKey: 'your_server_key' });
-
-    // Fetch order details
-    const order = await client.orders.get('ord_123');
-
-    if (order.status === 'COMPLETE') {
-      console.log(`Customer can download ${order.files.length} files`);
-      order.files.forEach(file => {
-        console.log(`- ${file.name}: ${file.download_url}`);
-      });
-    }
-    ```
-  </Tab>
-</Tabs>
-
-## File Delivery Best Practices
-
-### Organization
-
-- **Clear naming** - Use descriptive file names like "MyApp-v1.0-Setup.exe" not "file1.zip"
-- **Logical ordering** - Put important files first, supplementary docs last
-- **Version tracking** - Include version numbers in file names so customers know what they're downloading
-
-### Testing
-
-Before offering files to customers:
-
-1. **Upload test files** to your staging environment
-2. **Download test files** to verify they're not corrupted
-3. **Check file size** - Ensure the download completes successfully
-4. **Verify extraction** - If delivering archives, test extraction
-
-### Large Files
-
-For very large files:
-
-- **Consider hosting alternatives** - If files exceed 5GB, consider hosting on CDN and providing download links
-- **Provide checksums** - Include MD5 or SHA-256 checksums for integrity verification
-- **Notify customers** - In your plan description, note file size so customers can plan storage
-
-### Digital Products
-
-If selling digital products like software:
-
-- **Include instructions** - Add a README or setup guide as a separate file
-- **Version management** - Use semantic versioning (v1.0.0, v1.0.1) in file names
-- **Update strategy** - Plan how you'll deliver updates (new versions, patches, etc.)
-
-## Common Questions
-
-<Accordion title="Can I update a file without deleting the old one?">
-  No, you must delete the old file and upload the new one. The filename will be the same unless you rename it. Consider including version numbers in filenames if you need to provide multiple versions.
-</Accordion>
-
-<Accordion title="Can customers download files multiple times?">
-  Yes, customers can download files as many times as they want from the order details page, as long as their order remains active (not refunded or cancelled).
-</Accordion>
-
-<Accordion title="What happens if a customer's order is refunded?">
-  Their access to files is immediately revoked. They'll see the message "Your access to the file has been revoked" on the order details page, and download buttons will be disabled.
-</Accordion>
-
-<Accordion title="Can I deliver files to different customers differently?">
-  Not directly in Kelviq. However, you can use webhooks to detect when a customer purchases a plan and send them custom files or download links via email or your own platform.
-</Accordion>
-
-<Accordion title="Are downloads logged or tracked?">
-  Download activity is not tracked in the Kelviq dashboard, but you can listen to webhook events to track downloads in your own system.
-</Accordion>
-
-## Next Steps
-
-- [Learn about license keys](/product-catalog/license-keys) - Add license key generation to your products
-- [Configure entitlements](/product-catalog/entitlements) - Set up feature access and usage limits
-- [Webhook events](/webhooks/webhooks) - Track file downloads with webhooks
+Files remain accessible to customers as long as their subscription or purchase is active.
