@@ -1450,7 +1450,7 @@
 
         "parameters": [
           {
-            "name": "customerId",
+            "name": "customer_id",
             "in": "query",
             "required": true,
             "description": "The unique identifier for the customer.",
@@ -1460,7 +1460,7 @@
             }
           },
           {
-            "name": "featureId",
+            "name": "feature_id",
             "in": "query",
             "required": false,
             "description": "Optional. The unique identifier for a specific feature. If provided, filters entitlements to this feature.",
