@@ -1445,7 +1445,7 @@
           "Entitlements"
         ],
         "summary": "Retrieve customer entitlements",
-        "description": "Retrieves detailed entitlement information for a customer.\n- If `featureId` is provided as a query parameter, returns details for that specific feature.\n- If `featureId` is omitted, returns all entitlements for the customer.\n",
+        "description": "Retrieves detailed entitlement information for a customer.\n- If `feature_idd` is provided as a query parameter, returns details for that specific feature.\n- If `feature_id` is omitted, returns all entitlements for the customer.\n",
         "operationId": "getCustomerEntitlements",
 
         "parameters": [
