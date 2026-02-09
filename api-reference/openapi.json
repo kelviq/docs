@@ -285,27 +285,6 @@
               }
             ]
           },
-          "offeringId": {
-            "type": "string",
-            "format": "uuid",
-            "nullable": true,
-            "description": "The ID (uuid) of the offering the customer is checking out with.",
-            "example": "96d3a293-34ac-48a5-b73d-976b15781afd"
-          },
-          "pricingTableId": {
-            "type": "string",
-            "format": "uuid",
-            "nullable": true,
-            "description": "The ID (uuid) of the pricingTable being used (considered if offeringId is not provided).",
-            "example": "6db2717a-4e43-4ae1-a293-6c0a775f6264"
-          },
-          "ruleId": {
-            "type": "string",
-            "format": "uuid",
-            "nullable": true,
-            "description": "The ID (uuid) of the pricing rule being applied (considered if offeringId is not provided).",
-            "example": "f2ebc23f-3f79-4cf4-b17e-fe8e30a42ab2"
-          },
           "ipAddress": {
             "type": "string",
             "nullable": true,
@@ -583,27 +562,6 @@
             "nullable": true,
             "description": "The IP Address of the customer, used for location-based pricing.",
             "example": "103.154.35.20"
-          },
-          "offeringId": {
-            "type": "string",
-            "format": "uuid",
-            "nullable": true,
-            "description": "The ID (uuid) of the offering the customer is subscribing with.",
-            "example": "96d3a293-34ac-48a5-b73d-976b15781afd"
-          },
-          "pricingTableId": {
-            "type": "string",
-            "format": "uuid",
-            "nullable": true,
-            "description": "The ID (uuid) of the pricingTable being used (considered if offeringId is not provided).",
-            "example": "6db2717a-4e43-4ae1-a293-6c0a775f6264"
-          },
-          "ruleId": {
-            "type": "string",
-            "format": "uuid",
-            "nullable": true,
-            "description": "The ID (uuid) of the pricing rule being applied (considered if offeringId is not provided).",
-            "example": "f2ebc23f-3f79-4cf4-b17e-fe8e30a42ab2"
           }
         }
       },
@@ -917,27 +875,6 @@
                 "quantity": 10
               }
             ]
-          },
-          "offeringId": {
-            "type": "string",
-            "format": "uuid",
-            "nullable": true,
-            "description": "The ID of the new offering, if applicable.",
-            "example": "e4567-e89b-12d3-a456-426614174000"
-          },
-          "pricingTableId": {
-            "type": "string",
-            "format": "uuid",
-            "nullable": true,
-            "description": "The ID of the new pricingTable, if applicable.",
-            "example": "e4567-e89b-12d3-a456-426614174001"
-          },
-          "ruleId": {
-            "type": "string",
-            "format": "uuid",
-            "nullable": true,
-            "description": "The ID of the new pricing rule, if applicable.",
-            "example": "e4567-e89b-12d3-a456-426614174002"
           },
           "ipAddress": {
             "type": "string",
@@ -2056,120 +1993,6 @@
                 },
                 "example": {
                   "message": "Subscription cancellation processed successfully."
-                }
-              }
-            }
-          }
-        }
-      }
-    },
-    "/monetization/public-offering/{offering_id}/": {
-      "get": {
-        "tags": [
-          "Monetization"
-        ],
-        "summary": "Get Public Offering",
-        "description": "Retrieves the public details of a specific offering, which can be used to render a pricing page or paywall.",
-        "operationId": "getPublicOffering",
-        "parameters": [
-          {
-            "name": "offering_id",
-            "in": "path",
-            "required": true,
-            "description": "The unique identifier (UUID) for the offering.",
-            "schema": {
-              "type": "string",
-              "format": "uuid"
-            }
-          },
-          {
-            "name": "customer_id",
-            "in": "query",
-            "required": false,
-            "description": "Optional. The identifier for an existing customer to tailor the offering view (e.g., showing their current plan).",
-            "schema": {
-              "type": "string"
-            }
-          }
-        ],
-        "responses": {
-          "200": {
-            "description": "Successful response with public offering details.",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/PublicOfferingResponse"
-                },
-                "example": {
-                  "id": "7b793738-9f99-43e0-a8af-7b72fc8f8886",
-                  "name": "Aphelo v1",
-                  "description": "",
-                  "pricingTable": {
-                    "name": "Aphelo Paywall",
-                    "description": "",
-                    "identifier": "aphelo-paywall",
-                    "style": { "priceColor": "#171923", "titleColor": "#171923", "buttonColor": "#F7FAFC", "dividerColor": "#E2E8F0", "featureColor": "#2D3748", "priceUnitColor": "#171923", "descriptionColor": "#718096", "pricePeriodColor": "#718096", "cardBackgroundColor": "#fff", "buttonBackgroundColor": "#1A202C", "buttonHoverBackgroundColor": "#1A202C" },
-                    "typography": { "priceFontSize": 32, "titleFontSize": 24, "featureFontSize": 16, "priceFontWeight": "bold", "titleFontWeight": "bold", "featureFontWeight": "normal", "priceUnitFontSize": 32, "descriptionFontSize": 16, "pricePeriodFontSize": 16, "priceUnitFontWeight": "bold", "descriptionFontWeight": "normal", "pricePeriodFontWeight": "normal" },
-                    "layout": { "gap": 24, "align": "center", "maxWidth": 400, "minWidth": 360 },
-                    "template": null,
-                    "descriptionTooltipEnabled": true,
-                    "pricingOptions": { "localization": true, "showDecimal": true, "showCurrencyCode": false, "showCurrencySymbol": true, "maximumDecimalDigits": 2, "minimumDecimalDigits": 2 }
-                  },
-                  "plans": [
-                    {
-                      "name": "Free",
-                      "identifier": "free",
-                      "details": { "stripeProductId": "prod_SUs8ZwzyrjlSAZ" },
-                      "isVisible": true,
-                      "features": [
-                        { "identifier": "apicalls", "displayName": "apicalls", "featureType": "METER", "value": 5000 },
-                        { "identifier": "products", "displayName": "Products", "featureType": "CUSTOMIZABLE", "value": 1 },
-                        { "identifier": "branding", "displayName": "branding", "featureType": "BOOLEAN", "value": false },
-                        { "identifier": "email-settings", "displayName": "Email settings", "featureType": "BOOLEAN", "value": true }
-                      ],
-                      "price": { "priceType": "FREE", "charges": [{ "chargePeriod": "YEARLY", "priceData": { "amount": 0.0 } }] }
-                    },
-                    {
-                      "name": "Basic",
-                      "identifier": "basic",
-                      "details": { "stripeProductId": "prod_SUsCWTpt2AkvJD" },
-                      "isVisible": true,
-                      "features": [
-                        { "identifier": "apicalls", "displayName": "apicalls", "featureType": "METER", "value": 50000 },
-                        { "identifier": "products", "displayName": "Products", "featureType": "CUSTOMIZABLE", "value": 5 },
-                        { "identifier": "branding", "displayName": "branding", "featureType": "BOOLEAN", "value": false },
-                        { "identifier": "email-settings", "displayName": "Email settings", "featureType": "BOOLEAN", "value": true }
-                      ],
-                      "price": { "priceType": "PAID", "charges": [{ "chargePeriod": "MONTHLY", "priceData": { "amount": 59.0 } }, { "chargePeriod": "YEARLY", "priceData": { "amount": 491.0 } }] }
-                    }
-                  ],
-                  "countryCode": "IN",
-                  "pricingLocale": "en-US",
-                  "currencyCode": "USD",
-                  "currencySymbol": "$",
-                  "baseCurrencyCode": "USD",
-                  "baseCurrencySymbol": "$",
-                  "subscription": { "planIdentifier": "basic", "features": [], "subscriptionId": "7e468572-cc01-424f-ba88-69917164538b", "chargePeriod": "MONTHLY", "hasPreviousSubscription": true },
-                  "isCustomerExists": true,
-                  "billingPeriods": [
-                    { "displayName": "Monthly", "chargePeriod": "MONTHLY" },
-                    { "displayName": "Yearly", "chargePeriod": "YEARLY" },
-                    { "displayName": "One Time", "chargePeriod": "ONE_TIME" }
-                  ]
-                }
-              }
-            }
-          },
-          "400": {
-            "description": "Bad Request, for example, if the offering does not exist or the request is malformed.",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/ErrorResponse"
-                },
-                "example": {
-                  "status": "Bad request",
-                  "message": "Offering does not exists"
                 }
               }
             }
