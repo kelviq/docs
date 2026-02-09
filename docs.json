@@ -112,7 +112,6 @@
             "group": "Frontend Integration",
             "pages": [
               "frontend-integration/react-sdk",
-              "frontend-integration/react-ui",
               "frontend-integration/js-sdk"
             ]
           }
