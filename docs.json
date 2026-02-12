@@ -79,10 +79,21 @@
               "guides/subscription-integration",
               "guides/subscription-integration-for-nextjs"
             ]
+          },
+          {
+            "group": "Legal",
+            "pages": [
+              "legal/buyer-terms",
+              "legal/seller-terms",
+              "legal/master-service-agreement",
+              "legal/compliant-user-flow",
+              "legal/approved-prohibited-policy",
+              "legal/payment-flow-diagram"
+            ]
           }
         ]
       },
-      
+
       {
         "tab": "API Reference",
         "groups": [

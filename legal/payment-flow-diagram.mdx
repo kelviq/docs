@@ -1,0 +1,163 @@
+---
+title: "Payment Processing"
+description: "Stripe Connect integration and payment flow documentation for Kelviq"
+---
+
+## 1. Payment Architecture Overview
+
+Kelviq uses Stripe Connect with **separate charges and transfers** as its payment integration model. Under this model:
+
+- **Kelviq is the Merchant of Record (MoR)** for all transactions. The payment charge is created on Kelviq's platform Stripe account.
+- After a successful charge, Kelviq initiates a **separate transfer** to the Seller's Stripe Connected Account for the Seller's share of the revenue (Net Revenue).
+- Kelviq deducts Platform Fees and applicable taxes before transferring funds to the Seller.
+- The Buyer sees "KELVIQ" (or a Kelviq-branded descriptor) on their bank or card statement.
+- Kelviq is responsible for refunds, disputes, and chargebacks as the settlement merchant.
+
+### 1.1 Key Entities
+
+<CardGroup cols={2}>
+  <Card title="Buyer">
+    Pays for digital products through Kelviq Checkout
+  </Card>
+  <Card title="Kelviq (MoR)">
+    Platform Stripe account that receives the charge
+  </Card>
+  <Card title="Seller">
+    Stripe Express Connected Account that receives transfers
+  </Card>
+  <Card title="Stripe">
+    Payment processor handling charges, transfers, and payouts
+  </Card>
+</CardGroup>
+
+## 2. Purchase Payment Flow
+
+The following describes the step-by-step payment flow for a standard purchase through Kelviq Checkout.
+
+<Steps>
+  <Step title="Checkout Initiated">
+    Buyer clicks purchase link and lands on Kelviq-hosted checkout page.
+  </Step>
+  <Step title="Payment Details Entered">
+    Buyer enters payment details on Kelviq-hosted checkout (card data collected by Stripe.js).
+  </Step>
+  <Step title="PaymentIntent Created">
+    Stripe creates a PaymentIntent on Kelviq's platform account.
+  </Step>
+  <Step title="Charge Processed">
+    After successful charge, Kelviq calculates fee split.
+  </Step>
+  <Step title="Fee Calculation">
+    Kelviq deducts: Platform Fee + Applicable Taxes = Net Revenue for Seller.
+  </Step>
+  <Step title="Transfer Initiated">
+    Kelviq initiates separate Transfer to Seller's Connected Account.
+  </Step>
+  <Step title="Payout to Seller">
+    Stripe processes payout to Seller's bank account on schedule.
+  </Step>
+</Steps>
+
+## 3. Fee Breakdown Example
+
+The following illustrates how a $100 transaction is split between the parties.
+
+| Line Item | Amount |
+|-----------|--------|
+| Gross Transaction | $100.00 |
+| Kelviq Platform Fee (3.9%) | -$3.90 |
+| **Seller Net Revenue** | **$96.10** |
+
+**Additional fees may apply:**
+- **International cards:** +1.5% (cards issued outside the Seller's country)
+- **Subscriptions:** +0.5% (recurring billing transactions)
+
+<Note>
+The Platform Fee includes all payment processing costs. The complete fee schedule is available at [kelviq.com/pricing](https://kelviq.com/pricing) and in the Seller Dashboard.
+</Note>
+
+## 4. Refund Payment Flow
+
+Refunds can be initiated by either the Seller or through Kelviq as the Merchant of Record.
+
+<Steps>
+  <Step title="Request">
+    Buyer requests a refund by contacting the Seller directly (via contact form or email) or by emailing Kelviq at support@kelviq.com.
+  </Step>
+  <Step title="Review & Approval">
+    The Seller reviews the request and can issue a refund directly through the Seller Dashboard. If the request is made through Kelviq, Kelviq reviews it against the applicable refund policy.
+  </Step>
+  <Step title="Processing">
+    Once approved, the refund is processed through Stripe. The refund is issued to the Buyer's original payment method. The refunded amount is deducted from the Seller's balance.
+  </Step>
+</Steps>
+
+## 5. Chargeback/Dispute Payment Flow
+
+When a Buyer files a chargeback with their bank, the dispute flow is handled by Kelviq as the MoR.
+
+<Steps>
+  <Step title="Dispute Filed">
+    Buyer files chargeback with their bank or card issuer.
+  </Step>
+  <Step title="Notification Chain">
+    Bank notifies Stripe, Stripe notifies Kelviq.
+  </Step>
+  <Step title="Evidence Collection">
+    Seller provides evidence within 3-5 business days.
+  </Step>
+  <Step title="Response Submitted">
+    Kelviq compiles and submits dispute response to Stripe.
+  </Step>
+  <Step title="Card Network Review">
+    Card network reviews and decides (typically 60-75 days).
+  </Step>
+  <Step title="Resolution">
+    **Won:** Funds returned to Kelviq/Seller. **Lost:** Chargeback amount + fee deducted from Seller's balance.
+  </Step>
+</Steps>
+
+## 6. Technical Implementation Details
+
+### 6.1 Stripe Connect Configuration
+
+| Configuration | Value |
+|---------------|-------|
+| Account type | Stripe Connect with separate charges and transfers |
+| Platform account | Kelviq, Inc. (standard Stripe account) |
+| Connected accounts | Express accounts for Sellers (Stripe-hosted onboarding) |
+| Charge creation | PaymentIntent created on Kelviq's platform account |
+| Transfer | Separate Transfer object to Seller's Connected Account after successful charge |
+| Statement descriptor | Set on the PaymentIntent, shows "KELVIQ" or "KELVIQ* [suffix]" |
+| Payout schedule | Manual withdrawals; Sellers can withdraw available balance anytime |
+
+### 6.2 PCI Compliance
+
+Kelviq uses **Stripe.js and Stripe Elements** on the checkout page. Card data is collected directly by Stripe and never passes through or is stored on Kelviq's servers. This keeps Kelviq at the lowest PCI compliance level (**SAQ-A**).
+
+### 6.3 3D Secure and Strong Customer Authentication (SCA)
+
+Kelviq supports **3D Secure (3DS)** authentication through Stripe for transactions where it is required by regulation or recommended for fraud prevention.
+
+For Buyers in the **European Economic Area (EEA)** and the **United Kingdom**, Strong Customer Authentication (SCA) is applied in accordance with the Payment Services Directive 2 (PSD2) requirements. 3DS authentication is triggered automatically by Stripe based on the issuing bank's requirements and Stripe's risk assessment (Stripe Radar).
+
+### 6.4 Tax Handling
+
+Kelviq calculates and collects applicable **sales tax, VAT, or GST** at checkout based on the Buyer's location. Tax amounts are remitted to the appropriate tax authorities by Kelviq as the MoR. Tax is deducted from the gross transaction amount before the Seller's Net Revenue is calculated.
+
+### 6.5 Multi-Currency Support
+
+Kelviq supports checkout in **multiple currencies**. The Buyer pays in the currency displayed at checkout. Currency conversion for Seller payouts is handled by Stripe based on the Seller's Connected Account currency.
+
+## 7. Contact
+
+Questions about Kelviq's payment flow or Stripe integration should be directed to:
+
+<Card>
+**Kelviq, Inc.**
+
+2261 Market Street STE 46163
+San Francisco, CA 94114
+
+Email: [support@kelviq.com](mailto:support@kelviq.com)
+</Card>

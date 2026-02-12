@@ -1,0 +1,177 @@
+---
+title: "Transaction Flow"
+description: "End-to-end user flow documentation for the Kelviq Merchant of Record platform"
+---
+
+## 1. Overview
+
+This document describes the end-to-end user flow for both Sellers and Buyers on the Kelviq platform. Kelviq operates as a Merchant of Record (MoR) for digital product sellers, meaning Kelviq is the legal seller to the Buyer for all transactions processed through Kelviq Checkout.
+
+The flows described below demonstrate how Kelviq clearly identifies itself as the MoR at every touchpoint, ensuring compliance with card network rules and providing transparency to Buyers about who they are transacting with.
+
+## 2. Key Parties
+
+<CardGroup cols={1}>
+  <Card title="Kelviq (Platform/MoR)">
+    Kelviq, Inc. operates the platform, hosts the checkout experience, processes payments through Stripe, and acts as the Merchant of Record for all transactions. Kelviq appears on Buyer bank statements, issues receipts and invoices, and handles refunds and disputes.
+  </Card>
+  <Card title="Seller (Connected Account)">
+    The digital product creator who lists products on the platform, sets pricing, and is responsible for product quality, content, and customer support. The Seller receives payouts through a Stripe Express Connected Account after fees and reserves are deducted.
+  </Card>
+  <Card title="Buyer (End Customer)">
+    The person or entity purchasing a digital product through Kelviq Checkout. The Buyer's payment relationship is with Kelviq as the MoR.
+  </Card>
+  <Card title="Stripe (Payment Processor)">
+    Stripe, Inc. provides the payment infrastructure. Kelviq uses Stripe Connect with separate charges and transfers. Kelviq's platform Stripe account receives the payment, and a separate transfer is made to the Seller's Connected Account.
+  </Card>
+</CardGroup>
+
+## 3. Seller Onboarding Flow
+
+The Seller onboarding flow ensures KYC compliance, business verification, and proper agreement acceptance before any live payments are processed.
+
+<Steps>
+  <Step title="Account Creation">
+    Seller creates an account on Kelviq.
+  </Step>
+  <Step title="Business & Product Details">
+    Seller provides business information and product details for review.
+  </Step>
+  <Step title="Agreement Acceptance">
+    Seller reviews and accepts the Kelviq Seller Master Service Agreement, which includes acknowledgment of Kelviq's role as MoR.
+  </Step>
+  <Step title="Stripe Connect Onboarding">
+    Seller is redirected to Stripe Express onboarding to complete identity verification, business verification, and payout setup.
+  </Step>
+  <Step title="Kelviq Review">
+    Kelviq reviews the Seller's products and business against the Approved and Prohibited Business Policy. Accounts may be approved, require additional information, or be declined.
+  </Step>
+  <Step title="Go Live">
+    Once approved, the Seller's checkout links are activated and can accept live payments.
+  </Step>
+</Steps>
+
+## 4. Buyer Purchase Flow
+
+The Buyer purchase flow ensures the Buyer clearly understands that Kelviq is the Merchant of Record at every step of the transaction.
+
+<Steps>
+  <Step title="Product Discovery">
+    Buyer finds the Seller's product through the Seller's website, marketing, or other channels. The Seller's branding is present at this stage.
+  </Step>
+  <Step title="Checkout Initiation">
+    Buyer clicks a purchase link and is directed to a Kelviq-hosted checkout page. The checkout page displays Kelviq branding and clearly identifies Kelviq as the Merchant of Record.
+  </Step>
+  <Step title="Terms Acceptance">
+    Before completing the purchase, the Buyer is presented with links to the Kelviq Buyer Terms. By completing the purchase, the Buyer agrees to these terms.
+  </Step>
+  <Step title="Payment">
+    Buyer enters payment details. The payment is processed by Stripe and received by Kelviq's platform Stripe account.
+  </Step>
+  <Step title="Receipt">
+    Buyer receives an email receipt from Kelviq, Inc. The receipt clearly identifies Kelviq as the Merchant of Record, includes Kelviq's contact information, and itemizes the purchase.
+  </Step>
+  <Step title="Fulfillment">
+    Buyer receives access to the digital product (download link, license key, or access credentials) through the Kelviq Customer Portal or via email.
+  </Step>
+  <Step title="Bank Statement">
+    The charge appears on the Buyer's bank or card statement as "KELVIQ" or "KELVIQ* [product identifier]".
+  </Step>
+</Steps>
+
+## 5. Post-Purchase Flows
+
+### 5.1 Refund Flow
+
+Refunds can be initiated by either the Seller or through Kelviq as the Merchant of Record.
+
+<Steps>
+  <Step title="Request">
+    Buyer requests a refund by contacting the Seller directly (via contact form or email) or by emailing Kelviq at support@kelviq.com.
+  </Step>
+  <Step title="Review & Approval">
+    The Seller reviews the request and can issue a refund directly through the Seller Dashboard. If the request is made through Kelviq, Kelviq reviews it against the applicable refund policy.
+  </Step>
+  <Step title="Processing">
+    Once approved, the refund is processed through Stripe. The refund is issued to the Buyer's original payment method. The refunded amount is deducted from the Seller's balance.
+  </Step>
+</Steps>
+
+### 5.2 Dispute and Chargeback Flow
+
+Chargebacks and payment disputes are managed by Kelviq as the Merchant of Record.
+
+<Steps>
+  <Step title="Notification">
+    Kelviq receives chargeback notification from Stripe.
+  </Step>
+  <Step title="Evidence Collection">
+    Kelviq gathers evidence (receipt, delivery confirmation, terms accepted) and may request additional information from the Seller.
+  </Step>
+  <Step title="Response">
+    Kelviq submits the chargeback response to Stripe within required timelines.
+  </Step>
+  <Step title="Resolution">
+    If the chargeback is decided in Kelviq's favor, the funds are returned. If decided against Kelviq, the chargeback amount and fees are deducted from the Seller's payout balance per the Seller MSA.
+  </Step>
+</Steps>
+
+### 5.3 Subscription Management
+
+For subscription products, the following ongoing flow applies:
+
+- Subscription renewals are processed automatically by Kelviq through Stripe
+- Renewal receipts are issued by Kelviq, Inc.
+- Buyers can manage subscriptions (cancel, update payment method) through the Kelviq Customer Portal
+- Cancellation takes effect at the end of the current billing period
+- Failed renewal payments are retried by Kelviq, and access may be paused until payment succeeds
+
+## 6. MoR Compliance Summary
+
+The following table summarizes where and how Kelviq is identified as the Merchant of Record across all touchpoints.
+
+| Touchpoint | Kelviq Identified as MoR |
+|------------|--------------------------|
+| Checkout Page | Yes - Kelviq branding and legal name displayed |
+| Payment Form | Yes - Kelviq is the entity processing the payment |
+| Buyer Terms Link | Yes - Links to Kelviq Buyer Terms |
+| Email Receipt | Yes - Issued by Kelviq, Inc. with contact info |
+| Bank Statement | Yes - Descriptor shows "KELVIQ" |
+| Customer Portal | Yes - Kelviq-branded portal for orders, downloads, and support |
+| Refund Processing | Yes - Refunds issued by Kelviq |
+| Dispute Handling | Yes - Kelviq responds to chargebacks |
+
+## 7. Card Network Rule Compliance
+
+Kelviq's user flows are designed to comply with the following card network requirements:
+
+<AccordionGroup>
+  <Accordion title="Transaction Clarity">
+    The Buyer clearly understands that the transaction is with Kelviq at every point in the purchase flow. Kelviq's name and branding are visible on the checkout page, receipt, and bank statement.
+  </Accordion>
+  <Accordion title="Statement Descriptor Accuracy">
+    The Statement Descriptor identifies Kelviq as the merchant, preventing Buyer confusion about the source of the charge.
+  </Accordion>
+  <Accordion title="Refund and Dispute Handling">
+    Kelviq manages all refunds and disputes as the MoR, in accordance with card network timelines and procedures.
+  </Accordion>
+  <Accordion title="Customer Service Identification">
+    Buyers are directed to Kelviq (support@kelviq.com) for payment-related issues. Product-specific support is provided by the Seller, with clear disclosure of this division of responsibility in the Buyer Terms.
+  </Accordion>
+  <Accordion title="MCC Assignment">
+    Kelviq assigns appropriate Merchant Category Codes for transactions processed through the platform, in compliance with card network requirements.
+  </Accordion>
+</AccordionGroup>
+
+## 8. Contact
+
+Questions about this document or Kelviq's compliance program should be directed to:
+
+<Card>
+**Kelviq, Inc.**
+
+2261 Market Street STE 46163
+San Francisco, CA 94114
+
+Email: [support@kelviq.com](mailto:support@kelviq.com)
+</Card>
