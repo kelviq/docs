@@ -65,8 +65,8 @@ The following illustrates how a $100 transaction is split between the parties.
 | Line Item | Amount |
 |-----------|--------|
 | Gross Transaction | $100.00 |
-| Kelviq Platform Fee (3.9%) | -$3.90 |
-| **Seller Net Revenue** | **$96.10** |
+| Kelviq Platform Fee (3.9% + 40¢) | -$4.30 |
+| **Seller Net Revenue** | **$95.70** |
 
 **Additional fees may apply:**
 - **International cards:** +1.5% (cards issued outside the Seller's country)
@@ -101,10 +101,10 @@ When a Buyer files a chargeback with their bank, the dispute flow is handled by 
     Buyer files chargeback with their bank or card issuer.
   </Step>
   <Step title="Notification Chain">
-    Bank notifies Stripe, Stripe notifies Kelviq.
+    Bank notifies Stripe, Stripe notifies Kelviq, and Kelviq notifies the Seller.
   </Step>
   <Step title="Evidence Collection">
-    Seller provides evidence within 3-5 business days.
+    Seller provides evidence within the due date mentioned in the notification.
   </Step>
   <Step title="Response Submitted">
     Kelviq compiles and submits dispute response to Stripe.
@@ -113,7 +113,7 @@ When a Buyer files a chargeback with their bank, the dispute flow is handled by 
     Card network reviews and decides (typically 60-75 days).
   </Step>
   <Step title="Resolution">
-    **Won:** Funds returned to Kelviq/Seller. **Lost:** Chargeback amount + fee deducted from Seller's balance.
+    **Won:** Funds returned to Kelviq/Seller. **Lost:** Chargeback amount + $15 dispute fee deducted from Seller's balance.
   </Step>
 </Steps>
 
@@ -128,7 +128,7 @@ When a Buyer files a chargeback with their bank, the dispute flow is handled by 
 | Connected accounts | Express accounts for Sellers (Stripe-hosted onboarding) |
 | Charge creation | PaymentIntent created on Kelviq's platform account |
 | Transfer | Separate Transfer object to Seller's Connected Account after successful charge |
-| Statement descriptor | Set on the PaymentIntent, shows "KELVIQ" or "KELVIQ* [suffix]" |
+| Statement descriptor | Set on the PaymentIntent, shows "KELVIQ" or a Kelviq-branded descriptor |
 | Payout schedule | Manual withdrawals; Sellers can withdraw available balance anytime |
 
 ### 6.2 PCI Compliance
