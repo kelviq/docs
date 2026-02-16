@@ -1,0 +1,287 @@
+---
+title: 'Offerings'
+---
+
+<Warning>
+**Beta Feature:** Monetization features are currently in beta. Please contact us at [hi@kelviq.com](mailto:hi@kelviq.com) to enable this on your account.
+</Warning>
+
+## What is an Offering?
+
+In Kelviq, an **Offering** is the key that unlocks specific pricing and pricing table experiences for your different customer segments. It is a powerful entity that determines precisely what pricing table design and dynamic pricing adjustments a user or user segment is presented with. Offerings act as the crucial bridge connecting your Pricing table configurations and/or Targeting Rules to your live application.
+
+An Offering "offers" a package that can include:
+* A specific **Pricing table** design (how plans are visually presented).
+* Dynamic pricing adjustments driven by **Targeting Rules** (e.g., for Purchasing Power Parity, specific countries, or other customer attributes).
+
+Ultimately, Offerings enable you to remotely control, iterate on, and experiment with different pricing strategies and user experiences with agility.
+
+<Frame>
+        <img height="200" src="/images/central-hub-offering-illustartion.png" />
+</Frame>  
+---
+
+## How Offerings Work
+
+Offerings provide a robust way to remotely manage which Pricing table design and/or Targeting Rule (with its dynamic pricing logic) is delivered to your users. This is achieved by integrating a unique **Offering ID** into your application's code.
+
+* **Centralized Control:** You create and configure Offerings within the Kelviq dashboard.
+* **Decoupling for Agility:** The primary benefit is that once the `Offering ID` is implemented in your codebase, your product, marketing, or sales teams can change which Pricing table is displayed or which Targeting Rule is applied to that Offering directly from the Kelviq dashboard. **This requires no new code deployments for most updates.**
+* **Flexible Configuration:** You can configure an Offering with:
+  * Just a Pricing table
+  * Just a Targeting Rule
+  * Both a Pricing table and a Targeting Rule (where the available Targeting Rules are filtered based on the selected Pricing table)
+
+This system allows for rapid iteration, A/B testing, and strategic adjustments to your monetization approach without continuous engineering effort.
+
+<Frame>
+        <img height="200" src="/images/offering-power-illustartion.png" />
+</Frame>  
+---
+
+## Creating an Offering
+
+You create Offerings from the Kelviq dashboard.
+
+### Step 1: Navigate and Initiate
+1.  From the main sidebar navigation, go to **Monetization > Offerings**. 
+2.  On the "Offerings" list page, click the **"+ Create offering"** button.
+    <Frame>
+        <img height="200" src="/images/create-offering-list.png" />
+    </Frame>  
+This action opens the "Create offering" modal.
+
+### Step 2: Configure the Offering in the Modal
+
+Within the modal, you will define what this Offering will present to users.
+
+ <Frame>
+        <img height="200" src="/images/configure-offering-modal.png" />
+</Frame>  
+
+#### A. Link a Pricing table (Optional)
+* **Select Pricing table:** If this Offering is intended to display pricing table, select it from the "Select Pricing table" dropdown menu.
+     <Frame>
+        <img height="200" src="/images/select-pricing-table-offering.png" />
+    </Frame>  
+* **Skip Pricing table Linking:** You can skip the pricing table linking if you don't want to link a pricing table to this offering. This is useful if the Offering's purpose is solely to apply Targeting Rule-based price adjustments.
+
+#### B. Offer Via Targeting Rule (Optional)
+
+
+
+* **Offer via Targeting Rule:**
+    1.  Select this option if you want the Offering to apply dynamic pricing based on customer attributes defined in a Targeting Rule.
+    2.  From the **"Select Targeting Rule"** dropdown, choose the rule you want to link to this Offering.
+         <Frame>
+        <img height="200" src="/images/choose-how-to-offer.png" />
+        </Frame>  
+    3.  If you do not have a suitable Targeting Rule, click the **"+ Create rule"** link or button (often found within or near the dropdown). This action will take you to the Targeting Rule creation flow (as detailed in the [Targeting Rules documentation](/monetization/targeting-rules#creating-and-defining-targeting-rules)).
+        <Frame>
+        <img height="200" src="/images/create-rule-offering.png" />
+        </Frame>  
+
+<Note>
+  **Targeting Rule Filtering:** If you've selected a Pricing table, the available Targeting Rules in the dropdown will be filtered to only show rules that are associated with that specific Pricing table. This ensures consistency in your pricing strategy.
+</Note>
+<Frame>
+        <img height="200" src="/images/pricing-table-and-targeting-rule.png" />
+</Frame>  
+
+#### C. Create the Offering
+1.  Once you have configured the Pricing table (if any) and selected a Targeting Rule, click the **"Create"** button on the modal.
+     <Frame>
+        <img height="200" src="/images/create-the-offering.png" />
+    </Frame>  
+
+### Step 3: Integrate with Your Application
+Upon successful creation, a confirmation or success modal will appear, prominently displaying the unique **Offering ID**.
+
+* **Copy the Offering ID:** This ID is essential for using the Offering in your application.
+     <Frame>
+        <img height="200" src="/images/copy-offering-id.png" />
+     </Frame>  
+* **Implement in Your Code:** Paste this `Offering ID` into your application's frontend codebase where you initialize the Kelviq SDK or when you render your pricing component. This ID instructs your application which specific Offering (and therefore which pricing table, plans, and dynamic pricing logic) to fetch from Kelviq and display to the end-user.
+    
+Your Offering is now active and ready to be served to users based on your integration.
+
+---
+
+## Managing Offerings
+
+You can view, edit, and manage your Offerings from the Kelviq dashboard.
+
+### Viewing Your Offerings
+Navigate to **Monetization > Offerings**. The listing page displays all your Offerings, along with their statuses (e.g., "Active," "Archived," "Draft/Pending Changes").
+
+ <Frame>
+        <img height="200" src="/images/view-offering.png" />
+</Frame>  
+
+### Editing an Offering
+You can modify an Offering at any time to change the Pricing table it displays or the Targeting Rule it uses. This is a powerful way to iterate on your strategy.
+
+1.  On the Offerings list page, locate the Offering you wish to edit.
+2.  Click the **edit icon** on that Offering's row.
+     <Frame>
+        <img height="200" src="/images/edit-offering.png" />
+    </Frame>  
+3.  The "Edit Offering" modal will appear, which is similar to the creation modal. Here you can:
+    * Change the linked **Pricing table**.
+    * Change the linked **Targeting Rule** (filtered based on the selected Pricing table).
+     <Frame>
+        <img height="200" src="/images/offerings-edit-offerings.png" />
+    </Frame>  
+4.  Click **"Update"** to apply your modifications.
+
+<Tip>
+  **No Codebase Updates Needed for Most Changes!**
+  The Offering ID embedded in your application code remains the same. By editing the Offering in the Kelviq dashboard (e.g., switching its linked Pricing table or Targeting Rule), you can instantly change the pricing and presentation your users see without requiring your engineering team to deploy new code. This empowers Product Managers, Go-To-Market teams, and Sales teams to iterate rapidly.
+</Tip>
+
+<Warning>
+  **Active Offering Resolution:** For any given user and product context, Kelviq resolves a single Offering to present. This resolution is based on the priority of matching Targeting Rules. Careful planning of your Targeting Rules and default Offering configurations is recommended to ensure predictable outcomes.
+</Warning>
+
+
+{/* 
+---
+title: 'Offerings'
+---
+
+## What is an Offering?
+
+In Kelviq, an **Offering** is the key that unlocks specific pricing and pricing table experiences for your different customer segments. It is a powerful entity that determines precisely what pricing table design, set of plans, and dynamic pricing adjustments a user or user segment is presented with. Offerings act as the crucial bridge connecting your Pricing table configurations and/or Targeting Rules to your live application.
+
+An Offering "offers" a package that can include:
+* A specific **Pricing table** design (how plans are visually presented).
+* Dynamic pricing adjustments driven by **Targeting Rules** (e.g., for Purchasing Power Parity, specific countries, or other customer attributes).
+* A direct link to a **Product's** standard plans if no specific rules or unique pricing table designs are necessary beyond what's configured for that product.
+
+Ultimately, Offerings enable you to remotely control, iterate on, and experiment with different pricing strategies and user experiences with agility.
+
+<Frame>
+        <img height="200" src="/images/central-hub-offering-illustartion.png" />
+</Frame>  
+---
+
+## How Offerings Work
+
+Offerings provide a robust way to remotely manage which Pricing table design and/or Targeting Rule (with its dynamic pricing logic) is delivered to your users. This is achieved by integrating a unique **Offering ID** into your application's code.
+
+* **Centralized Control:** You create and configure Offerings within the Kelviq dashboard.
+* **Decoupling for Agility:** The primary benefit is that once the `Offering ID` is implemented in your codebase, your product, marketing, or sales teams can change which Pricing table is displayed or which Targeting Rule is applied to that Offering directly from the Kelviq dashboard. **This requires no new code deployments for most updates.**
+* **Pricing Table Pairing:** When using Kelviq Pricing Tables to define the visual presentation, an Offering is typically paired with one specific Pricing table design at a time.
+
+This system allows for rapid iteration, A/B testing, and strategic adjustments to your monetization approach without continuous engineering effort.
+
+<Frame>
+        <img height="200" src="/images/offering-power-illustartion.png" />
+</Frame>  
+---
+
+## Creating an Offering
+
+You create Offerings from the Kelviq dashboard.
+
+### Step 1: Navigate and Initiate
+1.  From the main sidebar navigation, go to **Monetization > Offerings**. 
+2.  On the "Offerings" list page, click the **"+ Create offering"** button.
+    <Frame>
+        <img height="200" src="/images/create-offering-list.png" />
+    </Frame>  
+This action opens the "Create offering" modal.
+
+### Step 2: Configure the Offering in the Modal
+
+Within the modal, you will define what this Offering will present to users.
+
+ <Frame>
+        <img height="200" src="/images/configure-offering-modal.png" />
+</Frame>  
+#### A. Link a Pricing table (Optional)
+* **Select Pricing table:** If this Offering is intended to display a specific visual pricing table (a pricing table design you've created), select it from the "Select Pricing table" dropdown menu.
+     <Frame>
+        <img height="200" src="/images/select-pricing-table-offering.png" />
+    </Frame>  
+* **Skip Pricing table Linking:** You can select the option "Skip if you don't want to link a pricing table to this offering." This is useful if the Offering's purpose is solely to apply Targeting Rule-based price adjustments, and the visual presentation of plans is handled differently by your application (e.g., hardcoded UI elements that only need dynamic price data).
+
+#### B. Choose How to Offer: Via Targeting Rule or Product
+Next, specify the logic this Offering will use:
+
+ <Frame>
+        <img height="200" src="/images/choose-how-to-offer.png" />
+</Frame>  
+
+* **Offer via Targeting Rule:**
+    1.  Select this option if you want the Offering to apply dynamic pricing or present different pricing tables based on customer attributes defined in a Targeting Rule.
+    2.  From the **"Select Targeting Rule"** dropdown, choose the rule you want to link to this Offering.
+         <Frame>
+        <img height="200" src="/images/select-targeting-rule-offering.png" />
+        </Frame>  
+    3.  If you do not have a suitable Targeting Rule, click the **"+ Create rule"** link or button (often found within or near the dropdown). This action will take you to the Targeting Rule creation flow (as detailed in the [Targeting Rules documentation](/monetization/targeting%20rules#creating-and-defining-targeting-rules)). After creating your rule, you will return to this modal to link it.
+        <Frame>
+        <img height="200" src="/images/create-rule-offering.png" />
+        </Frame>  
+* **Offer via Product:**
+    1.  Select this option for a simpler setup where the Offering links directly to a product's standard plans and pricing. This configuration is optionally styled by the Pricing table selected in section A. No specific targeting rules (beyond the product association itself) are applied.
+    2.  From the **"Select Product"** dropdown, choose the product you want this Offering to be associated with.
+         <Frame>
+        <img height="200" src="/images/offer-via-product.png" />
+        </Frame>  
+
+#### C. Create the Offering
+1.  Once you have configured the Pricing table (if any) and selected whether to offer via a Targeting Rule or a Product, click the **"Create"** button on the modal.
+     <Frame>
+        <img height="200" src="/images/create-the-offering.png" />
+    </Frame>  
+
+### Step 3: Integrate with Your Application
+Upon successful creation, a confirmation or success modal will appear, prominently displaying the unique **Offering ID**.
+
+* **Copy the Offering ID:** This ID is essential for using the Offering in your application.
+     <Frame>
+        <img height="200" src="/images/copy-offering-id.png" />
+     </Frame>  
+* **Implement in Your Code:** Paste this `Offering ID` into your application's frontend codebase where you initialize the Kelviq SDK or when you render your pricing component. This ID instructs your application which specific Offering (and therefore which pricing table, plans, and dynamic pricing logic) to fetch from Kelviq and display to the end-user.
+    
+Your Offering is now active and ready to be served to users based on your integration.
+
+---
+
+## Managing Offerings
+
+You can view, edit, and manage your Offerings from the Kelviq dashboard.
+
+### Viewing Your Offerings
+Navigate to **Monetization > Offerings**. The listing page displays all your Offerings, along with their statuses (e.g., "Active," "Archived," "Draft/Pending Changes").
+
+ <Frame>
+        <img height="200" src="/images/view-offering.png" />
+</Frame>  
+
+### Editing an Offering
+You can modify an Offering at any time to change the Pricing table it displays or the Targeting Rule it uses. This is a powerful way to iterate on your strategy.
+
+1.  On the Offerings list page, locate the Offering you wish to edit.
+2.  Click the **edit icon** on that Offering's row.
+     <Frame>
+        <img height="200" src="/images/edit-offering.png" />
+    </Frame>  
+3.  The "Edit Offering" modal will appear, which is similar to the creation modal. Here you can:
+    * Change the linked **Pricing table**.
+    * Change the linked **Targeting Rule**.
+    * Change the linked **Product** (if it was configured to offer directly via a Product).
+     <Frame>
+        <img height="200" src="/images/offerings-edit-offerings.png" />
+    </Frame>  
+4.  Click **"Update"** to apply your modifications.
+
+<Tip>
+  **No Codebase Updates Needed for Most Changes!**
+  The Offering ID embedded in your application code remains the same. By editing the Offering in the Kelviq dashboard (e.g., switching its linked Pricing table or Targeting Rule), you can instantly change the pricing and presentation your users see without requiring your engineering team to deploy new code. This empowers Product Managers, Go-To-Market teams, and Sales teams to iterate rapidly.
+</Tip>
+
+<Warning>
+  **Active Offering Resolution:** For any given user and product context, Kelviq resolves a single Offering to present. This resolution is based on the priority of matching Targeting Rules, or a designated default Offering if no rules apply or if the Offering is linked directly to a Product. Careful planning of your Targeting Rules and default Offering configurations is recommended to ensure predictable outcomes.
+</Warning> */}

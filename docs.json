@@ -41,6 +41,10 @@
             ]
           },
           {
+            "group": "Monetization",
+            "pages": ["monetization/pricing-tables", "monetization/targeting-rules" , "monetization/offerings"]
+          },
+          {
             "group": "Checkout",
             "pages": [
               "checkout/checkout-configuration"
