@@ -11,7 +11,8 @@ icon: 'node-js'
 The Kelviq Node SDK provides a convenient way to interact with the Kelviq REST APIs from your Node application.
 
 
-Installation
+## Installation
+
 Install the Kelviq SDK using npm or yarn:
 
 ```shell
@@ -26,20 +27,23 @@ yarn add @kelviq/node-sdk
 
 ## Prerequisites
 
-Before you can initialize the client and use the SDK methods, you need a Server API Key.
+Before you can initialize the client and use the SDK methods, you need a **Server API Key**.
 
 You can obtain this key from the Kelviq application:
 
     1. Navigate to Settings.
     2. Go to the [Developers](https://app.kelviq.com/settings/developers) section.
-    3. Copy the Server API Key.
+    3. Copy the **Server API Key**.
 
-Once copied, add this key to your environment variables or directly in your code (though environment variables are recommended for security).
+<Warning>
+**Security Warning:** The Server API Key should never be exposed in client-side code. Use it only in your backend services. For client-side applications, use the Client API Key with the [React SDK](/frontend-integration/react-sdk) or [JavaScript SDK](/frontend-integration/js-sdk).
+</Warning>
 
+Once copied, add this key to your environment variables (recommended for security):
 
 ```typescript
-# Example of setting it in your code (ensure you handle this securely)
-ACCESS_TOKEN = "__YOUR_API_KEY__"
+// Example of setting it in your code (environment variables recommended)
+const ACCESS_TOKEN = process.env.KELVIQ_SERVER_API_KEY;
 ```
 
 
@@ -67,7 +71,6 @@ const client = new Kelviq({ accessToken: ACCESS_TOKEN });
 
 
 
-
 ## Supported Functionalities
 
 The SDK currently supports the following operations:
@@ -81,9 +84,6 @@ The SDK currently supports the following operations:
     4. [Reporting](/api-reference/backend-integration/node-sdk#reporting)
 
     5. [Subscriptions](/api-reference/backend-integration/node-sdk#subscriptions)
-
-
-Further details on each method, including parameters and return values, should be added under each functionality.
 
 ---
 
@@ -107,11 +107,11 @@ const newCustomer = await client.customers.create({
 <Accordion title="Response">
 ```json
 {
-  "id": "a1b2c3d4-e5f6-7890-1234-567890abcdef", // Server-generated UUID
+  "id": "a1b2c3d4-e5f6-7890-1234-567890abcdef",
   "customerId": "unique-customer-id-789",
-  "name": "Node SDK Use",
+  "name": "Node SDK User",
   "email": "new.node.customer@example.com",
-  "details": {}, // Or any server-added details
+  "details": {},
   "metadata": {
     "source": "sdk_import",
     "priority": "high"
@@ -130,11 +130,11 @@ const newCustomer = await client.customers.create({
 
 * `email` : The email address of the customer. Must be a valid email format.
 * `name` : The name of the customer.
-* `metadata` : A dictionary of custom key-value pairs to store additional information about the customer.
+* `metadata` : An object of custom key-value pairs to store additional information about the customer.
 
 
 **Returns:**
-An instance of `CustomerResponse` (Pydantic model), representing the newly created customer record. Key attributes include:
+An instance of `CustomerResponse` (TypeScript Interface), representing the newly created customer record. Key attributes include:
 
 * `id` : The server-generated unique UUID for the customer record.
 * `customerId` : The client-provided customer identifier.
@@ -165,17 +165,16 @@ const updatedCustomer = await client.customers.update({
 <Accordion title="Response">
 ```json
 {
-  "id": "a1b2c3d4-e5f6-7890-1234-567890abcdef", // Server-generated UUID
+  "id": "a1b2c3d4-e5f6-7890-1234-567890abcdef",
   "customerId": "unique-customer-id-789",
   "name": "Node SDK User (Updated)",
   "email": "new.node.customer@example.com",
-  "details": {}, // Or any server-added details
+  "details": {},
   "metadata": {
     "tier": "premium_plus"
   },
   "createdOn": "2025-06-04T06:03:30.195790Z",
   "modifiedOn": "2025-06-04T06:03:30.195831Z"
-
 }
 ```
 </Accordion>
@@ -191,11 +190,11 @@ const updatedCustomer = await client.customers.update({
 
 * `email` : The email address of the customer. Must be a valid email format.
 * `name` : The name of the customer.
-* `metadata` : A dictionary of custom key-value pairs to store additional information about the customer.
+* `metadata` : An object of custom key-value pairs to store additional information about the customer.
 
 
 **Returns:**
-An instance of `CustomerResponse` (Pydantic model), representing the newly created customer record. Key attributes include:
+An instance of `CustomerResponse` (TypeScript Interface), representing the updated customer record. Key attributes include:
 
 * `id` : The server-generated unique UUID for the customer record.
 * `customerId` : The client-provided customer identifier.
@@ -234,7 +233,7 @@ const response = await client.checkout.createSession({
   ```json
    {
         "checkoutUrl": "https://www.kelviq.com/checkout/cs_fBhCIBerpe1pAsRW6P4wYc8WHqMdfdr457hd3oOLjhAFx/",
-        "checkoutSessionId": "cs_test_b1sNi7D6u9iMCUFV1UZi9ZwerfaiXKdOOmr3DCUW6XdCZIr5Id1F7G",
+        "checkoutSessionId": "cs_test_b1sNi7D6u9iMCUFV1UZi9ZwerfaiXKdOOmr3DCUW6XdCZIr5Id1F7G"
     }
   ```
 </Accordion>
@@ -274,7 +273,7 @@ const response = await client.checkout.createSession({
 
     * `customerId` :  The ID of the customer initiating the checkout. (If not provided, a new customer will be created)
 
-    * `features`: **Required**. A list of dictionaries, where each dictionary represents a feature and its desired quantity. Each dictionary **must** have two keys:
+    * `features`: A list of objects, where each object represents a feature and its desired quantity. Each object **must** have two keys:
         * `"identifier"` : The unique identifier for the feature.
         * `"quantity"`: The desired quantity for this feature.
             * Example: `[{"identifier": "seats", "quantity": 10}, {"identifier": "api-calls-tier1", "quantity": 5000}]`
@@ -284,7 +283,7 @@ const response = await client.checkout.createSession({
 
 **Returns**:
 
-An instance of CreateCheckoutSessionResponse (Pydantic model), which includes:
+An instance of CreateCheckoutSessionResponse (Object), which includes:
 
     * `checkoutSessionId` : The unique ID for the created checkout session.
 
@@ -312,7 +311,7 @@ const hasAccess = await client.entitlements.hasAccess({
 <Accordion title="Response">
 
   ```shell
-   True
+   true
   ```
 </Accordion>
 
@@ -324,15 +323,130 @@ const hasAccess = await client.entitlements.hasAccess({
 
 **Returns**:
 
-    * `bool`: True if the customer has access to the specified feature (considering feature type, limits, etc.), False otherwise or if the feature is not found in their entitlements.
+    * `boolean`: `true` if the customer has access to the specified feature (considering feature type, limits, etc.), `false` otherwise or if the feature is not found in their entitlements.
 
 
 
-### Retrieves the detailed entitlement information for a specific feature for a given customer.
+### Retrieves the aggregated entitlement for a specific feature for a given customer.
 
 
 ```typescript
-const response = await client.entitlements.getEntitlement({
+const entitlement = await client.entitlements.getEntitlement({
+    customerId: "cust_node_ent_123",
+    featureId: "premium-reporting-node"
+});
+```
+
+<Accordion title="Response">
+
+  ```json
+   {
+        "featureId": "advanced-analytics",
+        "featureType": "METER",
+        "hasAccess": true,
+        "hardLimit": false,
+        "usageLimit": 3,
+        "currentUsage": 0,
+        "remaining": 3,
+        "items": [
+            {
+                "featureId": "advanced-analytics",
+                "featureType": "METER",
+                "hasAccess": true,
+                "resetAt": "2025-05-22 08:27:45",
+                "hardLimit": false,
+                "usageLimit": 3,
+                "currentUsage": 0,
+                "remaining": 3
+            }
+        ]
+   }
+  ```
+</Accordion>
+
+**Required Parameters**:
+
+    * `customerId` : The unique identifier for the customer.
+
+    * `featureId` : The unique identifier for the feature whose access is being checked.
+
+**Returns**:
+
+An aggregated `Entitlement` object, or `null` if the feature is not found. If the customer has multiple subscriptions, there can be multiple raw entries for the same featureId. The SDK aggregates them and keeps raw entries in the `items` array. Note: `resetAt` is only available on individual items (not at the top level) because it can differ across subscriptions. The structure includes:
+
+    * `featureId`: string
+
+    * `hasAccess`: boolean — For **METER** features, computed as `remaining === null || remaining > 0`. For **BOOLEAN** and **CUSTOMIZABLE** features, `true` if at least one item grants access.
+
+    * `featureType`: string — `"METER"`, `"BOOLEAN"`, or `"CUSTOMIZABLE"`.
+
+    * `hardLimit`: boolean | null — For **METER**, `true` if any item has a hard limit. For **BOOLEAN**, always `false`.
+
+    * `usageLimit`: number | null — For **METER**, summed across all items. For **CUSTOMIZABLE**, taken from the first item. For **BOOLEAN**, always `null`.
+
+    * `currentUsage`: number | null — For **METER**, summed across all items. For **CUSTOMIZABLE**, taken from the first item. For **BOOLEAN**, always `0`.
+
+    * `remaining`: number | null — For **METER**, computed as `usageLimit - currentUsage`. For **CUSTOMIZABLE**, taken from the first item. For **BOOLEAN**, always `null`.
+
+    * `items` (`EntitlementDetail[]`): An array containing all raw entitlement entries for this featureId. Each item includes `resetAt`.
+
+
+### Retrieves all aggregated entitlements for a given customer.
+
+```typescript
+const entitlements = await client.entitlements.getEntitlements({
+    customerId: "cust_node_ent_123"
+});
+
+// Access a specific feature directly by featureId
+const analytics = entitlements["advanced-analytics"];
+```
+
+<Accordion title="Response">
+
+
+  ```json
+   {
+        "advanced-analytics": {
+            "featureId": "advanced-analytics",
+            "featureType": "METER",
+            "hasAccess": true,
+            "hardLimit": false,
+            "usageLimit": 3,
+            "currentUsage": 0,
+            "remaining": 3,
+            "items": [
+                {
+                    "featureId": "advanced-analytics",
+                    "featureType": "METER",
+                    "hasAccess": true,
+                    "resetAt": "2025-05-22 08:27:45",
+                    "hardLimit": false,
+                    "usageLimit": 3,
+                    "currentUsage": 0,
+                    "remaining": 3
+                }
+            ]
+        }
+   }
+  ```
+</Accordion>
+
+**Required Parameters**:
+
+    * `customerId` : The unique identifier for the customer.
+
+
+**Returns**:
+
+A `Record<string, Entitlement>` keyed by `featureId`. If the customer has multiple subscriptions, there can be multiple raw entries for the same featureId. The SDK aggregates them and keeps raw entries in the `items` array. Note: `resetAt` is only available on individual items (not at the top level) because it can differ across subscriptions. Each `Entitlement` value has the same structure as described in `getEntitlement` above.
+
+
+### Retrieves the raw entitlement from the API for a specific feature.
+
+
+```typescript
+const response = await client.entitlements.getRawEntitlement({
     customerId: "cust_node_ent_123",
     featureId: "premium-reporting-node"
 });
@@ -363,43 +477,43 @@ const response = await client.entitlements.getEntitlement({
 
     * `customerId` : The unique identifier for the customer.
 
-    * `featureId` : The unique identifier for the feature whose access is being checked.
+    * `featureId` : The unique identifier for the feature.
 
 **Returns**:
 
-An instance of CheckEntitlementsResponse (Pydantic model). When querying for a specific featureId, the entitlements list within this response is typically expected to contain a single EntitlementDetail object corresponding to the requested feature if found. The structure includes:
+An instance of `CheckEntitlementsResponse` (Object). This returns the raw API response without aggregation. The structure includes:
 
     * `customerId` : The customer's ID.
 
-    * `entitlements` (List[EntitlementDetail]): A list containing the details for the requested feature. Each EntitlementDetail has fields like:
+    * `entitlements` (`EntitlementDetail[]`): A list containing raw entitlement details. Each `EntitlementDetail` has fields like:
 
-        * `featureId`: str
+        * `featureId`: string
 
-        * `hasAccess`: bool
+        * `hasAccess`: boolean
 
-        * `featureType`: str
+        * `featureType`: string
 
-        * `resetAt`: str
+        * `resetAt`: string
 
-        * `hardLimit`: Optional[bool]
+        * `hardLimit`: boolean | null
 
-        * `usageLimit`: Optional[int]
+        * `usageLimit`: number | null
 
-        * `currentUsage`: Optional[int]
+        * `currentUsage`: number | null
 
-        * `remaining`: Optional[int]
+        * `remaining`: number | null
 
 
-### Retrieves all entitlements for a given customer.
+### Retrieves all raw entitlements from the API without aggregation.
+
 
 ```typescript
-const response = await client.entitlements.getAllEntitlements({
+const response = await client.entitlements.getRawEntitlements({
     customerId: "cust_node_ent_123"
 });
 ```
 
 <Accordion title="Response">
-
 
   ```json
    {
@@ -416,7 +530,7 @@ const response = await client.entitlements.getAllEntitlements({
                 "remaining": 3
             }
         ]
-    }
+   }
   ```
 </Accordion>
 
@@ -424,29 +538,29 @@ const response = await client.entitlements.getAllEntitlements({
 
     * `customerId` : The unique identifier for the customer.
 
-
 **Returns**:
 
+An instance of `CheckEntitlementsResponse` (Object). This returns the raw API response without aggregation. The structure includes:
 
     * `customerId` : The customer's ID.
 
-    * `entitlements` (List[EntitlementDetail]): A list containing the details for the requested feature. Each EntitlementDetail has fields like:
+    * `entitlements` (`EntitlementDetail[]`): A list containing raw entitlement details. Each `EntitlementDetail` has fields like:
 
-        * `featureId`: str
+        * `featureId`: string
 
-        * `hasAccess`: bool
+        * `hasAccess`: boolean
 
-        * `featureType`: str
+        * `featureType`: string
 
-        * `resetAt`: str
+        * `resetAt`: string
 
-        * `hardLimit`: Optional[bool]
+        * `hardLimit`: boolean | null
 
-        * `usageLimit`: Optional[int]
+        * `usageLimit`: number | null
 
-        * `currentUsage`: Optional[int]
+        * `currentUsage`: number | null
 
-        * `remaining`: Optional[int]
+        * `remaining`: number | null
 
 ---
 
@@ -506,7 +620,7 @@ const response = await client.reporting.reportUsage({
 
 **Returns**:
 
-An instance of ReportUsageResponse (Pydantic model), which includes:
+An instance of ReportUsageResponse (Object), which includes:
 
     * `value`: The usage value that was recorded.
 
@@ -522,7 +636,7 @@ An instance of ReportUsageResponse (Pydantic model), which includes:
 
     * `idempotencyKey` : A unique idempotency key generated by the server for this specific usage report instance.
 
-    * `timestamp` : The server-generated UTC timestamp (str format) indicating when the usage report was processed.
+    * `timestamp` : The server-generated UTC timestamp (string format) indicating when the usage report was processed.
 
 
 {/* ### Reporting raw events for customer */}
@@ -574,13 +688,13 @@ An instance of ReportUsageResponse (Pydantic model), which includes:
 
 {/*     * `idempotencyKey` : A unique client-generated key to ensure that the event is processed at most once, even if the request is retried. A UUID is a good choice. */}
 
-{/*     * `timestamp` : The UTC timestamp indicating when the event occurred. This must be a str formatted as "%Y-%m-%d %H:%M:%S.%f" (e.g., "2025-05-23 10:30:00.123456"). */}
+{/*     * `timestamp` : The UTC timestamp indicating when the event occurred. This must be a string formatted as "%Y-%m-%d %H:%M:%S.%f" (e.g., "2025-05-23 10:30:00.123456"). */}
 
-{/*     * `properties` : A dictionary of additional custom properties associated with the event. Values can be strs, numbers, booleans. */}
+{/*     * `properties` : An object of additional custom properties associated with the event. Values can be strings, numbers, booleans. */}
 
 {/* **Returns**: */}
 
-{/* An instance of ReportEventResponse (Pydantic model), which includes: */}
+{/* An instance of ReportEventResponse (Object), which includes: */}
 
 {/*     * `customerId` : The customer ID associated with the event. */}
 
@@ -588,7 +702,7 @@ An instance of ReportUsageResponse (Pydantic model), which includes:
 
 {/*     * `idempotencyKey` : The idempotency key that was used for the request. */}
 
-{/*     * `timestamp` : The timestamp (str format) that was recorded for the event. */}
+{/*     * `timestamp` : The timestamp (string format) that was recorded for the event. */}
 
 {/*     * `properties` : The custom properties associated with the event, if provided and returned by the server. */}
 
@@ -609,14 +723,15 @@ The subscriptions module allows you to manage customer subscriptions, including 
 ```typescript
 import { CHARGE_PERIOD_CHOICES } from '@kelviq/node-sdk';
 
-try:
-    const response = await client.subscription.update({
+try {
+    const response = await client.subscriptions.update({
       subscriptionId: "sub_node_78058918",
       planIdentifier: "premium-plan-node",
       chargePeriod: CHARGE_PERIOD_CHOICES.MONTHLY
     });
-except Exception as e:
-    print(f"Error updating subscription: {e}")
+} catch (e) {
+    console.error(`Error updating subscription: ${e}`);
+}
 ```
 
 
@@ -648,16 +763,16 @@ except Exception as e:
 * `pricingTableId` :  The ID of the new pricing table, if applicable.
 * `ruleId` :  The ID of the new pricing rule, if applicable.
 * `ipAddress` : The IP Address of the customer, used for location based pricing.
-* `features`:  A array of objects, where each dictionary represents a feature and its desired quantity to update for the subscription. Each dictionary **must** have two keys:
+* `features`:  An array of objects, where each object represents a feature and its desired quantity to update for the subscription. Each object **must** have two keys:
     * `"identifier"` : The unique identifier for the feature.
     * `"quantity"` : The desired quantity for this feature.
-        * Example: `[{'identifier': 'seats', 'quantity': 10}, {'identifier': 'projects', 'quantity': 5}]`
+        * Example: `[{"identifier": "seats", "quantity": 10}, {"identifier": "projects", "quantity": 5}]`
 
 **Returns**:
 
 An instance of `UpdateSubscriptionResponse`, which includes:
 
-* `subscriptionId` (str): UUID of the updated subscription.
+* `subscriptionId` (string): UUID of the updated subscription.
 
 
 ### Cancel an active subscription for a customer.
@@ -666,11 +781,14 @@ An instance of `UpdateSubscriptionResponse`, which includes:
 ```typescript
 import { CANCELLATION_TYPES } from '@kelviq/node-sdk';
 
-const response = await client.subscription.cancel({
-    subscriptionId: "sub_node_78058918",
-    cancellationType: CANCELLATION_TYPES.CURRENT_PERIOD_ENDS
-    // cancellationDate: "2025-12-31" // Required if cancellationType is SPECIFIC_DATE
-});
+try {
+    const response = await client.subscriptions.cancel({
+        subscriptionId: "sub_node_78058918",
+        cancellationType: CANCELLATION_TYPES.CURRENT_PERIOD_ENDS
+    });
+} catch (e) {
+    console.error(`Error cancelling subscription: ${e}`);
+}
 ```
 
 

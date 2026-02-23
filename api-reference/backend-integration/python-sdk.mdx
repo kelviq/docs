@@ -19,20 +19,25 @@ pip install kelviq-sdk
 
 ## Prerequisites
 
-Before you can initialize the client and use the SDK methods, you need a Server API Key.
+Before you can initialize the client and use the SDK methods, you need a **Server API Key**.
 
 You can obtain this key from the Kelviq application:
 
     1. Navigate to Settings.
     2. Go to the [Developers](https://app.kelviq.com/settings/developers) section.
-    3. Copy the Server API Key.
+    3. Copy the **Server API Key**.
 
-Once copied, add this key to your environment variables or directly in your code (though environment variables are recommended for security).
+<Warning>
+**Security Warning:** The Server API Key should never be exposed in client-side code. Use it only in your backend services. For client-side applications, use the Client API Key with the [React SDK](/frontend-integration/react-sdk) or [JavaScript SDK](/frontend-integration/js-sdk).
+</Warning>
 
+Once copied, add this key to your environment variables (recommended for security):
 
 ```python
-# Example of setting it in your code (ensure you handle this securely)
-ACCESS_TOKEN = "__YOUR_API_KEY__"
+import os
+
+# Example of setting it in your code (environment variables recommended)
+ACCESS_TOKEN = os.environ.get("KELVIQ_SERVER_API_KEY")
 ```
 
 ## Configuring the Client
@@ -60,6 +65,17 @@ from kelviq_sdk import Kelviq
 async_client = Kelviq.create_async_client(access_token=ACCESS_TOKEN)
 ```
 
+#### Enum Helpers
+
+The SDK provides `ChargePeriod` and `CancellationType` enum classes to prevent typos when passing required string parameters:
+
+```python
+from kelviq_sdk import ChargePeriod, CancellationType
+
+# Use enums instead of raw strings
+ChargePeriod.MONTHLY       # "MONTHLY"
+CancellationType.IMMEDIATE # "IMMEDIATE"
+```
 
 
 ## Supported Functionalities
@@ -75,9 +91,6 @@ The SDK currently supports the following operations:
     4. [Reporting](/api-reference/backend-integration/python-sdk#reporting)
 
     5. [Subscriptions](/api-reference/backend-integration/python-sdk#subscriptions)
-
-
-Further details on each method, including parameters and return values, should be added under each functionality.
 
 ---
 
@@ -117,11 +130,11 @@ All methods are available in both synchronous and asynchronous versions, dependi
 <Accordion title="Response">
 ```json
 {
-  "id": "a1b2c3d4-e5f6-7890-1234-567890abcdef", // Server-generated UUID
+  "id": "a1b2c3d4-e5f6-7890-1234-567890abcdef",
   "customerId": "unique-customer-id-123",
   "name": "John Doe",
   "email": "new.customer@example.com",
-  "details": {}, // Or any server-added details
+  "details": {},
   "metadata": {
     "source": "sdk_import",
     "priority": "high"
@@ -136,10 +149,10 @@ All methods are available in both synchronous and asynchronous versions, dependi
 **Required Parameters:**
 
 * `customerId` (str): A unique identifier for the customer that you define. This ID will be used to reference the customer in subsequent API calls.
+* `email` (str): The email address of the customer. Must be a valid email format.
 
 **Optional Parameters:**
 
-* `email` (str): The email address of the customer. Must be a valid email format.
 * `name` (str): The name of the customer.
 * `metadata` (Dict[str, str]): A dictionary of custom key-value pairs to store additional information about the customer.
 
@@ -184,11 +197,11 @@ This operation performs a partial update (PATCH), so you only need to provide th
 <Accordion title="Response">
 ```json
 {
-  "id": "a1b2c3d4-e5f6-7890-1234-567890abcdef", // Server-generated UUID
+  "id": "a1b2c3d4-e5f6-7890-1234-567890abcdef",
   "customerId": "unique-customer-id-123",
   "name": "Johnathan Doe",
   "email": "new.customer@example.com",
-  "details": {}, // Or any server-added details
+  "details": {},
   "metadata": {
     "source": "sdk_import",
     "priority": "high",
@@ -215,7 +228,7 @@ This operation performs a partial update (PATCH), so you only need to provide th
 
 
 **Returns:**
-An instance of `CustomerResponse` (Pydantic model), representing the newly created customer record. Key attributes include:
+An instance of `CustomerResponse` (Pydantic model), representing the **updated** customer record. Key attributes include:
 
 * `id` (str): The server-generated unique UUID for the customer record.
 * `customerId` (str): The client-provided customer identifier.
@@ -241,7 +254,7 @@ This operation creates a new checkout session for a customer, allowing them to p
 response = client.checkout.create_session(
     planIdentifier="plan-pro-monthly",
     chargePeriod="MONTHLY",
-    customerId="cust_789", // Recommended, otherwise it will create a new customer
+    customerId="cust_789",  # Recommended, otherwise it will create a new customer
     successUrl="https://kelviq.com/checkout/success"
 )
 print(f"Checkout Session URL: {response.checkoutUrl}")
@@ -271,7 +284,7 @@ print(f"Checkout Session URL: {response.checkoutUrl}")
   ```json
    {
         "checkoutUrl": "https://checkout.stripe.com/c/pay/cs_test_b1sNi7D6u9iMCUFV1UZi9ZaiXKdOOmr3DCUW6XdCZIr5Id1F7#fid2cGd2ZndsdXsdjahsdkhsdhc%2FY2RpdmApJ3Zxd2x1YERmZmpwa3EnPydkZmZxWjRLZjV3X0BAckFBYGJKSEInKSdkdWxOYHwnPyd1blpxYHZxWjA0Tj1DSGdWRmwxYkdiMFxGQ29zf2BdTldOTGQzUlNqfWd9U1ZkanNHMlVnczxidEg0fFFqYVJNYzw8XEh2YVA8dkQ1bmA9NW5sS1c2PHE8hH89Q11Uf1E2NTVgY0M1Q0ZmYycpJ2N3amhWYHdzYHcnP3F3cGApJ2lkfGpwc",
-        "checkoutSessionId": "cs_test_b1sNi7D6u9iMCUFV1UZi9ZwerfaiXKdOOmr3DCUW6XdCZIr5Id1F7G",
+        "checkoutSessionId": "cs_test_b1sNi7D6u9iMCUFV1UZi9ZwerfaiXKdOOmr3DCUW6XdCZIr5Id1F7G"
     }
   ```
 </Accordion>
@@ -283,21 +296,21 @@ print(f"Checkout Session URL: {response.checkoutUrl}")
 
 * `successUrl` (str): The URL to which the user will be redirected after a successful checkout.
 
-* `chargePeriod` (str): Required. The billing cycle for the subscription. Must be one of:
+* `chargePeriod` (str | ChargePeriod): Required. The billing cycle for the subscription. You can use the `ChargePeriod` enum (e.g., `ChargePeriod.MONTHLY`) or a raw string. Must be one of:
 
-        * `"ONE_TIME"`
+        * `"ONE_TIME"` / `ChargePeriod.ONE_TIME`
 
-        * `"MONTHLY"`
+        * `"MONTHLY"` / `ChargePeriod.MONTHLY`
 
-        * `"YEARLY"`
+        * `"YEARLY"` / `ChargePeriod.YEARLY`
 
-        * `"WEEKLY"`
+        * `"WEEKLY"` / `ChargePeriod.WEEKLY`
 
-        * `"DAILY"`
+        * `"DAILY"` / `ChargePeriod.DAILY`
 
-        * `"THREE_MONTHS"`
+        * `"THREE_MONTHS"` / `ChargePeriod.THREE_MONTHS`
 
-        * `"SIX_MONTHS"`
+        * `"SIX_MONTHS"` / `ChargePeriod.SIX_MONTHS`
 
 
 
@@ -311,7 +324,7 @@ print(f"Checkout Session URL: {response.checkoutUrl}")
 
     * `customerId` (str): Required. The ID of the customer initiating the checkout. (If not provided, a new customer will be created)
 
-    * `features` (List[Dict[str, Union[str, int]]]): **Required**. A list of dictionaries, where each dictionary represents a feature and its desired quantity. Each dictionary **must** have two keys:
+    * `features` (List[Dict[str, Union[str, int]]]): Optional. A list of dictionaries, where each dictionary represents a feature and its desired quantity. Each dictionary **must** have two keys:
         * `"identifier"` (str): The unique identifier for the feature.
         * `"quantity"` (int): The desired quantity for this feature.
             * Example: `[{"identifier": "seats", "quantity": 10}, {"identifier": "api-calls-tier1", "quantity": 5000}]`
@@ -397,22 +410,19 @@ entitlement_response = await async_client.entitlements.get_entitlement(
 
 <Accordion title="Response">
 
-  ```json
-   {
-        "customerId": "cust_456",
-        "entitlements": [
-            {
-                "featureId": "advanced-analytics",
-                "featureType": "METER",
-                "hasAccess": true,
-                "resetAt": "2025-05-22 08:27:45",
-                "hardLimit": false,
-                "usageLimit": 3,
-                "currentUsage": 0,
-                "remaining": 3
-            }
-        ]
-   }
+  ```python
+  Entitlement(
+      featureId="advanced-analytics",
+      featureType="METER",
+      hasAccess=True,
+      hardLimit=False,
+      usageLimit=3,
+      currentUsage=0,
+      remaining=3,
+      items=[
+          EntitlementDetail(featureId="advanced-analytics", featureType="METER", hasAccess=True, resetAt="2025-05-22 08:27:45", hardLimit=False, usageLimit=3, currentUsage=0, remaining=3)
+      ]
+  )
   ```
 </Accordion>
 
@@ -424,35 +434,106 @@ entitlement_response = await async_client.entitlements.get_entitlement(
 
 **Returns**:
 
-An instance of CheckEntitlementsResponse (Pydantic model). When querying for a specific featureId, the entitlements list within this response is typically expected to contain a single EntitlementDetail object corresponding to the requested feature if found. The structure includes:
+An `Entitlement` model (Pydantic), or `None` if the feature is not found. If the customer has multiple subscriptions, there can be multiple raw entries for the same featureId. The SDK aggregates these into a single model and keeps the raw entries accessible via the `items` attribute.
 
-    * `customerId` (str): The customer's ID.
+The aggregated `Entitlement` model includes:
 
-    * `entitlements` (List[EntitlementDetail]): A list containing the details for the requested feature. Each EntitlementDetail has fields like:
+    * `featureId` (str): The feature ID.
 
-        * `featureId`: str
+    * `featureType` (str): The type of the feature — `"METER"`, `"BOOLEAN"`, or `"CUSTOMIZABLE"`.
 
-        * `hasAccess`: bool
+    * `hasAccess` (bool): For **METER** features, computed as `remaining is None or remaining > 0`. For **BOOLEAN** and **CUSTOMIZABLE** features, `True` if any raw entry grants access.
 
-        * `featureType`: str
+    * `hardLimit` (Optional[bool]): For **METER**, `True` if any entry has a hard limit. For **BOOLEAN**, always `False`.
 
-        * `resetAt`: str
+    * `usageLimit` (Optional[int]): For **METER**, summed across all items. For **CUSTOMIZABLE**, taken from the first item. For **BOOLEAN**, always `None`.
 
-        * `hardLimit`: Optional[bool]
+    * `currentUsage` (Optional[int]): For **METER**, summed across all items. For **CUSTOMIZABLE**, taken from the first item. For **BOOLEAN**, always `0`.
 
-        * `usageLimit`: Optional[int]
+    * `remaining` (Optional[int]): For **METER**, computed as `usageLimit - currentUsage`. For **CUSTOMIZABLE**, taken from the first item. For **BOOLEAN**, always `None`.
 
-        * `currentUsage`: Optional[int]
-
-        * `remaining`: Optional[int]
+    * `items` (List[EntitlementDetail]): The raw entitlement entries from the API. Each item retains its own `resetAt` value, since reset dates can differ across subscriptions.
 
 
-### Retrieves all entitlements for a given customer.
+### Retrieves all aggregated entitlements for a given customer.
 
 **Synchronous**:
 
 ```python
-all_entitlements_response = client.entitlements.get_all_entitlements(
+entitlements = client.entitlements.get_entitlements(
+    customerId="cust_123"
+)
+# Access by feature ID
+if "premium-reporting" in entitlements:
+    ent = entitlements["premium-reporting"]
+    print(f"hasAccess={ent.hasAccess}, items={len(ent.items)}")
+```
+
+**Asynchronous**:
+
+```python
+entitlements = await async_client.entitlements.get_entitlements(
+    customerId="cust_456"
+)
+for feature_id, ent in entitlements.items():
+    print(f"{feature_id}: hasAccess={ent.hasAccess}, items={len(ent.items)}")
+```
+
+**Required Parameters**:
+
+    * `customerId` (str): The unique identifier for the customer.
+
+
+**Returns**:
+
+A `Dict[str, Entitlement]` keyed by `featureId`, where each value is an aggregated `Entitlement` model with an `.items` list containing the raw entries. See `get_entitlement` above for the full model structure.
+
+
+### Retrieves the raw entitlement response for a specific feature (no aggregation).
+
+**Synchronous**:
+
+```python
+raw_response = client.entitlements.get_raw_entitlement(
+    customerId="cust_123",
+    featureId="premium-reporting"
+)
+print(f"Customer: {raw_response.customerId}")
+for detail in raw_response.entitlements:
+    print(f"  {detail.featureId}: {detail.hasAccess}")
+```
+
+**Asynchronous**:
+
+```python
+raw_response = await async_client.entitlements.get_raw_entitlement(
+    customerId="cust_456",
+    featureId="advanced-analytics"
+)
+```
+
+**Required Parameters**:
+
+    * `customerId` (str): The unique identifier for the customer.
+
+    * `featureId` (str): The unique identifier for the feature.
+
+
+**Returns**:
+
+An instance of `CheckEntitlementsResponse` (Pydantic model) containing the raw API response without aggregation:
+
+    * `customerId` (str): The customer's ID.
+
+    * `entitlements` (List[EntitlementDetail]): The raw list of entitlement entries.
+
+
+### Retrieves all raw entitlements for a given customer (no aggregation).
+
+**Synchronous**:
+
+```python
+raw_response = client.entitlements.get_raw_entitlements(
     customerId="cust_123"
 )
 ```
@@ -460,13 +541,12 @@ all_entitlements_response = client.entitlements.get_all_entitlements(
 **Asynchronous**:
 
 ```python
-all_entitlements_response = await async_client.entitlements.get_all_entitlements(
+raw_response = await async_client.entitlements.get_raw_entitlements(
     customerId="cust_456"
 )
 ```
 
 <Accordion title="Response">
-
 
   ```json
    {
@@ -494,10 +574,11 @@ all_entitlements_response = await async_client.entitlements.get_all_entitlements
 
 **Returns**:
 
+An instance of `CheckEntitlementsResponse` (Pydantic model) containing the raw API response without aggregation:
 
     * `customerId` (str): The customer's ID.
 
-    * `entitlements` (List[EntitlementDetail]): A list containing the details for the requested feature. Each EntitlementDetail has fields like:
+    * `entitlements` (List[EntitlementDetail]): The raw list of entitlement entries. Each `EntitlementDetail` has fields like:
 
         * `featureId`: str
 
@@ -743,14 +824,14 @@ except Exception as e:
 
 * `subscriptionId` (str): Required. The unique identifier of the subscription to be updated.
 * `planIdentifier` (str): Required. The identifier of the new plan.
-* `chargePeriod` (str): Required. The new charging period for the subscription. Must be one of:
-    * `"ONE_TIME"`
-    * `"MONTHLY"`
-    * `"YEARLY"`
-    * `"WEEKLY"`
-    * `"DAILY"`
-    * `"THREE_MONTHS"`
-    * `"SIX_MONTHS"`
+* `chargePeriod` (str | ChargePeriod): Required. The new charging period for the subscription. You can use the `ChargePeriod` enum (e.g., `ChargePeriod.MONTHLY`) or a raw string. Must be one of:
+    * `"ONE_TIME"` / `ChargePeriod.ONE_TIME`
+    * `"MONTHLY"` / `ChargePeriod.MONTHLY`
+    * `"YEARLY"` / `ChargePeriod.YEARLY`
+    * `"WEEKLY"` / `ChargePeriod.WEEKLY`
+    * `"DAILY"` / `ChargePeriod.DAILY`
+    * `"THREE_MONTHS"` / `ChargePeriod.THREE_MONTHS`
+    * `"SIX_MONTHS"` / `ChargePeriod.SIX_MONTHS`
 
 **Optional Parameters:**
 
@@ -816,11 +897,11 @@ except Exception as e:
 
 * `subscriptionId` (str): The unique identifier of the subscription to be cancelled.
 
-* `cancellationType` (str): The type of cancellation to perform. Must be one of:
+* `cancellationType` (str | CancellationType): The type of cancellation to perform. You can use the `CancellationType` enum (e.g., `CancellationType.CURRENT_PERIOD_ENDS`) or a raw string. Must be one of:
 
-    * `"IMMEDIATE"`: The subscription is cancelled immediately.
-    * `"CURRENT_PERIOD_ENDS"`: The subscription will remain active until the end of the current billing period and then cancel.
-    * `"SPECIFIC_DATE"`: The subscription will be cancelled on the specified `cancellationDate`.
+    * `"IMMEDIATE"` / `CancellationType.IMMEDIATE`: The subscription is cancelled immediately.
+    * `"CURRENT_PERIOD_ENDS"` / `CancellationType.CURRENT_PERIOD_ENDS`: The subscription will remain active until the end of the current billing period and then cancel.
+    * `"SPECIFIC_DATE"` / `CancellationType.SPECIFIC_DATE`: The subscription will be cancelled on the specified `cancellationDate`.
 
 * `cancellationDate` (str): The specific date for cancellation if `cancellationType` is `"SPECIFIC_DATE"`. Must be in `YYYY-MM-DD` format. This parameter is **required** if `cancellationType` is `"SPECIFIC_DATE"`.
 
