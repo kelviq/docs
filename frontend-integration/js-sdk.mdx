@@ -40,11 +40,14 @@ Get started with the SDK in just a few lines of code.
 ```typescript
 import kelviqSDK from '@kelviq/js-sdk';
 
-// Initialize the SDK
+// Initialize the SDK (fetches entitlements automatically)
 const kq = kelviqSDK({
   customerId: "your-customer-id",
   accessToken: "your-access-token",
 });
+
+// Wait for the initial fetch to complete
+await kq.ready();
 
 // Check if user has access to a feature
 if (kq.hasAccess('premium-features')) {
@@ -160,9 +163,26 @@ if (raw) {
 }
 ```
 
+#### `ready(): Promise<void>`
+
+Wait for the initial fetch (triggered by `initializeAndFetch: true`) to complete. Resolves immediately if no initial fetch was triggered or if the data is already available.
+
+```typescript
+const kq = kelviqSDK({
+  customerId: "your-customer-id",
+  accessToken: "your-access-token",
+});
+
+await kq.ready();
+// Entitlements are now available
+if (kq.hasAccess('premium-features')) {
+  showPremiumUI();
+}
+```
+
 #### `fetchAllEntitlements(forceRefresh?: boolean): Promise<Record<string, Entitlement>>`
 
-Manually trigger a network request to refresh the entitlements.
+Manually trigger a network request to refresh the entitlements. If a fetch is already in progress, the same promise is returned (calls are deduplicated).
 
 ```typescript
 // Fetch fresh data
