@@ -268,7 +268,7 @@
           "customerId": {
             "type": "string",
             "nullable": true,
-            "description": "The ID of the customer initiating the checkout. (If not provided, a new customer might be created depending on server logic).",
+            "description": "The ID of the customer initiating the checkout. If not provided, a new customer may be created depending on server logic.\n\n**Note:** Even if a unique customer ID is provided, if the email address already exists in the system, the subscription will be created for that existing email — not the new customer ID. This is to preserve the uniqueness of the email address.",
             "example": "cust_789"
           },
           "features": {
