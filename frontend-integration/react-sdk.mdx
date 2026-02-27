@@ -1,6 +1,6 @@
 ---
 title: "React SDK"
-description: "Documentation for the kelviq React SDK"
+description: "Documentation for the Kelviq React SDK"
 icon: 'react'
 ---
 
@@ -69,7 +69,7 @@ export default App;
 - `customerId: string`
   - The ID of the customer for whom entitlements are being fetched. This will be sent as a query parameter (`customer_id`).
 - `accessToken: string | null`
-  - Your static API token or Bearer token for authenticating requests to the kelviq API. If provided, it will be included in the `Authorization: Bearer <accessToken>` header.
+  - Your **Client API Key** for authenticating requests to the Kelviq API. This key is safe to expose in client-side code. You can find it in the [Developers](https://app.kelviq.com/settings/developers) section of your Kelviq dashboard. Never use your Server API Key in client-side code.
 
 ### Optional Props for `KelviqProvider`
 <Expandable title="Optional Props">
@@ -98,6 +98,12 @@ This optional object can contain the following properties:
 - `fetchEntitlementsOnMount?: boolean`
   - Defaults to `true`. If true, entitlements are fetched automatically when the `KelviqProvider` mounts.
   - Set to `false` if you want to control the initial fetch manually using the `refreshAllEntitlements` function from the `useKelviq` hook.
+- `fetchSubscriptionsOnMount?: boolean`
+  - Defaults to `false`. If true, the customer's subscription data is fetched automatically when the `KelviqProvider` mounts.
+  - When enabled, data is available via the `useSubscriptions()` hook or `subscriptions` from `useKelviq()`.
+- `fetchCustomerOnMount?: boolean`
+  - Defaults to `false`. If true, customer data is fetched automatically when the `KelviqProvider` mounts.
+  - When enabled, data is available via the `useCustomer()` hook or `customer` from `useKelviq()`.
 </Expandable>
 
 
@@ -152,17 +158,317 @@ This is the primary hook to access the SDK's context.
 
 - **Returns:** `KelviqContextValue` object containing:
   - `allEntitlements: AsyncState<EntitlementMap | null>`: The state object for all fetched entitlements.
-    - `data`: An `EntitlementMap` (a `Record<string, AnyEntitlement>`) where keys are `featureKey`s, or `null` if not loaded or error.
+    - `data`: An `EntitlementMap` (a `Record<string, Entitlement>`) where keys are `featureId`s, or `null` if not loaded or error.
     - `isLoading`: Boolean indicating if the `allEntitlements` data is currently being fetched/refreshed.
     - `error`: An `Error` object if the last fetch failed, otherwise `null`.
   - `refreshAllEntitlements: () => Promise<void>`: Function to manually trigger a re-fetch of all entitlements.
-  - `getEntitlement: <T extends AnyEntitlement>(featureKey: string, type: T['type']) => AsyncState<T | null>`: Function to get a specific entitlement's state from the cache.
-  - `hasAccess: (featureKey: string) => boolean | undefined`: A utility function to quickly check access for a feature. Returns `true` if access is granted, `false` if denied or feature not found, and `undefined` if data is loading or an error occurred.
+  - `getEntitlements: () => EntitlementMap`: Returns all aggregated entitlements as a `Record<string, Entitlement>` keyed by `featureId`. Returns an empty object if data has not been fetched yet.
+  - `getEntitlement: (featureId: string) => Entitlement | null`: Returns the aggregated entitlement for a given `featureId`, or `null` if not found or not yet loaded.
+  - `getRawEntitlements: () => EntitlementsResponse | null`: Returns the raw API response with `customerId` and the un-aggregated `entitlements` array (duplicate `featureId` entries are preserved). Returns `null` if data has not been fetched yet.
+  - `getRawEntitlement: (featureId: string) => EntitlementsResponse | null`: Returns the raw API response filtered to a specific `featureId`, with `customerId` and only the matching entries.
+  - `hasAccess: (featureId: string) => boolean`: A utility function to quickly check access for a feature. Returns `true` if access is granted, `false` if denied, feature not found, or data is not yet loaded.
+  - `updateEntitlement: (featureId: string, data: Partial<...>) => void`: Updates a cached entitlement in-place. Accepts partial data (excluding `featureId`, `featureType`, and `items`). Automatically recalculates `remaining` when `usageLimit` or `currentUsage` are updated.
+  - `subscriptions: AsyncState<RawSubscriptionData[] | null>`: The state object for the customer's subscriptions. Only populated when `fetchSubscriptionsOnMount` is `true` or after calling `refreshSubscriptions()`.
+  - `refreshSubscriptions: () => Promise<void>`: Function to manually trigger a re-fetch of the customer's subscriptions.
+  - `customer: AsyncState<RawCustomerApiResponse | null>`: The state object for customer data. Only populated when `fetchCustomerOnMount` is `true` or after calling `refreshCustomer()`.
+  - `refreshCustomer: () => Promise<void>`: Function to manually trigger a re-fetch of the customer data.
   - `isLoading: boolean`: A global loading state indicating if the SDK is performing its initial configured fetch or a refresh operation.
   - `error: Error | null`: A global error state reflecting any error from the last fetch operation initiated by the provider.
   - `customerId: string`: The customer ID passed to the provider.
-  - `apiUrl: string`: The base API URL passed to the provider.
+  - `environment: string`: The environment (`'production'` or `'sandbox'`) passed to the provider.
+  - `apiUrl: string`: The resolved API URL used by the provider.
   - `entitlementsPath: string`: The entitlements path passed to the provider.
+
+---
+
+#### `hasAccess(featureId)`
+
+Quickly check if a customer has access to a feature.
+
+```tsx
+const { hasAccess } = useKelviq();
+const canUse = hasAccess("premium-reporting");
+```
+
+<Accordion title="Response">
+```json
+true
+```
+</Accordion>
+
+---
+
+#### `getEntitlement(featureId)`
+
+Returns the aggregated entitlement for a given feature. When the API returns multiple entries for the same `featureId` (e.g. from different subscriptions), the SDK groups them and exposes aggregated totals at the top level.
+
+```tsx
+const { getEntitlement } = useKelviq();
+const entitlement = getEntitlement("api-calls-quota");
+```
+
+<Accordion title="Response — Metered Entitlement">
+```json
+{
+  "featureId": "api-calls-quota",
+  "featureType": "METER",
+  "hasAccess": true,
+  "currentUsage": 150,
+  "usageLimit": 1000,
+  "remaining": 850,
+  "hardLimit": true,
+  "items": [
+    {
+      "featureId": "api-calls-quota",
+      "featureType": "METER",
+      "hasAccess": true,
+      "resetAt": "2025-06-01T00:00:00Z",
+      "hardLimit": false,
+      "usageLimit": 500,
+      "currentUsage": 100,
+      "remaining": 400
+    },
+    {
+      "featureId": "api-calls-quota",
+      "featureType": "METER",
+      "hasAccess": true,
+      "resetAt": "2025-07-01T00:00:00Z",
+      "hardLimit": true,
+      "usageLimit": 500,
+      "currentUsage": 50,
+      "remaining": 450
+    }
+  ]
+}
+```
+</Accordion>
+
+<Accordion title="Response — Boolean Entitlement">
+```json
+{
+  "featureId": "enable-dark-mode",
+  "featureType": "BOOLEAN",
+  "hasAccess": true,
+  "currentUsage": 0,
+  "usageLimit": null,
+  "remaining": null,
+  "hardLimit": false,
+  "items": [
+    {
+      "featureId": "enable-dark-mode",
+      "featureType": "BOOLEAN",
+      "hasAccess": true
+    }
+  ]
+}
+```
+</Accordion>
+
+<Accordion title="Response — Customizable Entitlement">
+```json
+{
+  "featureId": "max-items-per-page",
+  "featureType": "CUSTOMIZABLE",
+  "hasAccess": true,
+  "currentUsage": 0,
+  "usageLimit": 50,
+  "remaining": 50,
+  "hardLimit": false,
+  "items": [
+    {
+      "featureId": "max-items-per-page",
+      "featureType": "CUSTOMIZABLE",
+      "hasAccess": true,
+      "usageLimit": 50,
+      "currentUsage": 0,
+      "remaining": 50
+    }
+  ]
+}
+```
+</Accordion>
+
+---
+
+#### `getEntitlements()`
+
+Returns all aggregated entitlements as a `Record<string, Entitlement>` keyed by `featureId`.
+
+```tsx
+const { getEntitlements } = useKelviq();
+const entitlements = getEntitlements();
+```
+
+<Accordion title="Response">
+```json
+{
+  "api-calls-quota": {
+    "featureId": "api-calls-quota",
+    "featureType": "METER",
+    "hasAccess": true,
+    "currentUsage": 150,
+    "usageLimit": 1000,
+    "remaining": 850,
+    "hardLimit": true,
+    "items": [
+      {
+        "featureId": "api-calls-quota",
+        "featureType": "METER",
+        "hasAccess": true,
+        "resetAt": "2025-06-01T00:00:00Z",
+        "hardLimit": false,
+        "usageLimit": 500,
+        "currentUsage": 100,
+        "remaining": 400
+      },
+      {
+        "featureId": "api-calls-quota",
+        "featureType": "METER",
+        "hasAccess": true,
+        "resetAt": "2025-07-01T00:00:00Z",
+        "hardLimit": true,
+        "usageLimit": 500,
+        "currentUsage": 50,
+        "remaining": 450
+      }
+    ]
+  },
+  "enable-dark-mode": {
+    "featureId": "enable-dark-mode",
+    "featureType": "BOOLEAN",
+    "hasAccess": true,
+    "currentUsage": 0,
+    "usageLimit": null,
+    "remaining": null,
+    "hardLimit": false,
+    "items": [
+      {
+        "featureId": "enable-dark-mode",
+        "featureType": "BOOLEAN",
+        "hasAccess": true
+      }
+    ]
+  }
+}
+```
+</Accordion>
+
+---
+
+#### `getRawEntitlements()`
+
+Returns the raw, un-aggregated API response with `customerId`. Duplicate `featureId` entries from multiple subscriptions are preserved as-is.
+
+```tsx
+const { getRawEntitlements } = useKelviq();
+const raw = getRawEntitlements();
+```
+
+<Accordion title="Response">
+```json
+{
+  "customerId": "cust_456",
+  "entitlements": [
+    {
+      "featureId": "api-calls-quota",
+      "featureType": "METER",
+      "hasAccess": true,
+      "resetAt": "2025-06-01T00:00:00Z",
+      "hardLimit": false,
+      "usageLimit": 500,
+      "currentUsage": 100,
+      "remaining": 400
+    },
+    {
+      "featureId": "api-calls-quota",
+      "featureType": "METER",
+      "hasAccess": true,
+      "resetAt": "2025-07-01T00:00:00Z",
+      "hardLimit": true,
+      "usageLimit": 500,
+      "currentUsage": 50,
+      "remaining": 450
+    },
+    {
+      "featureId": "enable-dark-mode",
+      "featureType": "BOOLEAN",
+      "hasAccess": true
+    }
+  ]
+}
+```
+</Accordion>
+
+---
+
+#### `getRawEntitlement(featureId)`
+
+Returns the raw API response filtered to a specific `featureId`. Useful for accessing per-subscription data for a single feature.
+
+```tsx
+const { getRawEntitlement } = useKelviq();
+const raw = getRawEntitlement("api-calls-quota");
+```
+
+<Accordion title="Response">
+```json
+{
+  "customerId": "cust_456",
+  "entitlements": [
+    {
+      "featureId": "api-calls-quota",
+      "featureType": "METER",
+      "hasAccess": true,
+      "resetAt": "2025-06-01T00:00:00Z",
+      "hardLimit": false,
+      "usageLimit": 500,
+      "currentUsage": 100,
+      "remaining": 400
+    },
+    {
+      "featureId": "api-calls-quota",
+      "featureType": "METER",
+      "hasAccess": true,
+      "resetAt": "2025-07-01T00:00:00Z",
+      "hardLimit": true,
+      "usageLimit": 500,
+      "currentUsage": 50,
+      "remaining": 450
+    }
+  ]
+}
+```
+</Accordion>
+
+---
+
+#### `updateEntitlement(featureId, data)`
+
+Updates a cached entitlement in-place. Useful for optimistically updating the UI after a usage increment without waiting for a full refresh. The `remaining` field is automatically recalculated when `usageLimit` or `currentUsage` are updated.
+
+```tsx
+const { updateEntitlement } = useKelviq();
+
+// After the user performs an action that consumes usage
+updateEntitlement("api-calls-quota", { currentUsage: 151 });
+```
+
+<Accordion title="Updated Entitlement">
+```json
+{
+  "featureId": "api-calls-quota",
+  "featureType": "METER",
+  "hasAccess": true,
+  "currentUsage": 151,
+  "usageLimit": 1000,
+  "remaining": 849,
+  "hardLimit": true,
+  "items": [...]
+}
+```
+</Accordion>
+
+Accepts `Partial<Omit<Entitlement, 'featureId' | 'featureType' | 'items'>>`. You can update any combination of `hasAccess`, `currentUsage`, `usageLimit`, and `remaining`.
 
 ### `useAllEntitlements()`
 
@@ -183,8 +489,8 @@ function EntitlementsList() {
   return (
     <ul>
       {Object.values(entitlementsMap).map(ent => (
-        <li key={ent.featureKey}>
-          {ent.featureKey}: {ent.hasAccess ? 'Enabled' : 'Disabled'} ({ent.type})
+        <li key={ent.featureId}>
+          {ent.featureId}: {ent.hasAccess ? 'Enabled' : 'Disabled'} ({ent.featureType})
         </li>
       ))}
     </ul>
@@ -193,45 +499,311 @@ function EntitlementsList() {
 
 ```
 
-### `useBooleanEntitlement(featureKey: string)`
+<Accordion title="Response — entitlementsMap">
+```json
+{
+  "api-calls-quota": {
+    "featureId": "api-calls-quota",
+    "featureType": "METER",
+    "hasAccess": true,
+    "currentUsage": 150,
+    "usageLimit": 1000,
+    "remaining": 850,
+    "hardLimit": true,
+    "items": [...]
+  },
+  "enable-dark-mode": {
+    "featureId": "enable-dark-mode",
+    "featureType": "BOOLEAN",
+    "hasAccess": true,
+    "currentUsage": 0,
+    "usageLimit": null,
+    "remaining": null,
+    "hardLimit": false,
+    "items": [...]
+  },
+  "max-items-per-page": {
+    "featureId": "max-items-per-page",
+    "featureType": "CUSTOMIZABLE",
+    "hasAccess": true,
+    "currentUsage": 0,
+    "usageLimit": 50,
+    "remaining": 50,
+    "hardLimit": false,
+    "items": [...]
+  }
+}
+```
+</Accordion>
 
-Fetches the state for a specific boolean entitlement from the cache.
+### `useBooleanEntitlement(featureId: string)`
+
+Returns the aggregated entitlement for a specific boolean feature from the cache.
 
 - **Arguments:**
-  - `featureKey: string`: The key of the boolean feature.
-- **Returns:** `AsyncState<BooleanEntitlement | null>`
+  - `featureId: string`: The identifier of the boolean feature.
+- **Returns:** `Entitlement | null`
 
-### `useConfigEntitlement(featureKey: string)`
+```tsx
+import { useBooleanEntitlement } from '@kelviq/react-sdk';
 
-Fetches the state for a specific configuration entitlement from the cache.
+const entitlement = useBooleanEntitlement("enable-dark-mode");
+```
+
+<Accordion title="Response">
+```json
+{
+  "featureId": "enable-dark-mode",
+  "featureType": "BOOLEAN",
+  "hasAccess": true,
+  "currentUsage": 0,
+  "usageLimit": null,
+  "remaining": null,
+  "hardLimit": false,
+  "items": [
+    {
+      "featureId": "enable-dark-mode",
+      "featureType": "BOOLEAN",
+      "hasAccess": true
+    }
+  ]
+}
+```
+</Accordion>
+
+### `useCustomizableEntitlement(featureId: string)`
+
+Returns the aggregated entitlement for a specific customizable feature from the cache.
 
 - **Arguments:**
-  - `featureKey: string`: The key of the configuration feature.
-- **Returns:** `AsyncState<ConfigEntitlement | null>` (where `ConfigEntitlement` has a `configuration: number | null` property).
+  - `featureId: string`: The identifier of the customizable feature.
+- **Returns:** `Entitlement | null`
 
-### `useMeteredEntitlement(featureKey: string)`
+```tsx
+import { useCustomizableEntitlement } from '@kelviq/react-sdk';
 
-Fetches the state for a specific metered entitlement from the cache.
+const entitlement = useCustomizableEntitlement("max-items-per-page");
+```
+
+<Accordion title="Response">
+```json
+{
+  "featureId": "max-items-per-page",
+  "featureType": "CUSTOMIZABLE",
+  "hasAccess": true,
+  "currentUsage": 0,
+  "usageLimit": 50,
+  "remaining": 50,
+  "hardLimit": false,
+  "items": [
+    {
+      "featureId": "max-items-per-page",
+      "featureType": "CUSTOMIZABLE",
+      "hasAccess": true,
+      "usageLimit": 50,
+      "currentUsage": 0,
+      "remaining": 50
+    }
+  ]
+}
+```
+</Accordion>
+
+### `useMeteredEntitlement(featureId: string)`
+
+Returns the aggregated entitlement for a specific metered feature from the cache.
 
 - **Arguments:**
-  - `featureKey: string`: The key of the metered feature.
-- **Returns:** `AsyncState<MeteredEntitlement | null>`
+  - `featureId: string`: The identifier of the metered feature.
+- **Returns:** `Entitlement | null`
+
+```tsx
+import { useMeteredEntitlement } from '@kelviq/react-sdk';
+
+const entitlement = useMeteredEntitlement("api-calls-quota");
+```
+
+<Accordion title="Response">
+```json
+{
+  "featureId": "api-calls-quota",
+  "featureType": "METER",
+  "hasAccess": true,
+  "currentUsage": 150,
+  "usageLimit": 1000,
+  "remaining": 850,
+  "hardLimit": true,
+  "items": [
+    {
+      "featureId": "api-calls-quota",
+      "featureType": "METER",
+      "hasAccess": true,
+      "resetAt": "2025-06-01T00:00:00Z",
+      "hardLimit": false,
+      "usageLimit": 500,
+      "currentUsage": 100,
+      "remaining": 400
+    },
+    {
+      "featureId": "api-calls-quota",
+      "featureType": "METER",
+      "hasAccess": true,
+      "resetAt": "2025-07-01T00:00:00Z",
+      "hardLimit": true,
+      "usageLimit": 500,
+      "currentUsage": 50,
+      "remaining": 450
+    }
+  ]
+}
+```
+</Accordion>
+
+### `useSubscriptions()`
+
+Returns the customer's subscription data. Only populated when `fetchSubscriptionsOnMount` is enabled in the provider config, or after calling `refreshSubscriptions()` from `useKelviq()`.
+
+- **Returns:** `AsyncState<RawSubscriptionData[] | null>`
+
+```tsx
+import { useSubscriptions } from '@kelviq/react-sdk';
+
+function SubscriptionInfo() {
+  const { data: subscriptions, isLoading, error } = useSubscriptions();
+
+  if (isLoading) return <p>Loading subscriptions...</p>;
+  if (error) return <p>Error: {error.message}</p>;
+  if (!subscriptions) return <p>No subscriptions found.</p>;
+
+  return (
+    <ul>
+      {subscriptions.map(sub => (
+        <li key={sub.id}>
+          {sub.plan.name} — {sub.status} ({sub.recurrence})
+        </li>
+      ))}
+    </ul>
+  );
+}
+```
+
+<Accordion title="Response — subscriptions">
+```json
+[
+  {
+    "id": "sub-uuid-1",
+    "externalSubscriptionId": "ext-sub-123",
+    "startDate": "2025-01-01T00:00:00Z",
+    "endDate": null,
+    "billingPeriodStartTime": "2025-06-01T00:00:00Z",
+    "billingPeriodEndTime": "2025-07-01T00:00:00Z",
+    "amount": "49.99",
+    "recurrence": "monthly",
+    "currency": "USD",
+    "status": "active",
+    "product": {
+      "name": "Pro Plan",
+      "identifier": "pro-plan"
+    },
+    "plan": {
+      "name": "Pro Monthly",
+      "identifier": "pro-monthly"
+    },
+    "features": [
+      {
+        "featureId": "api-calls-quota",
+        "featureType": "METER",
+        "hasAccess": true,
+        "usageLimit": 1000,
+        "currentUsage": 150,
+        "remaining": 850
+      }
+    ],
+    "trialDaysRemaining": null,
+    "customerId": "cust_456"
+  }
+]
+```
+</Accordion>
+
+<Note>
+You must enable `fetchSubscriptionsOnMount: true` in the provider's `config` prop, or call `refreshSubscriptions()` manually, for this hook to return data.
+</Note>
+
+### `useCustomer()`
+
+Returns the customer data. Only populated when `fetchCustomerOnMount` is enabled in the provider config, or after calling `refreshCustomer()` from `useKelviq()`.
+
+- **Returns:** `AsyncState<RawCustomerApiResponse | null>`
+
+```tsx
+import { useCustomer } from '@kelviq/react-sdk';
+
+function CustomerProfile() {
+  const { data: customer, isLoading, error } = useCustomer();
+
+  if (isLoading) return <p>Loading customer...</p>;
+  if (error) return <p>Error: {error.message}</p>;
+  if (!customer) return <p>No customer data.</p>;
+
+  return (
+    <div>
+      <h2>{customer.name}</h2>
+      <p>{customer.email}</p>
+      {customer.billingAddress && (
+        <p>{customer.billingAddress.city}, {customer.billingAddress.state}</p>
+      )}
+    </div>
+  );
+}
+```
+
+<Accordion title="Response — customer">
+```json
+{
+  "id": "a1b2c3d4-e5f6-7890-1234-567890abcdef",
+  "customerId": "unique-customer-id-123",
+  "name": "John Doe",
+  "email": "customer@example.com",
+  "details": {},
+  "metadata": {
+    "source": "sdk_import",
+    "priority": "high"
+  },
+  "billingAddress": {
+    "country": "IN",
+    "line1": "123 Main Street",
+    "line2": "Apt 4B",
+    "postalCode": "560001",
+    "city": "Bangalore",
+    "state": "Karnataka"
+  },
+  "createdOn": "2025-06-04T06:03:30.195790Z",
+  "modifiedOn": "2025-06-04T06:03:30.195831Z"
+}
+```
+</Accordion>
+
+<Note>
+You must enable `fetchCustomerOnMount: true` in the provider's `config` prop, or call `refreshCustomer()` manually, for this hook to return data.
+</Note>
 
 **Example using a specific entitlement hook:**
 
 ``` tsx
-import { useBooleanEntitlement } from '@kelviq/react-sdk';
+import { useBooleanEntitlement, useKelviq } from '@kelviq/react-sdk';
 
-function FeatureSpecificComponent({ featureKey }: { featureKey: string }) {
-  const { data: entitlement, isLoading, error } = useBooleanEntitlement(featureKey);
+function FeatureSpecificComponent({ featureId }: { featureId: string }) {
+  const { isLoading, error } = useKelviq();
+  const entitlement = useBooleanEntitlement(featureId);
 
-  if (isLoading) return <p>Loading feature {featureKey}...</p>;
-  if (error) return <p>Error loading feature {featureKey}: {error.message}</p>;
+  if (isLoading) return <p>Loading feature {featureId}...</p>;
+  if (error) return <p>Error loading feature {featureId}: {error.message}</p>;
 
   if (entitlement && entitlement.hasAccess) {
-    return <p>You have access to {featureKey}!</p>;
+    return <p>You have access to {featureId}!</p>;
   } else {
-    return <p>You do not have access to {featureKey}.</p>;
+    return <p>You do not have access to {featureId}.</p>;
   }
 }
 
@@ -243,10 +815,10 @@ These components provide a declarative way to render UI based on entitlement sta
 
 **Common Props:**
 
-- `featureKey: string`: The unique key of the feature to check.
-- `children: ReactNode | ((data: E) => ReactNode)`:
+- `featureId: string`: The unique identifier of the feature to check.
+- `children: ReactNode | ((data: Entitlement) => ReactNode)`:
   - If a `ReactNode`, it's rendered when the user is entitled and conditions are met.
-  - If a function (render prop), it's called with the entitlement data (`BooleanEntitlement`, `ConfigEntitlement`, or `MeteredEntitlement`) and its return value is rendered.
+  - If a function (render prop), it's called with the aggregated `Entitlement` data and its return value is rendered.
 - `fallback?: ReactNode`: Content to render if the user is not entitled, or if data is loading (and no `loadingComponent` is provided), or if an error occurs. Defaults to `null`.
 - `loadingComponent?: ReactNode`: Specific content to render while the entitlement data is loading. Overrides `fallback` during loading.
 
@@ -258,59 +830,104 @@ Renders children if the boolean feature is enabled (`hasAccess: true`).
 import { ShowWhenBooleanEntitled } from '@kelviq/react-sdk';
 
 <ShowWhenBooleanEntitled
-  featureKey="enable-dark-mode"
+  featureId="enable-dark-mode"
   loadingComponent={<p>Checking theme settings...</p>}
   fallback={<p>Dark mode is not available.</p>}
 >
   <button>Toggle Dark Mode</button>
 </ShowWhenBooleanEntitled>
 
-<ShowWhenBooleanEntitled featureKey="show-advanced-settings">
+<ShowWhenBooleanEntitled featureId="show-advanced-settings">
   {(entitlementData) => (
-    <div>Advanced settings for {entitlementData.featureKey} are visible!</div>
+    <div>Advanced settings for {entitlementData.featureId} are visible!</div>
   )}
 </ShowWhenBooleanEntitled>
 
 ```
 
-### `ShowWhenConfigEntitled`
+<Accordion title="Render Prop Data (entitlementData)">
+```json
+{
+  "featureId": "show-advanced-settings",
+  "featureType": "BOOLEAN",
+  "hasAccess": true,
+  "currentUsage": 0,
+  "usageLimit": null,
+  "remaining": null,
+  "hardLimit": false,
+  "items": [
+    {
+      "featureId": "show-advanced-settings",
+      "featureType": "BOOLEAN",
+      "hasAccess": true
+    }
+  ]
+}
+```
+</Accordion>
 
-Renders children if the config feature is enabled and provides the numeric configuration value to the children render prop.
+### `ShowWhenCustomizableEntitled`
 
-- **Children Prop:** `(config: number) => ReactNode` (Required to be a function for this component).
+Renders children if the customizable feature is enabled (`hasAccess: true`).
 
 ``` tsx
-import { ShowWhenConfigEntitled } from '@kelviq/react-sdk';
+import { ShowWhenCustomizableEntitled } from '@kelviq/react-sdk';
 
-<ShowWhenConfigEntitled
-  featureKey="max-items-per-page"
+<ShowWhenCustomizableEntitled
+  featureId="max-items-per-page"
   loadingComponent={<p>Loading display settings...</p>}
   fallback={<p>Default item limit applies.</p>}
 >
-  {(maxItems) => <p>You can display up to {maxItems} items per page.</p>}
-</ShowWhenConfigEntitled>
+  {(entitlementData) => (
+    <p>You have access to {entitlementData.featureId}.</p>
+  )}
+</ShowWhenCustomizableEntitled>
 
 ```
 
+<Accordion title="Render Prop Data (entitlementData)">
+```json
+{
+  "featureId": "max-items-per-page",
+  "featureType": "CUSTOMIZABLE",
+  "hasAccess": true,
+  "currentUsage": 0,
+  "usageLimit": 50,
+  "remaining": 50,
+  "hardLimit": false,
+  "items": [
+    {
+      "featureId": "max-items-per-page",
+      "featureType": "CUSTOMIZABLE",
+      "hasAccess": true,
+      "usageLimit": 50,
+      "currentUsage": 0,
+      "remaining": 50
+    }
+  ]
+}
+```
+</Accordion>
+
 ### `ShowWhenMeteredEntitled`
 
-Renders children if the metered feature is enabled and, by default, if `remaining` usage is greater than 0 or unlimited (`limit` is `null`).
+Renders children if the metered feature is enabled and, by default, if `remaining` usage is greater than 0 or unlimited (`usageLimit` is `null`).
 
 - **Optional Prop:**
-  - `condition?: (data: MeteredEntitlement) => boolean`: A custom function to further determine if children should render based on the metered entitlement data.
-- **Children Prop:** Can be `ReactNode` or `(data: MeteredEntitlement) => ReactNode`.
+  - `condition?: (data: Entitlement) => boolean`: A custom function to further determine if children should render based on the entitlement data.
+- **Children Prop:** Can be `ReactNode` or `(data: Entitlement) => ReactNode`.
 
 ``` tsx
 import { ShowWhenMeteredEntitled } from '@kelviq/react-sdk';
 
 <ShowWhenMeteredEntitled
-  featureKey="api-calls-quota"
+  featureId="api-calls-quota"
   loadingComponent={<p>Loading API quota...</p>}
   fallback={<p>API call limit reached or feature not available.</p>}
 >
   {(meterData) => (
     <div>
-      <p>API Calls Used: {meterData.used} / {meterData.limit === null ? 'Unlimited' : meterData.limit}</p>
+      <p>API Calls Used: {meterData.currentUsage} / {meterData.usageLimit === null ? 'Unlimited' : meterData.usageLimit}</p>
       <p>Remaining: {meterData.remaining === null ? 'Unlimited' : meterData.remaining}</p>
     </div>
   )}
@@ -318,25 +935,75 @@ import { ShowWhenMeteredEntitled } from '@kelviq/react-sdk';
 
 ```
 
+<Accordion title="Render Prop Data (meterData)">
+```json
+{
+  "featureId": "api-calls-quota",
+  "featureType": "METER",
+  "hasAccess": true,
+  "currentUsage": 150,
+  "usageLimit": 1000,
+  "remaining": 850,
+  "hardLimit": true,
+  "items": [
+    {
+      "featureId": "api-calls-quota",
+      "featureType": "METER",
+      "hasAccess": true,
+      "resetAt": "2025-06-01T00:00:00Z",
+      "hardLimit": false,
+      "usageLimit": 500,
+      "currentUsage": 100,
+      "remaining": 400
+    },
+    {
+      "featureId": "api-calls-quota",
+      "featureType": "METER",
+      "hasAccess": true,
+      "resetAt": "2025-07-01T00:00:00Z",
+      "hardLimit": true,
+      "usageLimit": 500,
+      "currentUsage": 50,
+      "remaining": 450
+    }
+  ]
+}
+```
+</Accordion>
+
 ## **7. Key Types**
 
 The SDK exports several types for better integration with TypeScript. Some key ones include:
 
-- `KelviqProviderOptions`: Configuration for the provider.
 - `KelviqContextValue`: The shape of the object returned by `useKelviq()`.
-- `AsyncState<T>`: Generic type for asynchronous data states.
-- `EntitlementMap`: The structure of the cached entitlements (`Record<string, AnyEntitlement>`).
-- `Entitlement`, `BooleanEntitlement`, `ConfigEntitlement`, `MeteredEntitlement`: Processed entitlement types.
-- `ApiRequestConfig`, `ApiResponse`: Interfaces related to the underlying `apiRequest` service.
+- `KelviqApiBehaviorOptions`: Configuration options for the `config` prop.
+- `AsyncState<T>`: Generic type for asynchronous data states (`{ data, isLoading, error }`).
+- `Entitlement`: The unified entitlement type with aggregated data and an `items` array containing the raw API objects.
+- `EntitlementMap`: The structure of the cached entitlements (`Record<string, Entitlement>`), keyed by `featureId`.
+- `EntitlementsResponse`: The raw API response shape (`{ customerId, entitlements }`) returned by `getRawEntitlements()` and `getRawEntitlement()`.
 - `RawEntitlementsApiResponse` and related `Raw...` types: Represent the structure of the direct API response.
+- `RawSubscriptionData`: A single subscription object as returned by the subscriptions API, including `plan`, `product`, `features`, `status`, `amount`, `recurrence`, etc.
+- `RawCustomerApiResponse`: Customer data as returned by the customer API, including `id`, `customerId`, `name`, `email`, `billingAddress`, `details`, `metadata`, `createdOn`, and `modifiedOn`.
+- `RawBillingAddress`: The billing address object (`country`, `line1`, `line2`, `postalCode`, `city`, `state`).
 
-You can import these types from `@kelviq/react-sdk/types` (assuming your `src/types/index.ts` re-exports them) or directly from the main SDK entry if configured.
+You can import these types directly from the main SDK entry:
+
+``` ts
+import type {
+  Entitlement,
+  EntitlementMap,
+  EntitlementsResponse,
+  RawSubscriptionData,
+  RawCustomerApiResponse,
+  RawBillingAddress,
+} from '@kelviq/react-sdk';
+```
 
 ## **8. Error Handling**
 
-- **Provider Level:** The `onError` callback in `KelviqProviderOptions` can be used to globally handle errors that occur during the entitlement fetching process initiated by the provider.
-- **Hook Level:** Each hook (`useAllEntitlements`, `useBooleanEntitlement`, etc.) returns an `AsyncState` object which includes an `error: Error | null` property. You can check this to handle errors specific to that data slice.
-- **Context Level:** `useKelviq()` also returns a global `error: Error | null` state, reflecting errors from the provider's most recent fetch operation.
+- **Provider Level:** The `onError` callback in `config` (`KelviqApiBehaviorOptions`) can be used to globally handle errors that occur during the entitlement fetching process initiated by the provider.
+- **Context Level:** `useKelviq()` returns a global `isLoading: boolean` and `error: Error | null` state, reflecting the provider's most recent fetch operation. Use these for loading/error UI in your components.
+- **`allEntitlements` Level:** The `allEntitlements` object from `useKelviq()` or `useAllEntitlements()` also carries its own `isLoading` and `error` fields within the `AsyncState` wrapper.
 
 ## **9. Example Usage**
 
@@ -354,25 +1021,25 @@ The SDK relies on an `apiRequest` function for making HTTP requests. The SDK's `
 
 ## **11. Project Structure (for contributors/reference)**
 
-The SDK source code (`src/`) is organized as follows:
+The SDK source code (`lib/`) is organized as follows:
 
 - `components/`: Contains conditional rendering React components.
   - `ShowWhenBooleanEntitled.tsx`
-  - `ShowWhenConfigEntitled.tsx`
+  - `ShowWhenCustomizableEntitled.tsx`
   - `ShowWhenMeteredEntitled.tsx`
   - `ShowWhenEntitledInternal.tsx` (Internal helper, not typically exported)
-  - `index.ts` (Exports public components)
-- `context/`: Defines the React Context.
+- `contexts/`: Defines the React Context and Provider.
   - `KelviqContext.ts`
+  - `KelviqProvider.tsx`
 - `hooks/`: Contains all custom React Hooks.
   - `useKelviq.ts`
   - `useAllEntitlements.ts`
   - `useBooleanEntitlement.ts`
-  - `useConfigEntitlement.ts`
+  - `useCustomizableEntitlement.ts`
   - `useMeteredEntitlement.ts`
+  - `useSubscriptions.ts`
+  - `useCustomer.ts`
   - `index.ts` (Exports all hooks)
-- `provider/`: Contains the main `KelviqProvider`.
-  - `KelviqProvider.tsx`
 - `types/`: Contains all TypeScript definitions.
   - `api.types.ts` (Raw types from API)
   - `sdk.types.ts` (Processed types for SDK and public use)

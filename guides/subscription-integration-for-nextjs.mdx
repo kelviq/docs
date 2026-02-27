@@ -378,12 +378,12 @@ export function MyFeature() {
   const canExport = entitlements?.["export-data"]?.hasAccess ?? false;
 
   // Metered entitlement example
-  const maxProjects = entitlements?.["max-projects"]?.limit;
-  const currentProjects = entitlements?.["max-projects"]?.used ?? 0;
+  const maxProjects = entitlements?.["max-projects"]?.usageLimit;
+  const currentProjects = entitlements?.["max-projects"]?.currentUsage ?? 0;
   const remainingProjects = entitlements?.["max-projects"]?.remaining;
 
   // Config entitlement example
-  const teamSize = entitlements?.["team-size"]?.limit ?? 1;
+  const teamSize = entitlements?.["team-size"]?.usageLimit ?? 1;
 
   return (
     <div>
@@ -418,12 +418,14 @@ export function MyFeature() {
 
 ```typescript
 interface Entitlement {
-  featureKey: string;
-  type: "BOOLEAN" | "METER" | "CUSTOMIZABLE";
+  featureId: string;
+  featureType: "BOOLEAN" | "METER" | "CUSTOMIZABLE";
   hasAccess: boolean;
-  limit: number | null;     // For METER and CUSTOMIZABLE
-  used: number;             // For METER
-  remaining: number | null; // For METER (null = unlimited)
+  usageLimit: number | null;  // For METER (summed) and CUSTOMIZABLE (first item)
+  currentUsage: number;       // For METER (summed) and CUSTOMIZABLE (first item)
+  remaining: number | null;   // For METER: usageLimit - currentUsage (null = unlimited)
+  hardLimit: boolean;         // true if any item has a hard limit
+  items: RawEntitlement[];    // Raw API entries for this featureId
 }
 ```
 
@@ -471,8 +473,8 @@ function UsageBar({ featureId }: { featureId: string }) {
   const entitlements = useAllEntitlements()?.data;
   const feature = entitlements?.[featureId];
 
-  const current = feature?.used ?? 0;
-  const max = feature?.limit;
+  const current = feature?.currentUsage ?? 0;
+  const max = feature?.usageLimit;
   const percentage = max ? (current / max) * 100 : 0;
 
   return (
@@ -502,7 +504,7 @@ function DashboardFeatures() {
 
   const canExport = entitlements?.["export-data"]?.hasAccess;
   const canInviteTeam = entitlements?.["team-features"]?.hasAccess;
-  const maxProjects = entitlements?.["max-projects"]?.limit;
+  const maxProjects = entitlements?.["max-projects"]?.usageLimit;
 
   return (
     <div>

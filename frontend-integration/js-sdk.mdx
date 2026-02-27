@@ -1,6 +1,6 @@
 ---
 title: "JavaScript SDK"
-description: "Documentation for the kelviq JavaScript SDK"
+description: "Documentation for the Kelviq JavaScript SDK"
 icon: 'js'
 ---
 
@@ -36,14 +36,18 @@ pnpm add @kelviq/js-sdk
 
 Get started with the SDK in just a few lines of code.
 
+
 ```typescript
 import kelviqSDK from '@kelviq/js-sdk';
 
-// Initialize the SDK
+// Initialize the SDK (fetches entitlements automatically)
 const kq = kelviqSDK({
   customerId: "your-customer-id",
   accessToken: "your-access-token",
 });
+
+// Wait for the initial fetch to complete
+await kq.ready();
 
 // Check if user has access to a feature
 if (kq.hasAccess('premium-features')) {
@@ -51,9 +55,9 @@ if (kq.hasAccess('premium-features')) {
 }
 
 // Get specific entitlement details
-const emailLimit = kq.getEntitlement('email-sends', 'metered');
-if (emailLimit && emailLimit.hasAccess) {
-  console.log(`Emails remaining: ${emailLimit.remaining}`);
+const emailQuota = kq.getEntitlement('email-sends');
+if (emailQuota && emailQuota.hasAccess) {
+  console.log(`Emails remaining: ${emailQuota.remaining}`);
 }
 ```
 
@@ -65,6 +69,10 @@ Complete documentation of all SDK methods and configuration options.
 ### Initialization
 
 Create and configure your SDK instance with the required parameters.
+
+<Warning>
+**Security Warning:** Never use your Server API Key in the browser. Use the **Client API Key** which is safe to expose in client-side code. You can find both keys in the [Developers](https://app.kelviq.com/settings/developers) section of your Kelviq dashboard.
+</Warning>
 
 ```typescript
 // Initialize the SDK
@@ -79,17 +87,17 @@ const kq = kelviqSDK({
 | Option | Type | Description |
 |--------|------|-------------|
 | `customerId` | `string` | Unique identifier for the customer |
-| `accessToken` | `string` | - | Authentication token for API requests |
+| `accessToken` | `string` | Authentication token for API requests |
 | `environment` | `sandbox\|production` | 'production' | The environment to use. If you want to use the sandbox, you must provide this. |
 | `initializeAndFetch` | `boolean` | `true` | Automatically fetch entitlements on initialization |
-| `onError` | `(error: Error) => void` | - | Error callback function |
+| `onError` | `(error: Error) => void` | Error callback function |
 
 
 ### Core Methods
 
 #### `hasAccess(featureId: string): boolean`
 
-Check if the user has access to a specific feature.
+Check if the user has access to a specific feature. Returns `false` if the feature doesn't exist or data hasn't been fetched.
 
 ```typescript
 if (kq.hasAccess('premium-features')) {
@@ -98,36 +106,31 @@ if (kq.hasAccess('premium-features')) {
 }
 ```
 
-#### `getEntitlement<T>(featureId: string, type: T['type']): T | null`
+#### `getEntitlement(featureId: string): Entitlement | null`
 
-Get detailed entitlement information for a specific feature.
+Get the aggregated entitlement for a specific feature. Returns the unified `Entitlement` object which includes the `.items` array of raw API objects.
 
 ```typescript
 // Boolean entitlement
-const canUseAnalytics = kq.getEntitlement('analytics', 'boolean');
+const canUseAnalytics = kq.getEntitlement('analytics');
 if (canUseAnalytics?.hasAccess) {
   enableAnalytics();
 }
 
-// Configurable entitlement
-const storageLimit = kq.getEntitlement('storage-limit', 'customizable');
-if (storageLimit?.hasAccess && storageLimit.configuration) {
-  setStorageLimit(storageLimit.configuration);
-}
-
 // Metered entitlement
-const emailQuota = kq.getEntitlement('email-sends', 'metered');
+const emailQuota = kq.getEntitlement('email-sends');
 if (emailQuota?.hasAccess && emailQuota.remaining !== null && emailQuota.remaining > 0) {
+  console.log(`Usage: ${emailQuota.currentUsage} / ${emailQuota.usageLimit}`);
   console.log(`Emails remaining: ${emailQuota.remaining}`);
 }
 ```
 
-#### `getAllEntitlements(): EntitlementMap | null`
+#### `getEntitlements(): Record<string, Entitlement> | null`
 
-Get all cached entitlements.
+Get all aggregated entitlements as a map keyed by `featureId`.
 
 ```typescript
-const allEntitlements = kq.getAllEntitlements();
+const allEntitlements = kq.getEntitlements();
 if (allEntitlements) {
   Object.entries(allEntitlements).forEach(([featureId, entitlement]) => {
     console.log(`${featureId}: ${entitlement.hasAccess ? 'Access granted' : 'Access denied'}`);
@@ -135,9 +138,51 @@ if (allEntitlements) {
 }
 ```
 
-#### `fetchAllEntitlements(forceRefresh?: boolean): Promise<EntitlementMap>`
+#### `getRawEntitlement(featureId: string): RawEntitlement[] | null`
 
-Manually fetch or refresh entitlements from the server.
+Get the raw, un-aggregated API items for a specific feature. Useful when you need per-item details like `resetAt` or `hardLimit`.
+
+```typescript
+const rawItems = kq.getRawEntitlement('email-sends');
+if (rawItems) {
+  rawItems.forEach(item => {
+    console.log(`Reset at: ${item.resetAt}, Limit: ${item.usageLimit}`);
+  });
+}
+```
+
+#### `getRawEntitlements(): RawEntitlementsApiResponse | null`
+
+Get the full raw API response including the `customerId` wrapper, exactly as received from the server.
+
+```typescript
+const raw = kq.getRawEntitlements();
+if (raw) {
+  console.log(`Customer: ${raw.customerId}`);
+  console.log(`Total items: ${raw.entitlements.length}`);
+}
+```
+
+#### `ready(): Promise<void>`
+
+Wait for the initial fetch (triggered by `initializeAndFetch: true`) to complete. Resolves immediately if no initial fetch was triggered or if the data is already available.
+
+```typescript
+const kq = kelviqSDK({
+  customerId: "your-customer-id",
+  accessToken: "your-access-token",
+});
+
+await kq.ready();
+// Entitlements are now available
+if (kq.hasAccess('premium-features')) {
+  showPremiumUI();
+}
+```
+
+#### `fetchAllEntitlements(forceRefresh?: boolean): Promise<Record<string, Entitlement>>`
+
+Manually trigger a network request to refresh the entitlements. If a fetch is already in progress, the same promise is returned (calls are deduplicated).
 
 ```typescript
 // Fetch fresh data
@@ -178,25 +223,27 @@ Clear the cached entitlements.
 
 ```typescript
 kq.clearCache();
-// Next call to hasAccess or getEntitlement will trigger a new fetch
+// Next call to hasAccess or getEntitlement will need a new fetch
 ```
 
 ## Entitlement Types
 
-Different types of entitlements supported by the SDK.
+The SDK uses a single, unified `Entitlement` interface. When the API returns duplicate `featureId`s (e.g., from Subscriptions + Top-ups), they are aggregated automatically.
 
 ```typescript
-interface MeteredEntitlement {
+interface Entitlement {
   featureId: string;
   featureType: "METER" | "BOOLEAN" | "CUSTOMIZABLE";
-  hardLimit: boolean;
-  hasAccess: boolean;
-  currentUsage: number;
-  usageLimit: number | null;
-  remaining: number | null;
-  resetAt?: string | null;
+  hasAccess: boolean;         // METER: remaining === null || remaining > 0; others: true if any item grants access
+  hardLimit: boolean;         // true if any item has a hard limit
+  currentUsage: number;       // METER: summed across items; CUSTOMIZABLE: from first item; BOOLEAN: 0
+  usageLimit: number | null;  // METER: summed across items; CUSTOMIZABLE: from first item; BOOLEAN: null
+  remaining: number | null;   // METER: usageLimit - currentUsage; CUSTOMIZABLE: from first item; BOOLEAN: null
+  items: RawEntitlement[];    // The raw array of original API objects for this featureId
 }
 ```
+
+Per-item details such as `resetAt` and `hardLimit` are available on each item in the `items` array.
 
 ## Examples
 
@@ -227,11 +274,12 @@ return (
 Implement usage limits and quota management.
 
 ```typescript
-const apiCalls = kq.getEntitlement('api-calls', 'metered');
+const apiCalls = kq.getEntitlement('api-calls');
 if (apiCalls?.hasAccess) {
   if (apiCalls.remaining === null || apiCalls.remaining > 0) {
     // Allow API call
     makeApiCall();
+    console.log(`Usage: ${apiCalls.currentUsage} / ${apiCalls.usageLimit}`);
   } else {
     // Show upgrade message
     showUpgradeMessage();
@@ -244,18 +292,37 @@ if (apiCalls?.hasAccess) {
 Apply dynamic configuration based on user entitlements.
 
 ```typescript
-const teamSizeEntitlement = kq.getEntitlement('max-team-size', 'customizable');
+const teamSizeEntitlement = kq.getEntitlement('max-team-size');
 
-if (teamSizeEntitlement?.hasAccess && teamSizeEntitlement.configuration) {
-  const maxTeamSize = teamSizeEntitlement.configuration;
-
-  if (currentTeam.length >= maxTeamSize) {
+if (teamSizeEntitlement?.hasAccess) {
+  if (currentTeam.length >= (teamSizeEntitlement.usageLimit ?? Infinity)) {
     showUpgradePrompt(); // or disable the "Add Member" button
   } else {
     enableTeamInvite();
   }
 }
+```
 
+### Accessing Per-Item Details
+
+When you need item-level details like `resetAt` or `hardLimit`, use the `items` array or the `getRawEntitlement` method.
+
+```typescript
+// Via the aggregated entitlement's items array
+const emailQuota = kq.getEntitlement('email-sends');
+if (emailQuota) {
+  emailQuota.items.forEach(item => {
+    console.log(`Reset at: ${item.resetAt}, Hard limit: ${item.hardLimit}`);
+  });
+}
+
+// Or via getRawEntitlement
+const rawItems = kq.getRawEntitlement('email-sends');
+if (rawItems) {
+  rawItems.forEach(item => {
+    console.log(`Reset at: ${item.resetAt}, Hard limit: ${item.hardLimit}`);
+  });
+}
 ```
 
 ### Error Handling
@@ -269,7 +336,7 @@ const kq = kelviqSDK({
   onError: (error) => {
     // Log to monitoring service
     logError('kelviq SDK Error', error);
-    
+
     // Show user-friendly message
     showNotification('Unable to load feature settings', 'error');
   }
@@ -301,11 +368,11 @@ async function customApiRequest<T>(config: ApiRequestConfig): Promise<ApiRespons
     },
     body: config.body ? JSON.stringify(config.body) : undefined
   });
-  
+
   if (!response.ok) {
     throw new Error(`HTTP ${response.status}: ${response.statusText}`);
   }
-  
+
   return {
     status: response.status,
     statusText: response.statusText,
@@ -328,10 +395,11 @@ Full TypeScript support with comprehensive type definitions.
 The SDK is written in TypeScript and provides full type safety:
 
 ```typescript
-import kelviqSDK, { 
-  KelviqClientOptions, 
-  EntitlementMap, 
-  MeteredEntitlement 
+import kelviqSDK, {
+  KelviqClientOptions,
+  Entitlement,
+  RawEntitlement,
+  RawEntitlementsApiResponse
 } from '@kelviq/js-sdk';
 
 const options: KelviqClientOptions = {
@@ -342,7 +410,7 @@ const options: KelviqClientOptions = {
 const kq = kelviqSDK(options);
 
 // Type-safe entitlement access
-const emailQuota: MeteredEntitlement | null = kq.getEntitlement('emails', 'metered');
+const emailQuota: Entitlement | null = kq.getEntitlement('emails');
 ```
 
 
@@ -377,7 +445,7 @@ const kq = kelviqSDK({
   onError: (error) => {
     // Send to error tracking service
     Sentry.captureException(error);
-    
+
     // Retry logic
     if (error.message.includes('network')) {
       setTimeout(() => kq.fetchAllEntitlements(), 5000);
@@ -424,3 +492,4 @@ const kq = kelviqSDK({
   accessToken: "your-access-token",
   environment: "sandbox"
 });
+```

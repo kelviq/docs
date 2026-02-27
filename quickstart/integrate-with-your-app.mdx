@@ -23,11 +23,11 @@ npm install @kelviq/node-sdk
 ````
 
 ```ts
-import { kelviq } from "@kelviq/node-sdk";
+import { Kelviq } from "@kelviq/node-sdk";
 
 // API keys are under Settings → Developers in the dashboard
-const client = new kelviq({
-  accessToken: process.env.Kelviq_SERVER_API_KEY!,
+const client = new Kelviq({
+  accessToken: process.env.KELVIQ_SERVER_API_KEY!,
 });
 
 // Create a customer on signup
@@ -80,7 +80,7 @@ In all examples we’ll keep using the same customer ID: `unique-customer-001`.
 import { ShowWhenBooleanEntitled } from '@kelviq/react-sdk';
 
 <ShowWhenBooleanEntitled
-  featureKey="enable-dark-mode"
+  featureId="enable-dark-mode"
   loadingComponent={<p>Checking…</p>}
   fallback={<p>Dark mode not available</p>}
 >
@@ -99,8 +99,8 @@ function EntitlementsList() {
   return (
     <ul>
       {Object.values(entitlements).map(ent => (
-        <li key={ent.featureKey}>
-          {ent.featureKey}: {ent.hasAccess ? 'Enabled' : 'Disabled'} ({ent.type})
+        <li key={ent.featureId}>
+          {ent.featureId}: {ent.hasAccess ? 'Enabled' : 'Disabled'} ({ent.featureType})
         </li>
       ))}
     </ul>
@@ -111,12 +111,12 @@ function EntitlementsList() {
 ### Backend check with Node
 
 ```ts
-const ent = await client.entitlements.get({
+const ent = await client.entitlements.getEntitlement({
   customerId: "unique-customer-001",
-  featureKey: "max_upload_size_mb",
+  featureId: "max_upload_size_mb",
 });
 
-if (file.sizeMB > ent.value) {
+if (ent && file.sizeMB > (ent.usageLimit ?? Infinity)) {
   throw new Error("Upgrade required");
 }
 ```
@@ -134,7 +134,7 @@ await client.reporting.reportUsage({
   customerId: "unique-customer-001",
   featureId: "downloads",
   value: 1,
-  behaviour: BEHAVIOUR_CHOICES.INCREMENT, // or SET
+  behaviour: BEHAVIOUR_CHOICES.DELTA, // or SET
 });
 ```
 

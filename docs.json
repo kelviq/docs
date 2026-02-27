@@ -119,8 +119,8 @@
           {
             "group": "Backend Integration",
             "pages": [
-              "api-reference/backend-integration/python-sdk",
-              "api-reference/backend-integration/node-sdk"
+              "backend-integration/python-sdk",
+              "backend-integration/node-sdk"
             ]
           },
           {

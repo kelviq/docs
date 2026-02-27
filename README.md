@@ -33,8 +33,8 @@ Complete documentation for Kelviq, the SaaS monetization and subscription manage
 ### Developer Tools
 - **[Authentication](api-reference/authentication)** - API key setup
 - **[Error Codes](api-reference/errors)** - Error handling reference
-- **[Python SDK](api-reference/backend-integration/python-sdk)** - Backend integration
-- **[Node.js SDK](api-reference/backend-integration/node-sdk)** - Backend integration
+- **[Python SDK](backend-integration/python-sdk)** - Backend integration
+- **[Node.js SDK](backend-integration/node-sdk)** - Backend integration
 - **[React SDK](frontend-integration/react-sdk)** - Frontend integration
 - **[React UI](frontend-integration/react-ui)** - Pre-built components
 
