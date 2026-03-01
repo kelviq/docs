@@ -1,0 +1,211 @@
+---
+title: "React SDK"
+description: "Changelog for @kelviq/react-sdk"
+mode: "wide"
+rss: true
+---
+
+<Update label="v2.0.0" description="February 27, 2026">
+
+### New Features
+
+#### Duplicate `featureId` Aggregation
+
+The SDK now handles customers with multiple subscriptions that grant entitlements to the same feature. Raw entries are grouped by `featureId` and aggregated automatically:
+
+- **METER**: `usageLimit` and `currentUsage` are summed across entries; `remaining` is recalculated
+- **BOOLEAN / CUSTOMIZABLE**: `hasAccess` is OR'd across entries (any `true` → `true`)
+
+The raw un-aggregated entries are preserved in the `items` array on each `Entitlement`.
+
+#### `getEntitlements()` — Convenience Accessor
+
+Returns the aggregated entitlements map directly, without the `AsyncState` wrapper:
+
+```ts
+const { getEntitlements } = useKelviq();
+const entitlements = getEntitlements(); // Record<string, Entitlement>
+
+const emailFeature = entitlements["email-sends"];
+console.log(emailFeature.hasAccess, emailFeature.remaining);
+```
+
+#### `getRawEntitlements()` — Raw API Response
+
+Access the un-aggregated API response with the `customerId` wrapper:
+
+```ts
+const { getRawEntitlements } = useKelviq();
+const raw = getRawEntitlements();
+// { customerId: "cust_123", entitlements: [...] }
+```
+
+#### `getRawEntitlement(featureId)` — Raw Data for a Single Feature
+
+Returns the raw API response filtered to a specific featureId:
+
+```ts
+const { getRawEntitlement } = useKelviq();
+const raw = getRawEntitlement("email-sends");
+// { customerId: "cust_123", entitlements: [/* only "email-sends" entries */] }
+```
+
+#### `updateEntitlement()` — Client-Side Entitlement Mutation
+
+Update an entitlement in-place, for example after recording a usage increment on the client side. The `remaining` field is automatically recalculated.
+
+```ts
+const { updateEntitlement } = useKelviq();
+updateEntitlement("email-sends", { currentUsage: 5 });
+// `remaining` is automatically recalculated
+```
+
+Accepts `Partial<Omit<Entitlement, 'featureId' | 'featureType' | 'items'>>`.
+
+#### `environment` Prop on `KelviqProvider`
+
+Supports `'production'` (default) and `'sandbox'`, which selects the appropriate default API URL:
+
+```tsx
+<KelviqProvider environment="sandbox" customerId="cust_123" accessToken="...">
+  <App />
+</KelviqProvider>
+```
+
+---
+
+### Breaking Changes
+
+#### Unified `Entitlement` Type
+
+The three separate entitlement interfaces and their union type have been replaced by a single unified `Entitlement` interface:
+
+```ts
+// Before — three separate types
+interface BooleanEntitlement { type: 'boolean'; featureKey: string; hasAccess: boolean; }
+interface ConfigEntitlement  { type: 'customizable'; featureKey: string; hasAccess: boolean; configuration: number | null; }
+interface MeteredEntitlement { type: 'metered'; featureKey: string; hasAccess: boolean; limit: number | null; used: number; remaining: number | null; resetAt: string | null; hardLimit: boolean; }
+
+// After — one unified type
+interface Entitlement {
+  featureId: string;
+  featureType: 'METER' | 'BOOLEAN' | 'CUSTOMIZABLE';
+  hasAccess: boolean;
+  currentUsage: number;
+  usageLimit: number | null;
+  remaining: number | null;
+  hardLimit: boolean;
+  items: AnyRawEntitlementData[];
+}
+```
+
+#### `featureKey` Renamed to `featureId`
+
+All props, parameters, and type fields now use `featureId` to match the backend API naming:
+
+```tsx
+// Before
+<ShowWhenBooleanEntitled featureKey="my-feature">
+  <PremiumContent />
+</ShowWhenBooleanEntitled>
+
+// After
+<ShowWhenBooleanEntitled featureId="my-feature">
+  <PremiumContent />
+</ShowWhenBooleanEntitled>
+```
+
+#### `Config` Renamed to `Customizable`
+
+| Before | After |
+|---|---|
+| `useConfigEntitlement` | `useCustomizableEntitlement` |
+| `ShowWhenConfigEntitled` | `ShowWhenCustomizableEntitled` |
+| `ConfigEntitlement` type | Unified `Entitlement` |
+
+#### `type` Field Renamed to `featureType` with Uppercase Values
+
+| Before | After |
+|---|---|
+| `type: 'boolean'` | `featureType: 'BOOLEAN'` |
+| `type: 'customizable'` | `featureType: 'CUSTOMIZABLE'` |
+| `type: 'metered'` | `featureType: 'METER'` |
+
+#### `configuration` Field Removed
+
+`ConfigEntitlement.configuration` has been removed. Customizable entitlements now use the same `usageLimit`, `currentUsage`, and `remaining` fields as metered entitlements.
+
+#### Hooks Return `Entitlement | null` Directly
+
+All entitlement hooks now return the entitlement object directly (or `null`) instead of an `AsyncState` wrapper. Use the top-level `isLoading` and `error` from `useKelviq()` for loading/error states.
+
+```ts
+// Before
+const { data, isLoading, error } = useMeteredEntitlement("my-feature");
+if (isLoading) return <Spinner />;
+console.log(data?.used);
+
+// After
+const entitlement = useMeteredEntitlement("my-feature");
+const { isLoading, error } = useKelviq();
+if (isLoading) return <Spinner />;
+console.log(entitlement?.currentUsage);
+```
+
+#### `getEntitlement()` Simplified
+
+The generic type parameter and second argument have been removed:
+
+```ts
+// Before
+getEntitlement<MeteredEntitlement>("my-feature", "metered")
+
+// After
+getEntitlement("my-feature") // returns Entitlement | null
+```
+
+#### `hasAccess()` Returns `boolean` (Never `undefined`)
+
+`hasAccess(featureId)` now returns `false` when data is unavailable instead of `undefined`. No need for nullish checks.
+
+#### Metered Field Renames
+
+| Before | After | Notes |
+|---|---|---|
+| `limit` | `usageLimit` | Aligned with the API |
+| `used` | `currentUsage` | Aligned with the API |
+| `resetAt` | _(removed)_ | Now per-item: `entitlement.items[].resetAt` |
+| `hardLimit` | `hardLimit` | Now aggregated: `true` if any item sets it |
+
+#### `allEntitlements.data` Shape Changed
+
+The map is now keyed by `featureId` (previously `featureKey`) and contains unified `Entitlement` objects. Use the new `getEntitlements()` convenience method:
+
+```ts
+// Before
+const { allEntitlements } = useKelviq();
+const myFeature = allEntitlements.data?.["my-feature"]; // AnyEntitlement | undefined
+
+// After
+const { getEntitlements } = useKelviq();
+const entitlements = getEntitlements(); // Record<string, Entitlement>
+const myFeature = entitlements["my-feature"]; // Entitlement | undefined
+```
+
+---
+
+### Migration Checklist
+
+1. Replace all `featureKey` props/params with `featureId`
+2. Replace `entitlement.type` with `entitlement.featureType` and update values to uppercase
+3. Replace `useConfigEntitlement` with `useCustomizableEntitlement`
+4. Replace `ShowWhenConfigEntitled` with `ShowWhenCustomizableEntitled`
+5. Replace `ConfigEntitlement.configuration` with `usageLimit` / `currentUsage` / `remaining`
+6. Update hook consumers: hooks now return `Entitlement | null` directly (not `AsyncState`)
+7. Remove type parameters from `getEntitlement()` calls
+8. Replace `limit` → `usageLimit`, `used` → `currentUsage`
+9. Replace `entitlement.resetAt` with `entitlement.items[].resetAt`
+10. Use `getEntitlements()` instead of `allEntitlements.data`
+11. Use `getRawEntitlements()` for un-aggregated API data
+
+</Update>

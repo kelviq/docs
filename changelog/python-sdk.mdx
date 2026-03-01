@@ -1,0 +1,123 @@
+---
+title: "Python SDK"
+description: "Changelog for kelviq-sdk (Python)"
+mode: "wide"
+rss: true
+---
+
+<Update label="v1.1.0" description="February 27, 2026">
+
+### New Features
+
+#### Entitlements Aggregation Engine
+
+When a customer has multiple active subscriptions, the API can return duplicate `featureId` entries. The SDK now automatically aggregates them into a single `Entitlement` model while preserving the raw data.
+
+```python
+entitlement = client.entitlements.get_entitlement("cust_123", "email-sends")
+
+# Aggregated values across all subscriptions
+print(entitlement.has_access)     # True
+print(entitlement.usage_limit)    # 1500 (e.g., 1000 from base + 500 from top-up)
+print(entitlement.current_usage)  # 200
+print(entitlement.remaining)      # 1300
+
+# Per-subscription details
+for item in entitlement.items:
+    print(item.usage_limit, item.reset_at)
+```
+
+**Aggregation rules:**
+
+| Field | Aggregation Strategy |
+|---|---|
+| `hasAccess` | `True` if **any** raw entry grants access |
+| `usageLimit` | **Summed** across all entries (for `METER` feature types) |
+| `currentUsage` | **Summed** across all entries (for `METER` feature types) |
+| `remaining` | Computed as `usageLimit - currentUsage` |
+| `hardLimit` | `True` if **any** entry has a hard limit |
+
+> **Note:** `resetAt` is intentionally **not** aggregated at the top level because each subscription item can have a different reset date. Access individual reset dates via `entitlement.items[i].resetAt`.
+
+#### New `Entitlement` Pydantic Model
+
+A new model representing an aggregated entitlement:
+
+- `featureId`, `featureType`, `hasAccess`, `hardLimit`, `usageLimit`, `currentUsage`, `remaining`
+- `items: List[EntitlementDetail]` — the raw entries that were aggregated into this model
+
+#### `get_entitlements(customerId)` — All Entitlements as a Map
+
+Returns a `Dict[str, Entitlement]` keyed by `featureId`. Each value is an aggregated model with an `.items` list containing the original raw entries.
+
+```python
+entitlements = client.entitlements.get_entitlements("cust_123")
+
+for feature_id, entitlement in entitlements.items():
+    print(f"{feature_id}: hasAccess={entitlement.has_access}, remaining={entitlement.remaining}")
+```
+
+#### `get_raw_entitlement(customerId, featureId)` — Raw API Response for a Feature
+
+Returns the raw API response (`CheckEntitlementsResponse`) for a specific feature without any aggregation. Includes the `customerId` wrapper.
+
+```python
+raw = client.entitlements.get_raw_entitlement("cust_123", "email-sends")
+# CheckEntitlementsResponse with customerId wrapper
+```
+
+#### `get_raw_entitlements(customerId)` — Full Raw API Response
+
+Returns the raw API response for all entitlements without any aggregation.
+
+```python
+raw = client.entitlements.get_raw_entitlements("cust_123")
+# CheckEntitlementsResponse with customerId wrapper and all raw entries
+```
+
+#### Enum Helpers for IDE Autocompletion
+
+New `str`-based `Enum` classes that improve developer experience with IDE autocompletion and prevent typos:
+
+- **`ChargePeriod`** — `ONE_TIME`, `MONTHLY`, `YEARLY`, `WEEKLY`, `DAILY`, `THREE_MONTHS`, `SIX_MONTHS`
+- **`CancellationType`** — `IMMEDIATE`, `CURRENT_PERIOD_ENDS`, `SPECIFIC_DATE`
+
+```python
+from kelviq_sdk import ChargePeriod, CancellationType
+
+# With enums — IDE autocompletion and typo prevention
+response = client.checkout.create_session(
+    planIdentifier="pro-plan",
+    chargePeriod=ChargePeriod.MONTHLY,
+    successUrl="https://example.com/success"
+)
+
+# Cancel with enum
+client.subscriptions.cancel(
+    subscriptionId="sub_123",
+    cancellationType=CancellationType.CURRENT_PERIOD_ENDS,
+)
+```
+
+Raw string values (e.g., `"MONTHLY"`) continue to work everywhere — the enums are fully backward-compatible.
+
+---
+
+### Changed
+
+- **`get_entitlement(customerId, featureId)`** now returns `Optional[Entitlement]` (aggregated) instead of raw `CheckEntitlementsResponse`. Use `get_raw_entitlement()` if you need the original response.
+- **`get_all_entitlements` removed** — Use `get_entitlements()` instead, which returns a `Dict[str, Entitlement]` keyed by `featureId`.
+- **`resetAt` removed from top-level `Entitlement`** — Access individual reset dates via the `.items` list.
+
+---
+
+### Fixed
+
+- Removed invalid JavaScript-style comments (`// Server-generated UUID`) from JSON response blocks in documentation.
+- Fixed `//` comments to `#` comments in Python code snippets.
+- Fixed trailing comma in Checkout response JSON block.
+- Fixed typo: "newly created customer" → "**updated** customer" in `customers.update` return description.
+- Removed placeholder text from "Supported Functionalities" section.
+- Updated entitlements description to explain multi-subscription aggregation and the `items` attribute.
+
+</Update>

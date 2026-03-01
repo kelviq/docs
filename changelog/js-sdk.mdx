@@ -1,0 +1,146 @@
+---
+title: "JS SDK"
+description: "Changelog for @kelviq/js-sdk"
+mode: "wide"
+rss: true
+---
+
+<Update label="v2.0.0" description="February 27, 2026">
+
+### New Features
+
+#### Hybrid Aggregation Engine
+
+If a customer has multiple subscriptions (e.g., a base plan + a top-up), the API may return duplicate `featureId` entries. The SDK now automatically aggregates them into a single `Entitlement` object per feature — no manual merging required.
+
+**Aggregation rules:**
+
+| Feature Type | `hasAccess` | `currentUsage` | `usageLimit` | `hardLimit` |
+|---|---|---|---|---|
+| **METER** | `true` if `remaining > 0` or unlimited | Summed | Summed | `true` if any item sets it |
+| **BOOLEAN** | `true` if any item grants access | `0` | `null` | `false` |
+| **CUSTOMIZABLE** | `true` if any item grants access | First item's value | First item's value | First item's value |
+
+Per-item details (like `resetAt` and individual `hardLimit` values) are available on `entitlement.items[]`.
+
+#### `getEntitlements()` — Fetch All Entitlements
+
+Returns all aggregated entitlements as a map keyed by `featureId`. Replaces the old `getAllEntitlements()` method.
+
+```typescript
+const entitlements = kq.getEntitlements();
+// { "email-sends": Entitlement, "api-calls": Entitlement, ... }
+```
+
+#### `getRawEntitlement(featureId)` — Raw Data for a Single Feature
+
+Returns the un-aggregated raw API items for a specific `featureId`. Useful when you need per-subscription details.
+
+```typescript
+const rawItems = kq.getRawEntitlement("email-sends");
+// [{ featureId: 'email-sends', featureType: 'METER', hasAccess: true, ... }, ...]
+```
+
+#### `getRawEntitlements()` — Full Raw API Response
+
+Returns the complete raw API response including the `customerId` wrapper, before any aggregation.
+
+```typescript
+const raw = kq.getRawEntitlements();
+// { customerId: 'cust_123', entitlements: [...] }
+```
+
+#### `ready()` — Wait for Initial Fetch
+
+Returns a promise that resolves once the initial entitlement fetch completes. If `initializeAndFetch` was not set, resolves immediately.
+
+```typescript
+const kq = kelviqSDK({
+  customerId: "cust_123",
+  accessToken: "your-access-token",
+});
+
+await kq.ready();
+// Entitlements are now available
+const emails = kq.getEntitlement("email-sends");
+console.log(emails.hasAccess, emails.remaining);
+```
+
+#### New Type Exports
+
+`RawEntitlement` and `RawEntitlementsApiResponse` are now exported for consumers who need to type the raw API objects in their own code.
+
+---
+
+### Breaking Changes
+
+#### Unified `Entitlement` Interface
+
+The separate `BooleanEntitlement`, `ConfigEntitlement`, and `MeteredEntitlement` types have been replaced with a single, unified `Entitlement` interface:
+
+```typescript
+interface Entitlement {
+  featureId: string;
+  featureType: "METER" | "BOOLEAN" | "CUSTOMIZABLE";
+  hasAccess: boolean;      // true if at least one item grants access
+  hardLimit: boolean;      // true if any item has hardLimit set
+  currentUsage: number;    // SUM of all items' currentUsage (METER only)
+  usageLimit: number | null; // SUM of all items' usageLimit (METER only)
+  remaining: number | null;  // usageLimit - currentUsage
+  items: RawEntitlement[];   // Original API objects for this featureId
+}
+```
+
+**Migration:** Replace all references to `BooleanEntitlement`, `ConfigEntitlement`, `MeteredEntitlement`, and `AnyEntitlement` with `Entitlement`.
+
+#### `getEntitlement()` No Longer Accepts a Type Argument
+
+The generic type parameter and second `type` argument have been removed. The SDK now determines the feature type automatically.
+
+```typescript
+// Before
+const emailQuota = kq.getEntitlement<MeteredEntitlement>("email-sends", "metered");
+console.log(emailQuota.used, emailQuota.limit);
+
+// After
+const emailQuota = kq.getEntitlement("email-sends");
+console.log(emailQuota.currentUsage, emailQuota.usageLimit);
+```
+
+#### Renamed Fields
+
+| Before | After | Notes |
+|---|---|---|
+| `used` | `currentUsage` | Aligned with the raw API field name |
+| `limit` | `usageLimit` | Aligned with the raw API field name |
+| `type` | `featureType` | Now uses uppercase API values (`"METER"`, `"BOOLEAN"`, `"CUSTOMIZABLE"`) |
+| `configuration` | _(removed)_ | No longer surfaced at the top level |
+| `resetAt` | _(removed)_ | Access via `entitlement.items[].resetAt` (may differ per subscription) |
+
+#### Removed Exports
+
+The following types are no longer exported:
+
+- `BooleanEntitlement`, `ConfigEntitlement`, `MeteredEntitlement`, `AnyEntitlement`
+- `EntitlementMap` is now `Record<string, Entitlement>` (no union type)
+
+#### `getAllEntitlements()` Removed
+
+Use `getEntitlements()` instead, which returns the aggregated map.
+
+---
+
+### Changed
+
+- **`fetchAllEntitlements()` deduplicates concurrent calls** — Instead of rejecting with "already in progress", it returns the same in-flight promise. This makes `initializeAndFetch: true` safely composable with `await fetchAllEntitlements()`.
+- **`fetchAllEntitlements()` stores raw data** — Now stores both the full raw API response and the aggregated cache internally.
+- **`clearCache()` clears raw data** — Now also clears the stored raw API response.
+
+---
+
+### Fixed
+
+- **`initializeAndFetch: false` was ignored** — The factory used `||` instead of `??`, so passing `false` had no effect and entitlements were always fetched on initialization. Fixed to use nullish coalescing (`??`).
+- **Options table in documentation** — Filled in missing type values for `accessToken` (`string`) and `onError` (`(error: Error) => void`).
+
+</Update>

@@ -1,0 +1,165 @@
+---
+title: "Node SDK"
+description: "Changelog for @kelviq/node-sdk"
+mode: "wide"
+rss: true
+---
+
+<Update label="v2.0.0" description="February 27, 2026">
+
+### New Features
+
+#### Entitlements Aggregation Engine
+
+When a customer has multiple subscriptions, the API can return duplicate `featureId` entries. The SDK now automatically aggregates them into a single `Entitlement` object per feature:
+
+- Numeric fields (`usageLimit`, `currentUsage`, `remaining`) are **summed** across all entries
+- `hasAccess` is `true` if **any** raw entry grants access
+- `hardLimit` is `true` if **any** entry sets it
+- All raw entries are preserved in the `.items[]` array
+
+```typescript
+const entitlement = await client.entitlements.getEntitlement({
+  customerId: "cust_123",
+  featureId: "email-sends",
+});
+
+// Aggregated values across all subscriptions
+console.log(entitlement.hasAccess);    // true
+console.log(entitlement.usageLimit);   // 1500 (e.g., 1000 from base plan + 500 from top-up)
+console.log(entitlement.currentUsage); // 200
+console.log(entitlement.remaining);    // 1300
+
+// Per-subscription details
+entitlement.items.forEach(item => {
+  console.log(item.usageLimit, item.resetAt);
+});
+```
+
+#### `Entitlement` Interface
+
+New type representing an aggregated entitlement with an `items: EntitlementDetail[]` field containing the raw entries that were aggregated.
+
+#### `getRawEntitlement({ customerId, featureId })`
+
+Returns the raw API response for a specific feature (`CheckEntitlementsResponse` with `customerId` wrapper), without any aggregation:
+
+```typescript
+const raw = await client.entitlements.getRawEntitlement({
+  customerId: "cust_123",
+  featureId: "email-sends",
+});
+// { customerId: "cust_123", entitlements: [/* raw entries for email-sends */] }
+```
+
+#### `getRawEntitlements({ customerId })`
+
+Returns the raw API response for all entitlements, without any aggregation:
+
+```typescript
+const raw = await client.entitlements.getRawEntitlements({
+  customerId: "cust_123",
+});
+// { customerId: "cust_123", entitlements: [/* all raw entries */] }
+```
+
+#### `client.subscription` Deprecated Alias
+
+A backward-compatible getter that maps `client.subscription` to `client.subscriptions`, so existing code continues to work during migration.
+
+---
+
+### Breaking Changes
+
+#### `client.subscription` Renamed to `client.subscriptions`
+
+The subscriptions module now uses the plural form for consistency with other modules (`client.customers`, `client.entitlements`, etc.):
+
+```typescript
+// Before
+const sub = await client.subscription.get({ subscriptionId: "sub_123" });
+
+// After
+const sub = await client.subscriptions.get({ subscriptionId: "sub_123" });
+```
+
+The old `client.subscription` accessor still works as a deprecated alias.
+
+#### `getEntitlement()` Returns `Entitlement | null`
+
+Previously returned `CheckEntitlementsResponse` (the raw API shape with a `customerId` wrapper). Now returns a single aggregated `Entitlement` object with an `.items[]` array, or `null` if the feature is not found:
+
+```typescript
+// Before
+const response = await client.entitlements.getEntitlement({
+  customerId: "cust_123",
+  featureId: "email-sends",
+});
+// { customerId: "cust_123", entitlements: [...] }
+
+// After
+const entitlement = await client.entitlements.getEntitlement({
+  customerId: "cust_123",
+  featureId: "email-sends",
+});
+// { featureId: "email-sends", hasAccess: true, currentUsage: 200, ... }
+```
+
+For the original raw API response, use `getRawEntitlement()`.
+
+#### `getAllEntitlements()` Removed
+
+Replaced by `getEntitlements()`, which returns `Record<string, Entitlement>` — a record keyed by `featureId` with aggregated values and an `.items[]` array:
+
+```typescript
+// Before
+const response = await client.entitlements.getAllEntitlements({ customerId: "cust_123" });
+
+// After
+const entitlements = await client.entitlements.getEntitlements({ customerId: "cust_123" });
+// { "email-sends": Entitlement, "api-calls": Entitlement, ... }
+```
+
+For the original raw API response, use `getRawEntitlements()`.
+
+#### `FeatureType` Changed: `"LIMIT"` → `"CUSTOMIZABLE"`
+
+The `FeatureType` union no longer includes `"LIMIT"`. Update any code that matches on this value:
+
+```typescript
+// Before
+if (entitlement.featureType === "LIMIT") { ... }
+
+// After
+if (entitlement.featureType === "CUSTOMIZABLE") { ... }
+```
+
+#### `resetAt` Removed from Aggregated `Entitlement`
+
+Since `resetAt` can differ across subscriptions, it is only available on individual items:
+
+```typescript
+// Before
+console.log(entitlement.resetAt);
+
+// After
+entitlement.items.forEach(item => {
+  console.log(item.resetAt); // per-subscription reset date
+});
+```
+
+---
+
+### Fixed
+
+- Fixed Python-style `try/except` syntax in subscription update documentation — replaced with JavaScript `try...catch`.
+- Added missing `try/catch` error handling to subscription cancel documentation example.
+- Removed invalid JSON comments (`// Server-generated UUID`) from documentation response blocks.
+- Fixed trailing comma in checkout session JSON response example.
+- Fixed `"Node SDK Use"` typo → `"Node SDK User"` in create customer documentation.
+- Fixed `True` → `true`, `bool` → `boolean` in `hasAccess` documentation.
+- Replaced "Pydantic model" references with "TypeScript Interface" or "Object".
+- Replaced "Dictionary" with "Object" in parameter descriptions.
+- Fixed Python-style `ACCESS_TOKEN = "..."` → `const ACCESS_TOKEN = "...";` in setup example.
+
+</Update>

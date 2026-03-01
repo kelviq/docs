@@ -131,6 +131,21 @@
             ]
           }
         ]
+      },
+      {
+        "tab": "Changelog",
+        "groups": [
+          {
+            "group": "Changelog",
+            "pages": [
+              "changelog/app",
+              "changelog/js-sdk",
+              "changelog/react-sdk",
+              "changelog/node-sdk",
+              "changelog/python-sdk"
+            ]
+          }
+        ]
       }
     ]
   },
