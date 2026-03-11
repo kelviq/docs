@@ -1,0 +1,389 @@
+---
+title: "React Promotions UI"
+description: "Add purchasing power parity discounts and a localised banner to your React app"
+icon: "react"
+---
+
+The `@kelviq/react-promotions-ui` SDK provides React components for displaying location-based promotional banners and dynamically discounted prices. It handles API communication, discount calculation, and currency formatting out of the box.
+
+- A **React Context Provider** (`KQProvider`) to fetch and share promotion data
+- A **banner component** (`KQBanner`) with template variables and full styling control
+- **Price components** for formatted display of discounted prices
+- **Granular price components** for building fully custom price layouts
+
+<Note>
+  This SDK is separate from the [entitlements React SDK](/frontend-integration/react-sdk) and the [React UI SDK](/frontend-integration/react-ui). Use this SDK when you need PPP / country-based discount banners and price display in a React app.
+</Note>
+
+---
+
+## Installation
+
+```bash
+npm install @kelviq/react-promotions-ui
+# or
+yarn add @kelviq/react-promotions-ui
+```
+
+Requires `react` and `react-dom` as peer dependencies (v17, v18, or v19).
+
+---
+
+## Quick start
+
+Wrap your app with `KQProvider` and place `KQBanner` where you want the banner to appear.
+
+```tsx
+import { KQProvider, KQBanner } from '@kelviq/react-promotions-ui';
+
+function App() {
+  return (
+    <KQProvider
+      promotionId="YOUR_PROMOTION_ID"
+      accessToken="YOUR_ACCESS_TOKEN"
+    >
+      <KQBanner />
+      {/* Your app components */}
+    </KQProvider>
+  );
+}
+```
+
+<Warning>
+  **Never expose your Server API Key in the browser.** Use the **Client API Key**, which is safe for client-side code. You can find both keys under **Settings → Developers** in the [Kelviq dashboard](https://app.kelviq.com/settings/developers).
+</Warning>
+
+---
+
+## `KQProvider`
+
+The provider initializes the SDK, fetches promotion data from the Kelviq API, and makes it available to all child components via React Context.
+
+### Props
+
+| Prop | Type | Default | Description |
+|------|------|---------|-------------|
+| `promotionId` | `string` | `''` | The promotion ID from the Kelviq dashboard |
+| `accessToken` | `string` | `''` | Client API Key (Settings → Developers) |
+| `kqIdentifier` | `string` | `''` | Optional Kelviq identifier for the request |
+| `environment` | `'production' \| 'sandbox'` | `'production'` | Set to `'sandbox'` to use the sandbox API |
+| `baseCurrencyCode` | `string` | `'USD'` | ISO 4217 currency code used for formatting |
+| `baseCurrencySymbol` | `string` | `'$'` | Currency symbol for display |
+| `config` | `object` | `{}` | Advanced configuration (see below) |
+
+### Advanced config
+
+The optional `config` prop accepts:
+
+| Field | Type | Default | Description |
+|-------|------|---------|-------------|
+| `apiUrl` | `string` | — | Override the default API endpoint |
+| `onError` | `(error: Error) => void` | — | Error callback for API failures |
+| `maxRetries` | `number` | `3` | Maximum retry attempts for failed requests |
+| `timeout` | `number` | `5000` | Request timeout in milliseconds |
+
+### Sandbox
+
+Set `environment` to `'sandbox'` to test against the Kelviq sandbox environment:
+
+```tsx
+<KQProvider
+  promotionId="YOUR_PROMOTION_ID"
+  accessToken="YOUR_SANDBOX_ACCESS_TOKEN"
+  environment="sandbox"
+>
+  {/* ... */}
+</KQProvider>
+```
+
+---
+
+## `KQBanner`
+
+Displays a location-aware promotional banner. The banner message is configured in the Kelviq dashboard and supports template variables that are automatically replaced with real data.
+
+```tsx
+import { KQBanner } from '@kelviq/react-promotions-ui';
+
+// Basic — uses styles from the dashboard
+<KQBanner />
+
+// With local style overrides
+<KQBanner
+  backgroundColor="#1a1a2e"
+  fontColor="#eaeaea"
+  borderRadius="8px"
+  fontSize="14px"
+  addCloseIcon={true}
+  className="my-banner"
+  onClose={() => console.log('Banner closed')}
+/>
+```
+
+### Props
+
+| Prop | Type | Default | Description |
+|------|------|---------|-------------|
+| `backgroundColor` | `string` | *(from API)* | Banner background color |
+| `fontColor` | `string` | *(from API)* | Banner text color |
+| `borderRadius` | `string` | *(from API)* | Banner border radius |
+| `fontSize` | `string` | *(from API)* | Banner font size |
+| `unStyled` | `boolean` | *(from API)* | If `true`, no default styles are injected |
+| `addCloseIcon` | `boolean` | *(from API)* | Show a close button on the banner |
+| `className` | `string` | `''` | Custom CSS class name |
+| `onClose` | `() => void` | — | Callback fired when the banner is closed |
+
+<Tip>
+  Props override the corresponding values returned by the API. If you don't pass a prop, the dashboard-configured value is used.
+</Tip>
+
+### Template variables
+
+The banner message (configured in the dashboard) supports these placeholders:
+
+| Variable | Replaced with | Example |
+|----------|---------------|---------|
+| `{country}` | Visitor's country name | `United States` |
+| `{country_flag}` | Country flag image (CDN-hosted SVG) | 🇺🇸 *(rendered as `<img>`)* |
+| `{coupon_code}` | The discount coupon code | `SAVE20` |
+| `{discount_percentage}` | The discount percentage | `20` |
+
+**Example message:**
+
+```
+Hello {country_flag} You're visiting from {country}! Use code "{coupon_code}" for {discount_percentage}% off.
+```
+
+### CSS hooks
+
+The banner adds classes to `document.body` that you can target in your stylesheets:
+
+| Class | Added when |
+|-------|------------|
+| `kq-has-banner` | The banner is visible on the page |
+
+```css
+/* Add top padding so content isn't hidden behind the banner */
+body.kq-has-banner main {
+  padding-top: 60px;
+}
+```
+
+### Unstyled mode
+
+Set `unStyled={true}` to remove all default styles and apply your own CSS from scratch. Target the banner using the `kq-banner` CSS class or the `data-testid="kq-banner"` attribute.
+
+```tsx
+<KQBanner unStyled={true} className="my-custom-banner" />
+```
+
+---
+
+## `KQPriceFormatted`
+
+Displays a fully formatted discounted price based on the visitor's location.
+
+```tsx
+import { KQPriceFormatted } from '@kelviq/react-promotions-ui';
+
+// Discounted price
+<KQPriceFormatted price={99.99} />
+
+// With decimals
+<KQPriceFormatted price={99.99} showDecimal={true} />
+
+// Currency code instead of symbol
+<KQPriceFormatted price={99.99} currencyDisplay="code" />
+```
+
+### Props
+
+| Prop | Type | Default | Description |
+|------|------|---------|-------------|
+| `price` | `number` | — | **Required.** The product price |
+| `displayPrice` | `number` | — | The price shown for original display (used with `isOriginalDisplay`) |
+| `isOriginalDisplay` | `boolean` | `false` | Renders as strikethrough original price for comparison |
+| `className` | `string` | `''` | Custom CSS class name |
+| `currencyDisplay` | `'symbol' \| 'code' \| 'name'` | `'symbol'` | How the currency is displayed |
+| `showDecimal` | `boolean` | `false` | Whether to show decimal digits |
+| `minimumDecimalDigits` | `number` | `2` | Minimum decimal digits when `showDecimal` is `true` |
+| `maximumDecimalDigits` | `number` | `2` | Maximum decimal digits (max 2) |
+
+### Original + discounted price
+
+Show a strikethrough original price next to the discounted price:
+
+```tsx
+{/* Original price (strikethrough) */}
+<KQPriceFormatted
+  price={99.99}
+  displayPrice={99.99}
+  isOriginalDisplay={true}
+  showDecimal={true}
+/>
+
+{/* Discounted price */}
+<KQPriceFormatted price={99.99} showDecimal={true} />
+```
+
+---
+
+## Granular price components
+
+Use these components individually to build custom price layouts with full styling control. All components must be rendered inside a `KQProvider`.
+
+### `KQPriceInteger`
+
+Displays just the integer part of the discounted price.
+
+```tsx
+import { KQPriceInteger } from '@kelviq/react-promotions-ui';
+
+<KQPriceInteger price={99.99} />
+```
+
+| Prop | Type | Default | Description |
+|------|------|---------|-------------|
+| `price` | `number` | — | **Required.** The product price |
+| `className` | `string` | `''` | Custom CSS class name |
+
+### `KQPriceDecimal`
+
+Displays just the decimal portion of the discounted price.
+
+```tsx
+import { KQPriceDecimal } from '@kelviq/react-promotions-ui';
+
+<KQPriceDecimal price={99.99} />
+```
+
+| Prop | Type | Default | Description |
+|------|------|---------|-------------|
+| `price` | `number` | — | **Required.** The product price |
+| `className` | `string` | `''` | Custom CSS class name |
+| `minimumDecimalDigits` | `number` | `2` | Minimum decimal digits |
+| `maximumDecimalDigits` | `number` | `2` | Maximum decimal digits (max 2) |
+
+### `KQPriceDecimalSeparator`
+
+Renders the locale-specific decimal separator (e.g. `.` or `,`).
+
+```tsx
+import { KQPriceDecimalSeparator } from '@kelviq/react-promotions-ui';
+
+<KQPriceDecimalSeparator price={99.99} />
+```
+
+| Prop | Type | Default | Description |
+|------|------|---------|-------------|
+| `price` | `number` | — | **Required.** The product price |
+| `className` | `string` | `''` | Custom CSS class name |
+
+### `KQPriceCurrencySymbol`
+
+Renders the currency symbol (e.g. `$`, `€`, `₹`).
+
+```tsx
+import { KQPriceCurrencySymbol } from '@kelviq/react-promotions-ui';
+
+<KQPriceCurrencySymbol />
+```
+
+| Prop | Type | Default | Description |
+|------|------|---------|-------------|
+| `className` | `string` | `''` | Custom CSS class name |
+
+### `KQPriceCurrencyCode`
+
+Renders the currency code (e.g. `USD`, `EUR`, `INR`).
+
+```tsx
+import { KQPriceCurrencyCode } from '@kelviq/react-promotions-ui';
+
+<KQPriceCurrencyCode />
+```
+
+| Prop | Type | Default | Description |
+|------|------|---------|-------------|
+| `className` | `string` | `''` | Custom CSS class name |
+
+### Custom price layout example
+
+Combine granular components to build a fully custom price display:
+
+```tsx
+import {
+  KQPriceCurrencySymbol,
+  KQPriceInteger,
+  KQPriceDecimalSeparator,
+  KQPriceDecimal,
+  KQPriceCurrencyCode,
+} from '@kelviq/react-promotions-ui';
+
+<div className="custom-price">
+  <KQPriceCurrencySymbol />
+  <KQPriceInteger price={99.99} />
+  <KQPriceDecimalSeparator price={99.99} />
+  <KQPriceDecimal price={99.99} />
+  <span className="currency-code">
+    <KQPriceCurrencyCode />
+  </span>
+</div>
+```
+
+---
+
+## Complete example
+
+```tsx
+import {
+  KQProvider,
+  KQBanner,
+  KQPriceFormatted,
+  KQPriceCurrencySymbol,
+  KQPriceInteger,
+  KQPriceDecimalSeparator,
+  KQPriceDecimal,
+} from '@kelviq/react-promotions-ui';
+
+function PricingPage() {
+  return (
+    <KQProvider
+      promotionId="YOUR_PROMOTION_ID"
+      accessToken="YOUR_ACCESS_TOKEN"
+    >
+      {/* Promotional banner */}
+      <KQBanner />
+
+      {/* Formatted price with original + discounted */}
+      <div className="pricing">
+        <span className="original">
+          <KQPriceFormatted
+            price={99.99}
+            displayPrice={99.99}
+            isOriginalDisplay={true}
+            showDecimal={true}
+          />
+        </span>
+        <span className="discounted">
+          <KQPriceFormatted price={99.99} showDecimal={true} />
+        </span>
+      </div>
+
+      {/* Custom price layout with granular components */}
+      <div className="custom-price">
+        <KQPriceCurrencySymbol />
+        <KQPriceInteger price={49.99} />
+        <KQPriceDecimalSeparator price={49.99} />
+        <KQPriceDecimal price={49.99} />
+      </div>
+    </KQProvider>
+  );
+}
+```
+
+---
+
+## Support
+
+For technical support and questions, reach out at [hi@kelviq.com](mailto:hi@kelviq.com).

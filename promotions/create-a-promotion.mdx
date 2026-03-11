@@ -1,0 +1,68 @@
+---
+title: 'Create a promotion'
+description: 'Set up purchasing power parity discounts, country overrides, and security enforcement'
+---
+
+A promotion ties a set of discounts to one or more of your products and plans. Once created, eligible visitors will see their local discount automatically.
+
+<Steps>
+  <Step title="Navigate to Promotions">
+    Go to **Promotions** in the sidebar, then click **+ Create promotion**.
+  </Step>
+
+  <Step title="Enter a promotion name">
+    Give the promotion a descriptive internal name (e.g. *PPP pricing* or *Black Friday*). This is not shown to customers.
+
+    The name field is required — you cannot create a promotion without one.
+  </Step>
+
+  <Step title="Select products and plans">
+    Choose which products and plans this promotion applies to. You can select multiple products, and for each product you can pick one or more plans.
+
+    <Note>
+      Only **Published** plans appear in the selector. If a plan is missing, open the plan in **Product Catalog → Plans** and publish it first.
+    </Note>
+
+    At least one plan must be selected before you can create the promotion.
+  </Step>
+
+  <Step title="Set up PPP group discounts">
+    Kelviq groups countries into economic tiers based on purchasing power. Enter a discount percentage for each group you want to target.
+
+    * Enter a value between 1–100 in the **Discount %** field for the relevant group.
+    * Leave the field empty (or set it to 0) for groups you do not want to discount.
+
+    You can see which countries belong to each group by expanding the group row.
+  </Step>
+
+  <Step title="Add country-specific overrides (optional)">
+    To override the group discount for a specific country, use the **Country-specific discounts** section.
+
+    1. Search for the country by name.
+    2. Click the country to add it to the list.
+    3. Enter the exact discount percentage for that country.
+
+    Country overrides take precedence over the group discount. For example, if India is in a group with 30% off but you want to offer 40% for India specifically, add India as a country override with 40%.
+  </Step>
+
+  <Step title="Configure security & enforcement">
+    Security toggles prevent abuse by blocking users who are masking or misrepresenting their location. All toggles are **enabled by default** — disable only if you have a specific reason to.
+
+    | Toggle | Description |
+    |--------|-------------|
+    | **VPN protection** | Block users connecting through a VPN |
+    | **Tor Browser protection** | Block anonymous traffic routed via Tor |
+    | **Proxy server protection** | Block known proxy IP addresses |
+    | **Apple Relay protection** | Block users using Apple Private Relay |
+    | **Strict country matching** | Require the billing address country to match the discount country |
+    | **Crawler protection** | Block bots from accessing localized pricing |
+  </Step>
+
+  <Step title="Create the promotion">
+    Click **Create promotion**. You will be taken to the promotion detail page where you can integrate the banner and customize its appearance.
+  </Step>
+</Steps>
+
+## Editing a promotion
+
+To update discounts, products, or security settings after creation, open the promotion and go to the **Edit rules** tab. Changes take effect immediately.

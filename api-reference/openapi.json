@@ -268,7 +268,7 @@
           "customerId": {
             "type": "string",
             "nullable": true,
-            "description": "The ID of the customer initiating the checkout. If not provided, a new customer may be created depending on server logic.\n\n**Note:** Even if a unique customer ID is provided, if the email address already exists in the system, the subscription will be created for that existing email — not the new customer ID. This is to preserve the uniqueness of the email address.",
+            "description": "The ID of the customer initiating the checkout. If not provided, a new customer may be created depending on server logic.\n\n**Note:** Even if a unique customer ID is provided, if the email address already exists in the system, the subscription will be created for that existing email \u2014 not the new customer ID. This is to preserve the uniqueness of the email address.",
             "example": "cust_789"
           },
           "features": {
@@ -370,96 +370,178 @@
         }
       },
       "LicenseActivation": {
-    "type": "object",
-    "properties": {
-      "licenseKey": { "type": "string" },
-      "customerId": { "type": "string" },
-      "instanceName": { "type": "string" },
-      "metadata": { "type": "object", "additionalProperties": {} }
-    },
-    "required": ["licenseKey"],
-    "example": {
-      "licenseKey": "KLVQ-PRO-1234-ABCD-9999",
-      "customerId": "cust_45678",
-      "instanceName": "Geo's MacBook Pro"
-    }
-  },
-      "LicenseActivationResponse": {
-    "type": "object",
-    "properties": {
-      "instanceId": { "type": "string", "format": "uuid" },
-      "activatedAt": { "type": "string", "format": "date-time" },
-      "expiresOn": { "type": "string", "format": "date-time", "nullable": true },
-      "license": { "$ref": "#/components/schemas/LicenseDetails" }
-    },
-    "example": {
-      "instanceId": "8f3e2b1a-5c6d-4e9f-8a0b-1c2d3e4f5g6h",
-      "activatedAt": "2026-01-27T10:33:00Z",
-      "expiresOn": "2027-01-27T10:33:00Z",
-      "license": {
-        "id": "7be7a5b6-7a0e-4178-a085-8ef48f0649ab",
-        "licenseKey": "LIC-A8D5F89E-B46B-472C-9BED-66EE2545B85E",
-        "activatedOn": "2026-01-22T03:26:56.836323Z",
-        "expiresOn": "2026-01-23T03:26:56.836323Z",
-        "activationUsage": 0,
-        "activationLimit": 2,
-        "enabled": true,
-        "customer": {
-          "customerId": "cfa95cf8c8d24e8b9d3d2d1ada98a94d",
-          "name": "Geo",
-          "email": "hazelmathew7+100@gmail.com"
-        }
-      }
-    }
-  },
-      "LicenseDetails": {
-    "type": "object",
-    "properties": {
-      "id": { "type": "string", "format": "uuid" },
-      "licenseKey": { "type": "string" },
-      "activatedOn": { "type": "string", "format": "date-time", "nullable": true },
-      "expiresOn": { "type": "string", "format": "date-time", "nullable": true },
-      "activationUsage": { "type": "integer" },
-      "activationLimit": { "type": "integer" },
-      "enabled": { "type": "boolean" },
-      "customer": {
         "type": "object",
         "properties": {
-          "customerId": { "type": "string" },
-          "name": { "type": "string" },
-          "email": { "type": "string", "format": "email" }
+          "licenseKey": {
+            "type": "string"
+          },
+          "customerId": {
+            "type": "string"
+          },
+          "instanceName": {
+            "type": "string"
+          },
+          "metadata": {
+            "type": "object",
+            "additionalProperties": {}
+          }
+        },
+        "required": [
+          "licenseKey"
+        ],
+        "example": {
+          "licenseKey": "KLVQ-PRO-1234-ABCD-9999",
+          "customerId": "cust_45678",
+          "instanceName": "Geo's MacBook Pro"
         }
       },
-      "plan": {
+      "LicenseActivationResponse": {
         "type": "object",
         "properties": {
-          "identifier": { "type": "string" },
-          "name": { "type": "string" },
-          "description": { "type": "string" },
-          "product": {
+          "instanceId": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "activatedAt": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "expiresOn": {
+            "type": "string",
+            "format": "date-time",
+            "nullable": true
+          },
+          "license": {
+            "$ref": "#/components/schemas/LicenseDetails"
+          }
+        },
+        "example": {
+          "instanceId": "8f3e2b1a-5c6d-4e9f-8a0b-1c2d3e4f5g6h",
+          "activatedAt": "2026-01-27T10:33:00Z",
+          "expiresOn": "2027-01-27T10:33:00Z",
+          "license": {
+            "id": "7be7a5b6-7a0e-4178-a085-8ef48f0649ab",
+            "licenseKey": "LIC-A8D5F89E-B46B-472C-9BED-66EE2545B85E",
+            "activatedOn": "2026-01-22T03:26:56.836323Z",
+            "expiresOn": "2026-01-23T03:26:56.836323Z",
+            "activationUsage": 0,
+            "activationLimit": 2,
+            "enabled": true,
+            "customer": {
+              "customerId": "cfa95cf8c8d24e8b9d3d2d1ada98a94d",
+              "name": "Geo",
+              "email": "hazelmathew7+100@gmail.com"
+            }
+          }
+        }
+      },
+      "LicenseDetails": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "licenseKey": {
+            "type": "string"
+          },
+          "activatedOn": {
+            "type": "string",
+            "format": "date-time",
+            "nullable": true
+          },
+          "expiresOn": {
+            "type": "string",
+            "format": "date-time",
+            "nullable": true
+          },
+          "activationUsage": {
+            "type": "integer"
+          },
+          "activationLimit": {
+            "type": "integer"
+          },
+          "enabled": {
+            "type": "boolean"
+          },
+          "customer": {
             "type": "object",
             "properties": {
-              "id": { "type": "string", "format": "uuid" },
-              "identifier": { "type": "string" },
-              "name": { "type": "string" },
-              "taxCode": { "type": "string" },
-              "createdOn": { "type": "string", "format": "date-time" },
-              "modifiedOn": { "type": "string", "format": "date-time" }
+              "customerId": {
+                "type": "string"
+              },
+              "name": {
+                "type": "string"
+              },
+              "email": {
+                "type": "string",
+                "format": "email"
+              }
             }
           },
-          "version": { "type": "integer" },
-          "isLatest": { "type": "boolean" }
+          "plan": {
+            "type": "object",
+            "properties": {
+              "identifier": {
+                "type": "string"
+              },
+              "name": {
+                "type": "string"
+              },
+              "description": {
+                "type": "string"
+              },
+              "product": {
+                "type": "object",
+                "properties": {
+                  "id": {
+                    "type": "string",
+                    "format": "uuid"
+                  },
+                  "identifier": {
+                    "type": "string"
+                  },
+                  "name": {
+                    "type": "string"
+                  },
+                  "taxCode": {
+                    "type": "string"
+                  },
+                  "createdOn": {
+                    "type": "string",
+                    "format": "date-time"
+                  },
+                  "modifiedOn": {
+                    "type": "string",
+                    "format": "date-time"
+                  }
+                }
+              },
+              "version": {
+                "type": "integer"
+              },
+              "isLatest": {
+                "type": "boolean"
+              }
+            }
+          }
         }
-      }
-    }
-  },
+      },
       "LicenseDeactivation": {
         "type": "object",
         "properties": {
-          "licenseKey": { "type": "string" },
-          "instanceId": { "type": "string", "format": "uuid" }
+          "licenseKey": {
+            "type": "string"
+          },
+          "instanceId": {
+            "type": "string",
+            "format": "uuid"
+          }
         },
-        "required": ["instanceId", "licenseKey"],
+        "required": [
+          "instanceId",
+          "licenseKey"
+        ],
         "example": {
           "licenseKey": "KLVQ-PRO-1234-ABCD-9999",
           "instanceId": "8f3e2b1a-5c6d-4e9f-8a0b-1c2d3e4f5g6h"
@@ -468,8 +550,13 @@
       "LicenseDeactivationResponse": {
         "type": "object",
         "properties": {
-          "message": { "type": "string" },
-          "deactivatedAt": { "type": "string", "format": "date-time" }
+          "message": {
+            "type": "string"
+          },
+          "deactivatedAt": {
+            "type": "string",
+            "format": "date-time"
+          }
         },
         "example": {
           "message": "License instance deactivated successfully.",
@@ -479,30 +566,49 @@
       "LicenseValidate": {
         "type": "object",
         "properties": {
-          "licenseKey": { "type": "string" },
-          "instanceId": { "type": "string", "format": "uuid" }
+          "licenseKey": {
+            "type": "string"
+          },
+          "instanceId": {
+            "type": "string",
+            "format": "uuid"
+          }
         },
-        "required": ["licenseKey"],
+        "required": [
+          "licenseKey"
+        ],
         "example": {
           "licenseKey": "KLVQ-PRO-1234-ABCD-9999",
           "instanceId": "8f3e2b1a-5c6d-4e9f-8a0b-1c2d3e4f5g6h"
         }
       },
       "LicenseValidationResponse": {
-    "type": "object",
-    "properties": {
-      "valid": { "type": "boolean" },
-      "code": { "type": "string" },
-      "detail": { "type": "string" },
-      "metadata": { "type": "object", "additionalProperties": true }
-    },
-    "example": {
-      "valid": true,
-      "code": "VALID",
-      "detail": "Instance ID valid for this license.",
-      "metadata": { "os": "macOS", "arch": "arm64" }
-    }
-  },
+        "type": "object",
+        "properties": {
+          "valid": {
+            "type": "boolean"
+          },
+          "code": {
+            "type": "string"
+          },
+          "detail": {
+            "type": "string"
+          },
+          "metadata": {
+            "type": "object",
+            "additionalProperties": true
+          }
+        },
+        "example": {
+          "valid": true,
+          "code": "VALID",
+          "detail": "Instance ID valid for this license.",
+          "metadata": {
+            "os": "macOS",
+            "arch": "arm64"
+          }
+        }
+      },
       "CreateSubscriptionRequest": {
         "type": "object",
         "required": [
@@ -930,120 +1036,307 @@
       "PublicOfferingResponse": {
         "type": "object",
         "properties": {
-          "id": { "type": "string", "format": "uuid" },
-          "name": { "type": "string" },
-          "description": { "type": "string" },
-          "pricingTable": { "$ref": "#/components/schemas/PricingTable" },
-          "plans": { "type": "array", "items": { "$ref": "#/components/schemas/Plan" } },
-          "countryCode": { "type": "string" },
-          "pricingLocale": { "type": "string" },
-          "currencyCode": { "type": "string" },
-          "currencySymbol": { "type": "string" },
-          "baseCurrencyCode": { "type": "string" },
-          "baseCurrencySymbol": { "type": "string" },
-          "subscription": { "$ref": "#/components/schemas/SubscriptionInfo", "nullable": true },
-          "isCustomerExists": { "type": "boolean" },
-          "billingPeriods": { "type": "array", "items": { "$ref": "#/components/schemas/BillingPeriod" } }
+          "id": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "name": {
+            "type": "string"
+          },
+          "description": {
+            "type": "string"
+          },
+          "pricingTable": {
+            "$ref": "#/components/schemas/PricingTable"
+          },
+          "plans": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/Plan"
+            }
+          },
+          "countryCode": {
+            "type": "string"
+          },
+          "pricingLocale": {
+            "type": "string"
+          },
+          "currencyCode": {
+            "type": "string"
+          },
+          "currencySymbol": {
+            "type": "string"
+          },
+          "baseCurrencyCode": {
+            "type": "string"
+          },
+          "baseCurrencySymbol": {
+            "type": "string"
+          },
+          "subscription": {
+            "$ref": "#/components/schemas/SubscriptionInfo",
+            "nullable": true
+          },
+          "isCustomerExists": {
+            "type": "boolean"
+          },
+          "billingPeriods": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/BillingPeriod"
+            }
+          }
         }
       },
       "PricingTable": {
         "type": "object",
         "properties": {
-          "name": { "type": "string" },
-          "description": { "type": "string" },
-          "identifier": { "type": "string" },
-          "style": { "type": "object" },
-          "typography": { "type": "object" },
-          "layout": { "type": "object" },
-          "template": { "nullable": true },
-          "descriptionTooltipEnabled": { "type": "boolean" },
-          "pricingOptions": { "type": "object" }
+          "name": {
+            "type": "string"
+          },
+          "description": {
+            "type": "string"
+          },
+          "identifier": {
+            "type": "string"
+          },
+          "style": {
+            "type": "object"
+          },
+          "typography": {
+            "type": "object"
+          },
+          "layout": {
+            "type": "object"
+          },
+          "template": {
+            "nullable": true
+          },
+          "descriptionTooltipEnabled": {
+            "type": "boolean"
+          },
+          "pricingOptions": {
+            "type": "object"
+          }
         }
       },
       "Plan": {
         "type": "object",
         "properties": {
-          "name": { "type": "string" },
-          "description": { "type": "string" },
-          "identifier": { "type": "string" },
-          "details": { "type": "object" },
-          "isVisible": { "type": "boolean" },
-          "metadata": { "type": "object" },
-          "price": { "$ref": "#/components/schemas/FeaturePrice" },
-          "addons": { "type": "array", "items": {} },
-          "originalPrice": { "type": "object" },
-          "enabled": { "type": "boolean" },
-          "features": { "type": "array", "items": { "$ref": "#/components/schemas/Feature" } },
-          "displayName": { "type": "string" },
-          "shouldHighlight": { "type": "boolean" },
-          "displayDescription": { "type": "string" }
+          "name": {
+            "type": "string"
+          },
+          "description": {
+            "type": "string"
+          },
+          "identifier": {
+            "type": "string"
+          },
+          "details": {
+            "type": "object"
+          },
+          "isVisible": {
+            "type": "boolean"
+          },
+          "metadata": {
+            "type": "object"
+          },
+          "price": {
+            "$ref": "#/components/schemas/FeaturePrice"
+          },
+          "addons": {
+            "type": "array",
+            "items": {}
+          },
+          "originalPrice": {
+            "type": "object"
+          },
+          "enabled": {
+            "type": "boolean"
+          },
+          "features": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/Feature"
+            }
+          },
+          "displayName": {
+            "type": "string"
+          },
+          "shouldHighlight": {
+            "type": "boolean"
+          },
+          "displayDescription": {
+            "type": "string"
+          }
         }
       },
       "FeaturePrice": {
         "type": "object",
         "properties": {
-          "id": { "type": "string", "format": "uuid" },
-          "priceType": { "type": "string" },
-          "freeTrial": { "type": "boolean" },
-          "trialPeriod": { "type": "integer" },
-          "currency": { "type": "string" },
-          "charges": { "type": "array", "items": { "$ref": "#/components/schemas/Charge" } }
+          "id": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "priceType": {
+            "type": "string"
+          },
+          "freeTrial": {
+            "type": "boolean"
+          },
+          "trialPeriod": {
+            "type": "integer"
+          },
+          "currency": {
+            "type": "string"
+          },
+          "charges": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/Charge"
+            }
+          }
         }
       },
       "Charge": {
         "type": "object",
         "properties": {
-          "id": { "type": "string", "format": "uuid" },
-          "chargePeriod": { "type": "string" },
-          "tiers": { "type": "array", "items": {} },
-          "priceData": { "type": "object" },
-          "details": { "type": "object" },
-          "advanced": { "type": "object" },
-          "featureQuantityPrice": { "type": "number" }
+          "id": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "chargePeriod": {
+            "type": "string"
+          },
+          "tiers": {
+            "type": "array",
+            "items": {}
+          },
+          "priceData": {
+            "type": "object"
+          },
+          "details": {
+            "type": "object"
+          },
+          "advanced": {
+            "type": "object"
+          },
+          "featureQuantityPrice": {
+            "type": "number"
+          }
         }
       },
       "Feature": {
         "type": "object",
         "properties": {
-          "enabled": { "type": "boolean" },
-          "identifier": { "type": "string" },
-          "displayName": { "type": "string" },
-          "displayDescription": { "type": "string" },
-          "displayTooltipDescription": { "type": "boolean" },
-          "id": { "type": "string", "format": "uuid" },
-          "name": { "type": "string" },
-          "description": { "type": "string" },
-          "featureType": { "type": "string" },
-          "details": { "type": "object" },
-          "isArchived": { "type": "boolean" },
-          "metadata": { "type": "object" },
-          "modifiedOn": { "type": "string", "format": "date-time" },
-          "meter": { "type": "object" },
-          "featureDetails": { "type": "object" },
-          "value": { "nullable": true },
-          "hardLimit": { "type": "boolean", "nullable": true },
-          "reset": { "type": "string", "nullable": true },
-          "resetTime": { "type": "string", "nullable": true },
-          "charges": { "type": "array", "items": { "$ref": "#/components/schemas/Charge" }, "nullable": true }
+          "enabled": {
+            "type": "boolean"
+          },
+          "identifier": {
+            "type": "string"
+          },
+          "displayName": {
+            "type": "string"
+          },
+          "displayDescription": {
+            "type": "string"
+          },
+          "displayTooltipDescription": {
+            "type": "boolean"
+          },
+          "id": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "name": {
+            "type": "string"
+          },
+          "description": {
+            "type": "string"
+          },
+          "featureType": {
+            "type": "string"
+          },
+          "details": {
+            "type": "object"
+          },
+          "isArchived": {
+            "type": "boolean"
+          },
+          "metadata": {
+            "type": "object"
+          },
+          "modifiedOn": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "meter": {
+            "type": "object"
+          },
+          "featureDetails": {
+            "type": "object"
+          },
+          "value": {
+            "nullable": true
+          },
+          "hardLimit": {
+            "type": "boolean",
+            "nullable": true
+          },
+          "reset": {
+            "type": "string",
+            "nullable": true
+          },
+          "resetTime": {
+            "type": "string",
+            "nullable": true
+          },
+          "charges": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/Charge"
+            },
+            "nullable": true
+          }
         }
       },
       "SubscriptionInfo": {
         "type": "object",
         "properties": {
-          "planIdentifier": { "type": "string" },
-          "features": { "type": "array", "items": {} },
-          "subscriptionId": { "type": "string", "format": "uuid" },
-          "chargePeriod": { "type": "string" },
-          "hasPreviousSubscription": { "type": "boolean" }
+          "planIdentifier": {
+            "type": "string"
+          },
+          "features": {
+            "type": "array",
+            "items": {}
+          },
+          "subscriptionId": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "chargePeriod": {
+            "type": "string"
+          },
+          "hasPreviousSubscription": {
+            "type": "boolean"
+          }
         }
       },
       "BillingPeriod": {
         "type": "object",
         "properties": {
-          "enabled": { "type": "boolean" },
-          "displayName": { "type": "string" },
-          "chargePeriod": { "type": "string" },
-          "promoCaption": { "type": "string" }
+          "enabled": {
+            "type": "boolean"
+          },
+          "displayName": {
+            "type": "string"
+          },
+          "chargePeriod": {
+            "type": "string"
+          },
+          "promoCaption": {
+            "type": "string"
+          }
         }
       },
       "SubscriptionListResponse": {
@@ -1204,6 +1497,141 @@
           },
           "hardLimit": {
             "type": "boolean"
+          }
+        }
+      },
+      "PromotionResponse": {
+        "type": "object",
+        "description": "Promotion data resolved for the visitor's detected location.",
+        "properties": {
+          "country": {
+            "type": "string",
+            "description": "Full name of the visitor's detected country.",
+            "example": "India"
+          },
+          "countryCode": {
+            "type": "string",
+            "description": "ISO 3166-1 alpha-2 country code.",
+            "example": "IN"
+          },
+          "percentage": {
+            "type": "number",
+            "description": "Discount percentage for the visitor's country. `0` means no active discount.",
+            "example": 40
+          },
+          "code": {
+            "type": "string",
+            "description": "Coupon code the visitor can apply at checkout.",
+            "example": "KQP5LHNZB1Z"
+          },
+          "message": {
+            "type": "string",
+            "description": "Optional plain-text message. Usually empty \u2014 the banner message is in `widgets[].countryMessage`.",
+            "example": ""
+          },
+          "widgets": {
+            "type": "array",
+            "description": "UI widgets configured for this promotion. Currently contains one `BANNER` widget.",
+            "items": {
+              "$ref": "#/components/schemas/PromotionWidget"
+            }
+          },
+          "security": {
+            "$ref": "#/components/schemas/PromotionSecurity"
+          }
+        }
+      },
+      "PromotionWidget": {
+        "type": "object",
+        "description": "Banner widget configuration returned by the promotion API.",
+        "properties": {
+          "type": {
+            "type": "string",
+            "enum": [
+              "BANNER"
+            ],
+            "description": "Widget type. Currently always `BANNER`.",
+            "example": "BANNER"
+          },
+          "backgroundColor": {
+            "type": "string",
+            "description": "Banner background color (hex).",
+            "example": "#3182CE"
+          },
+          "fontColor": {
+            "type": "string",
+            "description": "Main text color.",
+            "example": "#F9F9F9"
+          },
+          "highlightFontColor": {
+            "type": "string",
+            "description": "Color for emphasized text such as the discount percentage.",
+            "example": "#DD5C64"
+          },
+          "fontSize": {
+            "type": "string",
+            "description": "Font size as a CSS value.",
+            "example": "1rem"
+          },
+          "borderRadius": {
+            "type": "string",
+            "description": "Banner border radius as a CSS value.",
+            "example": "0"
+          },
+          "placement": {
+            "type": "string",
+            "enum": [
+              "top",
+              "bottom"
+            ],
+            "description": "Viewport position of the banner.",
+            "example": "top"
+          },
+          "unStyled": {
+            "type": "boolean",
+            "description": "When `true`, no default styles are injected. Apply your own CSS from scratch.",
+            "example": false
+          },
+          "addCloseIcon": {
+            "type": "boolean",
+            "description": "When `true`, a close button is shown on the banner.",
+            "example": false
+          },
+          "countryMessage": {
+            "type": "string",
+            "description": "Banner message template. Supports: `{country}`, `{country_flag}`, `{coupon_code}`, `{discount_percentage}`. HTML tags are allowed.",
+            "example": "Hello {country_flag} You're from <b>{country}</b>. Use code <b>\"{coupon_code}\"</b> for <b>{discount_percentage}%</b> off."
+          }
+        }
+      },
+      "PromotionSecurity": {
+        "type": "object",
+        "description": "Security check results for the visitor. `true` means the check flagged the request.",
+        "properties": {
+          "vpn": {
+            "type": "boolean",
+            "description": "`true` if a VPN was detected.",
+            "example": false
+          },
+          "tor": {
+            "type": "boolean",
+            "description": "`true` if Tor Browser was detected.",
+            "example": false
+          },
+          "proxy": {
+            "type": "boolean",
+            "description": "`true` if a proxy server was detected.",
+            "example": false
+          },
+          "relay": {
+            "type": "boolean",
+            "description": "`true` if Apple Private Relay was detected.",
+            "example": false
+          },
+          "crawler": {
+            "type": "boolean",
+            "description": "`true` if the request is identified as a bot or crawler.",
+            "example": false
           }
         }
       }
@@ -1384,7 +1812,6 @@
         "summary": "Retrieve customer entitlements",
         "description": "Retrieves detailed entitlement information for a customer.\n- If `feature_idd` is provided as a query parameter, returns details for that specific feature.\n- If `feature_id` is omitted, returns all entitlements for the customer.\n",
         "operationId": "getCustomerEntitlements",
-
         "parameters": [
           {
             "name": "customer_id",
@@ -1468,19 +1895,26 @@
     "/license/activate/": {
       "post": {
         "operationId": "licenseActivate",
-        "tags": ["License"],
+        "tags": [
+          "License"
+        ],
         "summary": "Activate License",
         "description": "Activates a license key for a specific instance.",
         "requestBody": {
           "required": true,
           "content": {
             "application/json": {
-              "schema": { "$ref": "#/components/schemas/LicenseActivation" },
+              "schema": {
+                "$ref": "#/components/schemas/LicenseActivation"
+              },
               "example": {
                 "licenseKey": "LIC-A8D5F89E-B46B-472C-9BED-66EE2545B85E",
                 "customerId": "cfa95cf8c8d24e8b9d3d2d1ada98a94d",
                 "instanceName": "Geo's Workstation",
-                "metadata": { "os": "macOS", "version": "14.2" }
+                "metadata": {
+                  "os": "macOS",
+                  "version": "14.2"
+                }
               }
             }
           }
@@ -1490,7 +1924,9 @@
             "description": "Activation successful",
             "content": {
               "application/json": {
-                "schema": { "$ref": "#/components/schemas/LicenseActivationResponse" },
+                "schema": {
+                  "$ref": "#/components/schemas/LicenseActivationResponse"
+                },
                 "example": {
                   "instanceId": "8f3e2b1a-5c6d-4e9f-8a0b-1c2d3e4f5g6h",
                   "activatedAt": "2026-01-27T10:33:00Z",
@@ -1528,7 +1964,9 @@
             "content": {
               "application/json": {
                 "example": {
-                  "licenseKey": ["This field is required."]
+                  "licenseKey": [
+                    "This field is required."
+                  ]
                 }
               }
             }
@@ -1539,10 +1977,14 @@
               "application/json": {
                 "examples": {
                   "expired": {
-                    "value": { "error": "This license has expired." }
+                    "value": {
+                      "error": "This license has expired."
+                    }
                   },
                   "limit_reached": {
-                    "value": { "error": "Activation limit reached (10/10)." }
+                    "value": {
+                      "error": "Activation limit reached (10/10)."
+                    }
                   }
                 }
               }
@@ -1552,7 +1994,9 @@
             "description": "Not Found - Invalid license key or customer ID mapping.",
             "content": {
               "application/json": {
-                "example": { "error": "Invalid license key or customer ID." }
+                "example": {
+                  "error": "Invalid license key or customer ID."
+                }
               }
             }
           },
@@ -1560,7 +2004,9 @@
             "description": "Internal Server Error - Processing error during database transaction.",
             "content": {
               "application/json": {
-                "example": { "error": "An error occurred during activation processing." }
+                "example": {
+                  "error": "An error occurred during activation processing."
+                }
               }
             }
           }
@@ -1568,69 +2014,83 @@
       }
     },
     "/license/deactivate/": {
-    "post": {
-      "operationId": "licenseDeactivate",
-      "tags": ["License"],
-      "summary": "Deactivate License",
-      "requestBody": {
-        "required": true,
-        "content": {
-          "application/json": {
-            "schema": { "$ref": "#/components/schemas/LicenseDeactivation" },
-            "example": {
-              "licenseKey": "KLVQ-PRO-1234-ABCD-9999",
-              "instanceId": "8f3e2b1a-5c6d-4e9f-8a0b-1c2d3e4f5g6h"
-            }
-          }
-        }
-      },
-      "responses": {
-        "200": {
-          "description": "Deactivation successful",
+      "post": {
+        "operationId": "licenseDeactivate",
+        "tags": [
+          "License"
+        ],
+        "summary": "Deactivate License",
+        "requestBody": {
+          "required": true,
           "content": {
             "application/json": {
-              "schema": { "$ref": "#/components/schemas/LicenseDeactivationResponse" },
+              "schema": {
+                "$ref": "#/components/schemas/LicenseDeactivation"
+              },
               "example": {
-                "message": "License instance deactivated successfully.",
-                "deactivatedAt": "2026-01-27T10:35:00Z"
+                "licenseKey": "KLVQ-PRO-1234-ABCD-9999",
+                "instanceId": "8f3e2b1a-5c6d-4e9f-8a0b-1c2d3e4f5g6h"
               }
             }
           }
         },
-        "400": {
-            "description": "Bad Request - Validation error (e.g., missing required fields).",
+        "responses": {
+          "200": {
+            "description": "Deactivation successful",
             "content": {
               "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/LicenseDeactivationResponse"
+                },
                 "example": {
-                  "licenseKey": ["This field is required."],
-                  "instanceId": ["This field is required."]
+                  "message": "License instance deactivated successfully.",
+                  "deactivatedAt": "2026-01-27T10:35:00Z"
                 }
               }
             }
           },
-        "404": {
-          "description": "Not Found - The combination of licenseKey and instanceId does not exist.",
-          "content": {
-            "application/json": {
-              "example": {
-                "error": "Invalid license key or instance ID."
+          "400": {
+            "description": "Bad Request - Validation error (e.g., missing required fields).",
+            "content": {
+              "application/json": {
+                "example": {
+                  "licenseKey": [
+                    "This field is required."
+                  ],
+                  "instanceId": [
+                    "This field is required."
+                  ]
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Not Found - The combination of licenseKey and instanceId does not exist.",
+            "content": {
+              "application/json": {
+                "example": {
+                  "error": "Invalid license key or instance ID."
+                }
               }
             }
           }
         }
       }
-    }
-  },
+    },
     "/license/validate/": {
       "post": {
         "operationId": "licenseValidate",
-        "tags": ["License"],
+        "tags": [
+          "License"
+        ],
         "summary": "Validate License",
         "requestBody": {
           "required": true,
           "content": {
             "application/json": {
-              "schema": { "$ref": "#/components/schemas/LicenseValidate" },
+              "schema": {
+                "$ref": "#/components/schemas/LicenseValidate"
+              },
               "example": {
                 "licenseKey": "KLVQ-PRO-1234-ABCD-9999",
                 "instanceId": "8f3e2b1a-5c6d-4e9f-8a0b-1c2d3e4f5g6h"
@@ -1643,12 +2103,17 @@
             "description": "Validation successful",
             "content": {
               "application/json": {
-                "schema": { "$ref": "#/components/schemas/LicenseValidationResponse" },
+                "schema": {
+                  "$ref": "#/components/schemas/LicenseValidationResponse"
+                },
                 "example": {
                   "valid": true,
                   "code": "VALID",
                   "detail": "Instance ID valid for this license.",
-                  "metadata": { "os": "macOS", "arch": "arm64" }
+                  "metadata": {
+                    "os": "macOS",
+                    "arch": "arm64"
+                  }
                 }
               }
             }
@@ -1658,7 +2123,9 @@
             "content": {
               "application/json": {
                 "example": {
-                  "licenseKey": ["This field is required."]
+                  "licenseKey": [
+                    "This field is required."
+                  ]
                 }
               }
             }
@@ -2045,39 +2512,146 @@
                     "name": "Aphelo Paywall",
                     "description": "",
                     "identifier": "aphelo-paywall",
-                    "style": { "priceColor": "#171923", "titleColor": "#171923", "buttonColor": "#F7FAFC", "dividerColor": "#E2E8F0", "featureColor": "#2D3748", "priceUnitColor": "#171923", "descriptionColor": "#718096", "pricePeriodColor": "#718096", "cardBackgroundColor": "#fff", "buttonBackgroundColor": "#1A202C", "buttonHoverBackgroundColor": "#1A202C" },
-                    "typography": { "priceFontSize": 32, "titleFontSize": 24, "featureFontSize": 16, "priceFontWeight": "bold", "titleFontWeight": "bold", "featureFontWeight": "normal", "priceUnitFontSize": 32, "descriptionFontSize": 16, "pricePeriodFontSize": 16, "priceUnitFontWeight": "bold", "descriptionFontWeight": "normal", "pricePeriodFontWeight": "normal" },
-                    "layout": { "gap": 24, "align": "center", "maxWidth": 400, "minWidth": 360 },
+                    "style": {
+                      "priceColor": "#171923",
+                      "titleColor": "#171923",
+                      "buttonColor": "#F7FAFC",
+                      "dividerColor": "#E2E8F0",
+                      "featureColor": "#2D3748",
+                      "priceUnitColor": "#171923",
+                      "descriptionColor": "#718096",
+                      "pricePeriodColor": "#718096",
+                      "cardBackgroundColor": "#fff",
+                      "buttonBackgroundColor": "#1A202C",
+                      "buttonHoverBackgroundColor": "#1A202C"
+                    },
+                    "typography": {
+                      "priceFontSize": 32,
+                      "titleFontSize": 24,
+                      "featureFontSize": 16,
+                      "priceFontWeight": "bold",
+                      "titleFontWeight": "bold",
+                      "featureFontWeight": "normal",
+                      "priceUnitFontSize": 32,
+                      "descriptionFontSize": 16,
+                      "pricePeriodFontSize": 16,
+                      "priceUnitFontWeight": "bold",
+                      "descriptionFontWeight": "normal",
+                      "pricePeriodFontWeight": "normal"
+                    },
+                    "layout": {
+                      "gap": 24,
+                      "align": "center",
+                      "maxWidth": 400,
+                      "minWidth": 360
+                    },
                     "template": null,
                     "descriptionTooltipEnabled": true,
-                    "pricingOptions": { "localization": true, "showDecimal": true, "showCurrencyCode": false, "showCurrencySymbol": true, "maximumDecimalDigits": 2, "minimumDecimalDigits": 2 }
+                    "pricingOptions": {
+                      "localization": true,
+                      "showDecimal": true,
+                      "showCurrencyCode": false,
+                      "showCurrencySymbol": true,
+                      "maximumDecimalDigits": 2,
+                      "minimumDecimalDigits": 2
+                    }
                   },
                   "plans": [
                     {
                       "name": "Free",
                       "identifier": "free",
-                      "details": { "stripeProductId": "prod_SUs8ZwzyrjlSAZ" },
+                      "details": {
+                        "stripeProductId": "prod_SUs8ZwzyrjlSAZ"
+                      },
                       "isVisible": true,
                       "features": [
-                        { "identifier": "apicalls", "displayName": "apicalls", "featureType": "METER", "value": 5000 },
-                        { "identifier": "products", "displayName": "Products", "featureType": "CUSTOMIZABLE", "value": 1 },
-                        { "identifier": "branding", "displayName": "branding", "featureType": "BOOLEAN", "value": false },
-                        { "identifier": "email-settings", "displayName": "Email settings", "featureType": "BOOLEAN", "value": true }
+                        {
+                          "identifier": "apicalls",
+                          "displayName": "apicalls",
+                          "featureType": "METER",
+                          "value": 5000
+                        },
+                        {
+                          "identifier": "products",
+                          "displayName": "Products",
+                          "featureType": "CUSTOMIZABLE",
+                          "value": 1
+                        },
+                        {
+                          "identifier": "branding",
+                          "displayName": "branding",
+                          "featureType": "BOOLEAN",
+                          "value": false
+                        },
+                        {
+                          "identifier": "email-settings",
+                          "displayName": "Email settings",
+                          "featureType": "BOOLEAN",
+                          "value": true
+                        }
                       ],
-                      "price": { "priceType": "FREE", "charges": [{ "chargePeriod": "YEARLY", "priceData": { "amount": 0.0 } }] }
+                      "price": {
+                        "priceType": "FREE",
+                        "charges": [
+                          {
+                            "chargePeriod": "YEARLY",
+                            "priceData": {
+                              "amount": 0.0
+                            }
+                          }
+                        ]
+                      }
                     },
                     {
                       "name": "Basic",
                       "identifier": "basic",
-                      "details": { "stripeProductId": "prod_SUsCWTpt2AkvJD" },
+                      "details": {
+                        "stripeProductId": "prod_SUsCWTpt2AkvJD"
+                      },
                       "isVisible": true,
                       "features": [
-                        { "identifier": "apicalls", "displayName": "apicalls", "featureType": "METER", "value": 50000 },
-                        { "identifier": "products", "displayName": "Products", "featureType": "CUSTOMIZABLE", "value": 5 },
-                        { "identifier": "branding", "displayName": "branding", "featureType": "BOOLEAN", "value": false },
-                        { "identifier": "email-settings", "displayName": "Email settings", "featureType": "BOOLEAN", "value": true }
+                        {
+                          "identifier": "apicalls",
+                          "displayName": "apicalls",
+                          "featureType": "METER",
+                          "value": 50000
+                        },
+                        {
+                          "identifier": "products",
+                          "displayName": "Products",
+                          "featureType": "CUSTOMIZABLE",
+                          "value": 5
+                        },
+                        {
+                          "identifier": "branding",
+                          "displayName": "branding",
+                          "featureType": "BOOLEAN",
+                          "value": false
+                        },
+                        {
+                          "identifier": "email-settings",
+                          "displayName": "Email settings",
+                          "featureType": "BOOLEAN",
+                          "value": true
+                        }
                       ],
-                      "price": { "priceType": "PAID", "charges": [{ "chargePeriod": "MONTHLY", "priceData": { "amount": 59.0 } }, { "chargePeriod": "YEARLY", "priceData": { "amount": 491.0 } }] }
+                      "price": {
+                        "priceType": "PAID",
+                        "charges": [
+                          {
+                            "chargePeriod": "MONTHLY",
+                            "priceData": {
+                              "amount": 59.0
+                            }
+                          },
+                          {
+                            "chargePeriod": "YEARLY",
+                            "priceData": {
+                              "amount": 491.0
+                            }
+                          }
+                        ]
+                      }
                     }
                   ],
                   "countryCode": "IN",
@@ -2086,12 +2660,27 @@
                   "currencySymbol": "$",
                   "baseCurrencyCode": "USD",
                   "baseCurrencySymbol": "$",
-                  "subscription": { "planIdentifier": "basic", "features": [], "subscriptionId": "7e468572-cc01-424f-ba88-69917164538b", "chargePeriod": "MONTHLY", "hasPreviousSubscription": true },
+                  "subscription": {
+                    "planIdentifier": "basic",
+                    "features": [],
+                    "subscriptionId": "7e468572-cc01-424f-ba88-69917164538b",
+                    "chargePeriod": "MONTHLY",
+                    "hasPreviousSubscription": true
+                  },
                   "isCustomerExists": true,
                   "billingPeriods": [
-                    { "displayName": "Monthly", "chargePeriod": "MONTHLY" },
-                    { "displayName": "Yearly", "chargePeriod": "YEARLY" },
-                    { "displayName": "One Time", "chargePeriod": "ONE_TIME" }
+                    {
+                      "displayName": "Monthly",
+                      "chargePeriod": "MONTHLY"
+                    },
+                    {
+                      "displayName": "Yearly",
+                      "chargePeriod": "YEARLY"
+                    },
+                    {
+                      "displayName": "One Time",
+                      "chargePeriod": "ONE_TIME"
+                    }
                   ]
                 }
               }
@@ -2113,7 +2702,85 @@
           }
         }
       }
+    },
+    "/promotions": {
+      "get": {
+        "tags": [
+          "Promotions"
+        ],
+        "summary": "Get promotions",
+        "description": "Resolves the active promotion for the caller's detected location. Returns the applicable discount percentage, coupon code, banner widget configuration, and security check results.\n\n<Warning>Use your **Client API Key**, not your Server API Key. Find it under **Settings \u2192 Developers** in the Kelviq dashboard.</Warning>",
+        "operationId": "getPromotion",
+        "servers": [
+          {
+            "url": "https://edge.kelviq.com/api/v1",
+            "description": "Kelviq Edge API"
+          }
+        ],
+        "parameters": [
+          {
+            "name": "promotion_id",
+            "in": "query",
+            "required": true,
+            "description": "The promotion ID from the Kelviq dashboard.",
+            "schema": {
+              "type": "string"
+            },
+            "example": "promo_abc123"
+          }
+        ],
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Promotion data for the visitor's location",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PromotionResponse"
+                },
+                "example": {
+                  "country": "India",
+                  "countryCode": "IN",
+                  "percentage": 40,
+                  "code": "KQP5LHNZB1Z",
+                  "message": "",
+                  "widgets": [
+                    {
+                      "type": "BANNER",
+                      "backgroundColor": "#3182CE",
+                      "fontColor": "#F9F9F9",
+                      "highlightFontColor": "#DD5C64",
+                      "fontSize": "1rem",
+                      "unStyled": false,
+                      "addCloseIcon": false,
+                      "countryMessage": "Hello {country_flag} Hey! It looks like you are from <b>{country}</b>. Use code <b>\u201c{coupon_code}\u201d</b> to get <b>{discount_percentage}%</b> off.",
+                      "placement": "top",
+                      "borderRadius": "0"
+                    }
+                  ],
+                  "security": {
+                    "proxy": false,
+                    "crawler": false,
+                    "vpn": false,
+                    "tor": false,
+                    "relay": false
+                  }
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized \u2014 missing or invalid API key"
+          },
+          "404": {
+            "description": "Promotion not found"
+          }
+        }
+      }
     }
   }
 }
-

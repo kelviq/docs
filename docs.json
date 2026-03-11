@@ -45,6 +45,15 @@
             "pages": ["monetization/pricing-tables", "monetization/targeting-rules" , "monetization/offerings"]
           },
           {
+            "group": "Promotions",
+            "pages": [
+              "promotions/overview",
+              "promotions/create-a-promotion",
+              "promotions/integrate",
+              "promotions/customize-banner"
+            ]
+          },
+          {
             "group": "Checkout",
             "pages": [
               "checkout/checkout-configuration"
@@ -127,7 +136,15 @@
             "group": "Frontend Integration",
             "pages": [
               "frontend-integration/react-sdk",
+              "frontend-integration/react-ui",
               "frontend-integration/js-sdk"
+            ]
+          },
+          {
+            "group": "Promotions UI",
+            "pages": [
+              "frontend-integration/react-promotions-ui",
+              "frontend-integration/promotions-ui-js"
             ]
           }
         ]
