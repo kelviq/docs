@@ -1,0 +1,496 @@
+---
+title: "Webhooks"
+description: "Receive real-time event notifications from Kelviq to your server."
+---
+
+Kelviq can push event notifications to your server whenever something meaningful happens — a subscription is created, an invoice is paid, or a refund is issued. This guide explains how to register an endpoint, verify incoming requests, and handle events.
+
+---
+
+## How It Works
+
+When an event occurs, Kelviq creates a `WebhookEvent` and fans it out to all enabled endpoints you have registered for that event type. Each delivery is a single `POST` request with a JSON body and signed headers.
+
+Kelviq retries failed deliveries up to **3 times** with a 60-second delay between attempts. A delivery is considered successful when your endpoint returns a `2xx` status code.
+
+---
+
+## Registering an Endpoint
+
+Go to **Settings → Developers** in the [Kelviq dashboard](https://app.kelviq.com/settings/developers) to create a webhook endpoint. You will specify:
+
+- **URL** — The public HTTPS URL Kelviq will POST events to.
+- **Events** — The subset of event types you want to subscribe to.
+
+After creation, Kelviq generates a signing secret for the endpoint in the format `kq_whsec_<random>`. Store this secret securely — you will need it to verify signatures.
+
+<Warning>
+Your signing secret is shown only once. If you lose it, you must regenerate it from the dashboard.
+</Warning>
+
+---
+
+## Event Types
+
+| Event | Description |
+|-------|-------------|
+| `checkout.completed` | A customer successfully completed a checkout session and payment was collected. |
+| `customer.created` | A new customer record was created in your organization. |
+| `customer.updated` | A customer's profile data (name, email, metadata) was updated. |
+| `order.created` | A new order was placed. |
+| `order.updated` | An existing order was updated. |
+| `order.refunded` | A full or partial refund was issued against an order. |
+| `subscription.created` | A new subscription was activated for a customer. |
+| `subscription.updated` | A subscription's details were modified. |
+| `subscription.cancelled` | A subscription was cancelled (immediately or at period end). |
+| `subscription.plan_changed` | A subscription was moved to a different plan. |
+| `invoice.created` | A new invoice was generated. |
+| `invoice.paid` | An invoice was paid and funds were collected. |
+| `refund.created` | A refund was initiated. |
+| `refund.updated` | A refund's status changed (e.g., from pending to completed). |
+
+---
+
+## Request Headers
+
+Every webhook request from Kelviq includes the following headers:
+
+| Header | Description |
+|--------|-------------|
+| `webhook-id` | A unique UUID identifying this specific webhook event delivery. |
+| `webhook-timestamp` | Unix timestamp (seconds) of when the event was dispatched. |
+| `webhook-signature` | HMAC-SHA256 signature. Format: `v1,{signature}` |
+| `Content-Type` | Always `application/json`. |
+
+---
+
+## Payload Structure
+
+The request body is a JSON object with the following top-level fields:
+
+```json
+{
+  "id": "3a7f1c2d-8e4b-4a9f-b123-0e5d6c7a8b9e",
+  "type": "subscription.created",
+  "created_at": "2024-06-01T12:00:00Z",
+  "data": {
+    "object": { ... },
+    "previous_attributes": { ... }
+  }
+}
+```
+
+| Field | Type | Description |
+|-------|------|-------------|
+| `id` | `string` (UUID) | The unique ID of this event. Matches the `webhook-id` header. |
+| `type` | `string` | The event type (e.g., `subscription.created`). |
+| `created_at` | `string` (ISO 8601) | UTC timestamp of when the event was created. |
+| `data.object` | `object` | The primary resource affected by the event. |
+| `data.previous_attributes` | `object` | *(Update events only)* The resource's changed attributes before the event. Omitted if not applicable. |
+
+<Accordion title="Example: subscription.created payload">
+```json
+{
+  "id": "3a7f1c2d-8e4b-4a9f-b123-0e5d6c7a8b9e",
+  "type": "subscription.created",
+  "created_at": "2026-03-11T05:25:34Z",
+  "data": {
+    "object": {
+      "id": "a22f1b2a-b922-4a28-9b0e-75e826988b4b",
+      "object": "subscription",
+      "status": "active",
+      "plan": {
+        "name": "default pd",
+        "version": 1,
+        "identifier": "default-pd"
+      },
+      "product": {
+        "id": "b4ea7e75-5dbe-4b3b-96e0-9a31dfe5a600",
+        "name": "Migrate PD"
+      },
+      "amount": "21.24",
+      "amount_units": 2100,
+      "currency": "USD",
+      "recurrence": "1 month",
+      "start_date": "2026-03-11",
+      "billing_period_start_time": "2026-03-11T05:25:33Z",
+      "billing_period_end_time": "2026-04-10T06:28:58Z",
+      "customer": {
+        "id": "1bb69d0f-39f8-4db8-aace-e003d6e5f3ed",
+        "name": "Geo Jacob",
+        "email": "geo@example.com",
+        "customer_id": "1",
+        "billing_address": {
+          "city": "Bangalore",
+          "line1": null,
+          "line2": null,
+          "state": "Karnataka",
+          "country": "IN",
+          "postal_code": "560001"
+        }
+      },
+      "features": null,
+      "organization": "2a3664c0-cbd2-4f1c-a98f-1b4f65e3256c",
+      "created_on": "2026-03-11T05:25:34Z",
+      "modified_on": "2026-03-11T05:25:34Z"
+    }
+  }
+}
+```
+</Accordion>
+
+<Accordion title="Example: subscription.plan_changed payload">
+```json
+{
+  "id": "b9c2e1f0-7d3a-4b8e-a456-1f2g3h4i5j6k",
+  "type": "subscription.plan_changed",
+  "created_at": "2026-03-04T11:53:12Z",
+  "data": {
+    "object": {
+      "id": "d1284180-beba-465a-b756-9a300324245e",
+      "object": "subscription",
+      "status": "active",
+      "plan": {
+        "name": "Pro",
+        "version": 4,
+        "identifier": "pro"
+      },
+      "product": {
+        "id": "988dba89-0a96-4cb5-870a-34810011c1f1",
+        "name": "demo"
+      },
+      "amount": "29.00",
+      "amount_units": 2900,
+      "currency": "USD",
+      "recurrence": "1 month",
+      "start_date": "2026-02-26",
+      "billing_period_start_time": "2026-02-26T05:25:11Z",
+      "billing_period_end_time": "2026-03-26T05:25:11Z",
+      "customer": {
+        "id": "798e663f-2fe9-43d7-879f-2549263e20d1",
+        "name": "Geo",
+        "email": "geo@example.com",
+        "customer_id": "geo123",
+        "billing_address": {}
+      },
+      "features": null,
+      "organization": "5d0bec80-a7c1-41ae-bd24-ea9228500586",
+      "created_on": "2026-03-04T11:53:12Z",
+      "modified_on": "2026-03-04T11:53:14Z"
+    },
+    "previous_attributes": {
+      "id": "065ee4e2-b643-4f78-bac0-9bd4afcba963",
+      "object": "subscription",
+      "status": "active",
+      "plan": {
+        "name": "Enterprise",
+        "version": 1,
+        "identifier": "enterprise"
+      },
+      "product": {
+        "id": "988dba89-0a96-4cb5-870a-34810011c1f1",
+        "name": "demo"
+      },
+      "amount": "99.00",
+      "amount_units": 9900,
+      "currency": "USD",
+      "recurrence": "1 month",
+      "start_date": "2026-02-26",
+      "billing_period_start_time": "2026-02-26T05:25:11Z",
+      "billing_period_end_time": "2026-03-26T05:25:11Z",
+      "customer": {
+        "id": "798e663f-2fe9-43d7-879f-2549263e20d1",
+        "name": "Geo",
+        "email": "geo@example.com",
+        "customer_id": "geo123",
+        "billing_address": {}
+      },
+      "features": null,
+      "organization": "5d0bec80-a7c1-41ae-bd24-ea9228500586",
+      "created_on": "2026-03-04T11:29:19Z",
+      "modified_on": "2026-03-04T11:29:23Z"
+    }
+  }
+}
+```
+</Accordion>
+
+---
+
+## Verifying Signatures
+
+<Warning>
+Always verify the signature before processing a webhook. Skipping verification exposes your endpoint to spoofed requests from third parties.
+</Warning>
+
+Kelviq signs every request using **HMAC-SHA256**. To verify a request:
+
+1. Read the `webhook-id` and `webhook-timestamp` headers.
+2. Construct the signed string by concatenating: `{webhook-id}.{webhook-timestamp}.{raw-request-body}` (joined with `.`)
+3. Compute HMAC-SHA256 over the signed string using your endpoint's signing secret as the key.
+4. Compare the hex digest to the signature in the `webhook-signature` header (strip the `v1,` prefix before comparing).
+5. Reject the request if the signatures do not match.
+
+<Note>
+The raw request body must be used exactly as received — before any JSON parsing. The compact JSON serialization (no spaces) is what Kelviq sends and signs.
+</Note>
+
+Optionally, also check that `webhook-timestamp` is within a few minutes of your server's current time to defend against replay attacks.
+
+---
+
+## Code Examples
+
+<Note>
+Use `express.raw()` (not `express.json()`) in Node.js so that `req.body` contains the unmodified request bytes. Parsing the body before verification will break the signature check.
+</Note>
+
+<CodeGroup>
+
+```javascript Node.js
+const crypto = require('crypto');
+
+function verifyWebhook(req, signingSecret) {
+  const webhookId        = req.headers['webhook-id'];
+  const webhookTimestamp = req.headers['webhook-timestamp'];
+  const webhookSignature = req.headers['webhook-signature'];
+
+  if (!webhookId || !webhookTimestamp || !webhookSignature) {
+    throw new Error('Missing required webhook headers');
+  }
+
+  // Defend against replay attacks (5-minute tolerance)
+  const now = Math.floor(Date.now() / 1000);
+  if (Math.abs(now - parseInt(webhookTimestamp, 10)) > 300) {
+    throw new Error('Webhook timestamp is too old');
+  }
+
+  // Reconstruct the signed payload
+  const rawBody       = req.body; // must be the raw Buffer/string, not parsed JSON
+  const signedPayload = `${webhookId}.${webhookTimestamp}.${rawBody}`;
+
+  // Compute HMAC-SHA256
+  const expectedSignature = crypto
+    .createHmac('sha256', signingSecret)
+    .update(signedPayload, 'utf8')
+    .digest('hex');
+
+  // Strip the "v1," prefix from the header value
+  const [, receivedSignature] = webhookSignature.split(',');
+
+  if (!crypto.timingSafeEqual(
+    Buffer.from(expectedSignature, 'hex'),
+    Buffer.from(receivedSignature, 'hex')
+  )) {
+    throw new Error('Webhook signature mismatch');
+  }
+
+  return JSON.parse(rawBody);
+}
+
+// Express handler example
+app.post('/webhooks/kelviq', express.raw({ type: 'application/json' }), (req, res) => {
+  let event;
+  try {
+    event = verifyWebhook(req, process.env.KELVIQ_WEBHOOK_SECRET);
+  } catch (err) {
+    console.error('Webhook verification failed:', err.message);
+    return res.status(400).send('Bad Request');
+  }
+
+  switch (event.type) {
+    case 'subscription.created':
+      console.log('New subscription:', event.data.object.id);
+      break;
+    case 'invoice.paid':
+      console.log('Invoice paid:', event.data.object.id);
+      break;
+    default:
+      console.log('Unhandled event type:', event.type);
+  }
+
+  res.status(200).json({ received: true });
+});
+```
+
+```python Python
+import hashlib
+import hmac
+import json
+import time
+from flask import Flask, request, abort
+
+app = Flask(__name__)
+SIGNING_SECRET = "kq_whsec_your_secret_here"  # load from environment
+
+
+def verify_webhook(payload_bytes: bytes, webhook_id: str, webhook_timestamp: str, webhook_signature: str) -> dict:
+    # Defend against replay attacks (5-minute tolerance)
+    now = int(time.time())
+    if abs(now - int(webhook_timestamp)) > 300:
+        raise ValueError("Webhook timestamp is too old")
+
+    # Reconstruct the signed payload (body must be the raw bytes decoded as utf-8)
+    signed_payload = f"{webhook_id}.{webhook_timestamp}.{payload_bytes.decode('utf-8')}"
+
+    # Compute HMAC-SHA256
+    expected_signature = hmac.new(
+        SIGNING_SECRET.encode("utf-8"),
+        signed_payload.encode("utf-8"),
+        hashlib.sha256,
+    ).hexdigest()
+
+    # Strip the "v1," prefix from the header value
+    _, received_signature = webhook_signature.split(",", 1)
+
+    if not hmac.compare_digest(expected_signature, received_signature):
+        raise ValueError("Webhook signature mismatch")
+
+    return json.loads(payload_bytes)
+
+
+@app.route("/webhooks/kelviq", methods=["POST"])
+def handle_webhook():
+    webhook_id        = request.headers.get("webhook-id")
+    webhook_timestamp = request.headers.get("webhook-timestamp")
+    webhook_signature = request.headers.get("webhook-signature")
+
+    try:
+        event = verify_webhook(request.get_data(), webhook_id, webhook_timestamp, webhook_signature)
+    except ValueError as e:
+        print(f"Webhook verification failed: {e}")
+        abort(400)
+
+    event_type = event.get("type")
+    if event_type == "subscription.created":
+        print("New subscription:", event["data"]["object"]["id"])
+    elif event_type == "invoice.paid":
+        print("Invoice paid:", event["data"]["object"]["id"])
+    else:
+        print("Unhandled event type:", event_type)
+
+    return {"received": True}, 200
+```
+
+```go Go
+package main
+
+import (
+    "crypto/hmac"
+    "crypto/sha256"
+    "encoding/hex"
+    "encoding/json"
+    "errors"
+    "fmt"
+    "io"
+    "math"
+    "net/http"
+    "strconv"
+    "strings"
+    "time"
+)
+
+const signingSecret = "kq_whsec_your_secret_here" // load from environment
+
+type WebhookEvent struct {
+    ID        string          `json:"id"`
+    Type      string          `json:"type"`
+    CreatedAt string          `json:"created_at"`
+    Data      json.RawMessage `json:"data"`
+}
+
+func verifyWebhook(body []byte, webhookID, webhookTimestamp, webhookSignature string) (*WebhookEvent, error) {
+    // Defend against replay attacks (5-minute tolerance)
+    ts, err := strconv.ParseInt(webhookTimestamp, 10, 64)
+    if err != nil {
+        return nil, errors.New("invalid webhook-timestamp header")
+    }
+    if math.Abs(float64(time.Now().Unix()-ts)) > 300 {
+        return nil, errors.New("webhook timestamp is too old")
+    }
+
+    // Reconstruct the signed payload
+    signedPayload := fmt.Sprintf("%s.%s.%s", webhookID, webhookTimestamp, string(body))
+
+    // Compute HMAC-SHA256
+    mac := hmac.New(sha256.New, []byte(signingSecret))
+    mac.Write([]byte(signedPayload))
+    expectedSig := hex.EncodeToString(mac.Sum(nil))
+
+    // Strip the "v1," prefix from the header value
+    parts := strings.SplitN(webhookSignature, ",", 2)
+    if len(parts) != 2 {
+        return nil, errors.New("malformed webhook-signature header")
+    }
+    receivedSig := parts[1]
+
+    expectedBytes, _ := hex.DecodeString(expectedSig)
+    receivedBytes, _ := hex.DecodeString(receivedSig)
+    if !hmac.Equal(expectedBytes, receivedBytes) {
+        return nil, errors.New("webhook signature mismatch")
+    }
+
+    var event WebhookEvent
+    if err := json.Unmarshal(body, &event); err != nil {
+        return nil, fmt.Errorf("failed to parse webhook body: %w", err)
+    }
+    return &event, nil
+}
+
+func webhookHandler(w http.ResponseWriter, r *http.Request) {
+    body, err := io.ReadAll(r.Body)
+    if err != nil {
+        http.Error(w, "cannot read body", http.StatusBadRequest)
+        return
+    }
+    defer r.Body.Close()
+
+    event, err := verifyWebhook(
+        body,
+        r.Header.Get("webhook-id"),
+        r.Header.Get("webhook-timestamp"),
+        r.Header.Get("webhook-signature"),
+    )
+    if err != nil {
+        http.Error(w, "Bad Request: "+err.Error(), http.StatusBadRequest)
+        return
+    }
+
+    switch event.Type {
+    case "subscription.created":
+        fmt.Println("New subscription:", event.ID)
+    case "invoice.paid":
+        fmt.Println("Invoice paid:", event.ID)
+    default:
+        fmt.Println("Unhandled event type:", event.Type)
+    }
+
+    w.Header().Set("Content-Type", "application/json")
+    w.WriteHeader(http.StatusOK)
+    w.Write([]byte(`{"received":true}`))
+}
+
+func main() {
+    http.HandleFunc("/webhooks/kelviq", webhookHandler)
+    http.ListenAndServe(":8080", nil)
+}
+```
+
+</CodeGroup>
+
+---
+
+## Best Practices
+
+- **Return `2xx` fast.** Acknowledge the webhook immediately and process it asynchronously. Long-running handlers increase the risk of timeouts and duplicate retries.
+- **Make handlers idempotent.** The same event may be delivered more than once. Use `data.id` (the event UUID) as a deduplication key.
+- **Validate the timestamp.** Reject requests where `webhook-timestamp` is more than 5 minutes from your server's clock to prevent replay attacks.
+- **Use `hmac.compare_digest` / `hmac.Equal` / `crypto.timingSafeEqual`.** Constant-time comparison prevents timing side-channel attacks.
+- **Store the raw body before parsing.** Signature verification operates on the raw bytes, not the deserialized object.
+
+---
+
+## Need Help?
+
+- Email us at **hi@kelviq.com**
+- [Book a demo](https://tidycal.com/neravath/15-minute-meeting)

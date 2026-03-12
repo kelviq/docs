@@ -90,7 +90,8 @@
             "group": "Guides",
             "pages": [
               "guides/subscription-integration",
-              "guides/subscription-integration-for-nextjs"
+              "guides/subscription-integration-for-nextjs",
+              "guides/webhooks"
             ]
           },
           {
