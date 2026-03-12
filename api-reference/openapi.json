@@ -1088,6 +1088,100 @@
           }
         }
       },
+      "ProductOfferingResponse": {
+        "type": "object",
+        "properties": {
+          "organizationId": {
+            "type": "integer",
+            "description": "The internal ID of the organization that owns this product."
+          },
+          "countryCode": {
+            "type": "string",
+            "description": "ISO 3166-1 alpha-2 country code resolved from the request."
+          },
+          "pricingLocale": {
+            "type": "string",
+            "description": "BCP 47 locale tag used for price formatting (e.g. \"en-US\")."
+          },
+          "currencyCode": {
+            "type": "string",
+            "description": "ISO 4217 currency code for the resolved locale (e.g. \"USD\")."
+          },
+          "currencySymbol": {
+            "type": "string"
+          },
+          "currencyConversionRate": {
+            "type": "number",
+            "description": "Conversion rate from the base currency to the resolved currency."
+          },
+          "baseCurrencyCode": {
+            "type": "string"
+          },
+          "baseCurrencySymbol": {
+            "type": "string"
+          },
+          "plans": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/ProductPlan"
+            }
+          },
+          "subscription": {
+            "type": "object",
+            "properties": {
+              "hasPreviousSubscription": {
+                "type": "boolean"
+              },
+              "planIdentifier": {
+                "type": "string",
+                "nullable": true
+              },
+              "subscriptionId": {
+                "type": "string",
+                "format": "uuid",
+                "nullable": true
+              },
+              "chargePeriod": {
+                "type": "string",
+                "nullable": true
+              }
+            }
+          },
+          "isCustomerExists": {
+            "type": "boolean"
+          },
+          "billingPeriods": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/BillingPeriod"
+            }
+          }
+        }
+      },
+      "ProductPlan": {
+        "type": "object",
+        "properties": {
+          "name": { "type": "string" },
+          "description": { "type": "string" },
+          "identifier": { "type": "string" },
+          "details": { "type": "object" },
+          "isVisible": { "type": "boolean" },
+          "metadata": { "type": "object" },
+          "basePlan": { "nullable": true },
+          "price": { "$ref": "#/components/schemas/FeaturePrice" },
+          "addons": { "type": "array", "items": {} },
+          "originalPrice": {
+            "type": "object",
+            "description": "Map of chargePeriod to base price amount (e.g. {\"MONTHLY\": 19.0, \"YEARLY\": 190.0})."
+          },
+          "features": { "type": "array", "items": {} },
+          "shouldHighlight": { "type": "boolean" },
+          "enabled": { "type": "boolean" },
+          "displayName": { "type": "string" },
+          "displayDescription": { "type": "string" },
+          "includes": { "type": "string" }
+        }
+      },
       "PricingTable": {
         "type": "object",
         "properties": {
@@ -2696,6 +2790,328 @@
                 "example": {
                   "status": "Bad request",
                   "message": "Offering does not exists"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/monetization/product-offering/{product_id}/": {
+      "get": {
+        "tags": [
+          "Monetization"
+        ],
+        "summary": "Get Product Offering",
+        "description": "Retrieves the public pricing details for a specific product, including all eligible plans, localized pricing, and the customer's current subscription state. Use this to render a pricing page or paywall scoped to a product.",
+        "operationId": "getProductOffering",
+        "parameters": [
+          {
+            "name": "product_id",
+            "in": "path",
+            "required": true,
+            "description": "The unique identifier (UUID) of the product.",
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          },
+          {
+            "name": "customer_id",
+            "in": "query",
+            "required": false,
+            "description": "Optional. Your customer's ID. When provided, the response includes the customer's active subscription details and the `isCustomerExists` flag.",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "plans_enabled",
+            "in": "query",
+            "required": false,
+            "description": "Optional. Comma-separated list of plan identifiers to include in the response. When omitted, all active plans for the product are returned. Example: `plans_enabled=pro,enterprise`",
+            "schema": {
+              "type": "string"
+            },
+            "example": "pro,enterprise"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful response with product offering details.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProductOfferingResponse"
+                },
+                "example": {
+                  "organizationId": 6,
+                  "countryCode": "US",
+                  "pricingLocale": "en-US",
+                  "currencyCode": "USD",
+                  "currencySymbol": "$",
+                  "currencyConversionRate": 1,
+                  "baseCurrencyCode": "USD",
+                  "baseCurrencySymbol": "$",
+                  "plans": [
+                    {
+                      "name": "iBase",
+                      "description": "",
+                      "identifier": "i-base",
+                      "details": {},
+                      "isVisible": true,
+                      "metadata": {},
+                      "basePlan": null,
+                      "price": {
+                        "id": "43856a3d-255c-4f60-a17d-98e1d113bb98",
+                        "priceType": "PAID",
+                        "freeTrial": false,
+                        "trialPeriod": 7,
+                        "currency": "USD",
+                        "enabled": true,
+                        "charges": [
+                          {
+                            "id": "6bc6e8f7-5c52-48ae-b75b-0c652dddceb8",
+                            "chargePeriod": "MONTHLY",
+                            "tiers": [],
+                            "priceData": { "amount": 19.0 },
+                            "details": {},
+                            "advanced": {},
+                            "featureQuantityPrice": 19.0
+                          },
+                          {
+                            "id": "d3ca0fb6-d478-424d-8621-56d1e15073bd",
+                            "chargePeriod": "YEARLY",
+                            "tiers": [],
+                            "priceData": { "amount": 190.0 },
+                            "details": {},
+                            "advanced": {},
+                            "featureQuantityPrice": 190.0
+                          }
+                        ]
+                      },
+                      "addons": [],
+                      "originalPrice": { "MONTHLY": 19.0, "YEARLY": 190.0 },
+                      "features": [],
+                      "shouldHighlight": false,
+                      "enabled": true,
+                      "displayName": "iBase",
+                      "displayDescription": "",
+                      "includes": ""
+                    },
+                    {
+                      "name": "iStandard",
+                      "description": "",
+                      "identifier": "i-standard",
+                      "details": {},
+                      "isVisible": true,
+                      "metadata": {},
+                      "basePlan": null,
+                      "price": {
+                        "id": "61f11451-5aed-4534-9c4c-44e0c47810a6",
+                        "priceType": "PAID",
+                        "freeTrial": false,
+                        "trialPeriod": 7,
+                        "currency": "USD",
+                        "enabled": true,
+                        "charges": [
+                          {
+                            "id": "4762b0c0-89b4-4f16-9779-ecd871d98a4e",
+                            "chargePeriod": "MONTHLY",
+                            "tiers": [],
+                            "priceData": { "amount": 39.0 },
+                            "details": {},
+                            "advanced": {},
+                            "featureQuantityPrice": 39.0
+                          },
+                          {
+                            "id": "dfc2e342-317c-4d0c-bbf5-c1db43f63a42",
+                            "chargePeriod": "YEARLY",
+                            "tiers": [],
+                            "priceData": { "amount": 390.0 },
+                            "details": {},
+                            "advanced": {},
+                            "featureQuantityPrice": 390.0
+                          }
+                        ]
+                      },
+                      "addons": [],
+                      "originalPrice": { "MONTHLY": 39.0, "YEARLY": 390.0 },
+                      "features": [],
+                      "shouldHighlight": false,
+                      "enabled": true,
+                      "displayName": "iStandard",
+                      "displayDescription": "",
+                      "includes": ""
+                    },
+                    {
+                      "name": "iPremium",
+                      "description": "",
+                      "identifier": "i-premium",
+                      "details": {},
+                      "isVisible": true,
+                      "metadata": {},
+                      "basePlan": null,
+                      "price": {
+                        "id": "3b523320-ad1a-4922-b3e0-d504660e4747",
+                        "priceType": "PAID",
+                        "freeTrial": false,
+                        "trialPeriod": 7,
+                        "currency": "USD",
+                        "enabled": true,
+                        "charges": [
+                          {
+                            "id": "7a1f0b92-f49a-419b-8845-9b7f7706c566",
+                            "chargePeriod": "MONTHLY",
+                            "tiers": [],
+                            "priceData": { "amount": 59.0 },
+                            "details": {},
+                            "advanced": {},
+                            "featureQuantityPrice": 59.0
+                          },
+                          {
+                            "id": "453c2a16-33dc-4585-8876-63b59504d8b5",
+                            "chargePeriod": "YEARLY",
+                            "tiers": [],
+                            "priceData": { "amount": 590.0 },
+                            "details": {},
+                            "advanced": {},
+                            "featureQuantityPrice": 590.0
+                          }
+                        ]
+                      },
+                      "addons": [],
+                      "originalPrice": { "MONTHLY": 59.0, "YEARLY": 590.0 },
+                      "features": [],
+                      "shouldHighlight": false,
+                      "enabled": true,
+                      "displayName": "iPremium",
+                      "displayDescription": "",
+                      "includes": ""
+                    },
+                    {
+                      "name": "freepaln",
+                      "description": "",
+                      "identifier": "freepaln",
+                      "details": {},
+                      "isVisible": true,
+                      "metadata": {},
+                      "basePlan": null,
+                      "price": {
+                        "id": "fc5b3277-474e-49d3-8dcf-edd9e46c5bab",
+                        "priceType": "FREE",
+                        "freeTrial": false,
+                        "trialPeriod": 0,
+                        "currency": "USD",
+                        "enabled": true,
+                        "charges": [
+                          {
+                            "id": "a9262eb9-447e-4d87-a781-8502432f1dbf",
+                            "chargePeriod": "ONE_TIME",
+                            "tiers": [],
+                            "priceData": { "amount": 0.0 },
+                            "details": {},
+                            "advanced": {},
+                            "featureQuantityPrice": 0.0
+                          }
+                        ]
+                      },
+                      "addons": [],
+                      "originalPrice": { "ONE_TIME": 0.0 },
+                      "features": [],
+                      "shouldHighlight": false,
+                      "enabled": true,
+                      "displayName": "freepaln",
+                      "displayDescription": "",
+                      "includes": ""
+                    },
+                    {
+                      "name": "iUltra",
+                      "description": "",
+                      "identifier": "i-ultra",
+                      "details": {},
+                      "isVisible": true,
+                      "metadata": {},
+                      "basePlan": null,
+                      "price": {
+                        "id": "28d8dd6e-e864-4188-958a-f16c9b4a5ae6",
+                        "priceType": "PAID",
+                        "freeTrial": true,
+                        "trialPeriod": 7,
+                        "currency": "USD",
+                        "enabled": true,
+                        "charges": [
+                          {
+                            "id": "7195b8ec-1262-413c-a84a-217427d0fdcc",
+                            "chargePeriod": "MONTHLY",
+                            "tiers": [],
+                            "priceData": { "amount": 20.0 },
+                            "details": {},
+                            "advanced": {},
+                            "featureQuantityPrice": 20.0
+                          },
+                          {
+                            "id": "d4d6be26-dc10-40bb-9555-6db6985af8a4",
+                            "chargePeriod": "YEARLY",
+                            "tiers": [],
+                            "priceData": { "amount": 230.0 },
+                            "details": {},
+                            "advanced": {},
+                            "featureQuantityPrice": 230.0
+                          }
+                        ]
+                      },
+                      "addons": [],
+                      "originalPrice": { "MONTHLY": 20.0, "YEARLY": 230.0 },
+                      "features": [],
+                      "shouldHighlight": false,
+                      "enabled": true,
+                      "displayName": "iUltra",
+                      "displayDescription": "",
+                      "includes": ""
+                    }
+                  ],
+                  "subscription": {
+                    "hasPreviousSubscription": false
+                  },
+                  "isCustomerExists": false,
+                  "billingPeriods": [
+                    {
+                      "chargePeriod": "ONE_TIME",
+                      "enabled": true,
+                      "displayName": "One Time",
+                      "promoCaption": "",
+                      "defaultSelected": false
+                    },
+                    {
+                      "chargePeriod": "MONTHLY",
+                      "enabled": true,
+                      "displayName": "Monthly",
+                      "promoCaption": "",
+                      "defaultSelected": false
+                    },
+                    {
+                      "chargePeriod": "YEARLY",
+                      "enabled": true,
+                      "displayName": "Yearly",
+                      "promoCaption": "",
+                      "defaultSelected": false
+                    }
+                  ]
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Product not found.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                },
+                "example": {
+                  "status": "Not found",
+                  "message": "Product does not exist"
                 }
               }
             }
