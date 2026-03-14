@@ -3125,7 +3125,7 @@
           "Promotions"
         ],
         "summary": "Get promotions",
-        "description": "Resolves the active promotion for the caller's detected location. Returns the applicable discount percentage, coupon code, banner widget configuration, and security check results.\n\n<Warning>Use your **Client API Key**, not your Server API Key. Find it under **Settings \u2192 Developers** in the Kelviq dashboard.</Warning>",
+        "description": "Resolves the active promotion for the caller's detected location. Returns the applicable discount percentage, coupon code, banner widget configuration, and security check results.\n\n<Warning>Use your **Client API Key**, not your Server API Key. Find it under **Settings \u2192 API keys** in the Kelviq dashboard.</Warning>",
         "operationId": "getPromotion",
         "servers": [
           {

@@ -38,7 +38,7 @@ Copy your promotion ID from the promotion detail page and call `init()`:
 KQPromotionUI.init({
   // Replace with your promotion ID
   promotionId: "YOUR_PROMOTION_ID",
-  // Access token can be found in the Settings -> Developers section
+  // Access token can be found in the Settings -> API keys section
   accessToken: "YOUR_CLIENT_ACCESS_TOKEN",
   showBanner: true,
 });
@@ -47,7 +47,7 @@ KQPromotionUI.init({
 This will automatically display a discount banner if the visitor is eligible for a discount.
 
 <Warning>
-  **Never expose your Server API Key in the browser.** Use the **Client API Key**, which is safe for client-side code. You can find both keys under **Settings → Developers** in the [Kelviq dashboard](https://app.kelviq.com/settings/developers).
+  **Never expose your Server API Key in the browser.** Use the **Client API Key**, which is safe for client-side code. You can find both keys under **Settings → API keys** in the [Kelviq dashboard](https://app.kelviq.com/settings/api-keys).
 </Warning>
 
 ---
@@ -57,7 +57,7 @@ This will automatically display a discount banner if the visitor is eligible for
 | Option | Type | Default | Description |
 |--------|------|---------|-------------|
 | `promotionId` | `string` | — | Promotion ID from the Kelviq dashboard |
-| `accessToken` | `string` | — | Client API Key (Settings → Developers) |
+| `accessToken` | `string` | — | Client API Key (Settings → API keys) |
 | `showBanner` | `boolean` | `true` | Render the localised discount banner automatically |
 | `environment` | `"production" \| "sandbox"` | `"production"` | Target environment |
 | `baseCurrencyCode` | `string` | `"USD"` | ISO 4217 code for prices displayed on the page |
@@ -271,4 +271,4 @@ KQPromotionUI.init({
 });
 ```
 
-Use sandbox API keys (available under **Settings → Developers** with the Sandbox toggle enabled) so real visitor data is never affected during testing.
+Use sandbox API keys (available under **Settings → API keys** with the Sandbox toggle enabled) so real visitor data is never affected during testing.
