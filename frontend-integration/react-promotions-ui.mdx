@@ -50,7 +50,7 @@ function App() {
 ```
 
 <Warning>
-  **Never expose your Server API Key in the browser.** Use the **Client API Key**, which is safe for client-side code. You can find both keys under **Settings → Developers** in the [Kelviq dashboard](https://app.kelviq.com/settings/developers).
+  **Never expose your Server API Key in the browser.** Use the **Client API Key**, which is safe for client-side code. You can find both keys under **Settings → API keys** in the [Kelviq dashboard](https://app.kelviq.com/settings/api-keys).
 </Warning>
 
 ---
@@ -64,7 +64,7 @@ The provider initializes the SDK, fetches promotion data from the Kelviq API, an
 | Prop | Type | Default | Description |
 |------|------|---------|-------------|
 | `promotionId` | `string` | `''` | The promotion ID from the Kelviq dashboard |
-| `accessToken` | `string` | `''` | Client API Key (Settings → Developers) |
+| `accessToken` | `string` | `''` | Client API Key (Settings → API keys) |
 | `kqIdentifier` | `string` | `''` | Optional Kelviq identifier for the request |
 | `environment` | `'production' \| 'sandbox'` | `'production'` | Set to `'sandbox'` to use the sandbox API |
 | `baseCurrencyCode` | `string` | `'USD'` | ISO 4217 currency code used for formatting |
