@@ -5,13 +5,16 @@ icon: 'js'
 ---
 
 
-The `@kelviq/js-sdk` is a lightweight, plain TypeScript library designed for interacting with the kelviq entitlement service. It allows you to:
+The `@kelviq/js-sdk` is a lightweight, plain TypeScript library designed for interacting with Kelviq entitlement and pricing services. It allows you to:
 
 * Fetch all feature entitlements for a specific organization and customer.
 * Cache these entitlements client-side for efficient and repeated access.
 * Check if a user has access to a particular feature.
 * Retrieve specific entitlement details, including boolean flags, numeric configurations, and metered usage data.
-* Manually refresh entitlement data from the server.
+* Fetch product offering and pricing data for display on pricing pages.
+* Format prices with locale-aware currency formatting.
+* Automatically populate pricing into DOM elements via data attributes.
+* Manually refresh entitlement and pricing data from the server.
 
 <Note>If you are using React, you can use the <a href="/frontend-integration/react-sdk">React SDK</a> instead.</Note>
 
@@ -82,15 +85,46 @@ const kq = kelviqSDK({
 });
 ```
 
+You can also initialize the SDK with just a `productId` to fetch pricing data only (without entitlements):
+
+```typescript
+// Initialize for pricing only
+const kq = kelviqSDK({
+  productId: "your-product-id",
+  accessToken: "your-access-token",
+});
+
+await kq.ready();
+const pricing = kq.getPricing();
+```
+
+Or use both `customerId` and `productId` together:
+
+```typescript
+// Initialize for both entitlements and pricing
+const kq = kelviqSDK({
+  customerId: "your-customer-id",
+  productId: "your-product-id",
+  accessToken: "your-access-token",
+});
+
+await kq.ready();
+// Both entitlements and pricing are now available
+```
+
 #### Options
 
 | Option | Type | Description |
 |--------|------|-------------|
-| `customerId` | `string` | Unique identifier for the customer |
+| `customerId` | `string` | Unique identifier for the customer (required for entitlements) |
+| `productId` | `string` | Product identifier for fetching pricing data (required for pricing) |
 | `accessToken` | `string` | Authentication token for API requests |
 | `environment` | `sandbox\|production` | 'production' | The environment to use. If you want to use the sandbox, you must provide this. |
-| `initializeAndFetch` | `boolean` | `true` | Automatically fetch entitlements on initialization |
+| `initializeAndFetch` | `boolean` | `true` | Automatically fetch data on initialization |
 | `onError` | `(error: Error) => void` | Error callback function |
+| `mainApiUrl` | `string` | Optional override for the main API base URL (used by pricing) |
+
+<Note>At least one of `customerId` or `productId` must be provided.</Note>
 
 
 ### Core Methods
@@ -226,6 +260,114 @@ kq.clearCache();
 // Next call to hasAccess or getEntitlement will need a new fetch
 ```
 
+### Pricing Methods
+
+#### `fetchPricing(forceRefresh?: boolean): Promise<RawPricingApiResponse>`
+
+Fetch product offering and pricing data. Requires `productId` to be set. Results are cached; use `forceRefresh` to bypass the cache.
+
+```typescript
+const pricing = await kq.fetchPricing();
+console.log(`Plans: ${pricing.plans.length}`);
+console.log(`Currency: ${pricing.currencySymbol}`);
+```
+
+#### `getPricing(): RawPricingApiResponse | null`
+
+Get cached pricing data. Returns `null` if not yet fetched.
+
+```typescript
+const pricing = kq.getPricing();
+if (pricing) {
+  pricing.plans.forEach(plan => {
+    console.log(`${plan.displayName}: ${plan.price.priceType}`);
+  });
+}
+```
+
+#### `getPlan(identifier: string): RawPricingPlan | null`
+
+Find an enabled plan by its identifier from cached pricing data.
+
+```typescript
+const starterPlan = kq.getPlan('starter');
+if (starterPlan) {
+  const monthlyCharge = starterPlan.price.charges.find(c => c.chargePeriod === 'MONTHLY');
+  console.log(`Monthly price: ${monthlyCharge?.priceData.amount}`);
+}
+```
+
+#### `isPricingLoading(): boolean`
+
+Check if pricing data is currently being fetched.
+
+#### `getLastPricingError(): Error | null`
+
+Get the last error from a pricing fetch.
+
+#### `clearPricingCache(): void`
+
+Clear cached pricing data and reset pricing state.
+
+```typescript
+kq.clearPricingCache();
+// Next call to getPricing will need a new fetch
+```
+
+### `renderPricing()` — DOM Binding
+
+Automatically populate pricing into HTML elements using `data-kq-price` attributes. The SDK scans the DOM for elements with these attributes and fills in formatted prices.
+
+```html
+<span data-kq-price="starter" data-kq-period="MONTHLY">Loading...</span>
+<span data-kq-price="starter" data-kq-period="ANNUALLY">Loading...</span>
+<span data-kq-price="free" data-kq-period="MONTHLY">Loading...</span>
+```
+
+```typescript
+const kq = kelviqSDK({
+  productId: "your-product-id",
+  accessToken: "your-access-token",
+});
+
+await kq.ready();
+kq.renderPricing(); // Scans DOM and populates data-kq-price elements
+```
+
+- `data-kq-price` — the plan identifier (e.g., `"starter"`, `"pro"`)
+- `data-kq-period` — the charge period (e.g., `"MONTHLY"`, `"ANNUALLY"`)
+- Free plans display `"Free"` instead of a price
+- Disabled or missing plans result in empty text
+
+You can scope the scan to a container and pass formatting options:
+
+```typescript
+kq.renderPricing({
+  container: document.getElementById('pricing-section'),
+  formatOptions: { compact: true },
+});
+```
+
+### `kqFormatPrice` Utility
+
+A standalone utility for formatting prices with locale-aware currency formatting.
+
+```typescript
+import { kqFormatPrice } from '@kelviq/js-sdk';
+
+kqFormatPrice(49.99, '$');                    // "$49.99"
+kqFormatPrice(1299, '$', { compact: true });  // "$1.3K"
+kqFormatPrice(100, '€', { locale: 'de-DE' }); // "€100"
+kqFormatPrice(29, '$', { includeCurrencySymbol: false }); // "29"
+```
+
+| Option | Type | Default | Description |
+|--------|------|---------|-------------|
+| `compact` | `boolean` | `false` | Use compact notation (e.g., "1.2K") |
+| `locale` | `string` | `'en-US'` | Locale for number formatting |
+| `includeCurrencySymbol` | `boolean` | `true` | Include the currency symbol |
+| `pricingLocale` | `string` | — | Fallback locale (from pricing API response) |
+
 ## Entitlement Types
 
 The SDK uses a single, unified `Entitlement` interface. When the API returns duplicate `featureId`s (e.g., from Subscriptions + Top-ups), they are aggregated automatically.
@@ -244,6 +386,54 @@ interface Entitlement {
 ```
 
 Per-item details such as `resetAt` and `hardLimit` are available on each item in the `items` array.
+
+## Pricing Types
+
+The pricing API returns a rich data structure with plans, charges, features, and billing periods.
+
+```typescript
+interface RawPricingApiResponse {
+  organizationId: number;
+  countryCode: string;
+  pricingLocale: string;
+  currencyCode: string;
+  currencySymbol: string;
+  currencyConversionRate: number;
+  baseCurrencyCode: string;
+  baseCurrencySymbol: string;
+  plans: RawPricingPlan[];
+  subscription: { hasPreviousSubscription: boolean };
+  isCustomerExists: boolean;
+  billingPeriods: RawPricingBillingPeriod[];
+}
+
+interface RawPricingPlan {
+  name: string;
+  identifier: string;
+  displayName: string;
+  displayDescription: string;
+  price: RawPricingPrice;
+  features: RawPricingFeature[];
+  enabled: boolean;
+  shouldHighlight: boolean;
+  // ... additional fields
+}
+
+interface RawPricingPrice {
+  priceType: 'FREE' | 'PAID';
+  charges: RawPricingCharge[];
+  freeTrial: boolean;
+  trialPeriod: number;
+  currency: string;
+}
+
+interface RawPricingCharge {
+  chargePeriod: string;      // e.g., "MONTHLY", "ANNUALLY"
+  priceData: { amount: number };
+}
+```
+
+All pricing types are exported from the SDK: `RawPricingApiResponse`, `RawPricingPlan`, `RawPricingPrice`, `RawPricingCharge`, `RawPricingFeature`, `RawPricingBillingPeriod`.
 
 ## Examples
 
