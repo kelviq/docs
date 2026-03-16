@@ -9,8 +9,9 @@ The `@kelviq/react-sdk` provides a seamless way to integrate kelviq entitlement 
 ## Overview
 
 - A **React Context Provider** (`KelviqProvider`) to initialize and configure the SDK.
-- **Hooks** to easily access entitlement status and data within your components.
+- **Hooks** to easily access entitlement status, pricing, and data within your components.
 - **Conditional rendering components** to show or hide UI elements based on feature access.
+- **Pricing components** (`KQPrice`, `KQFeatureList`) for displaying localized plan pricing and features.
 - Automatic and manual **data fetching** and caching mechanisms.
 
 The SDK fetches all entitlements for a given organization and customer, caches them, and makes them available throughout your application via React Context and custom hooks.
@@ -44,6 +45,10 @@ const App = () => {
     <KelviqProvider
       customerId="your-customer-id"
       accessToken="your-access-token"
+      productId="your-product-id"
+      config={{
+        fetchPricingOnMount: true, // fetch pricing data on mount
+      }}
     >
       <MyAppContent />
     </KelviqProvider>
@@ -66,14 +71,16 @@ export default App;
 
 ### Required Props for `KelviqProvider`
 
-- `customerId: string`
-  - The ID of the customer for whom entitlements are being fetched. This will be sent as a query parameter (`customer_id`).
 - `accessToken: string | null`
   - Your **Client API Key** for authenticating requests to the Kelviq API. This key is safe to expose in client-side code. You can find it in the [API keys](https://app.kelviq.com/settings/api-keys) section of your Kelviq dashboard. Never use your Server API Key in client-side code.
 
 ### Optional Props for `KelviqProvider`
 <Expandable title="Optional Props">
-  
+
+- `customerId?: string`
+  - The ID of the customer for whom entitlements are being fetched. This will be sent as a query parameter (`customer_id`). Required for entitlements, subscriptions, and customer data. Optional when only using pricing.
+- `productId?: string`
+  - The product identifier for fetching pricing/offering data. Required when `fetchPricingOnMount` is `true`.
 - `apiUrl: string`
   - The base URL for your kelviq API. For example, `https://edge.api.kelviq.com/api/v1`.
 - `environment: 'sandbox' | 'production'`
@@ -104,6 +111,9 @@ This optional object can contain the following properties:
 - `fetchCustomerOnMount?: boolean`
   - Defaults to `false`. If true, customer data is fetched automatically when the `KelviqProvider` mounts.
   - When enabled, data is available via the `useCustomer()` hook or `customer` from `useKelviq()`.
+- `fetchPricingOnMount?: boolean`
+  - Defaults to `false`. If true, pricing/offering data is fetched automatically when the `KelviqProvider` mounts. Requires `productId` to be set on the provider.
+  - When enabled, data is available via the `usePricing()` hook or `pricing` from `useKelviq()`.
 </Expandable>
 
 
@@ -172,6 +182,8 @@ This is the primary hook to access the SDK's context.
   - `refreshSubscriptions: () => Promise<void>`: Function to manually trigger a re-fetch of the customer's subscriptions.
   - `customer: AsyncState<RawCustomerApiResponse | null>`: The state object for customer data. Only populated when `fetchCustomerOnMount` is `true` or after calling `refreshCustomer()`.
   - `refreshCustomer: () => Promise<void>`: Function to manually trigger a re-fetch of the customer data.
+  - `pricing: AsyncState<RawPricingApiResponse | null>`: The state object for pricing/offering data with localized currency. Only populated when `fetchPricingOnMount` is `true` or after calling `refreshPricing()`.
+  - `refreshPricing: () => Promise<void>`: Function to manually trigger a re-fetch of the pricing data.
   - `isLoading: boolean`: A global loading state indicating if the SDK is performing its initial configured fetch or a refresh operation.
   - `error: Error | null`: A global error state reflecting any error from the last fetch operation initiated by the provider.
   - `customerId: string`: The customer ID passed to the provider.
@@ -788,6 +800,41 @@ function CustomerProfile() {
 You must enable `fetchCustomerOnMount: true` in the provider's `config` prop, or call `refreshCustomer()` manually, for this hook to return data.
 </Note>
 
+### `usePricing()`
+
+Returns the pricing/offering data for the configured product. Includes localized currency information, plans, features, and billing periods. Only populated when `fetchPricingOnMount` is enabled in the provider config, or after calling `refreshPricing()` from `useKelviq()`.
+
+- **Returns:** `AsyncState<RawPricingApiResponse | null>`
+
+```tsx
+import { usePricing } from '@kelviq/react-sdk';
+
+function PricingDisplay() {
+  const { data: pricing, isLoading, error } = usePricing();
+
+  if (isLoading) return <p>Loading pricing...</p>;
+  if (error) return <p>Error: {error.message}</p>;
+  if (!pricing) return <p>No pricing data.</p>;
+
+  return (
+    <div>
+      <p>Currency: {pricing.currencySymbol} ({pricing.currencyCode})</p>
+      <ul>
+        {pricing.plans.map(plan => (
+          <li key={plan.id}>
+            {plan.displayName} — {plan.price.priceType}
+          </li>
+        ))}
+      </ul>
+    </div>
+  );
+}
+```
+
+<Note>
+You must set `productId` on the provider and enable `fetchPricingOnMount: true` in the provider's `config` prop, or call `refreshPricing()` manually, for this hook to return data.
+</Note>
+
 **Example using a specific entitlement hook:**
 
 ``` tsx
@@ -971,7 +1018,113 @@ import { ShowWhenMeteredEntitled } from '@kelviq/react-sdk';
 ```
 </Accordion>
 
-## **7. Key Types**
+## **7. Pricing Components**
+
+The SDK provides render-prop components for displaying pricing data. These require `productId` on the provider and `fetchPricingOnMount: true` (or a manual `refreshPricing()` call).
+
+### `KQPrice`
+
+Renders pricing information for a specific plan and billing period. Provides a `formattedPrice` string with locale-aware number formatting and currency symbol.
+
+**Props:**
+- `planIdentifier: string`: The plan identifier to display pricing for.
+- `billingPeriod: string`: The billing period to show (e.g. `"MONTHLY"`, `"YEARLY"`, `"ONE_TIME"`).
+- `children: (data) => ReactNode`: Render function receiving price data.
+- `formatOptions?: KQFormatPriceOptions`: Options for the `formattedPrice` string.
+- `loadingComponent?: ReactNode`: Shown while pricing data is loading.
+- `fallback?: ReactNode`: Shown when the plan is not found or pricing data is unavailable.
+
+```tsx
+import { KQPrice } from '@kelviq/react-sdk';
+
+<KQPrice
+  planIdentifier="pro-plan"
+  billingPeriod="MONTHLY"
+  fallback={<p>Price not available</p>}
+>
+  {({ formattedPrice, isFree, hasFreeTrial, trialPeriod }) => (
+    <div>
+      <h3>{formattedPrice}</h3>
+      {hasFreeTrial && <p>{trialPeriod}-day free trial</p>}
+    </div>
+  )}
+</KQPrice>
+```
+
+<Accordion title="Render Prop Data">
+The `children` render function receives an object with:
+- `plan`: The full plan object (`RawPricingPlan`).
+- `charge`: The matching charge for the billing period (`RawPricingCharge | null`).
+- `amount: number`: The raw price amount.
+- `formattedPrice: string`: Locale-formatted price string (e.g. `"$49.99"`, `"Free"`).
+- `currencySymbol: string`: The currency symbol (e.g. `"$"`, `"€"`).
+- `currencyCode: string`: The currency code (e.g. `"USD"`, `"EUR"`).
+- `pricingLocale: string`: The locale used for pricing (e.g. `"en-US"`).
+- `isFree: boolean`: Whether the plan is free.
+- `hasFreeTrial: boolean`: Whether the plan has a free trial.
+- `trialPeriod: number`: Trial period in days.
+</Accordion>
+
+#### `KQFormatPriceOptions`
+
+Options for customizing the `formattedPrice` string:
+
+- `compact?: boolean`: Use compact notation (e.g. `"1.2K"` instead of `"1,200"`). Defaults to `false`.
+- `locale?: string`: Locale for number formatting. Defaults to the `pricingLocale` from the API.
+- `includeCurrencySymbol?: boolean`: Whether to include the currency symbol. Defaults to `true`.
+
+### `KQFeatureList`
+
+Iterates over features for a specific plan, calling the render function for each feature.
+
+**Props:**
+- `planIdentifier: string`: The plan identifier to display features for.
+- `children: (data) => ReactNode`: Render function called for each feature.
+- `featureType?: 'BOOLEAN' | 'METER'`: Optional filter to show only specific feature types.
+- `loadingComponent?: ReactNode`: Shown while pricing data is loading.
+- `fallback?: ReactNode`: Shown when the plan is not found or has no features.
+
+```tsx
+import { KQFeatureList } from '@kelviq/react-sdk';
+
+<KQFeatureList
+  planIdentifier="pro-plan"
+  fallback={<p>No features</p>}
+>
+  {({ feature }) => (
+    <div key={feature.id}>
+      <span>{feature.displayName}</span>
+      <span>
+        {feature.featureType === 'BOOLEAN'
+          ? feature.value ? '✓' : '✗'
+          : feature.value}
+      </span>
+    </div>
+  )}
+</KQFeatureList>
+```
+
+<Accordion title="Render Prop Data">
+The `children` render function receives an object with:
+- `feature`: The feature object (`RawPricingFeature`) with `id`, `displayName`, `featureType`, `value`, `enabled`.
+- `plan`: The full plan object (`RawPricingPlan`).
+- `index: number`: The index of the feature in the list.
+</Accordion>
+
+### `kqFormatPrice(amount, currencySymbol, options?)`
+
+A standalone utility function for formatting prices. Exported from the SDK for use outside of components.
+
+```tsx
+import { kqFormatPrice } from '@kelviq/react-sdk';
+
+kqFormatPrice(1299.99, '$');              // "$1,299.99"
+kqFormatPrice(1299.99, '$', { compact: true }); // "$1.3K"
+kqFormatPrice(49.99, '€', { locale: 'de-DE' }); // "€49,99"
+kqFormatPrice(49.99, '$', { includeCurrencySymbol: false }); // "49.99"
+```
+
+## **8. Key Types**
 
 The SDK exports several types for better integration with TypeScript. Some key ones include:
 
@@ -985,6 +1138,11 @@ The SDK exports several types for better integration with TypeScript. Some key o
 - `RawSubscriptionData`: A single subscription object as returned by the subscriptions API, including `plan`, `product`, `features`, `status`, `amount`, `recurrence`, etc.
 - `RawCustomerApiResponse`: Customer data as returned by the customer API, including `id`, `customerId`, `name`, `email`, `billingAddress`, `details`, `metadata`, `createdOn`, and `modifiedOn`.
 - `RawBillingAddress`: The billing address object (`country`, `line1`, `line2`, `postalCode`, `city`, `state`).
+- `RawPricingApiResponse`: The full pricing/offering API response including `plans`, `currencySymbol`, `currencyCode`, `pricingLocale`, and `billingPeriods`.
+- `RawPricingPlan`: A single plan with `identifier`, `displayName`, `displayDescription`, `price`, `features`, and `enabled`.
+- `RawPricingFeature`: A plan feature with `id`, `displayName`, `featureType`, `value`, and `enabled`.
+- `RawPricingCharge`: A charge entry with `chargePeriod` and `priceData` (containing `amount`).
+- `KQFormatPriceOptions`: Options for the `kqFormatPrice` utility (`compact`, `locale`, `includeCurrencySymbol`).
 
 You can import these types directly from the main SDK entry:
 
@@ -996,38 +1154,45 @@ import type {
   RawSubscriptionData,
   RawCustomerApiResponse,
   RawBillingAddress,
+  RawPricingApiResponse,
+  RawPricingPlan,
+  RawPricingFeature,
+  RawPricingCharge,
+  KQFormatPriceOptions,
 } from '@kelviq/react-sdk';
 ```
 
-## **8. Error Handling**
+## **9. Error Handling**
 
 - **Provider Level:** The `onError` callback in `config` (`KelviqApiBehaviorOptions`) can be used to globally handle errors that occur during the entitlement fetching process initiated by the provider.
 - **Context Level:** `useKelviq()` returns a global `isLoading: boolean` and `error: Error | null` state, reflecting the provider's most recent fetch operation. Use these for loading/error UI in your components.
 - **`allEntitlements` Level:** The `allEntitlements` object from `useKelviq()` or `useAllEntitlements()` also carries its own `isLoading` and `error` fields within the `AsyncState` wrapper.
 
-## **9. Example Usage**
+## **10. Example Usage**
 
 A comprehensive example is provided within the comments of the SDK code, demonstrating provider setup and component usage. The core setup involves:
 
 1. Wrapping your application with `KelviqProvider` and providing the required props (`customerId`, `accessToken`)
 2. Using hooks like `useBooleanEntitlement` or conditional components like `ShowWhenBooleanEntitled` in your components to control UI and behavior based on entitlements.
 
-## **10. API Request Service**
+## **11. API Request Service**
 
 The SDK relies on an `apiRequest` function for making HTTP requests. The SDK's `KelviqProvider` passes configuration like `timeout`, `maxRetries`, `backoffBaseDelay`, and `accessToken` to this function.
 
 - **Your Responsibility:** You need to ensure that your project includes an implementation of this `apiRequest` service (e.g., in `src/services/makeRequest.service.ts`) that matches the `ApiRequestConfig` and `ApiResponse` interfaces used by the SDK. This service should handle actual HTTP communication, including appending query parameters passed via `ApiRequestConfig.queryParams` and using the `accessToken` to set the `Authorization` header.
 - The placeholder `apiRequest` function included in the SDK's source code is for demonstration and type-checking purposes only and will not make real API calls.
 
-## **11. Project Structure (for contributors/reference)**
+## **12. Project Structure (for contributors/reference)**
 
 The SDK source code (`lib/`) is organized as follows:
 
-- `components/`: Contains conditional rendering React components.
+- `components/`: Contains conditional rendering and pricing React components.
   - `ShowWhenBooleanEntitled.tsx`
   - `ShowWhenCustomizableEntitled.tsx`
   - `ShowWhenMeteredEntitled.tsx`
   - `ShowWhenEntitledInternal.tsx` (Internal helper, not typically exported)
+  - `KQPrice.tsx`
+  - `KQFeatureList.tsx`
 - `contexts/`: Defines the React Context and Provider.
   - `KelviqContext.ts`
   - `KelviqProvider.tsx`
@@ -1039,13 +1204,15 @@ The SDK source code (`lib/`) is organized as follows:
   - `useMeteredEntitlement.ts`
   - `useSubscriptions.ts`
   - `useCustomer.ts`
+  - `usePricing.ts`
   - `index.ts` (Exports all hooks)
 - `types/`: Contains all TypeScript definitions.
-  - `api.types.ts` (Raw types from API)
+  - `api.types.ts` (Raw types from API, including pricing types)
   - `sdk.types.ts` (Processed types for SDK and public use)
   - `index.ts` (Re-exports all types)
 - `utils/`: Contains utility functions.
   - `transformations.ts` (For `transformApiEntitlements`)
+  - `formatPrice.ts` (For `kqFormatPrice`)
   - `index.ts` (Exports utilities)
 - `index.ts`: The main entry point of the SDK, re-exporting all public APIs (provider, hooks, components, types).
 
