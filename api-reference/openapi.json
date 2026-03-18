@@ -631,7 +631,7 @@
           },
           "chargePeriod": {
             "type": "string",
-            "description": "The billing cycle for the subscription.",
+            "description": "The billing cycle for the subscription. If the plan is free, pass `ONE_TIME` as the chargePeriod.",
             "enum": [
               "ONE_TIME",
               "MONTHLY",
