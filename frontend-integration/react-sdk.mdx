@@ -46,6 +46,7 @@ const App = () => {
       customerId="your-customer-id"
       accessToken="your-access-token"
       productId="your-product-id"
+      plansEnabled="pro,enterprise" // optional: filter to specific plans
       config={{
         fetchPricingOnMount: true, // fetch pricing data on mount
       }}
@@ -81,6 +82,8 @@ export default App;
   - The ID of the customer for whom entitlements are being fetched. This will be sent as a query parameter (`customer_id`). Required for entitlements, subscriptions, and customer data. Optional when only using pricing.
 - `productId?: string`
   - The product identifier for fetching pricing/offering data. Required when `fetchPricingOnMount` is `true`.
+- `plansEnabled?: string`
+  - Comma-separated list of plan identifiers to include in the pricing response. When omitted, all active plans for the product are returned. Example: `"pro,enterprise"`.
 - `apiUrl: string`
   - The base URL for your kelviq API. For example, `https://edge.api.kelviq.com/api/v1`.
 - `environment: 'sandbox' | 'production'`
@@ -833,6 +836,8 @@ function PricingDisplay() {
 
 <Note>
 You must set `productId` on the provider and enable `fetchPricingOnMount: true` in the provider's `config` prop, or call `refreshPricing()` manually, for this hook to return data.
+
+When `customerId` is provided, the pricing response includes the customer's active subscription details and the `isCustomerExists` flag. Use `plansEnabled` to filter the response to specific plans (e.g., `"pro,enterprise"`).
 </Note>
 
 **Example using a specific entitlement hook:**
