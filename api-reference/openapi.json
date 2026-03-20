@@ -290,6 +290,19 @@
             "nullable": true,
             "description": "The IP Address of the customer, used for location-based pricing.",
             "example": "103.154.35.20"
+          },
+          "cancelUrl": {
+            "type": "string",
+            "format": "url",
+            "nullable": true,
+            "description": "The URL to which the user will be redirected if the payment is cancelled.",
+            "example": "https://kelviq.com/checkout/cancel"
+          },
+          "plansEnabled": {
+            "type": "string",
+            "nullable": true,
+            "description": "A comma-separated list of plan identifiers to display on the checkout page.",
+            "example": "plan-pro-monthly,plan-pro-yearly"
           }
         }
       },
