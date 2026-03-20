@@ -2484,7 +2484,7 @@
           "Subscriptions"
         ],
         "summary": "Update a subscription",
-        "description": "Updates an existing subscription to a new plan, charge period, and/or features.",
+        "description": "Updates an existing subscription to a new plan, charge period, and/or features.\n\n> **Warning:** Free plans are created as one-time charges. Upgrading from a free plan is not supported via this endpoint. Use the [Create Checkout Session](/api/v1/checkout/) endpoint instead.",
         "operationId": "updateSubscription",
         "parameters": [
           {
