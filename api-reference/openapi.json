@@ -1012,6 +1012,41 @@
           }
         }
       },
+      "CreatePortalSessionRequest": {
+        "type": "object",
+        "required": [
+          "customerId"
+        ],
+        "properties": {
+          "customerId": {
+            "type": "string",
+            "description": "The unique identifier of the customer for whom the portal session is being created.",
+            "example": "cust_789"
+          }
+        }
+      },
+      "CreatePortalSessionResponse": {
+        "type": "object",
+        "properties": {
+          "token": {
+            "type": "string",
+            "description": "The session token for authenticating the customer portal session.",
+            "example": "cpt-4f7c5dc4-da9f-447b-d447-6266dc35ed6d:23fca530-adeb-4685-b3d5-9928c6d38275"
+          },
+          "email": {
+            "type": "string",
+            "format": "email",
+            "description": "The email address of the customer.",
+            "example": "geo@example.com"
+          },
+          "customerPortalUrl": {
+            "type": "string",
+            "format": "url",
+            "description": "The URL to redirect the customer to their billing portal.",
+            "example": "https://www.kelviq.com/portal/aphelo/"
+          }
+        }
+      },
       "CancelSubscriptionRequest": {
         "type": "object",
         "required": [
@@ -3207,6 +3242,51 @@
           },
           "404": {
             "description": "Promotion not found"
+          }
+        }
+      }
+    },
+    "/portal/session/": {
+      "post": {
+        "tags": [
+          "Portal"
+        ],
+        "summary": "Create a portal session",
+        "description": "Creates a new customer portal session, returning a token and URL to redirect the customer to their billing portal.",
+        "operationId": "createPortalSession",
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CreatePortalSessionRequest"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Portal Session Created",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/CreatePortalSessionResponse"
+                },
+                "example": {
+                  "token": "cpt-4f7c5dc4-da9f-447b-d447-6266dc35ed6d:23fca530-adeb-4685-b3d5-9928c6d38275",
+                  "email": "geo@example.com",
+                  "customerPortalUrl": "https://www.kelviq.com/portal/aphelo/"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized — missing or invalid API key"
           }
         }
       }
