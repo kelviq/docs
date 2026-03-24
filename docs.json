@@ -12,7 +12,7 @@
   "integrations": {
     "posthog": {
         "apiKey": "phc_SG5oh2LfDgDWOpoTingeHcyUWSiQBxgGhYgkfNUv5Qb",
-        "apiHost": "https://us.i.posthog.com"
+        "apiHost": "https://d.kelviq.com"
     }
   },
   "navigation": {
