@@ -92,6 +92,8 @@ The SDK currently supports the following operations:
 
     5. [Subscriptions](/backend-integration/python-sdk#subscriptions)
 
+    6. [Portal](/backend-integration/python-sdk#portal)
+
 ---
 
 ## Customers
@@ -911,6 +913,63 @@ An instance of `CancelSubscriptionResponse`, which includes:
 
 * `message` (str): A confirmation message indicating the result of the cancellation request.
 
+
+
+---
+
+## Portal
+
+The portal module allows you to create authenticated customer portal sessions. Once a session is created, you can redirect your customer directly to their self-serve customer portal without requiring them to log in manually. You can access these operations via the `portal` attribute on an initialized `Kelviq` client instance.
+
+All methods are available in both synchronous and asynchronous versions, depending on how the `Kelviq` client was instantiated.
+
+### Creates a new customer portal session
+
+`create_session(...)`
+This operation creates a new portal session for a customer, returning a pre-authenticated URL that you can redirect them to.
+
+**Synchronous**:
+
+```python
+session = client.portal.create_session(
+    customerId="cust_789",
+)
+# Redirect your customer to the portal
+print(f"Portal URL: {session.customerPortalUrl}")
+```
+
+**Asynchronous**:
+
+```python
+session = await async_client.portal.create_session(
+    customerId="cust_789",
+)
+# Redirect your customer to the portal
+print(f"Portal URL: {session.customerPortalUrl}")
+```
+
+<Accordion title="Response">
+
+  ```json
+  {
+      "token": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...",
+      "email": "customer@example.com",
+      "customerPortalUrl": "https://portal.kelviq.com/session/eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9..."
+  }
+  ```
+</Accordion>
+
+**Required Parameters:**
+
+* `customerId` (str): The unique identifier of the customer for whom the portal session is being created.
+
+**Returns:**
+
+An instance of `CreatePortalSessionResponse` (Pydantic model), which includes:
+
+* `token` (str): The session token that authenticates the customer portal session.
+* `email` (str): The email address of the customer.
+* `customerPortalUrl` (str): The URL to redirect the customer to their customer portal. This link is pre-authenticated — no login required.
 
 
 ---
