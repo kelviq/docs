@@ -435,15 +435,25 @@
           "license": {
             "id": "7be7a5b6-7a0e-4178-a085-8ef48f0649ab",
             "licenseKey": "LIC-A8D5F89E-B46B-472C-9BED-66EE2545B85E",
-            "activatedOn": "2026-01-22T03:26:56.836323Z",
-            "expiresOn": "2026-01-23T03:26:56.836323Z",
-            "activationUsage": 0,
-            "activationLimit": 2,
+            "activatedOn": "2026-01-22T03:26:56Z",
+            "expiresOn": "2026-01-23T03:26:56Z",
+            "activationUsage": 1,
+            "activationLimit": 4,
             "enabled": true,
             "customer": {
               "customerId": "cfa95cf8c8d24e8b9d3d2d1ada98a94d",
               "name": "Geo",
-              "email": "hazelmathew7+100@gmail.com"
+              "email": "geo@kelviq.com"
+            },
+            "plan": {
+              "identifier": "pro-yearly",
+              "name": "Pro Yearly",
+              "product": {
+                "id": "d970ab2d-834f-4c52-8742-2e6ed7e8a31f",
+                "identifier": "kelviq-engine",
+                "name": "Kelviq Engine",
+                "taxCode": "software"
+              }
             }
           }
         }
@@ -610,6 +620,9 @@
           "metadata": {
             "type": "object",
             "additionalProperties": true
+          },
+          "license": {
+            "$ref": "#/components/schemas/LicenseDetails"
           }
         },
         "example": {
@@ -619,6 +632,30 @@
           "metadata": {
             "os": "macOS",
             "arch": "arm64"
+          },
+          "license": {
+            "id": "7be7a5b6-7a0e-4178-a085-8ef48f0649ab",
+            "licenseKey": "LIC-A8D5F89E-B46B-472C-9BED-66EE2545B85E",
+            "activatedOn": "2026-01-22T03:26:56Z",
+            "expiresOn": "2026-01-23T03:26:56Z",
+            "activationUsage": 1,
+            "activationLimit": 4,
+            "enabled": true,
+            "customer": {
+              "customerId": "cfa95cf8c8d24e8b9d3d2d1ada98a94d",
+              "name": "Geo",
+              "email": "geo@kelviq.com"
+            },
+            "plan": {
+              "identifier": "pro-yearly",
+              "name": "Pro Yearly",
+              "product": {
+                "id": "d970ab2d-834f-4c52-8742-2e6ed7e8a31f",
+                "identifier": "kelviq-engine",
+                "name": "Kelviq Engine",
+                "taxCode": "software"
+              }
+            }
           }
         }
       },
@@ -2255,6 +2292,30 @@
                   "metadata": {
                     "os": "macOS",
                     "arch": "arm64"
+                  },
+                  "license": {
+                    "id": "7be7a5b6-7a0e-4178-a085-8ef48f0649ab",
+                    "licenseKey": "LIC-A8D5F89E-B46B-472C-9BED-66EE2545B85E",
+                    "activatedOn": "2026-01-22T03:26:56Z",
+                    "expiresOn": "2026-01-23T03:26:56Z",
+                    "activationUsage": 1,
+                    "activationLimit": 4,
+                    "enabled": true,
+                    "customer": {
+                      "customerId": "cfa95cf8c8d24e8b9d3d2d1ada98a94d",
+                      "name": "Geo",
+                      "email": "geo@kelviq.com"
+                    },
+                    "plan": {
+                      "identifier": "pro-yearly",
+                      "name": "Pro Yearly",
+                      "product": {
+                        "id": "d970ab2d-834f-4c52-8742-2e6ed7e8a31f",
+                        "identifier": "kelviq-engine",
+                        "name": "Kelviq Engine",
+                        "taxCode": "software"
+                      }
+                    }
                   }
                 }
               }
