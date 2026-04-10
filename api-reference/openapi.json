@@ -454,6 +454,21 @@
                 "name": "Kelviq Engine",
                 "taxCode": "software"
               }
+            },
+            "subscription": {
+              "id": "09d706ca-58f3-4fb2-818f-5b8623d67e6e",
+              "recurrence": "1 month",
+              "billingPeriodStartTime": "2026-01-22T03:26:56Z",
+              "billingPeriodEndTime": "2026-02-22T03:26:56Z",
+              "startDate": "2026-01-22",
+              "endDate": null,
+              "status": "active",
+              "amount": "49.00",
+              "currency": "usd",
+              "trialDaysRemaining": 0,
+              "billingType": "SUBSCRIPTION",
+              "recurrenceUnit": 1,
+              "recurrenceType": "MONTH"
             }
           }
         }
@@ -545,6 +560,66 @@
               },
               "isLatest": {
                 "type": "boolean"
+              }
+            }
+          },
+          "subscription": {
+            "type": "object",
+            "nullable": true,
+            "properties": {
+              "id": {
+                "type": "string",
+                "format": "uuid"
+              },
+              "recurrence": {
+                "type": "string",
+                "nullable": true
+              },
+              "billingPeriodStartTime": {
+                "type": "string",
+                "format": "date-time",
+                "nullable": true
+              },
+              "billingPeriodEndTime": {
+                "type": "string",
+                "format": "date-time",
+                "nullable": true
+              },
+              "startDate": {
+                "type": "string",
+                "format": "date"
+              },
+              "endDate": {
+                "type": "string",
+                "format": "date",
+                "nullable": true
+              },
+              "status": {
+                "type": "string",
+                "nullable": true
+              },
+              "amount": {
+                "type": "string",
+                "nullable": true
+              },
+              "currency": {
+                "type": "string",
+                "nullable": true
+              },
+              "trialDaysRemaining": {
+                "type": "integer"
+              },
+              "billingType": {
+                "type": "string",
+                "enum": ["SUBSCRIPTION", "ONE_TIME"]
+              },
+              "recurrenceUnit": {
+                "type": "integer",
+                "nullable": true
+              },
+              "recurrenceType": {
+                "type": "string",
+                "nullable": true
               }
             }
           }
@@ -655,6 +730,21 @@
                 "name": "Kelviq Engine",
                 "taxCode": "software"
               }
+            },
+            "subscription": {
+              "id": "09d706ca-58f3-4fb2-818f-5b8623d67e6e",
+              "recurrence": "1 month",
+              "billingPeriodStartTime": "2026-01-22T03:26:56Z",
+              "billingPeriodEndTime": "2026-02-22T03:26:56Z",
+              "startDate": "2026-01-22",
+              "endDate": null,
+              "status": "active",
+              "amount": "49.00",
+              "currency": "usd",
+              "trialDaysRemaining": 0,
+              "billingType": "SUBSCRIPTION",
+              "recurrenceUnit": 1,
+              "recurrenceType": "MONTH"
             }
           }
         }
@@ -1598,6 +1688,18 @@
           },
           "customerId": {
             "type": "string"
+          },
+          "billingType": {
+            "type": "string",
+            "enum": ["SUBSCRIPTION", "ONE_TIME"]
+          },
+          "recurrenceUnit": {
+            "type": "integer",
+            "nullable": true
+          },
+          "recurrenceType": {
+            "type": "string",
+            "nullable": true
           }
         }
       },
@@ -2132,6 +2234,21 @@
                         "name": "Kelviq Engine",
                         "taxCode": "software"
                       }
+                    },
+                    "subscription": {
+                      "id": "09d706ca-58f3-4fb2-818f-5b8623d67e6e",
+                      "recurrence": "1 month",
+                      "billingPeriodStartTime": "2026-01-22T03:26:56Z",
+                      "billingPeriodEndTime": "2026-02-22T03:26:56Z",
+                      "startDate": "2026-01-22",
+                      "endDate": null,
+                      "status": "active",
+                      "amount": "49.00",
+                      "currency": "usd",
+                      "trialDaysRemaining": 0,
+                      "billingType": "SUBSCRIPTION",
+                      "recurrenceUnit": 1,
+                      "recurrenceType": "MONTH"
                     }
                   }
                 }
@@ -2315,6 +2432,21 @@
                         "name": "Kelviq Engine",
                         "taxCode": "software"
                       }
+                    },
+                    "subscription": {
+                      "id": "09d706ca-58f3-4fb2-818f-5b8623d67e6e",
+                      "recurrence": "1 month",
+                      "billingPeriodStartTime": "2026-01-22T03:26:56Z",
+                      "billingPeriodEndTime": "2026-02-22T03:26:56Z",
+                      "startDate": "2026-01-22",
+                      "endDate": null,
+                      "status": "active",
+                      "amount": "49.00",
+                      "currency": "usd",
+                      "trialDaysRemaining": 0,
+                      "billingType": "SUBSCRIPTION",
+                      "recurrenceUnit": 1,
+                      "recurrenceType": "MONTH"
                     }
                   }
                 }
@@ -2452,7 +2584,10 @@
                   },
                   "features": [],
                   "trialDaysRemaining": 1,
-                  "customerId": "geojacob"
+                  "customerId": "geojacob",
+                  "billingType": "SUBSCRIPTION",
+                  "recurrenceUnit": 1,
+                  "recurrenceType": "MONTH"
                 }
               }
             }
@@ -2564,7 +2699,10 @@
                         }
                       ],
                       "trialDaysRemaining": 0,
-                      "customerId": "testuser"
+                      "customerId": "testuser",
+                      "billingType": "SUBSCRIPTION",
+                      "recurrenceUnit": 1,
+                      "recurrenceType": "MONTH"
                     }
                   ]
                 }
