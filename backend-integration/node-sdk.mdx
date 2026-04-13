@@ -85,7 +85,9 @@ The SDK currently supports the following operations:
 
     5. [Subscriptions](/api-reference/backend-integration/node-sdk#subscriptions)
 
-    6. [Portal](/api-reference/backend-integration/node-sdk#portal)
+    6. [License](/api-reference/backend-integration/node-sdk#license)
+
+    7. [Portal](/api-reference/backend-integration/node-sdk#portal)
 
 ---
 
@@ -821,6 +823,241 @@ An instance of `CancelSubscriptionResponse`, which includes:
 
 * `message` : A confirmation message indicating the result of the cancellation request.
 
+
+---
+
+## License
+
+The `license` module allows you to activate, deactivate, and validate software licenses. You can access these operations via the `license` attribute on an initialized `Kelviq` client instance.
+
+---
+
+### Activate a license key
+
+Creates a new license instance for a given license key, optionally associating it with a customer.
+
+```typescript
+const response = await client.license.activate({
+    licenseKey: "LIC-XXXX-YYYY-ZZZZ",
+    customerId: "cust_789",
+    instanceName: "My MacBook Pro",
+    metadata: { os: "macOS", arch: "arm64" }
+});
+
+console.log(response.instanceId);
+```
+
+<Accordion title="Response">
+```json
+{
+  "instanceId": "8f3e2b1a-5c6d-4e9f-8a0b-1c2d3e4f5g6h",
+  "activatedAt": "2026-01-27T10:33:00Z",
+  "expiresOn": "2027-01-27T10:33:00Z",
+  "license": {
+    "id": "7be7a5b6-7a0e-4178-a085-8ef48f0649ab",
+    "licenseKey": "LIC-A8D5F89E-B46B-472C-9BED-66EE2545B85E",
+    "activatedOn": "2026-01-22T03:26:56Z",
+    "expiresOn": "2026-01-23T03:26:56Z",
+    "activationUsage": 1,
+    "activationLimit": 4,
+    "enabled": true,
+    "customer": {
+      "customerId": "cfa95cf8c8d24e8b9d3d2d1ada98a94d",
+      "name": "Geo",
+      "email": "geo@kelviq.com"
+    },
+    "plan": {
+      "identifier": "pro-yearly",
+      "name": "Pro Yearly",
+      "description": "Pro plan billed yearly",
+      "product": {
+        "id": "d970ab2d-834f-4c52-8742-2e6ed7e8a31f",
+        "identifier": "kelviq-engine",
+        "name": "Kelviq Engine",
+        "taxCode": "software",
+        "createdOn": "2025-01-01T00:00:00Z",
+        "modifiedOn": "2025-06-01T00:00:00Z"
+      },
+      "version": 1,
+      "isLatest": true
+    },
+    "subscription": {
+      "id": "09d706ca-58f3-4fb2-818f-5b8623d67e6e",
+      "recurrence": "1 month",
+      "billingPeriodStartTime": "2026-01-22T03:26:56Z",
+      "billingPeriodEndTime": "2026-02-22T03:26:56Z",
+      "startDate": "2026-01-22",
+      "endDate": null,
+      "status": "active",
+      "amount": "49.00",
+      "currency": "usd",
+      "trialDaysRemaining": 0,
+      "billingType": "SUBSCRIPTION",
+      "recurrenceUnit": 1,
+      "recurrenceType": "MONTH"
+    }
+  }
+}
+```
+</Accordion>
+
+**Required Parameters:**
+
+* `licenseKey` : The license key string to activate.
+
+**Optional Parameters:**
+
+* `customerId` : The ID of the customer this instance is associated with.
+* `instanceName` : A human-readable name for this instance (e.g. device name).
+* `metadata` : An object of custom key-value pairs to attach to the instance.
+
+**Returns:**
+
+An instance of `LicenseActivateResponse`, which includes:
+
+* `instanceId` (string): The unique ID of the newly created license instance.
+* `activatedAt` (string): ISO 8601 timestamp of when the instance was activated.
+* `expiresOn` (string | null): ISO 8601 timestamp of when the instance expires, if applicable.
+* `license` (`LicenseDetails`): The full license object. Key fields:
+    * `id` : Server-generated UUID for the license.
+    * `licenseKey` : The license key string.
+    * `activatedOn` (string | null): ISO 8601 timestamp of when the license was first activated.
+    * `expiresOn` (string | null): ISO 8601 timestamp of when the license expires.
+    * `activationUsage` : Number of currently active instances.
+    * `activationLimit` : Maximum number of allowed concurrent activations.
+    * `enabled` : Whether the license is active.
+    * `customer` (object | null): The associated customer, if any. Fields: `customerId`, `name`, `email`.
+    * `plan` (object | null): The plan associated with this license, if any. Fields: `identifier`, `name`, `description`, `version`, `isLatest`, and `product` (object with `id`, `identifier`, `name`, `taxCode`, `createdOn`, `modifiedOn`).
+    * `subscription` (object | null): Subscription details, if any. Fields: `id`, `recurrence`, `billingPeriodStartTime`, `billingPeriodEndTime`, `startDate`, `endDate`, `status`, `amount`, `currency`, `trialDaysRemaining`, `billingType`, `recurrenceUnit`, `recurrenceType`.
+
+---
+
+### Deactivate a license instance
+
+Deactivates a specific license instance by its instance ID.
+
+```typescript
+try {
+    const response = await client.license.deactivate({
+        licenseKey: "LIC-XXXX-YYYY-ZZZZ",
+        instanceId: "8f3e2b1a-5c6d-4e9f-8a0b-1c2d3e4f5a6b"
+    });
+    console.log(response.message);
+} catch (e) {
+    console.error(`Error deactivating license: ${e}`);
+}
+```
+
+<Accordion title="Response">
+```json
+{
+  "message": "License instance deactivated successfully.",
+  "deactivatedAt": "2026-01-27T10:35:00Z"
+}
+```
+</Accordion>
+
+**Required Parameters:**
+
+* `licenseKey` : The license key string.
+* `instanceId` : The unique ID of the instance to deactivate.
+
+**Returns:**
+
+An instance of `LicenseDeactivateResponse`, which includes:
+
+* `message` (string): Confirmation message.
+* `deactivatedAt` (string): ISO 8601 timestamp of when the instance was deactivated.
+
+---
+
+### Validate a license key
+
+Checks whether a license key (and optionally a specific instance) is valid.
+
+```typescript
+const response = await client.license.validate({
+    licenseKey: "LIC-XXXX-YYYY-ZZZZ",
+    instanceId: "8f3e2b1a-5c6d-4e9f-8a0b-1c2d3e4f5a6b"  // optional
+});
+
+if (response.valid) {
+    console.log("License is valid:", response.code);
+} else {
+    console.log("License invalid:", response.detail);
+}
+```
+
+<Accordion title="Response">
+```json
+{
+  "valid": true,
+  "code": "VALID",
+  "detail": "Instance ID valid for this license.",
+  "metadata": {
+    "os": "macOS",
+    "arch": "arm64"
+  },
+  "license": {
+    "id": "7be7a5b6-7a0e-4178-a085-8ef48f0649ab",
+    "licenseKey": "LIC-A8D5F89E-B46B-472C-9BED-66EE2545B85E",
+    "activatedOn": "2026-01-22T03:26:56Z",
+    "expiresOn": "2026-01-23T03:26:56Z",
+    "activationUsage": 1,
+    "activationLimit": 4,
+    "enabled": true,
+    "customer": {
+      "customerId": "cfa95cf8c8d24e8b9d3d2d1ada98a94d",
+      "name": "Geo",
+      "email": "geo@kelviq.com"
+    },
+    "plan": {
+      "identifier": "pro-yearly",
+      "name": "Pro Yearly",
+      "product": {
+        "id": "d970ab2d-834f-4c52-8742-2e6ed7e8a31f",
+        "identifier": "kelviq-engine",
+        "name": "Kelviq Engine",
+        "taxCode": "software"
+      }
+    },
+    "subscription": {
+      "id": "09d706ca-58f3-4fb2-818f-5b8623d67e6e",
+      "recurrence": "1 month",
+      "billingPeriodStartTime": "2026-01-22T03:26:56Z",
+      "billingPeriodEndTime": "2026-02-22T03:26:56Z",
+      "startDate": "2026-01-22",
+      "endDate": null,
+      "status": "active",
+      "amount": "49.00",
+      "currency": "usd",
+      "trialDaysRemaining": 0,
+      "billingType": "SUBSCRIPTION",
+      "recurrenceUnit": 1,
+      "recurrenceType": "MONTH"
+    }
+  }
+}
+```
+</Accordion>
+
+**Required Parameters:**
+
+* `licenseKey` : The license key string to validate.
+
+**Optional Parameters:**
+
+* `instanceId` : If provided, also validates that this specific instance is active for the given license key.
+
+**Returns:**
+
+An instance of `LicenseValidateResponse`, which includes:
+
+* `valid` (boolean): Whether the license (and instance, if provided) is valid.
+* `code` (string): A short status code (e.g. `"VALID"`, `"INVALID"`, `"EXPIRED"`).
+* `detail` (string): A human-readable description of the validation result.
+* `metadata` (object | null): Any metadata attached to the instance, if applicable.
+* `license` (`LicenseDetails | null`): The full license object (same structure as in `activate`), or `null` if not found.
 
 ---
 

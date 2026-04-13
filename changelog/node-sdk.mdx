@@ -5,6 +5,105 @@ mode: "wide"
 rss: true
 ---
 
+<Update label="v2.2.0" description="April 13, 2026">
+
+### New Features
+
+#### License Management Module
+
+A new `client.license` module provides full lifecycle management for software licenses.
+
+**`license.activate({ licenseKey, customerId?, instanceName?, metadata? })`**
+
+Activates a license key and creates a new instance. Returns a `LicenseActivateResponse` containing the `instanceId`, `activatedAt`, `expiresOn`, and the full `LicenseDetails` object.
+
+```typescript
+const response = await client.license.activate({
+    licenseKey: "LIC-XXXX-YYYY-ZZZZ",
+    customerId: "cust_789",
+    instanceName: "My MacBook Pro",
+    metadata: { os: "macOS", arch: "arm64" },
+});
+
+console.log(response.instanceId);
+console.log(response.license.activationUsage); // e.g. 1
+console.log(response.license.plan.product.name); // e.g. "Kelviq Engine"
+```
+
+**`license.deactivate({ licenseKey, instanceId })`**
+
+Deactivates a specific license instance. Returns a `LicenseDeactivateResponse` with `message` and `deactivatedAt`.
+
+```typescript
+const response = await client.license.deactivate({
+    licenseKey: "LIC-XXXX-YYYY-ZZZZ",
+    instanceId: "8f3e2b1a-5c6d-4e9f-8a0b-1c2d3e4f5g6h",
+});
+console.log(response.message); // "License instance deactivated successfully."
+```
+
+**`license.validate({ licenseKey, instanceId? })`**
+
+Validates a license key and optionally a specific instance. Returns a `LicenseValidateResponse` with `valid`, `code`, `detail`, `metadata`, and the full `LicenseDetails`.
+
+```typescript
+const response = await client.license.validate({
+    licenseKey: "LIC-XXXX-YYYY-ZZZZ",
+    instanceId: "8f3e2b1a-5c6d-4e9f-8a0b-1c2d3e4f5g6h",
+});
+
+if (response.valid) {
+    console.log(`Valid — code: ${response.code}`);
+} else {
+    console.log(`Invalid — ${response.detail}`);
+}
+```
+
+#### New TypeScript Interfaces
+
+- **`LicenseDetails`** — Full license object with `id`, `licenseKey`, `activatedOn`, `expiresOn`, `activationUsage`, `activationLimit`, `enabled`, `customer`, `plan`, and `subscription`.
+- **`LicenseCustomer`** — `{ customerId, name?, email? }` nested in `LicenseDetails`.
+- **`LicensePlan`** — Expanded with `description`, `version`, `isLatest`, and `product` (nested `LicensePlanProduct`).
+- **`LicensePlanProduct`** — `{ id, identifier, name, taxCode?, createdOn?, modifiedOn? }`.
+- **`LicenseActivateResponse`**, **`LicenseDeactivateResponse`**, **`LicenseValidateResponse`** — Typed responses for each operation.
+
+#### `SubscriptionData` New Fields
+
+Three new fields derived from the subscription's `recurrence` string are now included in `SubscriptionData` (returned within `LicenseDetails.subscription` and customer subscription summaries):
+
+- **`billingType`** — `"SUBSCRIPTION"` if the plan has a recurrence, `"ONE_TIME"` otherwise.
+- **`recurrenceUnit`** — Integer unit from the recurrence string (e.g. `1` from `"1 month"`), or `null`.
+- **`recurrenceType`** — Recurrence period in uppercase (e.g. `"MONTH"`), or `null`.
+
+</Update>
+
+<Update label="v2.1.0" description="April 2, 2026">
+
+### New Features
+
+#### Customer Portal Module
+
+A new `client.portal` module lets you create pre-authenticated customer portal sessions server-side and redirect customers directly to their self-serve portal.
+
+**`portal.createSession({ customerId })`**
+
+```typescript
+const session = await client.portal.createSession({
+    customerId: "cust_789",
+});
+
+// Redirect the customer — no login required
+res.redirect(session.customerPortalUrl);
+```
+
+Returns `CreatePortalSessionResponse` with:
+
+- `token` — Session token authenticating the portal session.
+- `email` — The customer's email address.
+- `customerPortalUrl` — Pre-authenticated URL to redirect the customer to.
+
+</Update>
+
 <Update label="v2.0.0" description="February 27, 2026">
 
 ### New Features

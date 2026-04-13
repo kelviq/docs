@@ -5,6 +5,206 @@ mode: "wide"
 rss: true
 ---
 
+<Update label="v2.2.0" description="April 13, 2026">
+
+### New Features
+
+#### License Management Module
+
+A new `client.license` module provides full lifecycle management for software licenses. All methods are available in both synchronous and asynchronous clients.
+
+**`license.activate(licenseKey, customerId?, instanceName?, metadata?)`**
+
+Activates a license key and creates a new instance. Returns a `LicenseActivateResponse` (Pydantic model) containing the `instanceId`, `activatedAt`, `expiresOn`, and the full `LicenseDetails` object.
+
+```python
+response = client.license.activate(
+    licenseKey="LIC-XXXX-YYYY-ZZZZ",
+    customerId="cust_789",
+    instanceName="My MacBook Pro",
+    metadata={"os": "macOS", "arch": "arm64"},
+)
+
+print(response.instanceId)
+print(response.license.activationUsage)       # e.g. 1
+print(response.license.plan.product.name)     # e.g. "Kelviq Engine"
+print(response.license.subscription.billingType)  # "SUBSCRIPTION"
+```
+
+**`license.deactivate(licenseKey, instanceId)`**
+
+Deactivates a specific license instance. Returns a `LicenseDeactivateResponse` with `message` and `deactivatedAt`.
+
+```python
+response = client.license.deactivate(
+    licenseKey="LIC-XXXX-YYYY-ZZZZ",
+    instanceId="8f3e2b1a-5c6d-4e9f-8a0b-1c2d3e4f5g6h",
+)
+print(response.message)  # "License instance deactivated successfully."
+```
+
+**`license.validate(licenseKey, instanceId?)`**
+
+Validates a license key and optionally a specific instance. Returns a `LicenseValidateResponse` with `valid`, `code`, `detail`, `metadata`, and the full `LicenseDetails`.
+
+```python
+response = client.license.validate(
+    licenseKey="LIC-XXXX-YYYY-ZZZZ",
+    instanceId="8f3e2b1a-5c6d-4e9f-8a0b-1c2d3e4f5g6h",
+)
+
+if response.valid:
+    print(f"Valid — code: {response.code}")
+else:
+    print(f"Invalid — {response.detail}")
+```
+
+#### New Pydantic Models
+
+- **`LicenseDetails`** — Full license object with `id`, `licenseKey`, `activatedOn`, `expiresOn`, `activationUsage`, `activationLimit`, `enabled`, `customer`, `plan`, and `subscription`.
+- **`LicenseCustomer`** — `customerId`, `name`, `email` nested within `LicenseDetails`.
+- **`LicensePlan`** — Expanded with `description`, `version`, `isLatest`, and `product` (nested `LicensePlanProduct` model).
+- **`LicensePlanProduct`** — `id`, `identifier`, `name`, `taxCode`, `createdOn`, `modifiedOn`.
+- **`LicenseActivateResponse`**, **`LicenseDeactivateResponse`**, **`LicenseValidateResponse`** — Typed Pydantic response models for each operation.
+
+#### `SubscriptionData` New Fields
+
+Three new fields derived from the subscription's `recurrence` string are now included in `SubscriptionData` (returned within `LicenseDetails.subscription` and customer subscription summaries):
+
+- **`billingType`** — `"SUBSCRIPTION"` if the plan has a recurrence, `"ONE_TIME"` otherwise.
+- **`recurrenceUnit`** — Integer unit from the recurrence string (e.g. `1` from `"1 month"`), or `None`.
+- **`recurrenceType`** — Recurrence period in uppercase (e.g. `"MONTH"`), or `None`.
+
+</Update>
+
+<Update label="v2.1.0" description="April 2, 2026">
+
+### New Features
+
+#### Customer Portal Module
+
+A new `client.portal` module lets you create pre-authenticated customer portal sessions server-side and redirect customers directly to their self-serve portal. Available on both synchronous and asynchronous clients.
+
+**`portal.create_session(customerId)`**
+
+```python
+session = client.portal.create_session(customerId="cust_789")
+
+# Redirect your customer — no login required
+print(session.customerPortalUrl)
+```
+
+**Async variant:**
+
+```python
+session = await async_client.portal.create_session(customerId="cust_789")
+```
+
+Returns `CreatePortalSessionResponse` (Pydantic model) with:
+
+- `token` (str) — Session token authenticating the portal session.
+- `email` (str) — The customer's email address.
+- `customerPortalUrl` (str) — Pre-authenticated URL to redirect the customer to.
+
+</Update>
+
+<Update label="v2.0.0" description="February 27, 2026">
+
+### New Features
+
+#### Entitlements Aggregation Engine
+
+When a customer has multiple active subscriptions, the API can return duplicate `featureId` entries. The SDK now automatically aggregates them into a single `Entitlement` model while preserving the raw data.
+
+```python
+entitlement = client.entitlements.get_entitlement("cust_123", "email-sends")
+
+# Aggregated values across all subscriptions
+print(entitlement.hasAccess)     # True
+print(entitlement.usageLimit)    # 1500 (e.g., 1000 from base + 500 from top-up)
+print(entitlement.currentUsage)  # 200
+print(entitlement.remaining)     # 1300
+
+# Per-subscription details
+for item in entitlement.items:
+    print(item.usageLimit, item.resetAt)
+```
+
+**Aggregation rules:**
+
+| Field | Aggregation Strategy |
+|---|---|
+| `hasAccess` | `True` if **any** raw entry grants access |
+| `usageLimit` | **Summed** across all entries (for `METER` feature types) |
+| `currentUsage` | **Summed** across all entries (for `METER` feature types) |
+| `remaining` | Computed as `usageLimit - currentUsage` |
+| `hardLimit` | `True` if **any** entry has a hard limit |
+
+> **Note:** `resetAt` is intentionally **not** aggregated at the top level because each subscription item can have a different reset date. Access individual reset dates via `entitlement.items[i].resetAt`.
+
+#### New `Entitlement` Pydantic Model
+
+A new model representing an aggregated entitlement:
+
+- `featureId`, `featureType`, `hasAccess`, `hardLimit`, `usageLimit`, `currentUsage`, `remaining`
+- `items: List[EntitlementDetail]` — the raw entries that were aggregated into this model
+
+#### `get_entitlements(customerId)` — All Entitlements as a Map
+
+Returns a `Dict[str, Entitlement]` keyed by `featureId`. Each value is an aggregated model with an `.items` list containing the original raw entries.
+
+```python
+entitlements = client.entitlements.get_entitlements("cust_123")
+
+for feature_id, entitlement in entitlements.items():
+    print(f"{feature_id}: hasAccess={entitlement.hasAccess}, remaining={entitlement.remaining}")
+```
+
+#### `get_raw_entitlement(customerId, featureId)` — Raw API Response for a Feature
+
+Returns the raw API response (`CheckEntitlementsResponse`) for a specific feature without any aggregation.
+
+```python
+raw = client.entitlements.get_raw_entitlement("cust_123", "email-sends")
+```
+
+#### `get_raw_entitlements(customerId)` — Full Raw API Response
+
+Returns the raw API response for all entitlements without any aggregation.
+
+```python
+raw = client.entitlements.get_raw_entitlements("cust_123")
+```
+
+#### Enum Helpers for IDE Autocompletion
+
+New `str`-based `Enum` classes:
+
+- **`ChargePeriod`** — `ONE_TIME`, `MONTHLY`, `YEARLY`, `WEEKLY`, `DAILY`, `THREE_MONTHS`, `SIX_MONTHS`
+- **`CancellationType`** — `IMMEDIATE`, `CURRENT_PERIOD_ENDS`, `SPECIFIC_DATE`
+
+```python
+from kelviq_sdk import ChargePeriod, CancellationType
+
+response = client.checkout.create_session(
+    planIdentifier="pro-plan",
+    chargePeriod=ChargePeriod.MONTHLY,
+    successUrl="https://example.com/success"
+)
+```
+
+Raw string values (e.g., `"MONTHLY"`) continue to work everywhere — fully backward-compatible.
+
+---
+
+### Changed
+
+- **`get_entitlement(customerId, featureId)`** now returns `Optional[Entitlement]` (aggregated) instead of raw `CheckEntitlementsResponse`. Use `get_raw_entitlement()` for the original response.
+- **`get_all_entitlements` removed** — Use `get_entitlements()` instead.
+- **`resetAt` removed from top-level `Entitlement`** — Access individual reset dates via the `.items` list.
+
+</Update>
+
 <Update label="v1.1.0" description="February 27, 2026">
 
 ### New Features
