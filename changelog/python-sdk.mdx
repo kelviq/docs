@@ -5,6 +5,51 @@ mode: "wide"
 rss: true
 ---
 
+<Update label="v2.3.0" description="April 25, 2026">
+
+### New Features
+
+#### Webhook Verification
+
+A new `validate_event` helper lets you securely verify incoming webhook requests from Kelviq in one step. It validates the HMAC-SHA256 signature using the three headers Kelviq attaches to every webhook delivery, then returns the parsed event dictionary.
+
+```python
+from flask import Flask, request
+from kelviq_sdk import validate_event, WebhookVerificationError
+
+app = Flask(__name__)
+
+@app.route('/webhook', methods=['POST'])
+def webhook():
+    try:
+        event = validate_event(
+            payload=request.data,
+            headers=request.headers,
+            secret='<YOUR_WEBHOOK_SECRET>',
+        )
+
+        # Process the event
+        print('Event type:', event.get('type'))
+
+        return "", 202
+    except WebhookVerificationError as e:
+        return "", 403
+```
+
+**`validate_event(payload, headers, secret)`**
+
+- `payload` — Raw request body as `bytes` or `str`. Must be the unparsed body — do not pass a pre-parsed dictionary.
+- `headers` — Any mapping of header name to value (e.g. `request.headers` in Flask). Header lookup is case-insensitive.
+- `secret` — Your webhook signing secret (`kq_whsec_...`) from the Kelviq dashboard.
+
+Returns the parsed event as `Dict[str, Any]`. Raises `WebhookVerificationError` if a required header is missing, the signature format is invalid, or the signature does not match.
+
+#### `WebhookVerificationError`
+
+New exception class raised by `validate_event` when verification fails. Extends `Exception`.
+
+</Update>
+
 <Update label="v2.2.0" description="April 13, 2026">
 
 ### New Features

@@ -335,6 +335,14 @@ print(f"Checkout Session URL: {response.checkoutUrl}")
 
     * `ipAddress` (str): The IP Address of the customer, used for location based pricing.
 
+    * `currencyCode` (str): The currency code for the checkout session (e.g. `"USD"`). Required when `customAmount` is provided.
+
+    * `customAmount` (float): A custom amount to charge for this checkout session. When provided, `taxBehavior` and `currencyCode` are also required.
+
+    * `taxBehavior` (str): Specifies how taxes are applied to the `customAmount`. Required when `customAmount` is provided. Must be one of:
+        * `"INCLUSIVE"` — Tax is included in the custom amount.
+        * `"EXCLUSIVE"` — Tax is added on top of the custom amount.
+
 
 **Returns**:
 
@@ -1247,6 +1255,75 @@ An instance of `CreatePortalSessionResponse` (Pydantic model), which includes:
 * `email` (str): The email address of the customer.
 * `customerPortalUrl` (str): The URL to redirect the customer to their customer portal. This link is pre-authenticated — no login required.
 
+
+---
+## Webhooks
+
+Kelviq can send real-time webhook notifications to your server when events occur in your account — for example, when a subscription is created or an invoice is paid.
+
+### Verifying webhook signatures
+
+Every webhook request includes three headers that you must use to verify the request is genuinely from Kelviq:
+
+| Header | Description |
+|---|---|
+| `webhook-id` | Unique identifier for the event |
+| `webhook-timestamp` | Unix timestamp of when the event was sent |
+| `webhook-signature` | HMAC-SHA256 signature, prefixed with `v1,` |
+
+Use the `validate_event` helper to verify the signature and parse the event in one step. It raises `WebhookVerificationError` if the signature is invalid.
+
+```python
+from flask import Flask, request
+from kelviq_sdk import validate_event, WebhookVerificationError
+
+app = Flask(__name__)
+
+@app.route('/webhook', methods=['POST'])
+def webhook():
+    try:
+        event = validate_event(
+            payload=request.data,
+            headers=request.headers,
+            secret='<YOUR_WEBHOOK_SECRET>',
+        )
+
+        # Process the event
+        print('Event type:', event.get('type'))
+
+        return "", 202
+    except WebhookVerificationError as e:
+        return "", 403
+```
+
+<Warning>
+Always pass the **raw** request body (e.g. `request.data` in Flask) to `validate_event`. Parsing the body as JSON before verification will break the signature check.
+</Warning>
+
+### Webhook event types
+
+| Event | Description |
+|---|---|
+| `checkout.completed` | A checkout session was completed |
+| `customer.created` | A new customer was created |
+| `customer.updated` | A customer's details were updated |
+| `order.created` | A new order was placed |
+| `order.updated` | An order was updated |
+| `order.refunded` | An order was refunded |
+| `subscription.created` | A new subscription was created |
+| `subscription.updated` | A subscription was updated |
+| `subscription.cancelled` | A subscription was cancelled |
+| `subscription.plan_changed` | A subscription plan was changed |
+| `invoice.created` | A new invoice was created |
+| `invoice.paid` | An invoice was paid |
+| `refund.created` | A refund was initiated |
+| `refund.updated` | A refund status changed |
+
+### Best practices
+
+* **Return quickly** — respond with a `2xx` status before doing any heavy processing. Kelviq retries up to 3 times at 60-second intervals if it does not receive a `2xx`.
+* **Use idempotency** — use the `webhook-id` header (or the event `id` field) to detect and skip duplicate deliveries.
+* **Validate every request** — always verify the signature before trusting the payload.
 
 ---
 ## Using the Sandbox Environment

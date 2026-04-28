@@ -303,6 +303,25 @@
             "nullable": true,
             "description": "A comma-separated list of plan identifiers to display on the checkout page.",
             "example": "plan-pro-monthly,plan-pro-yearly"
+          },
+          "currencyCode": {
+            "type": "string",
+            "nullable": true,
+            "description": "The currency code for the checkout session (e.g. 'USD'). Required when customAmount is provided with a server API key.",
+            "example": "USD"
+          },
+          "customAmount": {
+            "type": "number",
+            "nullable": true,
+            "description": "A custom amount to charge for this checkout session. When provided, taxBehavior is required. When using a server API key, currencyCode is also required.",
+            "example": 2999
+          },
+          "taxBehavior": {
+            "type": "string",
+            "nullable": true,
+            "description": "Specifies how taxes are applied to the custom amount. Required when customAmount is provided. INCLUSIVE means tax is included in the amount; EXCLUSIVE means tax is added on top.",
+            "enum": ["INCLUSIVE", "EXCLUSIVE"],
+            "example": "EXCLUSIVE"
           }
         }
       },
