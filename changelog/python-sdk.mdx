@@ -5,6 +5,48 @@ mode: "wide"
 rss: true
 ---
 
+<Update label="v2.4.0" description="May 4, 2026">
+
+### New Features
+
+#### Checkout Session — New Optional Parameters
+
+Three new optional parameters on `checkout.create_session()` give you more control over the hosted checkout page.
+
+**`discounts_enabled`** — controls whether the coupon/discount code field is shown. Defaults to `True` on the server.
+
+**`lock_email`** — when `True`, the email field is pre-filled and locked so the customer cannot change it. Defaults to `False`.
+
+**`default_billing_country`** — ISO 3166-1 alpha-2 country code (e.g. `"US"`, `"GB"`) used to pre-fill the billing address country field.
+
+```python
+response = client.checkout.create_session(
+    planIdentifier="plan-pro-monthly",
+    chargePeriod="MONTHLY",
+    customerId="cust_789",
+    successUrl="https://example.com/success",
+    discountsEnabled=False,
+    lockEmail=True,
+    defaultBillingCountry="US",
+)
+```
+
+**Async variant:**
+
+```python
+response = await async_client.checkout.create_session(
+    planIdentifier="plan-pro-monthly",
+    chargePeriod="MONTHLY",
+    customerId="cust_789",
+    successUrl="https://example.com/success",
+    discountsEnabled=False,
+    lockEmail=True,
+    defaultBillingCountry="US",
+)
+```
+
+</Update>
+
 <Update label="v2.3.0" description="April 25, 2026">
 
 ### New Features

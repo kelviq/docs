@@ -5,6 +5,34 @@ mode: "wide"
 rss: true
 ---
 
+<Update label="v2.4.0" description="May 4, 2026">
+
+### New Features
+
+#### Checkout Session — New Optional Parameters
+
+Three new optional fields on `CreateCheckoutSessionPayload` give you more control over the hosted checkout page.
+
+**`discountsEnabled`** — controls whether the coupon/discount code field is shown. Defaults to `true`.
+
+**`lockEmail`** — when `true`, the email field is pre-filled and locked so the customer cannot change it. Defaults to `false`.
+
+**`defaultBillingCountry`** — ISO 3166-1 alpha-2 country code (e.g. `"US"`, `"GB"`) used to pre-fill the billing address country field.
+
+```typescript
+const response = await client.checkout.createSession({
+  planIdentifier: "plan-pro-monthly",
+  chargePeriod: "MONTHLY",
+  customerId: "cust_789",
+  successUrl: "https://example.com/success",
+  discountsEnabled: false,
+  lockEmail: true,
+  defaultBillingCountry: "US",
+});
+```
+
+</Update>
+
 <Update label="v2.3.0" description="April 25, 2026">
 
 ### New Features

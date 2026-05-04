@@ -343,6 +343,12 @@ print(f"Checkout Session URL: {response.checkoutUrl}")
         * `"INCLUSIVE"` — Tax is included in the custom amount.
         * `"EXCLUSIVE"` — Tax is added on top of the custom amount.
 
+    * `discountsEnabled` (bool): Whether the discount/coupon code field is shown on the checkout page. Defaults to `True`.
+
+    * `lockEmail` (bool): When `True`, the email field is pre-filled and locked so the customer cannot change it. Defaults to `False`.
+
+    * `defaultBillingCountry` (str): ISO 3166-1 alpha-2 country code (e.g. `"US"`, `"GB"`) used to pre-fill the billing address country on the checkout page.
+
 
 **Returns**:
 

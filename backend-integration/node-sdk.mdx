@@ -292,6 +292,12 @@ const response = await client.checkout.createSession({
         * `"INCLUSIVE"` — Tax is included in the custom amount.
         * `"EXCLUSIVE"` — Tax is added on top of the custom amount.
 
+    * `discountsEnabled` : Whether the discount/coupon code field is shown on the checkout page. Defaults to `true`.
+
+    * `lockEmail` : When `true`, the email field is pre-filled and locked so the customer cannot change it. Defaults to `false`.
+
+    * `defaultBillingCountry` : ISO 3166-1 alpha-2 country code (e.g. `"US"`, `"GB"`) used to pre-fill the billing address country on the checkout page.
+
 
 **Returns**:
 

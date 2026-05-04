@@ -322,6 +322,24 @@
             "description": "Specifies how taxes are applied to the custom amount. Required when customAmount is provided. INCLUSIVE means tax is included in the amount; EXCLUSIVE means tax is added on top.",
             "enum": ["INCLUSIVE", "EXCLUSIVE"],
             "example": "EXCLUSIVE"
+          },
+          "discountsEnabled": {
+            "type": "boolean",
+            "nullable": true,
+            "description": "Whether discount/coupon code entry is shown on the checkout page. Defaults to `true`.",
+            "example": false
+          },
+          "lockEmail": {
+            "type": "boolean",
+            "nullable": true,
+            "description": "When `true`, the email field on the checkout page is pre-filled and locked so the customer cannot change it. Defaults to `false`.",
+            "example": true
+          },
+          "defaultBillingCountry": {
+            "type": "string",
+            "nullable": true,
+            "description": "ISO 3166-1 alpha-2 country code used to pre-fill the billing address country on the checkout page.",
+            "example": "US"
           }
         }
       },
