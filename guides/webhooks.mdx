@@ -88,6 +88,234 @@ The request body is a JSON object with the following top-level fields:
 | `data.object` | `object` | The primary resource affected by the event. |
 | `data.previous_attributes` | `object` | *(Update events only)* The resource's changed attributes before the event. Omitted if not applicable. |
 
+<Accordion title="Example: checkout.completed payload">
+```json
+{
+  "id": "1619afec-caab-40c7-827c-6af4f3acc9a3",
+  "type": "checkout.completed",
+  "created_at": "2026-04-01T17:28:39Z",
+  "data": {
+    "object": {
+      "id": "cs_jBy6ViggULoyDMW9ikaw4ydur1NUa6dCORT6vqKPbPPW8",
+      "object": "checkout_session",
+      "status": "success",
+      "checkout_type": "ONE_TIME",
+      "customer_id": "936cf361-3a4b-454c-a464-41ccc7600c2d",
+      "organization": "9b759915-5387-4e61-90e9-2162318e8d17",
+      "amount": "10.00",
+      "amount_units": 1000,
+      "currency": "USD",
+      "discount_code": "",
+      "features": null,
+      "plan": {
+        "name": "Exc Tax Plan",
+        "version": 1,
+        "identifier": "exc-tax-plan"
+      },
+      "product": {
+        "id": "df398021-477b-4e67-972d-c763a2f2ba7b",
+        "name": "ParityDeals"
+      },
+      "billing_address": {
+        "line1": null,
+        "line2": null,
+        "city": null,
+        "state": null,
+        "postal_code": "680121",
+        "country": "IN"
+      },
+      "metadata": {
+        "name": "Geo",
+        "email": "geojacob@example.com",
+        "referer": null,
+        "cancel_url": null,
+        "success_url": null,
+        "tax_behavior": "EXCLUSIVE",
+        "discounts_enabled": true
+      },
+      "created_on": "2026-04-01T17:27:59Z",
+      "modified_on": "2026-04-01T17:28:39Z"
+    }
+  }
+}
+```
+</Accordion>
+
+<Accordion title="Example: customer.created payload">
+```json
+{
+  "id": "0662641a-b415-46eb-a78a-c136ce12fa60",
+  "type": "customer.created",
+  "created_at": "2026-04-01T07:05:56Z",
+  "data": {
+    "object": {
+      "id": "7dd79eff-180f-4b07-a213-ebafd29e9725",
+      "object": "customer",
+      "customer_id": "geo-jacob",
+      "name": "Geo Jacob",
+      "email": "geo@example.com",
+      "details": {},
+      "metadata": {},
+      "billing_address": {},
+      "subscriptions": 0,
+      "organization": "9b759915-5387-4e61-90e9-2162318e8d17",
+      "created_on": "2026-04-01T07:05:56Z",
+      "modified_on": "2026-04-01T07:05:56Z"
+    }
+  }
+}
+```
+</Accordion>
+
+<Accordion title="Example: customer.updated payload">
+```json
+{
+  "id": "221a4d03-1cf4-47ae-9ed8-9f8f79ae989d",
+  "type": "customer.updated",
+  "created_at": "2026-04-01T07:32:42Z",
+  "data": {
+    "object": {
+      "id": "7dd79eff-180f-4b07-a213-ebafd29e9725",
+      "object": "customer",
+      "customer_id": "geo-jacob",
+      "name": "Geo Jacob v2",
+      "email": "geo@example.com",
+      "details": {},
+      "metadata": {},
+      "billing_address": {},
+      "subscriptions": 0,
+      "organization": "9b759915-5387-4e61-90e9-2162318e8d17",
+      "created_on": "2026-04-01T07:05:56Z",
+      "modified_on": "2026-04-01T07:32:42Z"
+    },
+    "previous_attributes": {
+      "name": "Geo Jacob"
+    }
+  }
+}
+```
+</Accordion>
+
+<Accordion title="Example: order.created payload">
+```json
+{
+  "id": "evt_01HXYZ1234567890ABCDEF",
+  "type": "order.created",
+  "created_at": "2026-04-01T17:36:41Z",
+  "data": {
+    "object": {
+      "id": "ORD-20260401173639-H8IO7",
+      "object": "order",
+      "status": "COMPLETE",
+      "billing_type": "ONE_TIME",
+      "customer_id": "936cf361-3a4b-454c-a464-41ccc7600c2d",
+      "organization": "9b759915-5387-4e61-90e9-2162318e8d17",
+      "is_renewal": false,
+      "paid_at": "2026-04-01T17:36:41Z",
+      "amount_total": "10.00",
+      "amount_total_units": 1000,
+      "currency": "USD",
+      "subscription_id": "2c78e8f0-892e-406c-9896-18c69d3026c4",
+      "product": {
+        "id": "df398021-477b-4e67-972d-c763a2f2ba7b",
+        "name": "ParityDeals"
+      },
+      "plan": {
+        "name": "Exc Tax Plan",
+        "version": 1,
+        "identifier": "exc-tax-plan"
+      },
+      "features": null,
+      "created_on": "2026-04-01T17:36:41Z",
+      "modified_on": "2026-04-01T17:36:41Z"
+    }
+  }
+}
+```
+</Accordion>
+
+<Accordion title="Example: order.updated payload">
+```json
+{
+  "id": "evt_01HXYZ2345678901BCDEFG",
+  "type": "order.updated",
+  "created_at": "2026-04-01T17:36:41Z",
+  "data": {
+    "object": {
+      "id": "ORD-20260401173639-H8IO7",
+      "object": "order",
+      "status": "COMPLETE",
+      "billing_type": "ONE_TIME",
+      "customer_id": "936cf361-3a4b-454c-a464-41ccc7600c2d",
+      "organization": "9b759915-5387-4e61-90e9-2162318e8d17",
+      "is_renewal": false,
+      "paid_at": "2026-04-01T17:36:41Z",
+      "amount_total": "10.00",
+      "amount_total_units": 1000,
+      "currency": "USD",
+      "subscription_id": "2c78e8f0-892e-406c-9896-18c69d3026c4",
+      "product": {
+        "id": "df398021-477b-4e67-972d-c763a2f2ba7b",
+        "name": "ParityDeals"
+      },
+      "plan": {
+        "name": "Exc Tax Plan",
+        "version": 1,
+        "identifier": "exc-tax-plan"
+      },
+      "features": null,
+      "created_on": "2026-04-01T17:36:41Z",
+      "modified_on": "2026-04-01T17:36:41Z"
+    },
+    "previous_attributes": {
+      "status": "PENDING"
+    }
+  }
+}
+```
+</Accordion>
+
+<Accordion title="Example: order.refunded payload">
+```json
+{
+  "id": "c1fb8514-fec6-44fa-9196-7dabe2f153ac",
+  "type": "order.refunded",
+  "created_at": "2026-04-02T03:48:32Z",
+  "data": {
+    "object": {
+      "id": "ORD-20260401173639-H8IO7",
+      "object": "order",
+      "status": "REFUNDED",
+      "billing_type": "ONE_TIME",
+      "customer_id": "936cf361-3a4b-454c-a464-41ccc7600c2d",
+      "organization": "9b759915-5387-4e61-90e9-2162318e8d17",
+      "is_renewal": false,
+      "paid_at": "2026-04-01T17:36:41Z",
+      "amount_total": "10.00",
+      "amount_total_units": 1000,
+      "currency": "USD",
+      "subscription_id": "2c78e8f0-892e-406c-9896-18c69d3026c4",
+      "product": {
+        "id": "df398021-477b-4e67-972d-c763a2f2ba7b",
+        "name": "ParityDeals"
+      },
+      "plan": {
+        "name": "Exc Tax Plan",
+        "version": 1,
+        "identifier": "exc-tax-plan"
+      },
+      "features": null,
+      "created_on": "2026-04-01T17:36:41Z",
+      "modified_on": "2026-04-02T03:48:32Z"
+    },
+    "previous_attributes": {
+      "status": "COMPLETE"
+    }
+  }
+}
+```
+</Accordion>
+
 <Accordion title="Example: subscription.created payload">
 ```json
 {
@@ -133,6 +361,115 @@ The request body is a JSON object with the following top-level fields:
       "organization": "2a3664c0-cbd2-4f1c-a98f-1b4f65e3256c",
       "created_on": "2026-03-11T05:25:34Z",
       "modified_on": "2026-03-11T05:25:34Z"
+    }
+  }
+}
+```
+</Accordion>
+
+<Accordion title="Example: subscription.updated payload">
+```json
+{
+  "id": "be4b0fa8-2e82-4664-b4f8-c3ab1622086c",
+  "type": "subscription.updated",
+  "created_at": "2026-04-02T05:21:33Z",
+  "data": {
+    "object": {
+      "id": "ff258fd6-9a31-4eda-b3c8-000a24530890",
+      "object": "subscription",
+      "status": "active",
+      "amount": "40.00",
+      "amount_units": 4000,
+      "currency": "USD",
+      "recurrence": "1 month",
+      "start_date": "2026-04-02",
+      "organization": "9b759915-5387-4e61-90e9-2162318e8d17",
+      "features": null,
+      "plan": {
+        "name": "Inc tax sub",
+        "version": 1,
+        "identifier": "inc-tax-sub"
+      },
+      "product": {
+        "id": "df398021-477b-4e67-972d-c763a2f2ba7b",
+        "name": "ParityDeals"
+      },
+      "customer": {
+        "id": "936cf361-3a4b-454c-a464-41ccc7600c2d",
+        "name": "Geo Jacob",
+        "email": "geojacob@example.com",
+        "customer_id": "bc43b1a034a643309ee39d2f1a4d2131",
+        "billing_address": {
+          "line1": null,
+          "line2": null,
+          "city": null,
+          "state": null,
+          "postal_code": "680121",
+          "country": "IN"
+        }
+      },
+      "billing_period_start_time": "2026-04-02T05:04:43Z",
+      "billing_period_end_time": "2026-05-02T05:04:43Z",
+      "created_on": "2026-04-02T05:21:28Z",
+      "modified_on": "2026-04-02T05:21:33Z"
+    },
+    "previous_attributes": {
+      "status": null,
+      "billing_period_start_time": null
+    }
+  }
+}
+```
+</Accordion>
+
+<Accordion title="Example: subscription.cancelled payload">
+```json
+{
+  "id": "cacae554-d67e-4c6c-9d51-9d68f5c9b574",
+  "type": "subscription.cancelled",
+  "created_at": "2026-04-02T05:02:47Z",
+  "data": {
+    "object": {
+      "id": "0faa77b7-2d42-4b6f-b682-d012987adad2",
+      "object": "subscription",
+      "status": "canceled",
+      "amount": "40.00",
+      "amount_units": 4000,
+      "currency": "USD",
+      "recurrence": "1 month",
+      "start_date": "2026-04-02",
+      "organization": "9b759915-5387-4e61-90e9-2162318e8d17",
+      "features": null,
+      "plan": {
+        "name": "Inc tax sub",
+        "version": 1,
+        "identifier": "inc-tax-sub"
+      },
+      "product": {
+        "id": "df398021-477b-4e67-972d-c763a2f2ba7b",
+        "name": "ParityDeals"
+      },
+      "customer": {
+        "id": "936cf361-3a4b-454c-a464-41ccc7600c2d",
+        "name": "Geo Jacob",
+        "email": "geojacob@example.com",
+        "customer_id": "bc43b1a034a643309ee39d2f1a4d2131",
+        "billing_address": {
+          "line1": null,
+          "line2": null,
+          "city": null,
+          "state": null,
+          "postal_code": "680121",
+          "country": "IN"
+        }
+      },
+      "billing_period_start_time": "2026-04-02T04:25:13Z",
+      "billing_period_end_time": "2026-05-02T04:25:13Z",
+      "created_on": "2026-04-02T04:25:20Z",
+      "modified_on": "2026-04-02T05:02:47Z"
+    },
+    "previous_attributes": {
+      "status": "active"
     }
   }
 }
@@ -209,6 +546,127 @@ The request body is a JSON object with the following top-level fields:
       "organization": "5d0bec80-a7c1-41ae-bd24-ea9228500586",
       "created_on": "2026-03-04T11:29:19Z",
       "modified_on": "2026-03-04T11:29:23Z"
+    }
+  }
+}
+```
+</Accordion>
+
+<Accordion title="Example: invoice.created payload">
+```json
+{
+  "id": "2f31925f-10fc-41eb-8cb9-3cdf2b4e9e29",
+  "type": "invoice.created",
+  "created_at": "2026-04-02T05:56:33Z",
+  "data": {
+    "object": {
+      "id": "INV-20260402055633-FCM4B",
+      "object": "invoice",
+      "status": "OPEN",
+      "paid_at": null,
+      "amount_total": "40",
+      "amount_total_units": 4000,
+      "currency": "USD",
+      "due_date": null,
+      "order_id": null,
+      "customer_id": "c479275c-6987-4e0b-9aca-46e6e83226aa",
+      "subscription_id": "a2951973-aca5-408d-bd9c-1d86827ed463",
+      "organization": "9b759915-5387-4e61-90e9-2162318e8d17",
+      "product": {
+        "id": "df398021-477b-4e67-972d-c763a2f2ba7b",
+        "name": "ParityDeals"
+      },
+      "created_on": "2026-04-02T05:56:33Z",
+      "modified_on": "2026-04-02T05:56:33Z"
+    }
+  }
+}
+```
+</Accordion>
+
+<Accordion title="Example: invoice.paid payload">
+```json
+{
+  "id": "9d2c7e54-3f1b-4a8c-9e6d-2b5f8e1a4c7b",
+  "type": "invoice.paid",
+  "created_at": "2026-04-02T06:00:00Z",
+  "data": {
+    "object": {
+      "id": "INV-20260402055633-FCM4B",
+      "object": "invoice",
+      "status": "PAID",
+      "paid_at": "2026-04-02T06:00:00Z",
+      "amount_total": "40",
+      "amount_total_units": 4000,
+      "currency": "USD",
+      "due_date": null,
+      "order_id": null,
+      "customer_id": "c479275c-6987-4e0b-9aca-46e6e83226aa",
+      "subscription_id": "a2951973-aca5-408d-bd9c-1d86827ed463",
+      "organization": "9b759915-5387-4e61-90e9-2162318e8d17",
+      "product": {
+        "id": "df398021-477b-4e67-972d-c763a2f2ba7b",
+        "name": "ParityDeals"
+      },
+      "created_on": "2026-04-02T05:56:33Z",
+      "modified_on": "2026-04-02T06:00:00Z"
+    },
+    "previous_attributes": {
+      "status": "OPEN",
+      "paid_at": null
+    }
+  }
+}
+```
+</Accordion>
+
+<Accordion title="Example: refund.created payload">
+```json
+{
+  "id": "6e76547b-9b6b-4504-af36-c8f646fa91fe",
+  "type": "refund.created",
+  "created_at": "2026-04-02T05:41:21Z",
+  "data": {
+    "object": {
+      "id": "ca435ba3-d951-472d-a836-370787df3026",
+      "object": "refund",
+      "status": "PROCESSING",
+      "amount": "20.0",
+      "amount_units": 2000,
+      "currency": "USD",
+      "reason": "REQUESTED_BY_CUSTOMER",
+      "order_id": "ORD-20260402042513-8M80C",
+      "organization": "9b759915-5387-4e61-90e9-2162318e8d17",
+      "created_on": "2026-04-02T05:41:21Z",
+      "modified_on": "2026-04-02T05:41:21Z"
+    }
+  }
+}
+```
+</Accordion>
+
+<Accordion title="Example: refund.updated payload">
+```json
+{
+  "id": "evt_01HXYZ2345678901BCDEFG",
+  "type": "refund.updated",
+  "created_at": "2026-04-02T05:41:30Z",
+  "data": {
+    "object": {
+      "id": "ca435ba3-d951-472d-a836-370787df3026",
+      "object": "refund",
+      "status": "SUCCEEDED",
+      "amount": "20.0",
+      "amount_units": 2000,
+      "currency": "USD",
+      "reason": "REQUESTED_BY_CUSTOMER",
+      "order_id": "ORD-20260402042513-8M80C",
+      "organization": "9b759915-5387-4e61-90e9-2162318e8d17",
+      "created_on": "2026-04-02T05:41:21Z",
+      "modified_on": "2026-04-02T05:41:30Z"
+    },
+    "previous_attributes": {
+      "status": "PROCESSING"
     }
   }
 }
