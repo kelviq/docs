@@ -1164,6 +1164,12 @@
             "nullable": true,
             "description": "The IP Address of the customer, for location-based pricing.",
             "example": "103.154.35.20"
+          },
+          "trialEnd": {
+            "type": "string",
+            "nullable": true,
+            "description": "Controls the trial period for the updated subscription. Accepts either the literal string `\"now\"` to end any active trial immediately, or an ISO 8601 datetime string (e.g. `\"2025-05-22 08:27:45.430732\"`) to set a new trial end date. The datetime must be in the future. If omitted, the existing trial behavior is preserved.",
+            "example": "2025-12-31 23:59:59"
           }
         }
       },

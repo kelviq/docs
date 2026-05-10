@@ -822,7 +822,8 @@ try:
         pricingTableId="pw_def",
         ruleId="rule_ghi",
         ipAddress="103.154.35.20",
-        features=[{'identifier': "seats", 'quantity': 10}]
+        features=[{'identifier': "seats", 'quantity': 10}],
+        trialEnd="2025-12-31 23:59:59"  # or "now" to end the trial immediately
     )
     print(response.subscriptionId)
 except Exception as e:
@@ -861,6 +862,10 @@ except Exception as e:
     * `"identifier"` (str): The unique identifier for the feature.
     * `"quantity"` (int): The desired quantity for this feature.
         * Example: `[{'identifier': 'seats', 'quantity': 10}, {'identifier': 'projects', 'quantity': 5}]`
+* `trialEnd` (str): Optional. Controls the trial period for the updated subscription. Accepts either:
+    * The literal string `"now"` to end any active trial immediately.
+    * An ISO 8601 datetime string (e.g. `"2025-12-31 23:59:59"`) to set a new trial end date. The datetime must be in the future. Naive datetimes are interpreted as UTC.
+    * If omitted, the existing trial behavior on the subscription is preserved.
 
 **Returns**:
 

@@ -5,6 +5,53 @@ mode: "wide"
 rss: true
 ---
 
+<Update label="v2.5.0" description="May 10, 2026">
+
+### New Features
+
+#### Subscription Update — `trialEnd` Parameter
+
+`subscriptions.update()` now accepts an optional `trialEnd` parameter to control the trial period when updating a subscription.
+
+Pass either:
+
+- The literal string `"now"` to end any active trial immediately.
+- An ISO 8601 datetime string (e.g. `"2025-12-31 23:59:59"`) to set a new trial end date. The datetime must be in the future. Naive datetimes are interpreted as UTC.
+- Omit the parameter to preserve the existing trial behavior on the subscription.
+
+```python
+# End the trial now
+response = client.subscriptions.update(
+    subscriptionId="78058918-9746-4280-9b9b-1bd5115eec6e",
+    planIdentifier="premium-plan",
+    chargePeriod="MONTHLY",
+    trialEnd="now",
+)
+
+# Extend the trial to a specific future date
+response = client.subscriptions.update(
+    subscriptionId="78058918-9746-4280-9b9b-1bd5115eec6e",
+    planIdentifier="premium-plan",
+    chargePeriod="MONTHLY",
+    trialEnd="2025-12-31 23:59:59",
+)
+```
+
+**Async variant:**
+
+```python
+response = await async_client.subscriptions.update(
+    subscriptionId="78058918-9746-4280-9b9b-1bd5115eec6e",
+    planIdentifier="premium-plan",
+    chargePeriod="MONTHLY",
+    trialEnd="2025-12-31 23:59:59",
+)
+```
+
+The SDK validates `trialEnd` client-side — invalid datetime strings or past datetimes raise `InvalidRequestError` before the request is sent.
+
+</Update>
+
 <Update label="v2.4.0" description="May 4, 2026">
 
 ### New Features

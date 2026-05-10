@@ -5,6 +5,44 @@ mode: "wide"
 rss: true
 ---
 
+<Update label="v2.5.0" description="May 10, 2026">
+
+### New Features
+
+#### Subscription Update — `trialEnd` Parameter
+
+`subscriptions.update()` now accepts an optional `trialEnd` field on `UpdateSubscriptionPayload` to control the trial period when updating a subscription.
+
+Pass either:
+
+- The literal string `"now"` to end any active trial immediately.
+- An ISO 8601 datetime string (e.g. `"2025-12-31T23:59:59Z"`) to set a new trial end date. The datetime must be in the future. Naive datetimes (no timezone designator) are interpreted as UTC.
+- Omit the field to preserve the existing trial behavior on the subscription.
+
+```typescript
+import { CHARGE_PERIOD_CHOICES } from '@kelviq/node-sdk';
+
+// End the trial now
+await client.subscriptions.update({
+  subscriptionId: "sub_node_78058918",
+  planIdentifier: "premium-plan-node",
+  chargePeriod: CHARGE_PERIOD_CHOICES.MONTHLY,
+  trialEnd: "now",
+});
+
+// Extend the trial to a specific future date
+await client.subscriptions.update({
+  subscriptionId: "sub_node_78058918",
+  planIdentifier: "premium-plan-node",
+  chargePeriod: CHARGE_PERIOD_CHOICES.MONTHLY,
+  trialEnd: "2025-12-31T23:59:59Z",
+});
+```
+
+The SDK validates `trialEnd` client-side — invalid datetime strings or past datetimes throw `InvalidRequestError` before the request is sent.
+
+</Update>
+
 <Update label="v2.4.0" description="May 4, 2026">
 
 ### New Features

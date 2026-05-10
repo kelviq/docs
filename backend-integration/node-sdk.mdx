@@ -745,7 +745,8 @@ try {
     const response = await client.subscriptions.update({
       subscriptionId: "sub_node_78058918",
       planIdentifier: "premium-plan-node",
-      chargePeriod: CHARGE_PERIOD_CHOICES.MONTHLY
+      chargePeriod: CHARGE_PERIOD_CHOICES.MONTHLY,
+      trialEnd: "2025-12-31T23:59:59Z" // or "now" to end the trial immediately
     });
 } catch (e) {
     console.error(`Error updating subscription: ${e}`);
@@ -785,6 +786,12 @@ try {
     * `"identifier"` : The unique identifier for the feature.
     * `"quantity"` : The desired quantity for this feature.
         * Example: `[{"identifier": "seats", "quantity": 10}, {"identifier": "projects", "quantity": 5}]`
+* `trialEnd` (string): Controls the trial period for the updated subscription. Accepts either:
+    * The literal string `"now"` to end any active trial immediately.
+    * An ISO 8601 datetime string (e.g. `"2025-12-31T23:59:59Z"`) to set a new trial end date. The datetime must be in the future. Naive datetimes (no timezone designator) are interpreted as UTC.
+    * If omitted, the existing trial behavior on the subscription is preserved.
+
+The SDK validates `trialEnd` client-side — invalid datetime strings or past datetimes throw `InvalidRequestError` before the request is sent.
 
 **Returns**:
 
