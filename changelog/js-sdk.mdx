@@ -5,6 +5,142 @@ mode: "wide"
 rss: true
 ---
 
+<Update label="v2.1.0" description="May 9, 2026">
+### New Features
+ 
+#### Product Offerings — Pricing API Support
+ 
+The SDK can now fetch and display product pricing data. Pass a `productId` to the client to enable pricing methods.
+ 
+```ts
+const client = kelviqSDK({
+  productId: 'your-product-id',
+  accessToken: 'your-access-token',
+});
+```
+ 
+If `customerId` is also set, it is forwarded to the pricing API so the response reflects that customer's subscription state.
+ 
+---
+ 
+##### `fetchPricing(forceRefresh?)` — Fetch and Cache Pricing
+ 
+Fetches product offering data for the configured `productId`. Subsequent calls return the cached result unless `forceRefresh` is `true`.
+ 
+```ts
+const pricing = await client.fetchPricing();
+console.log(pricing.plans, pricing.currencyCode, pricing.billingPeriods);
+ 
+await client.fetchPricing(true); // bypass cache
+```
+ 
+##### `getPricing()` — Read from Cache
+ 
+Returns cached pricing data synchronously, or `null` if not yet fetched.
+ 
+```ts
+const pricing = client.getPricing();
+```
+ 
+##### `getPlan(identifier)` — Look Up a Single Plan
+ 
+Finds an enabled plan by identifier from the pricing cache. Returns `null` if not found or pricing hasn't been fetched.
+ 
+```ts
+const plan = client.getPlan('pro-plan');
+console.log(plan?.displayName, plan?.price.priceType);
+```
+ 
+##### `isPricingLoading()` — Loading State
+ 
+Returns `true` while a pricing fetch is in progress.
+ 
+```ts
+if (client.isPricingLoading()) { /* show spinner */ }
+```
+ 
+##### `getLastPricingError()` — Error State
+ 
+Returns the last `Error` from a failed pricing fetch, or `null`.
+ 
+```ts
+const err = client.getLastPricingError();
+```
+ 
+##### `clearPricingCache()` — Reset Cache
+ 
+Clears cached pricing data and resets loading and error states.
+ 
+```ts
+client.clearPricingCache();
+```
+ 
+---
+ 
+##### `renderPricing(options?)` — DOM Binding
+ 
+Scans the DOM for elements with `data-kq-price` attributes and populates them with localized formatted prices. Requires pricing data to be fetched first.
+ 
+```html
+<span data-kq-price="pro-plan" data-kq-period="MONTHLY">Loading...</span>
+```
+ 
+```ts
+await client.fetchPricing();
+client.renderPricing();
+ 
+// Scope to a container
+client.renderPricing({ container: document.getElementById('pricing-section') });
+ 
+// With format options
+client.renderPricing({ formatOptions: { compact: true } });
+```
+ 
+| Attribute | Required | Description |
+|---|---|---|
+| `data-kq-price` | Yes | Plan identifier |
+| `data-kq-period` | No | Billing period (e.g. `MONTHLY`, `YEARLY`). Falls back to the first available charge. |
+ 
+---
+ 
+##### `kqFormatPrice(amount, currencySymbol, options?)` — Price Formatter
+ 
+Standalone named export for formatting a numeric amount with a currency symbol.
+ 
+```ts
+import { kqFormatPrice } from '@kelviq/js-sdk';
+ 
+kqFormatPrice(9.99, '$', { pricingLocale: 'en-US' });                  // "$9.99"
+kqFormatPrice(1200, '€', { compact: true, pricingLocale: 'de-DE' });   // "€1,2K"
+kqFormatPrice(9.99, '$', { includeCurrencySymbol: false });             // "9.99"
+```
+ 
+| Option | Type | Default | Description |
+|---|---|---|---|
+| `compact` | `boolean` | `false` | Use compact notation (e.g. `1.2K`) |
+| `locale` | `string` | `pricingLocale` | Override locale for number formatting |
+| `pricingLocale` | `string` | `'en-US'` | Locale from the pricing API |
+| `includeCurrencySymbol` | `boolean` | `true` | Prepend the currency symbol |
+ 
+---
+ 
+##### New Types and Exports
+ 
+```ts
+export { kqFormatPrice } from './formatPrice';
+export type { KQFormatPriceOptions } from './formatPrice';
+export type {
+  RawPricingFeature,
+  RawPricingCharge,
+  RawPricingPrice,
+  RawPricingPlan,
+  RawPricingBillingPeriod,
+  RawPricingApiResponse,
+} from './types';
+```
+ 
+</Update>
+
 <Update label="v2.0.0" description="February 27, 2026">
 
 ### New Features

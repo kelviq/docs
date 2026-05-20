@@ -1,0 +1,62 @@
+---
+title: "Checkout API"
+description: "Changelog for Checkout API"
+mode: "wide"
+rss: true
+---
+
+<Update label="Latest Updates" description="May 7, 2026">
+
+### New Features
+
+#### Custom Dynamic Amount Support
+Added support for custom dynamic amounts on the checkout page. You can now pass a specific `custom_amount` directly via the checkout API, which is ideal for usage-based, variable, or custom-quoted pricing models.
+
+
+* **`custom_amount`**: The specific numeric amount to be charged to the customer. This overrides static plan pricing and is ideal for usage-based, variable, or custom-quoted pricing models.
+
+* **`tax_behavior`**: Specifies how taxes should be applied to the custom amount. For example, setting it to "INCLUSIVE" means the tax is already factored into the custom_amount, while "EXCLUSIVE" would add the tax on top of the base amount.
+
+* **`currency_code`**: The three-letter ISO currency code (e.g., "INR", "USD") that defines the currency in which the custom_amount should be processed.
+
+
+```json
+{
+  "planIdentifier": "automatic-pricing",
+  "successUrl": "[https://www.kelviq.com/](https://www.kelviq.com/)",
+  "chargePeriod": "MONTHLY",
+  "customerId": "sam-altman0010",
+  "custom_amount": 1200,
+  "tax_behavior": "INCLUSIVE",
+  "currency_code": "INR"
+}
+```
+
+</Update>
+
+<Update label="v2.1.0" description="May 7, 2026">
+
+### New Features
+
+#### Enhanced Checkout Configuration
+You can now pass additional configuration parameters when [creating a checkout session via the API](https://docs.kelviq.com/api-reference/checkout/create-a-checkout-session). These new fields allow for tighter control over the customer experience:
+
+* **`lockEmail`**: When set to `true`, the email address field on the checkout page is disabled, preventing customers from changing the email associated with the session.
+* **`discountsEnabled`**: A boolean to explicitly allow or disallow discount code application on the checkout page.
+* **`defaultBillingCountry`**: Pre-fills the billing country field (e.g., `"IN"`).
+
+**Example Payload:**
+
+```json
+{
+  "planIdentifier": "base",
+  "successUrl": "[https://kelviq.com/checkout/success](https://kelviq.com/checkout/success)",
+  "chargePeriod": "MONTHLY",
+  "customerId": "sachin",
+  "lockEmail": true,
+  "discountsEnabled": false,
+  "defaultBillingCountry": "IN"
+}
+```
+
+</Update>

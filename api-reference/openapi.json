@@ -1210,10 +1210,10 @@
             "example": "geo@example.com"
           },
           "customerPortalUrl": {
-            "type": "string",
-            "format": "url",
-            "description": "The URL to redirect the customer to their billing portal.",
-            "example": "https://www.kelviq.com/portal/aphelo/"
+              "type": "string",
+              "format": "url",
+              "description": "The `customerPortalUrl` field contains the customer’s billing portal URL. This URL alone does not authenticate the customer session. To generate a signed portal link, append the `token` value from the same response as a query parameter using the following format:\n\n`${customerPortalUrl}?token=${token}`\n\nExample response:\n\n```json\n{\n  \"token\": \"cpt-4f7c5dc4-da9f-447b-d447-6266dc35ed6d:23fca530-adeb-4685-b3d5-9928c6d38275\",\n  \"email\": \"geo@example.com\",\n  \"customerPortalUrl\": \"https://www.kelviq.com/portal/aphelo/\"\n}\n```\n\nGenerated signed portal link:\n\n`https://www.kelviq.com/portal/aphelo/?token=cpt-4f7c5dc4-da9f-447b-d447-6266dc35ed6d:23fca530-adeb-4685-b3d5-9928c6d38275`\n\nThe generated URL can be safely shared with the customer to provide direct access to their billing portal session."
+
           }
         }
       },
