@@ -160,7 +160,9 @@
               "changelog/js-sdk",
               "changelog/react-sdk",
               "changelog/node-sdk",
-              "changelog/python-sdk"
+              "changelog/python-sdk",
+              "changelog/js-promotions-ui",
+              "changelog/checkout-api"
             ]
           }
         ]
