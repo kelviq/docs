@@ -11,12 +11,29 @@
       "description": "kelviq API Server (General - specific operations might override)"
     }
   ],
+  "tags": [
+    { "name": "Products", "description": "Catalog products." },
+    { "name": "Product Settings", "description": "Per-product settings (currency, VPN/Tor/proxy, product URL)." },
+    { "name": "Product Files", "description": "Product images and downloadable assets." },
+    { "name": "Features", "description": "Catalog features that can be granted as plan entitlements." },
+    { "name": "Plans", "description": "Catalog plans (CRUD, publish, versions, prices)." },
+    { "name": "Plan Entitlements", "description": "Feature entitlements attached to a plan." },
+    { "name": "Plan Files", "description": "Files attached to plans, and signed download links." },
+    { "name": "Media", "description": "Generate presigned S3 upload URLs for product/plan images and files." },
+    { "name": "Partner", "description": "Partner integration APIs (organization provisioning, lookup)." }
+  ],
   "components": {
     "securitySchemes": {
       "bearerAuth": {
         "type": "http",
         "scheme": "bearer",
         "description": "The Server API Key obtained from the kelviq application. Pass as a Bearer token in the Authorization header. Example: 'Authorization: Bearer __YOUR_API_KEY__'"
+      },
+      "partnerKeyAuth": {
+        "type": "apiKey",
+        "in": "header",
+        "name": "X-Kelviq-Partner-Key",
+        "description": "Partner integration secret issued by kelviq. Send the raw secret (prefixed `kvqp_`) in the `X-Kelviq-Partner-Key` header on every partner API request."
       }
     },
     "schemas": {
@@ -1387,7 +1404,6 @@
           "metadata": { "type": "object" },
           "basePlan": { "nullable": true },
           "price": { "$ref": "#/components/schemas/FeaturePrice" },
-          "addons": { "type": "array", "items": {} },
           "originalPrice": {
             "type": "object",
             "description": "Map of chargePeriod to base price amount (e.g. {\"MONTHLY\": 19.0, \"YEARLY\": 190.0})."
@@ -1455,10 +1471,6 @@
           },
           "price": {
             "$ref": "#/components/schemas/FeaturePrice"
-          },
-          "addons": {
-            "type": "array",
-            "items": {}
           },
           "originalPrice": {
             "type": "object"
@@ -1956,6 +1968,1109 @@
             "type": "boolean",
             "description": "`true` if the request is identified as a bot or crawler.",
             "example": false
+          }
+        }
+      },
+      "ProductImage": {
+        "type": "object",
+        "description": "An image asset attached to a product.",
+        "properties": {
+          "id": {
+            "type": "string",
+            "format": "uuid",
+            "readOnly": true,
+            "description": "Unique identifier for the image.",
+            "example": "1f7e1b54-7c6f-4d7e-9a4f-2c9c2d8b9d31"
+          },
+          "name": {
+            "type": "string",
+            "nullable": true,
+            "description": "Original filename or display name.",
+            "example": "hero-banner.png"
+          },
+          "image": {
+            "type": "string",
+            "readOnly": true,
+            "description": "Storage key / URL for the image asset.",
+            "example": "media/.../products/<id>/<uuid>/hero-banner.png"
+          },
+          "ordering": {
+            "type": "integer",
+            "description": "Position of the image in the gallery.",
+            "example": 0
+          },
+          "thumbnail": {
+            "type": "boolean",
+            "description": "If `true`, this image is used as the product thumbnail.",
+            "example": true
+          },
+          "enabled": {
+            "type": "boolean",
+            "description": "If `true`, the image is shown publicly.",
+            "example": true
+          }
+        }
+      },
+      "ProductImageUpdateRequest": {
+        "type": "object",
+        "description": "Editable fields on a product image. The underlying file cannot be changed; upload a new image instead.",
+        "properties": {
+          "name": {
+            "type": "string",
+            "description": "Display name.",
+            "example": "primary-hero.png"
+          },
+          "ordering": {
+            "type": "integer",
+            "description": "Position in the gallery.",
+            "example": 1
+          },
+          "thumbnail": {
+            "type": "boolean",
+            "description": "If `true`, marks this image as the product thumbnail and unsets the flag on other images.",
+            "example": true
+          },
+          "enabled": {
+            "type": "boolean",
+            "example": true
+          }
+        }
+      },
+      "ProductFile": {
+        "type": "object",
+        "description": "A downloadable file attached to a product.",
+        "properties": {
+          "id": {
+            "type": "string",
+            "format": "uuid",
+            "readOnly": true,
+            "example": "8d2f1cf4-9c4f-44a8-9b39-c98f3a39a6c1"
+          },
+          "name": {
+            "type": "string",
+            "description": "Display name shown to customers.",
+            "example": "Getting Started Guide.pdf"
+          },
+          "file": {
+            "type": "string",
+            "readOnly": true,
+            "description": "Storage key for the file.",
+            "example": "media/.../products/<id>/<uuid>/guide.pdf"
+          },
+          "ordering": {
+            "type": "integer",
+            "example": 0
+          },
+          "enabled": {
+            "type": "boolean",
+            "example": true
+          }
+        }
+      },
+      "ProductFileUpdateRequest": {
+        "type": "object",
+        "description": "Editable fields on a product file. The file content cannot be replaced; upload a new file instead.",
+        "properties": {
+          "name": {
+            "type": "string",
+            "example": "Onboarding Guide.pdf"
+          },
+          "ordering": {
+            "type": "integer",
+            "example": 2
+          },
+          "enabled": {
+            "type": "boolean",
+            "example": true
+          }
+        }
+      },
+      "Product": {
+        "type": "object",
+        "description": "A product in the catalog. Each product can have multiple plans, images and files.",
+        "properties": {
+          "id": {
+            "type": "string",
+            "format": "uuid",
+            "readOnly": true,
+            "example": "0d65f7c0-7e91-4f56-9b32-13a9a6a7c1de"
+          },
+          "identifier": {
+            "type": "string",
+            "description": "Human-readable, URL-safe slug. Auto-generated from `name` if omitted on create.",
+            "example": "pro-suite"
+          },
+          "name": {
+            "type": "string",
+            "example": "Pro Suite"
+          },
+          "description": {
+            "type": "string",
+            "example": "Premium tools for growing teams."
+          },
+          "taxCode": {
+            "type": "string",
+            "description": "Tax code for the product. Must be one of the supported values.",
+            "enum": [
+              "saas",
+              "saas_business",
+              "software",
+              "videocontent",
+              "informationservice",
+              "ebook",
+              "digitalgraphic",
+              "videogame",
+              "eservice",
+              "training"
+            ],
+            "example": "saas"
+          },
+          "createdBy": {
+            "type": "string",
+            "readOnly": true,
+            "description": "Display name of the user who created the product.",
+            "example": "Jane Smith"
+          },
+          "modifiedOn": {
+            "type": "string",
+            "format": "date-time",
+            "readOnly": true,
+            "example": "2025-04-12T08:21:14.910Z"
+          },
+          "images": {
+            "type": "array",
+            "readOnly": true,
+            "items": { "$ref": "#/components/schemas/ProductImage" }
+          }
+        }
+      },
+      "ProductRetrieve": {
+        "type": "object",
+        "description": "A product returned via the detail endpoint, including its published plans.",
+        "allOf": [
+          { "$ref": "#/components/schemas/Product" },
+          {
+            "type": "object",
+            "properties": {
+              "plans": {
+                "type": "array",
+                "description": "Identifiers of all published (latest, non-archived) plans on this product.",
+                "items": { "type": "string" },
+                "example": ["pro-monthly", "pro-annual"]
+              }
+            }
+          }
+        ]
+      },
+      "ProductCreateRequest": {
+        "type": "object",
+        "required": ["name", "taxCode"],
+        "description": "Payload to create a new product.",
+        "properties": {
+          "name": { "type": "string", "example": "ParityDeals" },
+          "identifier": {
+            "type": "string",
+            "description": "Optional URL-safe slug. Auto-generated from name if not supplied.",
+            "example": "parity-deals"
+          },
+          "description": { "type": "string", "example": "" },
+          "taxCode": {
+            "type": "string",
+            "description": "Tax code for the product. Must be one of the supported values.",
+            "enum": [
+              "saas",
+              "saas_business",
+              "software",
+              "videocontent",
+              "informationservice",
+              "ebook",
+              "digitalgraphic",
+              "videogame",
+              "eservice",
+              "training"
+            ],
+            "example": "saas"
+          },
+          "imageKeys": {
+            "type": "array",
+            "description": "Temporary S3 keys (e.g. `tmp/<uuid>/<filename>`) returned by the upload endpoint. They will be moved into permanent storage and attached as `ProductImage` records.",
+            "items": { "type": "string" },
+            "example": ["tmp/108713b0-1f81-42cf-a16c-c83b1d4d4148/web-app-manifest-512x512.png"]
+          }
+        },
+        "example": {
+          "name": "ParityDeals",
+          "description": "",
+          "identifier": "parity-deals",
+          "imageKeys": [
+            "tmp/108713b0-1f81-42cf-a16c-c83b1d4d4148/web-app-manifest-512x512.png"
+          ],
+          "taxCode": "saas"
+        }
+      },
+      "ProductUpdateRequest": {
+        "type": "object",
+        "description": "Payload for `PATCH /products/{id}/`. Most identifying fields are read-only.",
+        "properties": {
+          "name": { "type": "string", "example": "Pro Suite v2" },
+          "description": { "type": "string", "example": "Updated description." },
+          "taxCode": {
+            "type": "string",
+            "description": "Tax code for the product. Must be one of the supported values.",
+            "enum": [
+              "saas",
+              "saas_business",
+              "software",
+              "videocontent",
+              "informationservice",
+              "ebook",
+              "digitalgraphic",
+              "videogame",
+              "eservice",
+              "training"
+            ],
+            "example": "saas"
+          },
+          "imageKeys": {
+            "type": "array",
+            "items": { "type": "string" },
+            "description": "Additional temporary S3 keys to append to the product's images.",
+            "example": ["tmp/new-hero.jpg"]
+          },
+          "fileKeys": {
+            "type": "array",
+            "items": { "type": "string" },
+            "example": ["tmp/changelog.pdf"]
+          }
+        }
+      },
+      "ProductSettings": {
+        "type": "object",
+        "description": "Behavioural and presentation settings attached to a product.",
+        "properties": {
+          "vpn": {
+            "type": "boolean",
+            "description": "If `true`, VPN traffic is allowed for this product's experience.",
+            "example": true
+          },
+          "tor": {
+            "type": "boolean",
+            "description": "If `true`, Tor traffic is allowed.",
+            "example": true
+          },
+          "proxy": {
+            "type": "boolean",
+            "description": "If `true`, proxy traffic is allowed.",
+            "example": true
+          },
+          "currency": {
+            "type": "string",
+            "description": "Default currency for the product.",
+            "example": "USD"
+          },
+          "productUrl": {
+            "type": "string",
+            "nullable": true,
+            "format": "uri",
+            "description": "Public URL of the product.",
+            "example": "https://app.example.com"
+          }
+        }
+      },
+      "ProductSettingsUpdateRequest": {
+        "type": "object",
+        "description": "Partial update to product settings. Any subset of fields may be supplied.",
+        "properties": {
+          "vpn": { "type": "boolean", "example": false },
+          "tor": { "type": "boolean", "example": false },
+          "proxy": { "type": "boolean", "example": true },
+          "currency": { "type": "string", "example": "EUR" },
+          "productUrl": { "type": "string", "format": "uri", "example": "https://app.example.com" }
+        }
+      },
+      "CatalogFeature": {
+        "type": "object",
+        "description": "A feature that can be granted as an entitlement on a plan.",
+        "properties": {
+          "id": {
+            "type": "string",
+            "format": "uuid",
+            "readOnly": true,
+            "example": "3a3e92ab-90a3-4f43-8e87-9d4c8c5a9c01"
+          },
+          "identifier": {
+            "type": "string",
+            "description": "URL-safe slug, auto-generated from name if not provided.",
+            "example": "api-calls"
+          },
+          "name": { "type": "string", "example": "API Calls" },
+          "description": { "type": "string", "example": "Number of API calls per billing cycle." },
+          "featureType": {
+            "type": "string",
+            "enum": ["BOOLEAN", "CUSTOMIZABLE", "METER"],
+            "description": "BOOLEAN: on/off flag. CUSTOMIZABLE: numeric limit. METER: usage-based metering.",
+            "example": "METER"
+          },
+          "featureDetails": {
+            "type": "object",
+            "description": "Configuration for the feature. For METER features, expects `featureSubType` (PRE_AGGREGATED_USAGE or RAW_EVENTS), `units`, and optionally `customerUnit` for unit conversion.",
+            "additionalProperties": true,
+            "example": {
+              "featureSubType": "PRE_AGGREGATED_USAGE",
+              "units": { "singular": "call", "plural": "calls" }
+            }
+          },
+          "meter": {
+            "type": "object",
+            "description": "For RAW_EVENTS meter features: an object with `aggregation` (function, field) and `filters`.",
+            "additionalProperties": true,
+            "example": {}
+          },
+          "details": {
+            "type": "object",
+            "readOnly": true,
+            "additionalProperties": true,
+            "example": {}
+          },
+          "metadata": {
+            "type": "object",
+            "additionalProperties": true,
+            "example": { "category": "core" }
+          },
+          "isArchived": {
+            "type": "boolean",
+            "readOnly": true,
+            "example": false
+          },
+          "modifiedOn": {
+            "type": "string",
+            "format": "date-time",
+            "readOnly": true,
+            "example": "2025-04-12T08:21:14.910Z"
+          }
+        }
+      },
+      "FeatureCreateRequest": {
+        "type": "object",
+        "required": ["name", "featureType"],
+        "properties": {
+          "name": { "type": "string", "example": "API Calls" },
+          "identifier": { "type": "string", "example": "api-calls" },
+          "description": { "type": "string", "example": "Number of API calls per billing cycle." },
+          "featureType": {
+            "type": "string",
+            "enum": ["BOOLEAN", "CUSTOMIZABLE", "METER"],
+            "example": "METER"
+          },
+          "featureDetails": {
+            "type": "object",
+            "additionalProperties": true,
+            "example": {
+              "featureSubType": "PRE_AGGREGATED_USAGE",
+              "units": { "singular": "call", "plural": "calls" }
+            }
+          },
+          "meter": {
+            "type": "object",
+            "additionalProperties": true,
+            "example": {}
+          },
+          "metadata": {
+            "type": "object",
+            "additionalProperties": true,
+            "example": {}
+          }
+        }
+      },
+      "FeatureUpdateRequest": {
+        "type": "object",
+        "description": "Patch payload for a feature. `identifier`, `featureType`, `featureDetails`, `meter` and `details` are read-only after creation.",
+        "properties": {
+          "name": { "type": "string", "example": "API Calls (renamed)" },
+          "description": { "type": "string", "example": "Updated description." },
+          "metadata": { "type": "object", "additionalProperties": true, "example": {} }
+        }
+      },
+      "PlanLink": {
+        "type": "object",
+        "properties": {
+          "name": { "type": "string", "example": "Product page" },
+          "url": { "type": "string", "format": "uri", "example": "https://example.com/product" }
+        }
+      },
+      "PlanFile": {
+        "type": "object",
+        "properties": {
+          "id": { "type": "string", "format": "uuid", "readOnly": true, "example": "7a3e3411-cef0-4f4e-bdb6-1f74a4f4d2c0" },
+          "name": { "type": "string", "example": "Plan Terms.pdf" },
+          "file": { "type": "string", "readOnly": true, "example": "media/.../plans/<id>/<uuid>/terms.pdf" },
+          "ordering": { "type": "integer", "example": 0 },
+          "enabled": { "type": "boolean", "example": true },
+          "downloadUrl": {
+            "type": "string",
+            "format": "uri",
+            "readOnly": true,
+            "description": "URL clients can hit to download the file. Will redirect to a forced-download URL.",
+            "example": "https://api.kelviq.com/api/v1/catalog/plans/pro-monthly/file/7a3e3411-cef0-4f4e-bdb6-1f74a4f4d2c0/download/"
+          }
+        }
+      },
+      "PlanFileUpdateRequest": {
+        "type": "object",
+        "description": "Update display fields of a plan file. The underlying file cannot be replaced.",
+        "properties": {
+          "name": { "type": "string", "example": "Plan Terms (v2).pdf" },
+          "ordering": { "type": "integer", "example": 1 },
+          "enabled": { "type": "boolean", "example": true }
+        }
+      },
+      "LicenseConfig": {
+        "type": "object",
+        "description": "License configuration for a plan (used when issuing license keys).",
+        "properties": {
+          "enabled": { "type": "boolean", "example": true },
+          "activationLimit": { "type": "integer", "minimum": 1, "example": 3 },
+          "activationLimitEnabled": { "type": "boolean", "example": true },
+          "durationUnit": {
+            "type": "string",
+            "enum": ["DAY", "MONTH", "YEAR"],
+            "example": "YEAR"
+          },
+          "durationValue": { "type": "integer", "minimum": 1, "example": 1 },
+          "hasExpiry": { "type": "boolean", "example": true }
+        }
+      },
+      "CatalogPlan": {
+        "type": "object",
+        "description": "A versioned plan attached to a product. Updates create new versions; only the published version is `is_latest=true`.",
+        "properties": {
+          "identifier": {
+            "type": "string",
+            "description": "URL-safe slug. Stable across versions.",
+            "example": "pro-monthly"
+          },
+          "name": { "type": "string", "example": "Pro Monthly" },
+          "description": { "type": "string", "example": "Pro tier billed monthly." },
+          "product": {
+            "type": "string",
+            "format": "uuid",
+            "description": "UUID of the parent product.",
+            "example": "0d65f7c0-7e91-4f56-9b32-13a9a6a7c1de"
+          },
+          "metadata": { "type": "object", "additionalProperties": true, "example": {} },
+          "version": { "type": "integer", "readOnly": true, "example": 3 },
+          "isLatest": {
+            "type": "boolean",
+            "readOnly": true,
+            "description": "True only for the currently published version.",
+            "example": true
+          },
+          "modifiedOn": { "type": "string", "format": "date-time", "readOnly": true, "example": "2025-04-12T08:21:14.910Z" },
+          "createdOn": { "type": "string", "format": "date-time", "readOnly": true, "example": "2025-03-01T08:21:14.910Z" },
+          "details": {
+            "type": "object",
+            "readOnly": true,
+            "additionalProperties": true,
+            "description": "Provider-side identifiers (e.g. `stripeProductId`).",
+            "example": { "stripeProductId": "prod_ABC123" }
+          },
+          "isVisible": { "type": "boolean", "example": true },
+          "isImported": { "type": "boolean", "readOnly": true, "example": false },
+          "countries": {
+            "type": "array",
+            "readOnly": true,
+            "items": { "type": "string" },
+            "example": ["US", "IN"]
+          },
+          "license": { "$ref": "#/components/schemas/LicenseConfig" },
+          "links": {
+            "type": "array",
+            "items": { "$ref": "#/components/schemas/PlanLink" }
+          },
+          "files": {
+            "type": "array",
+            "readOnly": true,
+            "items": { "$ref": "#/components/schemas/PlanFile" }
+          },
+          "ordering": { "type": "integer", "nullable": true, "example": 1 }
+        }
+      },
+      "PlanCreateRequest": {
+        "type": "object",
+        "required": ["name", "product"],
+        "properties": {
+          "name": { "type": "string", "example": "Pro Monthly" },
+          "identifier": { "type": "string", "example": "pro-monthly" },
+          "description": { "type": "string", "example": "Pro tier billed monthly." },
+          "product": {
+            "type": "string",
+            "format": "uuid",
+            "description": "UUID of the parent product.",
+            "example": "0d65f7c0-7e91-4f56-9b32-13a9a6a7c1de"
+          },
+          "metadata": { "type": "object", "additionalProperties": true, "example": {} },
+          "isVisible": { "type": "boolean", "example": true },
+          "license": { "$ref": "#/components/schemas/LicenseConfig" },
+          "links": {
+            "type": "array",
+            "items": { "$ref": "#/components/schemas/PlanLink" }
+          },
+          "fileKeys": {
+            "type": "array",
+            "items": { "type": "string" },
+            "description": "Temporary S3 keys (e.g. `tmp/<uuid>/<filename>`) returned by `POST /media/` for files to attach to the plan. Uploaded files are moved into permanent storage and exposed via the plan's `files[]`.",
+            "example": [
+              "tmp/9b1c8af2-3d4e-4f9a-8b2c-1f3e5a7b9d12/plan-terms.pdf"
+            ]
+          },
+          "ordering": { "type": "integer", "example": 1 }
+        },
+        "example": {
+          "name": "Pro Monthly",
+          "identifier": "pro-monthly",
+          "description": "Pro tier billed monthly.",
+          "product": "0d65f7c0-7e91-4f56-9b32-13a9a6a7c1de",
+          "isVisible": true,
+          "fileKeys": [
+            "tmp/9b1c8af2-3d4e-4f9a-8b2c-1f3e5a7b9d12/plan-terms.pdf"
+          ],
+          "ordering": 1
+        }
+      },
+      "PlanUpdateRequest": {
+        "type": "object",
+        "description": "Patch payload for a plan. If applied to a published (is_latest) plan, a new version is created automatically.",
+        "properties": {
+          "name": { "type": "string", "example": "Pro Monthly (v2)" },
+          "description": { "type": "string", "example": "Updated description." },
+          "metadata": { "type": "object", "additionalProperties": true, "example": {} },
+          "isVisible": { "type": "boolean", "example": true },
+          "license": { "$ref": "#/components/schemas/LicenseConfig" },
+          "links": {
+            "type": "array",
+            "items": { "$ref": "#/components/schemas/PlanLink" }
+          },
+          "fileKeys": {
+            "type": "array",
+            "items": { "type": "string" },
+            "description": "Additional temporary S3 keys (from `POST /media/`) to append to the plan's files. Existing files are left untouched.",
+            "example": [
+              "tmp/9b1c8af2-3d4e-4f9a-8b2c-1f3e5a7b9d12/plan-terms.pdf"
+            ]
+          }
+        }
+      },
+      "PlanPublishRequest": {
+        "type": "object",
+        "description": "Publishes the most recent draft of a plan.",
+        "properties": {
+          "updateFeatures": {
+            "type": "boolean",
+            "description": "If `true`, existing customers are migrated so their feature entitlements match the newly published plan.",
+            "example": false
+          },
+          "updatePricing": {
+            "type": "boolean",
+            "description": "If `true`, existing customers are migrated to the newly published plan's pricing.",
+            "example": false
+          }
+        }
+      },
+      "PlanPublishResponse": {
+        "type": "object",
+        "properties": {
+          "status": { "type": "string", "example": "published" }
+        }
+      },
+      "PlanCharge": {
+        "type": "object",
+        "description": "An individual charge inside a feature's pricing definition.",
+        "properties": {
+          "chargePeriod": {
+            "type": "string",
+            "enum": ["ONE_TIME", "DAILY", "MONTHLY", "QUARTERLY", "YEARLY"],
+            "example": "MONTHLY"
+          },
+          "priceData": {
+            "type": "object",
+            "additionalProperties": true,
+            "description": "For FLAT/PACKAGE: `{ amount, block_size? }`. For TIERED/VOLUME/STAIRSTEP: `{ currency }`.",
+            "example": { "amount": 29.99 }
+          },
+          "tiers": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "properties": {
+                "flatAmount": { "type": "number", "example": 0 },
+                "unitAmount": { "type": "number", "example": 0.001 },
+                "upTo": {
+                  "nullable": true,
+                  "description": "Upper bound of the tier. Integer, or the string \"inf\" for an unbounded final tier.",
+                  "oneOf": [
+                    { "type": "integer" },
+                    { "type": "string" }
+                  ],
+                  "example": 1000
+                }
+              }
+            },
+            "example": []
+          },
+          "advanced": {
+            "type": "object",
+            "additionalProperties": true,
+            "description": "Optional `{ min_quantity, max_quantity }` (FLAT only, when a feature is attached).",
+            "example": {}
+          }
+        }
+      },
+      "PlanChargeCatalogPrice": {
+        "type": "object",
+        "description": "Pricing for one feature (or the plan itself if `feature` is null).",
+        "properties": {
+          "feature": {
+            "type": "string",
+            "format": "uuid",
+            "nullable": true,
+            "description": "Feature UUID this pricing applies to. Required for non-FLAT models.",
+            "example": "3a3e92ab-90a3-4f43-8e87-9d4c8c5a9c01"
+          },
+          "priceModel": {
+            "type": "string",
+            "enum": ["FLAT", "PACKAGE", "TIERED", "VOLUME", "STAIRSTEP"],
+            "example": "FLAT"
+          },
+          "reset": {
+            "type": "string",
+            "enum": ["NEVER", "EVERY_DAY", "EVERY_MONTH", "EVERY_QUARTER", "EVERY_YEAR"],
+            "example": "EVERY_MONTH"
+          },
+          "resetTime": {
+            "type": "string",
+            "nullable": true,
+            "example": "BEGINNING_OF_PERIOD"
+          },
+          "hasUnlimitedUsage": { "type": "boolean", "example": false },
+          "paymentType": {
+            "type": "string",
+            "enum": ["ADVANCE_COMMITMENT", "PAY_AS_YOU_GO"],
+            "example": "ADVANCE_COMMITMENT"
+          },
+          "rollover": {
+            "type": "object",
+            "description": "Optional `{ enabled, percentage, limit }`.",
+            "additionalProperties": true,
+            "example": {}
+          },
+          "usageAlerts": {
+            "type": "object",
+            "description": "Optional usage-alert configuration. `thresholdType` is `PERCENTAGE` (thresholds are 1-100) or `BALANCE` (thresholds are absolute usage values).",
+            "properties": {
+              "enabled": { "type": "boolean", "example": true },
+              "thresholds": {
+                "type": "array",
+                "items": { "type": "number" },
+                "example": [75, 90]
+              },
+              "thresholdType": {
+                "type": "string",
+                "enum": ["PERCENTAGE", "BALANCE"],
+                "example": "PERCENTAGE"
+              }
+            },
+            "example": {
+              "enabled": true,
+              "thresholds": [75, 90],
+              "thresholdType": "PERCENTAGE"
+            }
+          },
+          "charges": {
+            "type": "array",
+            "items": { "$ref": "#/components/schemas/PlanCharge" }
+          }
+        }
+      },
+      "PlanPrice": {
+        "type": "object",
+        "description": "A price (per currency) attached to a plan, with its per-feature charge configuration.",
+        "properties": {
+          "id": { "type": "string", "format": "uuid", "readOnly": true, "example": "df0b9da9-58c3-4d77-9b62-3f6e4c2b1ad0" },
+          "priceType": {
+            "type": "string",
+            "enum": ["FREE", "PAID", "CUSTOM"],
+            "example": "PAID"
+          },
+          "currency": { "type": "string", "example": "USD" },
+          "freeTrial": { "type": "boolean", "example": false },
+          "trialPeriod": { "type": "integer", "description": "Trial length in days.", "example": 14 },
+          "enabled": { "type": "boolean", "example": true },
+          "taxBehavior": {
+            "type": "string",
+            "enum": ["INCLUSIVE", "EXCLUSIVE", "UNSPECIFIED"],
+            "example": "EXCLUSIVE"
+          },
+          "chargeCatalogPrice": {
+            "type": "array",
+            "items": { "$ref": "#/components/schemas/PlanChargeCatalogPrice" }
+          }
+        }
+      },
+      "PlanPriceCreateRequest": {
+        "type": "object",
+        "required": ["priceType"],
+        "properties": {
+          "priceType": {
+            "type": "string",
+            "enum": ["FREE", "PAID", "CUSTOM"],
+            "example": "PAID"
+          },
+          "currency": { "type": "string", "example": "USD" },
+          "freeTrial": { "type": "boolean", "example": false },
+          "trialPeriod": { "type": "integer", "example": 0 },
+          "enabled": { "type": "boolean", "example": true },
+          "taxBehavior": {
+            "type": "string",
+            "enum": ["INCLUSIVE", "EXCLUSIVE", "UNSPECIFIED"],
+            "example": "EXCLUSIVE"
+          },
+          "chargeCatalogPrice": {
+            "type": "array",
+            "items": { "$ref": "#/components/schemas/PlanChargeCatalogPrice" }
+          }
+        }
+      },
+      "PlanPriceBulkRequest": {
+        "type": "object",
+        "required": ["prices"],
+        "description": "Replaces the plan's prices in one atomic call. Creating multiple PAID prices with the same currency is rejected.",
+        "properties": {
+          "prices": {
+            "type": "array",
+            "items": { "$ref": "#/components/schemas/PlanPriceCreateRequest" }
+          }
+        }
+      },
+      "PlanPriceBulkResponse": {
+        "type": "object",
+        "properties": {
+          "prices": {
+            "type": "array",
+            "items": { "$ref": "#/components/schemas/PlanPrice" }
+          }
+        }
+      },
+      "PlanEntitlementDetails": {
+        "type": "object",
+        "description": "Per-feature entitlement configuration on a plan. Shape varies by feature_type.",
+        "additionalProperties": true,
+        "properties": {
+          "value": {
+            "description": "For BOOLEAN: a boolean. For CUSTOMIZABLE / METER: a number.",
+            "example": 10000
+          },
+          "hasUnlimitedUsage": { "type": "boolean", "example": false },
+          "reset": {
+            "type": "string",
+            "enum": ["NEVER", "EVERY_DAY", "EVERY_MONTH", "EVERY_QUARTER", "EVERY_YEAR"],
+            "example": "EVERY_MONTH"
+          },
+          "resetTime": { "type": "string", "nullable": true, "example": "BEGINNING_OF_PERIOD" },
+          "rollover": { "type": "object", "additionalProperties": true, "example": {} },
+          "usageAlerts": {
+            "type": "object",
+            "description": "Optional usage-alert configuration for this entitlement. `thresholdType` is `PERCENTAGE` (thresholds are 1-100) or `BALANCE` (thresholds are absolute usage values).",
+            "properties": {
+              "enabled": { "type": "boolean", "example": true },
+              "thresholds": {
+                "type": "array",
+                "items": { "type": "number" },
+                "example": [75, 90]
+              },
+              "thresholdType": {
+                "type": "string",
+                "enum": ["PERCENTAGE", "BALANCE"],
+                "example": "PERCENTAGE"
+              }
+            },
+            "example": {
+              "enabled": true,
+              "thresholds": [75, 90],
+              "thresholdType": "PERCENTAGE"
+            }
+          },
+          "hardLimit": { "type": "boolean", "example": false },
+          "isInherited": { "type": "boolean", "example": false },
+          "isValueOverridden": { "type": "boolean", "example": false }
+        }
+      },
+      "PlanFeatureEntitlement": {
+        "type": "object",
+        "properties": {
+          "feature": { "$ref": "#/components/schemas/CatalogFeature" },
+          "details": { "$ref": "#/components/schemas/PlanEntitlementDetails" }
+        }
+      },
+      "PlanFeatureEntitlementWrite": {
+        "type": "object",
+        "required": ["feature", "details"],
+        "properties": {
+          "feature": {
+            "type": "string",
+            "format": "uuid",
+            "description": "Feature UUID.",
+            "example": "3a3e92ab-90a3-4f43-8e87-9d4c8c5a9c01"
+          },
+          "details": { "$ref": "#/components/schemas/PlanEntitlementDetails" }
+        }
+      },
+      "PlanFeaturesCreateRequest": {
+        "type": "object",
+        "required": ["planEntitlements"],
+        "properties": {
+          "planEntitlements": {
+            "type": "array",
+            "items": { "$ref": "#/components/schemas/PlanFeatureEntitlementWrite" }
+          }
+        }
+      },
+      "PlanFeaturesBulkUpdateRequest": {
+        "type": "object",
+        "required": ["planEntitlements"],
+        "description": "Full replacement of all entitlements on the plan. If applied to a published plan, a new version is created.",
+        "properties": {
+          "planEntitlements": {
+            "type": "array",
+            "items": { "$ref": "#/components/schemas/PlanFeatureEntitlementWrite" }
+          },
+          "basePlan": {
+            "type": "string",
+            "description": "Optional plan identifier to set as the base/parent plan.",
+            "example": "starter-monthly"
+          }
+        }
+      },
+      "PlanFeaturePatchRequest": {
+        "type": "object",
+        "required": ["details"],
+        "description": "Updates only the entitlement `details` for a single feature on the plan.",
+        "properties": {
+          "details": { "$ref": "#/components/schemas/PlanEntitlementDetails" }
+        }
+      },
+      "PlanVersionsResponse": {
+        "type": "object",
+        "description": "Paginated list of every version of a plan (latest first).",
+        "properties": {
+          "count": { "type": "integer", "example": 3 },
+          "next": { "type": "string", "nullable": true, "example": null },
+          "previous": { "type": "string", "nullable": true, "example": null },
+          "results": {
+            "type": "array",
+            "items": { "$ref": "#/components/schemas/CatalogPlan" }
+          }
+        }
+      },
+      "PaginatedProducts": {
+        "type": "object",
+        "properties": {
+          "count": { "type": "integer", "example": 1 },
+          "next": { "type": "string", "nullable": true, "example": null },
+          "previous": { "type": "string", "nullable": true, "example": null },
+          "results": {
+            "type": "array",
+            "items": { "$ref": "#/components/schemas/Product" }
+          }
+        }
+      },
+      "PaginatedFeatures": {
+        "type": "object",
+        "properties": {
+          "count": { "type": "integer", "example": 1 },
+          "next": { "type": "string", "nullable": true, "example": null },
+          "previous": { "type": "string", "nullable": true, "example": null },
+          "results": {
+            "type": "array",
+            "items": { "$ref": "#/components/schemas/CatalogFeature" }
+          }
+        }
+      },
+      "PaginatedPlans": {
+        "type": "object",
+        "properties": {
+          "count": { "type": "integer", "example": 1 },
+          "next": { "type": "string", "nullable": true, "example": null },
+          "previous": { "type": "string", "nullable": true, "example": null },
+          "results": {
+            "type": "array",
+            "items": { "$ref": "#/components/schemas/CatalogPlan" }
+          }
+        }
+      },
+      "PaginatedPlanPrices": {
+        "type": "object",
+        "properties": {
+          "count": { "type": "integer", "example": 1 },
+          "next": { "type": "string", "nullable": true, "example": null },
+          "previous": { "type": "string", "nullable": true, "example": null },
+          "results": {
+            "type": "array",
+            "items": { "$ref": "#/components/schemas/PlanPrice" }
+          }
+        }
+      },
+      "PaginatedPlanFeatureEntitlements": {
+        "type": "object",
+        "properties": {
+          "count": { "type": "integer", "example": 2 },
+          "next": { "type": "string", "nullable": true, "example": null },
+          "previous": { "type": "string", "nullable": true, "example": null },
+          "results": {
+            "type": "array",
+            "items": { "$ref": "#/components/schemas/PlanFeatureEntitlement" }
+          }
+        }
+      },
+      "MessageResponse": {
+        "type": "object",
+        "properties": {
+          "message": { "type": "string", "example": "Object deleted successfully." }
+        }
+      },
+      "PresignedUploadRequest": {
+        "type": "object",
+        "required": ["fileName", "fileType"],
+        "description": "Request a presigned S3 POST policy for uploading a single file (max 5 GB). The returned `fileKey` is a temporary `tmp/<uuid>/<fileName>` path that can be passed to product/plan endpoints via `imageKeys` / `fileKeys`.",
+        "properties": {
+          "fileName": {
+            "type": "string",
+            "description": "Name of the file being uploaded. Used as the suffix of the generated S3 object key.",
+            "example": "web-app-manifest-512x512.png"
+          },
+          "fileType": {
+            "type": "string",
+            "description": "MIME type of the file. Enforced by the presigned policy on upload.",
+            "example": "image/png"
+          }
+        },
+        "example": {
+          "fileName": "web-app-manifest-512x512.png",
+          "fileType": "image/png"
+        }
+      },
+      "PresignedUploadResponse": {
+        "type": "object",
+        "description": "S3 presigned POST policy. Upload the file by sending a `multipart/form-data` POST to `url` with every key in `fields` as a form field, plus a final `file` field containing the binary. The returned `fileKey` is what you pass back to kelviq.",
+        "properties": {
+          "url": {
+            "type": "string",
+            "format": "uri",
+            "description": "S3 endpoint to POST the upload to.",
+            "example": "https://kelviq-uploads.s3.amazonaws.com/"
+          },
+          "fields": {
+            "type": "object",
+            "description": "Form fields to include in the `multipart/form-data` POST (policy, signature, content-type, etc.). Send every field exactly as provided.",
+            "additionalProperties": { "type": "string" },
+            "example": {
+              "Content-Type": "image/png",
+              "key": "tmp/108713b0-1f81-42cf-a16c-c83b1d4d4148/web-app-manifest-512x512.png",
+              "AWSAccessKeyId": "AKIA...",
+              "policy": "eyJleHBpcmF0aW9uIjogIjIwMjYtMDUtMjFUMTI6MDA6MDBaIiwgImNvbmRpdGlvbnMiOiBbXX0=",
+              "signature": "bWFkZS11cC1zaWduYXR1cmU="
+            }
+          },
+          "fileKey": {
+            "type": "string",
+            "description": "Temporary S3 key for the uploaded object. Pass this back to kelviq via `imageKeys` / `fileKeys` on the relevant catalog endpoint.",
+            "example": "tmp/108713b0-1f81-42cf-a16c-c83b1d4d4148/web-app-manifest-512x512.png"
+          }
+        }
+      },
+      "PartnerOrganizationProvisionRequest": {
+        "type": "object",
+        "required": ["externalId", "email"],
+        "description": "Payload to provision a new organization on behalf of a partner. The owner user is created (or an error is returned if the email is already taken), an organization is set up, API keys are issued, and a welcome / set-password email is sent to the user.",
+        "properties": {
+          "externalId": {
+            "type": "string",
+            "maxLength": 128,
+            "description": "Partner-side identifier for this organization. Must be unique within the partner. Used later by `GET /partner/organizations/by-external-id/{externalId}/`.",
+            "example": "acme-corp"
+          },
+          "email": {
+            "type": "string",
+            "format": "email",
+            "description": "Email address of the organization owner. Must not match any existing kelviq user.",
+            "example": "owner@acme.example.com"
+          },
+          "businessName": {
+            "type": "string",
+            "maxLength": 200,
+            "description": "Optional business name for the organization. If provided, the organization's name and slug are set from this value (slug is auto-deduplicated).",
+            "example": "Acme Corp"
+          }
+        },
+        "example": {
+          "externalId": "acme-corp",
+          "email": "owner@acme.example.com",
+          "businessName": "Acme Corp"
+        }
+      },
+      "PartnerOrganization": {
+        "type": "object",
+        "description": "Organization owned by a partner. Returned by all partner organization endpoints.",
+        "properties": {
+          "userId": {
+            "type": "integer",
+            "nullable": true,
+            "description": "Internal kelviq user ID of the organization owner.",
+            "example": 4271
+          },
+          "organizationIdentifier": {
+            "type": "string",
+            "format": "uuid",
+            "description": "Stable UUID identifier for the organization.",
+            "example": "8e1d7b1a-6c4d-4e3a-9b2d-3f6e4c2b1ad0"
+          },
+          "organizationSlug": {
+            "type": "string",
+            "nullable": true,
+            "description": "URL-safe slug for the organization.",
+            "example": "acme-corp"
+          },
+          "clientKey": {
+            "type": "string",
+            "nullable": true,
+            "description": "Public client key for the organization's API integration.",
+            "example": "ck_live_a1b2c3d4e5f6"
+          },
+          "serverKey": {
+            "type": "string",
+            "nullable": true,
+            "description": "Private server key for the organization. Treat as a secret.",
+            "example": "sk_live_9z8y7x6w5v4u"
+          },
+          "partnerExternalId": {
+            "type": "string",
+            "nullable": true,
+            "description": "Partner-side identifier supplied at provisioning time.",
+            "example": "acme-corp"
+          }
+        }
+      },
+      "PartnerOrganizationList": {
+        "type": "object",
+        "description": "List response for partner organizations.",
+        "properties": {
+          "results": {
+            "type": "array",
+            "items": { "$ref": "#/components/schemas/PartnerOrganization" }
+          },
+          "count": {
+            "type": "integer",
+            "description": "Total number of organizations matching the query.",
+            "example": 1
           }
         }
       }
@@ -3180,7 +4295,6 @@
                           }
                         ]
                       },
-                      "addons": [],
                       "originalPrice": { "MONTHLY": 19.0, "YEARLY": 190.0 },
                       "features": [],
                       "shouldHighlight": false,
@@ -3225,7 +4339,6 @@
                           }
                         ]
                       },
-                      "addons": [],
                       "originalPrice": { "MONTHLY": 39.0, "YEARLY": 390.0 },
                       "features": [],
                       "shouldHighlight": false,
@@ -3270,7 +4383,6 @@
                           }
                         ]
                       },
-                      "addons": [],
                       "originalPrice": { "MONTHLY": 59.0, "YEARLY": 590.0 },
                       "features": [],
                       "shouldHighlight": false,
@@ -3306,7 +4418,6 @@
                           }
                         ]
                       },
-                      "addons": [],
                       "originalPrice": { "ONE_TIME": 0.0 },
                       "features": [],
                       "shouldHighlight": false,
@@ -3351,7 +4462,6 @@
                           }
                         ]
                       },
-                      "addons": [],
                       "originalPrice": { "MONTHLY": 20.0, "YEARLY": 230.0 },
                       "features": [],
                       "shouldHighlight": false,
@@ -3530,6 +4640,1075 @@
           "401": {
             "description": "Unauthorized — missing or invalid API key"
           }
+        }
+      }
+    },
+    "/catalog/products/": {
+      "get": {
+        "tags": ["Products"],
+        "summary": "List products",
+        "description": "Returns a paginated list of all products in the organization's catalog. Archived products are excluded.",
+        "operationId": "listCatalogProducts",
+        "security": [{ "bearerAuth": [] }],
+        "parameters": [
+          {
+            "name": "search",
+            "in": "query",
+            "required": false,
+            "description": "Free-text search across `name`, `identifier`, and `description`.",
+            "example": "pro",
+            "schema": { "type": "string" }
+          },
+          {
+            "name": "page",
+            "in": "query",
+            "required": false,
+            "description": "Page number for pagination.",
+            "example": 1,
+            "schema": { "type": "integer" }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Paginated list of products.",
+            "content": {
+              "application/json": {
+                "schema": { "$ref": "#/components/schemas/PaginatedProducts" }
+              }
+            }
+          },
+          "401": { "description": "Unauthorized — missing or invalid API key" }
+        }
+      },
+      "post": {
+        "tags": ["Products"],
+        "summary": "Create a product",
+        "description": "Creates a new product.",
+        "operationId": "createCatalogProduct",
+        "security": [{ "bearerAuth": [] }],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": { "$ref": "#/components/schemas/ProductCreateRequest" }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "Product created.",
+            "content": {
+              "application/json": {
+                "schema": { "$ref": "#/components/schemas/Product" },
+                "example": {
+                  "id": "762f0098-a8ef-4eed-b08b-f02043771b76",
+                  "identifier": "parity-deals",
+                  "name": "ParityDeals",
+                  "description": "",
+                  "createdBy": "Geo Jacob",
+                  "modifiedOn": "2026-05-20T10:54:41.324224Z",
+                  "images": [
+                    {
+                      "id": "2e025341-0f78-42cc-b814-8f059ac53339",
+                      "name": "web-app-manifest-512x512.png",
+                      "image": "https://cdn.kelviq.com/media/staging/organizations/6/products/762f0098-a8ef-4eed-b08b-f02043771b76/f318dec5767c498482d9e5dffe8a3332/web-app-manifest-512x512.png",
+                      "ordering": 0,
+                      "thumbnail": true,
+                      "enabled": true
+                    }
+                  ],
+                  "taxCode": "saas"
+                }
+              }
+            }
+          },
+          "401": { "description": "Unauthorized — missing or invalid API key" }
+        }
+      }
+    },
+    "/catalog/products/{pk}/": {
+      "parameters": [
+        {
+          "name": "pk",
+          "in": "path",
+          "required": true,
+          "description": "Product UUID.",
+          "example": "0d65f7c0-7e91-4f56-9b32-13a9a6a7c1de",
+          "schema": { "type": "string", "format": "uuid" }
+        }
+      ],
+      "get": {
+        "tags": ["Products"],
+        "summary": "Retrieve a product",
+        "description": "Fetches a product by ID along with its currently published plans.",
+        "operationId": "retrieveCatalogProduct",
+        "security": [{ "bearerAuth": [] }],
+        "responses": {
+          "200": {
+            "description": "Product details.",
+            "content": {
+              "application/json": {
+                "schema": { "$ref": "#/components/schemas/ProductRetrieve" }
+              }
+            }
+          },
+          "404": { "description": "Product not found." },
+          "401": { "description": "Unauthorized — missing or invalid API key" }
+        }
+      },
+      "patch": {
+        "tags": ["Products"],
+        "summary": "Update a product",
+        "description": "Partially updates a product. New images and files can be attached by sending temporary S3 keys in `imageKeys` / `fileKeys`.",
+        "operationId": "updateCatalogProduct",
+        "security": [{ "bearerAuth": [] }],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": { "$ref": "#/components/schemas/ProductUpdateRequest" }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Updated product.",
+            "content": {
+              "application/json": {
+                "schema": { "$ref": "#/components/schemas/Product" }
+              }
+            }
+          },
+          "401": { "description": "Unauthorized — missing or invalid API key" }
+        }
+      },
+      "delete": {
+        "tags": ["Products"],
+        "summary": "Archive a product",
+        "description": "Soft-deletes (archives) the product. Already-archived products return 400.",
+        "operationId": "deleteCatalogProduct",
+        "security": [{ "bearerAuth": [] }],
+        "responses": {
+          "204": {
+            "description": "Product archived.",
+            "content": {
+              "application/json": {
+                "schema": { "$ref": "#/components/schemas/MessageResponse" },
+                "example": { "message": "Object deleted successfully." }
+              }
+            }
+          },
+          "400": { "description": "Already archived." },
+          "401": { "description": "Unauthorized — missing or invalid API key" }
+        }
+      }
+    },
+    "/catalog/products/{pk}/settings/": {
+      "parameters": [
+        {
+          "name": "pk",
+          "in": "path",
+          "required": true,
+          "description": "Product UUID.",
+          "example": "0d65f7c0-7e91-4f56-9b32-13a9a6a7c1de",
+          "schema": { "type": "string", "format": "uuid" }
+        }
+      ],
+      "get": {
+        "tags": ["Product Settings"],
+        "summary": "Retrieve product settings",
+        "description": "Retrieves the VPN/TOR/proxy and presentation settings for a product. Settings are auto-created if they don't already exist.",
+        "operationId": "getCatalogProductSettings",
+        "security": [{ "bearerAuth": [] }],
+        "responses": {
+          "200": {
+            "description": "Product settings.",
+            "content": {
+              "application/json": {
+                "schema": { "$ref": "#/components/schemas/ProductSettings" }
+              }
+            }
+          },
+          "401": { "description": "Unauthorized — missing or invalid API key" }
+        }
+      },
+      "patch": {
+        "tags": ["Product Settings"],
+        "summary": "Update product settings",
+        "description": "Updates one or more product settings fields. Changing `currency` re-enables previously disabled prices in the new currency on the latest plans of that product.",
+        "operationId": "updateCatalogProductSettings",
+        "security": [{ "bearerAuth": [] }],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": { "$ref": "#/components/schemas/ProductSettingsUpdateRequest" }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Updated product settings.",
+            "content": {
+              "application/json": {
+                "schema": { "$ref": "#/components/schemas/ProductSettings" }
+              }
+            }
+          },
+          "401": { "description": "Unauthorized — missing or invalid API key" }
+        }
+      }
+    },
+    "/catalog/products/{product_pk}/image/{pk}/": {
+      "parameters": [
+        {
+          "name": "product_pk",
+          "in": "path",
+          "required": true,
+          "description": "Parent product UUID.",
+          "example": "0d65f7c0-7e91-4f56-9b32-13a9a6a7c1de",
+          "schema": { "type": "string", "format": "uuid" }
+        },
+        {
+          "name": "pk",
+          "in": "path",
+          "required": true,
+          "description": "Image UUID.",
+          "example": "1f7e1b54-7c6f-4d7e-9a4f-2c9c2d8b9d31",
+          "schema": { "type": "string", "format": "uuid" }
+        }
+      ],
+      "patch": {
+        "tags": ["Product Files"],
+        "summary": "Update a product image",
+        "description": "Updates image metadata such as `name`, `ordering`, `thumbnail`, or `enabled`. Setting `thumbnail` to true automatically clears the flag on the product's other images.",
+        "operationId": "updateCatalogProductImage",
+        "security": [{ "bearerAuth": [] }],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": { "$ref": "#/components/schemas/ProductImageUpdateRequest" }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Updated product image.",
+            "content": {
+              "application/json": {
+                "schema": { "$ref": "#/components/schemas/ProductImage" }
+              }
+            }
+          },
+          "401": { "description": "Unauthorized — missing or invalid API key" }
+        }
+      },
+      "delete": {
+        "tags": ["Product Files"],
+        "summary": "Delete a product image",
+        "description": "Permanently deletes the product image record.",
+        "operationId": "deleteCatalogProductImage",
+        "security": [{ "bearerAuth": [] }],
+        "responses": {
+          "204": { "description": "Image deleted." },
+          "404": { "description": "Image not found." },
+          "401": { "description": "Unauthorized — missing or invalid API key" }
+        }
+      }
+    },
+    "/catalog/features/": {
+      "get": {
+        "tags": ["Features"],
+        "summary": "List features",
+        "description": "Returns a paginated list of features for the organization. Archived features are excluded.",
+        "operationId": "listCatalogFeatures",
+        "security": [{ "bearerAuth": [] }],
+        "parameters": [
+          {
+            "name": "search",
+            "in": "query",
+            "required": false,
+            "description": "Free-text search across `name`, `identifier`, and `description`.",
+            "example": "api",
+            "schema": { "type": "string" }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Paginated list of features.",
+            "content": {
+              "application/json": {
+                "schema": { "$ref": "#/components/schemas/PaginatedFeatures" }
+              }
+            }
+          },
+          "401": { "description": "Unauthorized — missing or invalid API key" }
+        }
+      },
+      "post": {
+        "tags": ["Features"],
+        "summary": "Create a feature",
+        "description": "Creates a new feature. For METER features, `featureDetails` must include a `featureSubType` (PRE_AGGREGATED_USAGE or RAW_EVENTS) and `units`. RAW_EVENTS additionally requires a `meter` object with `aggregation` and `filters`.",
+        "operationId": "createCatalogFeature",
+        "security": [{ "bearerAuth": [] }],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": { "$ref": "#/components/schemas/FeatureCreateRequest" }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "Feature created.",
+            "content": {
+              "application/json": {
+                "schema": { "$ref": "#/components/schemas/CatalogFeature" }
+              }
+            }
+          },
+          "401": { "description": "Unauthorized — missing or invalid API key" }
+        }
+      }
+    },
+    "/catalog/features/{pk}/": {
+      "parameters": [
+        {
+          "name": "pk",
+          "in": "path",
+          "required": true,
+          "description": "Feature UUID.",
+          "example": "3a3e92ab-90a3-4f43-8e87-9d4c8c5a9c01",
+          "schema": { "type": "string", "format": "uuid" }
+        }
+      ],
+      "get": {
+        "tags": ["Features"],
+        "summary": "Retrieve a feature",
+        "operationId": "retrieveCatalogFeature",
+        "security": [{ "bearerAuth": [] }],
+        "responses": {
+          "200": {
+            "description": "Feature details.",
+            "content": {
+              "application/json": {
+                "schema": { "$ref": "#/components/schemas/CatalogFeature" }
+              }
+            }
+          },
+          "404": { "description": "Feature not found." },
+          "401": { "description": "Unauthorized — missing or invalid API key" }
+        }
+      },
+      "delete": {
+        "tags": ["Features"],
+        "summary": "Archive a feature",
+        "description": "Soft-deletes the feature and updates any published pricing tables that referenced it.",
+        "operationId": "deleteCatalogFeature",
+        "security": [{ "bearerAuth": [] }],
+        "responses": {
+          "204": {
+            "description": "Feature archived.",
+            "content": {
+              "application/json": {
+                "schema": { "$ref": "#/components/schemas/MessageResponse" },
+                "example": { "message": "Object archived successfully." }
+              }
+            }
+          },
+          "400": { "description": "Already archived." },
+          "401": { "description": "Unauthorized — missing or invalid API key" }
+        }
+      }
+    },
+    "/catalog/plans/": {
+      "get": {
+        "tags": ["Plans"],
+        "summary": "List plans",
+        "description": "Returns one row per plan identifier, picking the most recent version for each. Archived plans, or plans on archived products, are excluded.",
+        "operationId": "listCatalogPlans",
+        "security": [{ "bearerAuth": [] }],
+        "responses": {
+          "200": {
+            "description": "Paginated list of plans.",
+            "content": {
+              "application/json": {
+                "schema": { "$ref": "#/components/schemas/PaginatedPlans" }
+              }
+            }
+          },
+          "401": { "description": "Unauthorized — missing or invalid API key" }
+        }
+      },
+      "post": {
+        "tags": ["Plans"],
+        "summary": "Create a plan",
+        "description": "Creates a new plan against a product. The new plan starts as an unpublished draft (`isLatest=false`) until `POST /plans/{identifier}/publish/` is called.",
+        "operationId": "createCatalogPlan",
+        "security": [{ "bearerAuth": [] }],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": { "$ref": "#/components/schemas/PlanCreateRequest" }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "Plan created.",
+            "content": {
+              "application/json": {
+                "schema": { "$ref": "#/components/schemas/CatalogPlan" }
+              }
+            }
+          },
+          "401": { "description": "Unauthorized — missing or invalid API key" }
+        }
+      }
+    },
+    "/catalog/plans/{identifier}/": {
+      "parameters": [
+        {
+          "name": "identifier",
+          "in": "path",
+          "required": true,
+          "description": "Plan identifier (slug). Stable across versions.",
+          "example": "pro-monthly",
+          "schema": { "type": "string" }
+        },
+        {
+          "name": "version",
+          "in": "query",
+          "required": false,
+          "description": "Specific version number to fetch / update. Defaults to the latest version.",
+          "example": 2,
+          "schema": { "type": "integer" }
+        }
+      ],
+      "get": {
+        "tags": ["Plans"],
+        "summary": "Retrieve a plan",
+        "description": "Fetches a plan by identifier. Pass `?version=N` to fetch a specific version; otherwise the latest version is returned.",
+        "operationId": "retrieveCatalogPlan",
+        "security": [{ "bearerAuth": [] }],
+        "responses": {
+          "200": {
+            "description": "Plan details.",
+            "content": {
+              "application/json": {
+                "schema": { "$ref": "#/components/schemas/CatalogPlan" }
+              }
+            }
+          },
+          "404": { "description": "Plan not found." },
+          "401": { "description": "Unauthorized — missing or invalid API key" }
+        }
+      },
+      "patch": {
+        "tags": ["Plans"],
+        "summary": "Update a plan",
+        "description": "Partial update. If the latest version is already published (`isLatest=true`), a new draft version is created automatically; otherwise the existing draft is mutated.",
+        "operationId": "updateCatalogPlan",
+        "security": [{ "bearerAuth": [] }],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": { "$ref": "#/components/schemas/PlanUpdateRequest" }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Updated plan.",
+            "content": {
+              "application/json": {
+                "schema": { "$ref": "#/components/schemas/CatalogPlan" }
+              }
+            }
+          },
+          "401": { "description": "Unauthorized — missing or invalid API key" }
+        }
+      },
+      "delete": {
+        "tags": ["Plans"],
+        "summary": "Archive a plan",
+        "description": "Archives all versions of the plan (sets `isArchived=true`).",
+        "operationId": "deleteCatalogPlan",
+        "security": [{ "bearerAuth": [] }],
+        "responses": {
+          "204": {
+            "description": "Plan archived.",
+            "content": {
+              "application/json": {
+                "schema": { "$ref": "#/components/schemas/MessageResponse" },
+                "example": { "message": "Plan archived successfully." }
+              }
+            }
+          },
+          "400": { "description": "Already archived." },
+          "401": { "description": "Unauthorized — missing or invalid API key" }
+        }
+      }
+    },
+    "/catalog/plans/{identifier}/publish/": {
+      "parameters": [
+        {
+          "name": "identifier",
+          "in": "path",
+          "required": true,
+          "description": "Plan identifier.",
+          "example": "pro-monthly",
+          "schema": { "type": "string" }
+        }
+      ],
+      "post": {
+        "tags": ["Plans"],
+        "summary": "Publish a plan",
+        "description": "Promotes the most recent draft version of the plan to `isLatest=true`, demotes the previous published version, and syncs the plan to Stripe / internal billing. Optionally migrates existing customers' features or pricing. Fails with 400 if no price exists or required currencies are missing.",
+        "operationId": "publishCatalogPlan",
+        "security": [{ "bearerAuth": [] }],
+        "requestBody": {
+          "required": false,
+          "content": {
+            "application/json": {
+              "schema": { "$ref": "#/components/schemas/PlanPublishRequest" }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Plan published.",
+            "content": {
+              "application/json": {
+                "schema": { "$ref": "#/components/schemas/PlanPublishResponse" },
+                "example": { "status": "published" }
+              }
+            }
+          },
+          "400": { "description": "No price exists, missing currency coverage, or already published." },
+          "428": { "description": "Billing provider not authenticated." },
+          "401": { "description": "Unauthorized — missing or invalid API key" }
+        }
+      }
+    },
+    "/catalog/plans/{identifier}/discard/": {
+      "parameters": [
+        {
+          "name": "identifier",
+          "in": "path",
+          "required": true,
+          "description": "Plan identifier.",
+          "example": "pro-monthly",
+          "schema": { "type": "string" }
+        }
+      ],
+      "delete": {
+        "tags": ["Plans"],
+        "summary": "Discard draft plan",
+        "description": "Permanently deletes the latest draft (non-published) version of the plan. The previously published version remains untouched. Returns 400 if the latest version is already published.",
+        "operationId": "discardCatalogPlanDraft",
+        "security": [{ "bearerAuth": [] }],
+        "responses": {
+          "204": {
+            "description": "Draft discarded.",
+            "content": {
+              "application/json": {
+                "schema": { "$ref": "#/components/schemas/MessageResponse" },
+                "example": { "message": "Plan discarded successfully." }
+              }
+            }
+          },
+          "400": { "description": "Plan is already published; cannot be discarded." },
+          "401": { "description": "Unauthorized — missing or invalid API key" }
+        }
+      }
+    },
+    "/catalog/plans/{identifier}/prices/": {
+      "parameters": [
+        {
+          "name": "identifier",
+          "in": "path",
+          "required": true,
+          "description": "Plan identifier.",
+          "example": "pro-monthly",
+          "schema": { "type": "string" }
+        },
+        {
+          "name": "version",
+          "in": "query",
+          "required": false,
+          "description": "Optional plan version to scope the query to.",
+          "example": 2,
+          "schema": { "type": "integer" }
+        }
+      ],
+      "get": {
+        "tags": ["Plans"],
+        "summary": "List plan prices",
+        "description": "Returns the prices configured on the plan (one per currency), each with its full per-feature charge configuration.",
+        "operationId": "listCatalogPlanPrices",
+        "security": [{ "bearerAuth": [] }],
+        "responses": {
+          "200": {
+            "description": "Paginated list of plan prices.",
+            "content": {
+              "application/json": {
+                "schema": { "$ref": "#/components/schemas/PaginatedPlanPrices" }
+              }
+            }
+          },
+          "401": { "description": "Unauthorized — missing or invalid API key" }
+        }
+      }
+    },
+    "/catalog/plans/{identifier}/prices/bulk/": {
+      "parameters": [
+        {
+          "name": "identifier",
+          "in": "path",
+          "required": true,
+          "description": "Plan identifier.",
+          "example": "pro-monthly",
+          "schema": { "type": "string" }
+        }
+      ],
+      "post": {
+        "tags": ["Plans"],
+        "summary": "Update plan prices",
+        "description": "Atomically replaces the plan's prices with the supplied list. If the plan's latest version is published, a new draft version is created and the new prices are attached to it. Duplicate currencies among PAID prices are rejected.",
+        "operationId": "bulkSetCatalogPlanPrices",
+        "security": [{ "bearerAuth": [] }],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": { "$ref": "#/components/schemas/PlanPriceBulkRequest" }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Prices replaced.",
+            "content": {
+              "application/json": {
+                "schema": { "$ref": "#/components/schemas/PlanPriceBulkResponse" }
+              }
+            }
+          },
+          "400": { "description": "Validation error (duplicate currencies, invalid price configuration, etc.)." },
+          "401": { "description": "Unauthorized — missing or invalid API key" }
+        }
+      }
+    },
+    "/catalog/plans/{identifier}/features/": {
+      "parameters": [
+        {
+          "name": "identifier",
+          "in": "path",
+          "required": true,
+          "description": "Plan identifier.",
+          "example": "pro-monthly",
+          "schema": { "type": "string" }
+        },
+        {
+          "name": "version",
+          "in": "query",
+          "required": false,
+          "description": "Plan version to scope the listing to (GET only).",
+          "example": 2,
+          "schema": { "type": "integer" }
+        }
+      ],
+      "get": {
+        "tags": ["Plan Entitlements"],
+        "summary": "List plan entitlements",
+        "description": "Returns the feature entitlements (with per-entitlement `details`) configured on the plan.",
+        "operationId": "listCatalogPlanFeatures",
+        "security": [{ "bearerAuth": [] }],
+        "responses": {
+          "200": {
+            "description": "Paginated list of entitlements.",
+            "content": {
+              "application/json": {
+                "schema": { "$ref": "#/components/schemas/PaginatedPlanFeatureEntitlements" }
+              }
+            }
+          },
+          "401": { "description": "Unauthorized — missing or invalid API key" }
+        }
+      },
+      "post": {
+        "tags": ["Plan Entitlements"],
+        "summary": "Add plan entitlements",
+        "description": "Appends one or more feature entitlements to the plan. If the plan's latest version is published, a new draft version is created automatically.",
+        "operationId": "addCatalogPlanFeatures",
+        "security": [{ "bearerAuth": [] }],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": { "$ref": "#/components/schemas/PlanFeaturesCreateRequest" }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "Entitlements added.",
+            "content": {
+              "application/json": {
+                "schema": { "$ref": "#/components/schemas/CatalogPlan" }
+              }
+            }
+          },
+          "401": { "description": "Unauthorized — missing or invalid API key" }
+        }
+      }
+    },
+    "/catalog/plans/{identifier}/features/{feature_id}/": {
+      "parameters": [
+        {
+          "name": "identifier",
+          "in": "path",
+          "required": true,
+          "description": "Plan identifier.",
+          "example": "pro-monthly",
+          "schema": { "type": "string" }
+        },
+        {
+          "name": "feature_id",
+          "in": "path",
+          "required": true,
+          "description": "Feature identifier (slug, not UUID).",
+          "example": "api-calls",
+          "schema": { "type": "string" }
+        }
+      ],
+      "patch": {
+        "tags": ["Plan Entitlements"],
+        "summary": "Update plan entitlement",
+        "description": "Updates only the `details` (value, reset, hardLimit, rollover, etc.) of one feature entitlement on the plan. A new draft version is created if the latest is published.",
+        "operationId": "updateCatalogPlanFeature",
+        "security": [{ "bearerAuth": [] }],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": { "$ref": "#/components/schemas/PlanFeaturePatchRequest" }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Entitlement updated.",
+            "content": {
+              "application/json": {
+                "example": { "details": { "value": 20000, "hasUnlimitedUsage": false } }
+              }
+            }
+          },
+          "401": { "description": "Unauthorized — missing or invalid API key" }
+        }
+      },
+      "delete": {
+        "tags": ["Plan Entitlements"],
+        "summary": "Delete plan entitlement",
+        "description": "Removes the named feature from the plan's entitlements. A new draft version is created if the latest is published.",
+        "operationId": "deleteCatalogPlanFeature",
+        "security": [{ "bearerAuth": [] }],
+        "responses": {
+          "204": {
+            "description": "Entitlement removed.",
+            "content": {
+              "application/json": {
+                "schema": { "$ref": "#/components/schemas/MessageResponse" },
+                "example": { "message": "Entitlement deleted successfully." }
+              }
+            }
+          },
+          "401": { "description": "Unauthorized — missing or invalid API key" }
+        }
+      }
+    },
+    "/catalog/plans/{identifier}/file/{pk}/": {
+      "parameters": [
+        {
+          "name": "identifier",
+          "in": "path",
+          "required": true,
+          "description": "Plan identifier.",
+          "example": "pro-monthly",
+          "schema": { "type": "string" }
+        },
+        {
+          "name": "pk",
+          "in": "path",
+          "required": true,
+          "description": "Plan file UUID.",
+          "example": "7a3e3411-cef0-4f4e-bdb6-1f74a4f4d2c0",
+          "schema": { "type": "string", "format": "uuid" }
+        }
+      ],
+      "patch": {
+        "tags": ["Plan Files"],
+        "summary": "Update a plan file",
+        "description": "Updates display metadata on a plan file (name, ordering, enabled). If the plan's latest version is published, a new draft version is created and the file is updated on the new draft.",
+        "operationId": "updateCatalogPlanFile",
+        "security": [{ "bearerAuth": [] }],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": { "$ref": "#/components/schemas/PlanFileUpdateRequest" }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Updated plan file.",
+            "content": {
+              "application/json": {
+                "schema": { "$ref": "#/components/schemas/PlanFile" }
+              }
+            }
+          },
+          "404": { "description": "Plan file not found." },
+          "401": { "description": "Unauthorized — missing or invalid API key" }
+        }
+      },
+      "delete": {
+        "tags": ["Plan Files"],
+        "summary": "Delete a plan file",
+        "description": "Deletes the plan file. If the plan's latest version is published, a new draft version is created and the file is removed from the new draft.",
+        "operationId": "deleteCatalogPlanFile",
+        "security": [{ "bearerAuth": [] }],
+        "responses": {
+          "204": { "description": "File deleted." },
+          "401": { "description": "Unauthorized — missing or invalid API key" }
+        }
+      }
+    },
+    "/catalog/plans/{identifier}/file/{pk}/download/": {
+      "parameters": [
+        {
+          "name": "identifier",
+          "in": "path",
+          "required": true,
+          "description": "Plan identifier.",
+          "example": "pro-monthly",
+          "schema": { "type": "string" }
+        },
+        {
+          "name": "pk",
+          "in": "path",
+          "required": true,
+          "description": "Plan file UUID.",
+          "example": "7a3e3411-cef0-4f4e-bdb6-1f74a4f4d2c0",
+          "schema": { "type": "string", "format": "uuid" }
+        }
+      ],
+      "get": {
+        "tags": ["Plan Files"],
+        "summary": "Download a plan file",
+        "description": "Public download endpoint for a plan file. Responds with a 302 redirect to a short-lived forced-download URL on the storage backend. Returns 404 if the file does not exist.",
+        "operationId": "downloadCatalogPlanFile",
+        "security": [],
+        "responses": {
+          "302": {
+            "description": "Redirect to the temporary forced-download URL.",
+            "headers": {
+              "Location": {
+                "description": "Signed download URL.",
+                "schema": { "type": "string", "format": "uri" }
+              }
+            }
+          },
+          "404": { "description": "Plan file not found." }
+        }
+      }
+    },
+    "/media/": {
+      "post": {
+        "tags": ["Media"],
+        "summary": "Generate a presigned upload URL",
+        "description": "Returns a presigned S3 POST policy that lets you upload a single file directly to kelviq's storage bucket (max 5 GB, expires in 1 hour). Use the returned `fileKey` as the value of `imageKeys` / `fileKeys` on the catalog product/plan endpoints.\n\nUpload flow:\n1. `POST /media/` with `fileName` and `fileType`.\n2. Build a `multipart/form-data` request and send every key/value from `fields` as a form field, plus a final `file` field containing the binary.\n3. `POST` that form to the returned `url`. A `204 No Content` response means the upload succeeded.\n4. Pass `fileKey` to the relevant catalog endpoint (e.g. `POST /catalog/products/` with `imageKeys: [fileKey]`).",
+        "operationId": "createPresignedUploadUrl",
+        "security": [{ "bearerAuth": [] }],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": { "$ref": "#/components/schemas/PresignedUploadRequest" }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Presigned upload URL generated.",
+            "content": {
+              "application/json": {
+                "schema": { "$ref": "#/components/schemas/PresignedUploadResponse" },
+                "example": {
+                  "url": "https://kelviq-uploads.s3.amazonaws.com/",
+                  "fields": {
+                    "Content-Type": "image/png",
+                    "key": "tmp/108713b0-1f81-42cf-a16c-c83b1d4d4148/web-app-manifest-512x512.png",
+                    "AWSAccessKeyId": "AKIA...",
+                    "policy": "eyJleHBpcmF0aW9uIjogIjIwMjYtMDUtMjFUMTI6MDA6MDBaIiwgImNvbmRpdGlvbnMiOiBbXX0=",
+                    "signature": "bWFkZS11cC1zaWduYXR1cmU="
+                  },
+                  "fileKey": "tmp/108713b0-1f81-42cf-a16c-c83b1d4d4148/web-app-manifest-512x512.png"
+                }
+              }
+            }
+          },
+          "400": { "description": "Missing `fileName` or `fileType` in the request body." },
+          "401": { "description": "Unauthorized — missing or invalid API key" },
+          "500": { "description": "Could not generate upload URL." }
+        }
+      }
+    },
+    "/partner/organizations/": {
+      "post": {
+        "tags": ["Partner"],
+        "summary": "Provision an organization",
+        "description": "Creates a new kelviq user + organization on behalf of the partner, issues API keys, and emails the user a link to set their password. Fails with `409` if `email` belongs to an existing kelviq user, or with `400` if `externalId` already exists for this partner.",
+        "operationId": "provisionPartnerOrganization",
+        "security": [{ "partnerKeyAuth": [] }],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": { "$ref": "#/components/schemas/PartnerOrganizationProvisionRequest" }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "Organization provisioned.",
+            "content": {
+              "application/json": {
+                "schema": { "$ref": "#/components/schemas/PartnerOrganization" },
+                "example": {
+                  "userId": 4271,
+                  "organizationIdentifier": "8e1d7b1a-6c4d-4e3a-9b2d-3f6e4c2b1ad0",
+                  "organizationSlug": "acme-corp",
+                  "clientKey": "ck_live_a1b2c3d4e5f6",
+                  "serverKey": "sk_live_9z8y7x6w5v4u",
+                  "partnerExternalId": "acme-corp"
+                }
+              }
+            }
+          },
+          "400": { "description": "Validation error (e.g. duplicate `externalId` for this partner)." },
+          "401": { "description": "Unauthorized — missing or invalid `X-Kelviq-Partner-Key` header." },
+          "409": { "description": "An account with the supplied `email` already exists." }
+        }
+      },
+      "get": {
+        "tags": ["Partner"],
+        "summary": "List partner organizations",
+        "description": "Returns organizations owned by the authenticated partner. Optionally filter by the partner-side `externalId`.",
+        "operationId": "listPartnerOrganizations",
+        "security": [{ "partnerKeyAuth": [] }],
+        "parameters": [
+          {
+            "name": "external_id",
+            "in": "query",
+            "required": false,
+            "description": "If supplied, return only the organization with this partner-side identifier.",
+            "example": "acme-corp",
+            "schema": { "type": "string" }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "List of organizations.",
+            "content": {
+              "application/json": {
+                "schema": { "$ref": "#/components/schemas/PartnerOrganizationList" },
+                "example": {
+                  "results": [
+                    {
+                      "userId": 4271,
+                      "organizationIdentifier": "8e1d7b1a-6c4d-4e3a-9b2d-3f6e4c2b1ad0",
+                      "organizationSlug": "acme-corp",
+                      "clientKey": "ck_live_a1b2c3d4e5f6",
+                      "serverKey": "sk_live_9z8y7x6w5v4u",
+                      "partnerExternalId": "acme-corp"
+                    }
+                  ],
+                  "count": 1
+                }
+              }
+            }
+          },
+          "401": { "description": "Unauthorized — missing or invalid `X-Kelviq-Partner-Key` header." }
+        }
+      }
+    },
+    "/partner/organizations/{identifier}/": {
+      "parameters": [
+        {
+          "name": "identifier",
+          "in": "path",
+          "required": true,
+          "description": "Organization UUID identifier (the `organizationIdentifier` from the provision response).",
+          "example": "8e1d7b1a-6c4d-4e3a-9b2d-3f6e4c2b1ad0",
+          "schema": { "type": "string", "format": "uuid" }
+        }
+      ],
+      "get": {
+        "tags": ["Partner"],
+        "summary": "Get a partner organization by identifier",
+        "description": "Retrieve a single organization owned by the authenticated partner, looked up by its kelviq UUID.",
+        "operationId": "retrievePartnerOrganization",
+        "security": [{ "partnerKeyAuth": [] }],
+        "responses": {
+          "200": {
+            "description": "Organization details.",
+            "content": {
+              "application/json": {
+                "schema": { "$ref": "#/components/schemas/PartnerOrganization" }
+              }
+            }
+          },
+          "401": { "description": "Unauthorized — missing or invalid `X-Kelviq-Partner-Key` header." },
+          "404": { "description": "Organization not found for this partner." }
+        }
+      }
+    },
+    "/partner/organizations/by-external-id/{externalId}/": {
+      "parameters": [
+        {
+          "name": "externalId",
+          "in": "path",
+          "required": true,
+          "description": "Partner-side identifier supplied when the organization was provisioned.",
+          "example": "acme-corp",
+          "schema": { "type": "string" }
+        }
+      ],
+      "get": {
+        "tags": ["Partner"],
+        "summary": "Get a partner organization by external ID",
+        "description": "Retrieve a single organization owned by the authenticated partner using the partner-side `externalId`.",
+        "operationId": "retrievePartnerOrganizationByExternalId",
+        "security": [{ "partnerKeyAuth": [] }],
+        "responses": {
+          "200": {
+            "description": "Organization details.",
+            "content": {
+              "application/json": {
+                "schema": { "$ref": "#/components/schemas/PartnerOrganization" }
+              }
+            }
+          },
+          "401": { "description": "Unauthorized — missing or invalid `X-Kelviq-Partner-Key` header." },
+          "404": { "description": "Organization not found for this partner." }
         }
       }
     }
