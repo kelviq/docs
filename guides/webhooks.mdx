@@ -44,6 +44,7 @@ Your signing secret is shown only once. If you lose it, you must regenerate it f
 | `subscription.updated` | A subscription's details were modified. |
 | `subscription.cancelled` | A subscription was cancelled (immediately or at period end). |
 | `subscription.plan_changed` | A subscription was moved to a different plan. |
+| `feature.usage_alert` | A customer's feature usage crossed a configured threshold. |
 | `invoice.created` | A new invoice was generated. |
 | `invoice.paid` | An invoice was paid and funds were collected. |
 | `refund.created` | A refund was initiated. |
@@ -546,6 +547,52 @@ The request body is a JSON object with the following top-level fields:
       "organization": "5d0bec80-a7c1-41ae-bd24-ea9228500586",
       "created_on": "2026-03-04T11:29:19Z",
       "modified_on": "2026-03-04T11:29:23Z"
+    }
+  }
+}
+```
+</Accordion>
+
+<Accordion title="Example: feature.usage_alert payload">
+```json
+{
+  "id": "575a1aa4-3414-4e08-b4ad-6bfd3e96322d",
+  "type": "feature.usage_alert",
+  "created_at": "2026-05-18T18:48:59Z",
+  "data": {
+    "object": {
+      "id": "a1c88c9d-19cf-48cc-b194-6cc6ebb356ee",
+      "object": "feature_usage_alert",
+      "feature": {
+        "id": "245d745f-28ca-4856-81fe-1e1f5c6c7ebd",
+        "name": "API calls",
+        "identifier": "api-calls",
+        "feature_type": "METER"
+      },
+      "customer": {
+        "id": "d2b6c9ac-bcd5-4e59-8c7e-b6472485e112",
+        "name": "Geo",
+        "email": "geo@example.com",
+        "customer_id": "fcec7a06c7484584b8a4d92711bfe528",
+        "billing_address": {
+          "city": null,
+          "line1": null,
+          "line2": null,
+          "state": null,
+          "country": "IN",
+          "postal_code": "680121"
+        }
+      },
+      "usage_limit": 5,
+      "current_usage": 5,
+      "threshold_type": "PERCENTAGE",
+      "threshold_value": 90,
+      "period_start_time": "2026-05-18T00:00:00Z",
+      "period_end_time": null,
+      "subscription_id": "137e4652-5540-4a3b-9bce-fa393b028539",
+      "organization": "2a3664c0-cbd2-4f1c-a98f-1b4f65e3256c",
+      "created_on": "2026-05-18T17:57:16Z",
+      "modified_on": "2026-05-18T17:57:17Z"
     }
   }
 }
