@@ -40,10 +40,7 @@
               "product-catalog/discounts"
             ]
           },
-          {
-            "group": "Monetization",
-            "pages": ["monetization/pricing-tables", "monetization/targeting-rules" , "monetization/offerings"]
-          },
+          
           {
             "group": "Promotions",
             "pages": [
