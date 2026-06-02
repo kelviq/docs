@@ -367,12 +367,12 @@
             "type": "string",
             "format": "url",
             "description": "The URL that the customer should be redirected to complete the payment.",
-            "example": "https://checkout.stripe.com/c/pay/cs_test_b1sNi7D6u9iMCUFV1UZi9ZaiXKdOOmr3DCUW6XdCZIr5Id1F7#fid..."
+            "example": "https://kelviq.com/checkout/cs_eeCGdGayc5oTMdGNV5XocfRk6o87K0vlwwCuKeiE7BLU9/"
           },
           "checkoutSessionId": {
             "type": "string",
             "description": "The unique ID for the created checkout session.",
-            "example": "cs_test_b1sNi7D6u9iMCUFV1UZi9ZwerfaiXKdOOmr3DCUW6XdCZIr5Id1F7G"
+            "example": "cs_eeCGdGayc5oTMdGNV5XocfRk6o87K0vlwwCuKeiE7BLU9"
           }
         }
       },
@@ -3227,9 +3227,9 @@
                 "schema": {
                   "$ref": "#/components/schemas/CreateCheckoutSessionResponse"
                 },
-                "example": {
-                  "checkoutUrl": "https://checkout.stripe.com/c/pay/cs_test_b1sNi7D6u9iMCUFV1UZi9ZaiXKdOOmr3DCUW6XdCZIr5Id1F7#fid...",
-                  "checkoutSessionId": "cs_test_b1sNi7D6u9iMCUFV1UZi9ZwerfaiXKdOOmr3DCUW6XdCZIr5Id1F7G"
+                "example":  {
+                  "checkoutUrl": "https://kelviq.com/checkout/cs_eeCGdGayc5oTMdGNV5XocfRk6o87K0vlwwCuKeiE7BLU9/",
+                  "checkoutSessionId": "cs_eeCGdGayc5oTMdGNV5XocfRk6o87K0vlwwCuKeiE7BLU9"
                 }
               }
             }
