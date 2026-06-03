@@ -346,6 +346,12 @@
             "description": "Whether discount/coupon code entry is shown on the checkout page. Defaults to `true`.",
             "example": false
           },
+          "discountCode": {
+            "type": "string",
+            "nullable": true,
+            "description": "A discount/coupon code to pre-apply to the checkout session. The code is applied only if it is active, unexpired, and valid for the selected plan; otherwise the request fails with an error.",
+            "example": "WELCOME20"
+          },
           "lockEmail": {
             "type": "boolean",
             "nullable": true,
