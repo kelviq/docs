@@ -1,0 +1,45 @@
+---
+title: Location based pricing
+description: Set custom prices for specific countries to optimize global conversion
+---
+Location based pricing is a feature that allows you to set custom prices for specific countries to optimize global conversion.
+
+## Set up localized prices
+
+To offer a localized price open your plan configuration and expand the Price localization card.
+
+### 1. Choose a currency
+
+Select your target currency from the dropdown list. You can choose options like Euro or Indian Rupee. Click Add localized price to open the configuration panel.
+
+<Frame>
+  <img height="200" src="/images/choose-currency.png" />
+</Frame>
+
+### 2. Set the fixed base charge
+
+Kelviq automatically displays the billing cycles you already enabled for your default base price and usage based pricing. Enter the exact localized amount you want to charge for each active interval.
+
+<Frame>
+  <img height="400" src="/images/base-pricing.png" />
+</Frame>
+
+### 3. Localize usage based features
+
+If your plan includes metered features like API calls Kelviq pulls those in automatically right below the fixed charge section. You can set localized unit prices and flat fees for every single usage tier.
+
+You must configure these usage rates across all active billing periods. Use the tabs to switch between your monthly and yearly configurations and ensure every input has a defined price.
+
+<Frame>
+  <img height="600" src="/images/usage-pricing.png" />
+</Frame>
+
+### 4. Save and stack regions
+
+Click Save to lock in the location based pricing configuration. The currency will appear in your localized pricing list. 
+
+You can repeat this process to add as many localized currencies as you need. 
+
+## Fraud protection
+
+Kelviq analyzes the IP address, browser fingerprint, and issuing bank of the credit card during checkout. If a customer attempts to use a card from a high income country while pretending to be in a lower income region we block the transaction or force the standard global price automatically.

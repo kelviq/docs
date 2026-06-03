@@ -33,11 +33,17 @@
             "pages": [
               "product-catalog/products",
               "product-catalog/plans",
+              "product-catalog/one-time-payments",
+              "product-catalog/subscriptions",
+              "product-catalog/usage-based-billing",
+              "product-catalog/free-and-trials",
+              "product-catalog/location-based-pricing",
               "product-catalog/digital-downloads",
               "product-catalog/license-keys",
               "product-catalog/links",
               "product-catalog/entitlements",
-              "product-catalog/discounts"
+              "product-catalog/discounts",
+              "product-catalog/tax-settings"
             ]
           },
           

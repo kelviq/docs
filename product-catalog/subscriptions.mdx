@@ -1,0 +1,30 @@
+---
+title: Subscriptions
+description: Set up monthly or yearly billing for ongoing access
+---
+
+Subscriptions are the default for traditional SaaS products. You charge customers on a regular schedule to maintain access to your application.
+
+## Set up recurring billing
+
+<Frame>
+  <img height="200" src="/images/subscription-pricing.png" />
+</Frame>
+
+1. Open your draft plan and ensure it is set to Paid
+2. Under billing cycles select the intervals you want to offer like Monthly or Yearly
+3. Enter the price for each interval
+4. Click Save
+
+You can enable multiple intervals on a single plan. When the customer lands on your checkout page they can toggle between paying monthly or paying upfront for the entire year.
+
+## Subscription lifecycle
+
+Kelviq handles the entire recurring payment lifecycle automatically. We manage
+
+* Charging the card on file at the end of each billing cycle
+* Sending automated email receipts and tax invoices
+* Handling failed payments with built in retries
+* Prorating upgrades and downgrades if the user switches plans mid cycle
+
+You can skip building webhook listeners and just query the Kelviq SDK to check an active status when a user logs in. If your backend requires an event driven architecture we provide a complete webhooks system so you can listen and react to every subscription lifecycle event.

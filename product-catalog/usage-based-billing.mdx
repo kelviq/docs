@@ -1,0 +1,112 @@
+---
+title: Usage based pricing
+description: Charge customers for the actual work your product performs
+---
+
+AI products perform actual work. Flat rate subscriptions force you to guess at average compute costs which destroys your margins. Usage based pricing lets you charge for exact consumption.
+
+## Set up a usage plan
+
+To add consumption tracking to a plan open your pricing configuration and expand the usage pricing card.
+{/* <Frame> */}
+  <img height="200" src="/images/usage-pricing-card.png" />
+{/* </Frame> */}
+
+### 1. Select or create a metered feature
+
+Choose the specific metric you want to track from the dropdown list. You can select an existing feature like Platform API or Tokens consumed. To create a new metered feature just type a name like API request and hit enter.
+
+{/* <Frame> */}
+  <img height="200" src="/images/select-metered-feature.png" />
+{/* </Frame> */}
+
+### 2. Choose your billing model
+
+Select how payments are structured.
+
+{/* <Frame> */}
+  <img height="200" src="/images/select-billing-model.png" />
+{/* </Frame> */}
+
+**Advance commitment**
+Customers pay upfront for a baseline allotment of usage. This gives your users a predictable budget. They buy a set bucket of AI tokens or API requests at the start of the month. They consume what they paid for and avoid surprise overages.
+
+**Pay as you go**
+Customers pay in arrears based on exactly what they consumed. AI agents run autonomously and their usage fluctuates wildly. A user might trigger a research workflow that consumes massive amounts of compute overnight. Pay as you go ensures the agent keeps working without interruption while you capture the exact margin for the underlying infrastructure costs. We tally the final unit count at the end of the billing period and charge the card.
+
+<Note>
+  The pay as you go model only works on monthly plans.
+</Note>
+
+### 3. Configure the pricing model
+
+Kelviq supports five distinct ways to calculate the cost. Here is how the math works for each model.
+
+{/* <Frame> */}
+  <img height="400" src="/images/usage-pricing-models.png" />
+{/* </Frame> */}
+
+* **Flat** Customers pay a fixed rate for each unit used. For example you charge $0.10 per API call. A user makes 150 calls. The total is $15.00.
+{/* <Frame> */}
+  <img height="400" src="/images/flat-pricing.png" />
+{/* </Frame> */}
+* **Package** Customers buy usage units in predefined bundles. For example you charge $5.00 for a package of 1000 AI tokens. A user consumes 2500 tokens which pushes them into a third package. The total is $15.00.
+{/* <Frame> */}
+  <img height="400" src="/images/package-pricing.png" />
+{/* </Frame> */}
+* **Tiered** Unit price decreases progressively as usage crosses defined thresholds. You fill the lower buckets first. For example units 1 to 100 cost $1.00 each and units 101 to 200 cost $0.50 each. A user consumes 150 units. The first 100 cost $100 and the next 50 cost $25. The total is $125.
+{/* <Frame> */}
+  <img height="400" src="/images/tiered-pricing.png" />
+{/* </Frame> */}
+* **Volume** All units are billed at the rate for the highest usage tier reached. Using the same thresholds as above a user consumes 150 units. Because they reached the second tier every single unit is priced at $0.50. The total is $75.
+{/* <Frame> */}
+  <img height="400" src="/images/volume-pricing.png" />
+{/* </Frame> */}
+* **Stair-step** Customers pay a fixed price for the entire tier regardless of the exact unit count. For example usage between 1 and 100 units costs a flat $10 and usage between 101 and 200 units costs a flat $25. A user consumes 150 units. They pay exactly $25.
+{/* <Frame> */}
+  <img height="400" src="/images/stair-step-pricing.png" />
+{/* </Frame> */}
+
+### 4. Set the pricing rules
+
+Once you pick a pricing model you define the exact boundaries.
+
+If you select Tiered you specify the first unit and last unit for each bucket. You can charge a per unit price and a flat fee within that same tier.
+
+When you configure prices across multiple intervals Kelviq can automatically prefill a 20 percent yearly discount for you to edit. 
+
+You can also set localized pricing for usage based billing. This lets you define different per unit rates for specific countries and currencies.
+
+<Frame>
+  <img height="400" src="/images/usage-pricing-rules.png" />
+</Frame>
+
+### 5. Set the usage reset cadence
+
+Configure how often the usage meter clears out. 
+
+You can set the reset to Never for lifetime limits. You can also choose to reset it Every week or Every month. 
+
+For monthly resets you can align the timing perfectly by setting it to the first day of each month or tying it directly to the subscription start date.
+
+### 6. Configure rollover and alerts
+
+If your customers buy usage upfront you can let them keep what they do not use. Toggle Credit rollover to define how much carries over to the next billing cycle. You can set a specific percentage of unused units to roll over and apply a hard limit on the total units.
+
+Keep your users informed as they consume their quota. Toggle Usage alerts and set your threshold type. 
+
+<Frame>
+  <img height="200" src="/images/usage-alerts.png" />
+</Frame>
+
+You can click Add threshold to stack multiple percentage alerts. For example you can notify them at 75 percent and again at 90 percent so they are never surprised by a cutoff or an unexpected bill. 
+
+To receive these alerts you must create a webhook for the feature.usage_alert event.
+
+### 7. Stack multiple usage metrics
+
+<Frame>
+  <img height="400" src="/images/stack-multiple-usage-metrics.png" />
+</Frame>
+
+AI products rarely track just one variable. You can add as many metered usage features as you want to a single plan. Just click the Add usage pricing button at the bottom of the section to set up another metric.
