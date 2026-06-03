@@ -4004,6 +4004,16 @@
               "type": "string"
             },
             "example": "pro,enterprise"
+          },
+          {
+            "name": "ip_address",
+            "in": "query",
+            "required": false,
+            "description": "Optional. The end customer's IP address, used to determine pricing locale and currency based on their location. Only applied when authenticating with a server API key.",
+            "schema": {
+              "type": "string"
+            },
+            "example": "203.0.113.42"
           }
         ],
         "responses": {
