@@ -5,6 +5,43 @@ mode: "wide"
 rss: true
 ---
 
+<Update label="v2.6.0" description="June 5, 2026">
+
+### New Features
+
+#### Checkout Session — `metadata` Parameter
+
+`checkout.create_session()` now accepts an optional `metadata` parameter for attaching arbitrary key-value pairs to a checkout session. The metadata is returned verbatim on the `checkout.completed` webhook payload's `metadata` field, letting you correlate a completed checkout back to your own records.
+
+```python
+response = client.checkout.create_session(
+    planIdentifier="plan-pro-monthly",
+    chargePeriod="MONTHLY",
+    customerId="cust_789",
+    successUrl="https://example.com/success",
+    metadata={
+        "orderId": "order_12345",
+        "referralCode": "SUMMER2026",
+    },
+)
+```
+
+**Async variant:**
+
+```python
+response = await async_client.checkout.create_session(
+    planIdentifier="plan-pro-monthly",
+    chargePeriod="MONTHLY",
+    customerId="cust_789",
+    successUrl="https://example.com/success",
+    metadata={"orderId": "order_12345"},
+)
+```
+
+The keys inside `metadata` are preserved exactly as provided — they are not transformed on the way to the API, so they survive the round-trip back through webhooks unchanged.
+
+</Update>
+
 <Update label="v2.5.0" description="May 10, 2026">
 
 ### New Features

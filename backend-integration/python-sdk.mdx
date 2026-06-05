@@ -349,6 +349,8 @@ print(f"Checkout Session URL: {response.checkoutUrl}")
 
     * `defaultBillingCountry` (str): ISO 3166-1 alpha-2 country code (e.g. `"US"`, `"GB"`) used to pre-fill the billing address country on the checkout page.
 
+    * `metadata` (dict): Arbitrary key-value pairs to attach to the checkout session. The keys are preserved exactly as supplied and the object is returned unchanged on the `checkout.completed` webhook's `metadata` field. Example: `{"order_ref": "ABC-123", "source": "pricing_page"}`.
+
 
 **Returns**:
 

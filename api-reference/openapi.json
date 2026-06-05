@@ -363,6 +363,16 @@
             "nullable": true,
             "description": "ISO 3166-1 alpha-2 country code used to pre-fill the billing address country on the checkout page.",
             "example": "US"
+          },
+          "metadata": {
+            "type": "object",
+            "additionalProperties": true,
+            "nullable": true,
+            "description": "Arbitrary key-value pairs to attach to the checkout session. The keys are preserved verbatim and the object is returned unchanged on the `checkout.completed` webhook payload's `metadata` field.",
+            "example": {
+              "order_ref": "ABC-123",
+              "source": "pricing_page"
+            }
           }
         }
       },

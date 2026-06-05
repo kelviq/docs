@@ -5,6 +5,31 @@ mode: "wide"
 rss: true
 ---
 
+<Update label="v2.6.0" description="June 5, 2026">
+
+### New Features
+
+#### Checkout Session — `metadata` Parameter
+
+`CreateCheckoutSessionPayload` now accepts an optional `metadata` field for attaching arbitrary key-value pairs to a checkout session. The metadata is returned verbatim on the `checkout.completed` webhook payload's `metadata` field, letting you correlate a completed checkout back to your own records.
+
+```typescript
+const response = await client.checkout.createSession({
+  planIdentifier: "plan-pro-monthly",
+  chargePeriod: "MONTHLY",
+  customerId: "cust_789",
+  successUrl: "https://example.com/success",
+  metadata: {
+    orderId: "order_12345",
+    referralCode: "SUMMER2026",
+  },
+});
+```
+
+Unlike other payload fields, the **keys inside `metadata` are preserved exactly as provided** — they are not converted to snake_case on the way to the API, so they survive the round-trip back through webhooks unchanged.
+
+</Update>
+
 <Update label="v2.5.0" description="May 10, 2026">
 
 ### New Features
