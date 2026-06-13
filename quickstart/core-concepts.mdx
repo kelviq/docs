@@ -29,9 +29,9 @@ Examples: Free, Starter, Pro, Enterprise.
 
 ## Features & Entitlements
 
-A feature is a capability a customer can access, while entitlements define how that feature can be used within a plan.
+A feature is a capability a customer can access. Entitlements define how that feature gets used within a specific plan.
 
-Features are defined once and can be reused across multiple plans. Entitlements control access, limits, usage, or configuration for those features.
+You define features once and reuse them across multiple plans. Entitlements control the access, limits, or configuration for those features.
 
 Examples:
 - API access with 1,000 requests per month
@@ -39,10 +39,11 @@ Examples:
 - Storage feature with 100 GB included
 - Priority support enabled for Pro customers
 
-Entitlements can be:
-- **Boolean** — enable or disable a feature
-- **Metered** — usage-based limits or quotas
-- **Config** — custom values or settings
+Entitlements come in three types
+
+* **Boolean** to toggle a feature on or off
+* **Metered** to track usage like AI tokens, workflow runs, or compute time
+* **Config** to pass custom values or settings to your application
 
 [Learn more about features & entitlements →](/product-catalog/entitlements)
 
@@ -90,6 +91,17 @@ When they complete a purchase, Kelviq maps the transaction to the customer recor
 ---
 
 ## Typical workflows
+
+### AI and usage based products
+
+Billing for actual work delivered rather than just seat access.
+
+1. Create features like AI tokens, API calls, or workflow runs
+2. Create a product
+3. Create plans with a flat base fee plus metered usage charges
+4. Add entitlements to set soft or hard caps on compute
+5. Integrate the SDK to report usage back to Kelviq as the AI performs work
+6. Customer subscribes and pays automatically based on their actual consumption
 
 ### One-time products
 
