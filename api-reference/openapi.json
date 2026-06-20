@@ -20,7 +20,8 @@
     { "name": "Plan Entitlements", "description": "Feature entitlements attached to a plan." },
     { "name": "Plan Files", "description": "Files attached to plans, and signed download links." },
     { "name": "Media", "description": "Generate presigned S3 upload URLs for product/plan images and files." },
-    { "name": "Partner", "description": "Partner integration APIs (organization provisioning, lookup)." }
+    { "name": "Partner", "description": "Partner integration APIs (organization provisioning, lookup)." },
+    { "name": "Charges", "description": "One-time payments charged immediately against a customer's default payment method." }
   ],
   "components": {
     "securitySchemes": {
@@ -985,6 +986,174 @@
             "type": "string",
             "description": "The customer identifier associated with this subscription.",
             "example": "geojacob"
+          }
+        }
+      },
+      "CreateChargeRequest": {
+        "type": "object",
+        "required": [
+          "planIdentifier",
+          "chargePeriod",
+          "customerId"
+        ],
+        "properties": {
+          "planIdentifier": {
+            "type": "string",
+            "description": "The identifier of the plan being purchased as a one-time payment.",
+            "example": "lifetime-access"
+          },
+          "chargePeriod": {
+            "type": "string",
+            "description": "Must be `ONE_TIME`. Any other value is rejected.",
+            "enum": [
+              "ONE_TIME"
+            ],
+            "example": "ONE_TIME"
+          },
+          "customerId": {
+            "type": "string",
+            "description": "The ID of the customer being charged. The customer must already have a default payment method on file.",
+            "example": "cust_789"
+          },
+          "features": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/FeatureInput"
+            },
+            "nullable": true,
+            "description": "A list of features and their desired quantities.",
+            "example": [
+              {
+                "identifier": "seats",
+                "quantity": 5
+              }
+            ]
+          },
+          "currencyCode": {
+            "type": "string",
+            "nullable": true,
+            "description": "Optional ISO 4217 currency code to charge in. Must match the customer's currency if they already have one set.",
+            "example": "USD"
+          },
+          "ipAddress": {
+            "type": "string",
+            "nullable": true,
+            "description": "The IP Address of the customer, used for location-based pricing.",
+            "example": "103.154.35.20"
+          }
+        }
+      },
+      "CreateChargeResponse": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "format": "uuid",
+            "description": "The unique identifier of the created charge record.",
+            "example": "7c2f3a91-2d4e-4a8b-9b1c-6f0a2e5d9c11"
+          },
+          "startDate": {
+            "type": "string",
+            "format": "date",
+            "description": "The date the one-time payment was created.",
+            "example": "2026-06-20"
+          },
+          "endDate": {
+            "type": "string",
+            "format": "date",
+            "nullable": true,
+            "description": "Always null for one-time payments.",
+            "example": null
+          },
+          "billingPeriodStartTime": {
+            "type": "string",
+            "format": "date-time",
+            "nullable": true,
+            "description": "Not applicable for one-time payments.",
+            "example": null
+          },
+          "billingPeriodEndTime": {
+            "type": "string",
+            "format": "date-time",
+            "nullable": true,
+            "description": "Not applicable for one-time payments.",
+            "example": null
+          },
+          "amount": {
+            "type": "string",
+            "description": "The amount charged.",
+            "example": "49.00"
+          },
+          "recurrence": {
+            "type": "string",
+            "description": "Empty for one-time payments.",
+            "example": ""
+          },
+          "currency": {
+            "type": "string",
+            "description": "The currency of the payment.",
+            "example": "USD"
+          },
+          "status": {
+            "type": "string",
+            "description": "The status of the resulting record.",
+            "example": "active"
+          },
+          "product": {
+            "type": "object",
+            "properties": {
+              "name": {
+                "type": "string",
+                "description": "The name of the product.",
+                "example": "Invoice Test"
+              },
+              "id": {
+                "type": "string",
+                "format": "uuid",
+                "description": "The unique identifier of the product.",
+                "example": "88e437b8-6017-405b-9328-e0f4e140bb79"
+              },
+              "identifier": {
+                "type": "string",
+                "description": "The identifier of the product.",
+                "example": "invoice-test"
+              }
+            }
+          },
+          "plan": {
+            "type": "object",
+            "properties": {
+              "name": {
+                "type": "string",
+                "description": "The name of the plan.",
+                "example": "Lifetime Access"
+              },
+              "identifier": {
+                "type": "string",
+                "description": "The identifier of the plan.",
+                "example": "lifetime-access"
+              }
+            }
+          },
+          "features": {
+            "type": "array",
+            "items": {},
+            "description": "List of features included in the purchase."
+          },
+          "trialDaysRemaining": {
+            "type": "integer",
+            "description": "Always 0 for one-time payments.",
+            "example": 0
+          },
+          "customerId": {
+            "type": "string",
+            "description": "The customer identifier associated with this payment.",
+            "example": "geojacob"
+          },
+          "billingType": {
+            "type": "string",
+            "description": "The billing type of the record.",
+            "example": "ONE_TIME"
           }
         }
       },
@@ -3775,6 +3944,77 @@
                 },
                 "example": {
                   "detail": "Customer does not exist."
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/charges/": {
+      "post": {
+        "tags": [
+          "Charges"
+        ],
+        "summary": "Create a charge",
+        "description": "Creates a one-time charge billed immediately against the customer's default payment method, without requiring a checkout session.\n\nThe customer must already have a usable payment method on file (a saved payment method or an active subscription). If no default payment method exists, or the off-session charge is declined or requires authentication, the request fails with a `400`.\n\n> **Note:** `chargePeriod` must be `ONE_TIME`. Recurring charge periods are not supported by this endpoint — use [Create a subscription](/api-reference/subscriptions/create-a-subscription) instead.",
+        "operationId": "createCharge",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CreateChargeRequest"
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "Charge created",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/CreateChargeResponse"
+                },
+                "example": {
+                  "id": "7c2f3a91-2d4e-4a8b-9b1c-6f0a2e5d9c11",
+                  "startDate": "2026-06-20",
+                  "endDate": null,
+                  "billingPeriodStartTime": null,
+                  "billingPeriodEndTime": null,
+                  "amount": "49.00",
+                  "recurrence": "",
+                  "currency": "USD",
+                  "status": "active",
+                  "product": {
+                    "name": "Invoice Test",
+                    "id": "88e437b8-6017-405b-9328-e0f4e140bb79",
+                    "identifier": "invoice-test"
+                  },
+                  "plan": {
+                    "name": "Lifetime Access",
+                    "identifier": "lifetime-access"
+                  },
+                  "features": [],
+                  "trialDaysRemaining": 0,
+                  "customerId": "geojacob",
+                  "billingType": "ONE_TIME",
+                  "recurrenceUnit": null,
+                  "recurrenceType": null
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad Request - Validation or business logic error (e.g. no default payment method, declined charge, blocked organization, or a non-`ONE_TIME` charge period).",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/DetailErrorResponse"
+                },
+                "example": {
+                  "detail": "A payment method is required to complete this payment."
                 }
               }
             }
