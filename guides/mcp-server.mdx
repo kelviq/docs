@@ -1,0 +1,394 @@
+---
+title: "MCP Server"
+description: "Control Kelviq from Claude, Cursor, and any AI assistant that speaks the Model Context Protocol."
+---
+
+`@kelviq/mcp-server` is the official [Model Context Protocol](https://modelcontextprotocol.io) server for Kelviq. It plugs into any MCP-compatible client — Claude Code, Claude Desktop, Cursor, Zed — and exposes the full Kelviq API as **typed tools** that the LLM can call directly, plus the entire Kelviq documentation as **searchable resources**.
+
+Instead of asking your assistant to "write me a curl command," you describe the outcome ("create a Pro plan under product X and publish it") and it does the work in a single turn.
+
+<Info>
+**51 tools across 13 domains** (customers, checkout, subscriptions, entitlements, licenses, usage, offerings, promotions, portal, catalog products, catalog plans, catalog features, partner organizations) plus **61 resources** including the full OpenAPI spec.
+</Info>
+
+
+---
+
+## How It Works
+
+The server runs locally on your machine as a Node process started by your AI client. It speaks the MCP **stdio transport** — your client launches `npx -y @kelviq/mcp-server`, connects over stdio, and discovers the tools and resources advertised by the server.
+
+When the LLM decides to call a Kelviq tool, the server:
+
+1. Validates the LLM-provided arguments against a Zod schema derived from Kelviq's OpenAPI spec.
+2. Adds your API key as a Bearer token and sends the HTTPS request to the appropriate Kelviq host.
+3. Returns the JSON response (or a structured `{"error": {...}}` object) back to the LLM.
+
+API errors are returned as content, not exceptions — the LLM reads them and reacts (retries with a fix, asks you to clarify, etc).
+
+---
+
+## Step 1: Get Your API Keys
+
+1. Sign in at [app.kelviq.com](https://app.kelviq.com).
+2. Navigate to **Settings → API Keys**.
+3. Copy:
+   - **Server API Key** — required for all API tools.
+   - **Client API Key** — required only for the `promotion_get` tool.
+
+<Warning>
+Never commit API keys to version control or paste them into shared chats. Use your MCP client's `env` configuration mechanism — most clients store secrets in their own credentials file.
+</Warning>
+
+---
+
+## Step 2: Add the Server to Your AI Client
+
+Pick the section that matches your client.
+
+### Claude Code (CLI)
+
+```bash
+claude mcp add kelviq \
+  --env KELVIQ_SERVER_API_KEY=<your-server-key> \
+  --env KELVIQ_CLIENT_API_KEY=<your-client-key> \
+  -- npx -y @kelviq/mcp-server
+```
+
+<Note>
+The `--` separator is required so that `claude` doesn't intercept `-y` as one of its own flags. Put all `--env` arguments **before** the `--`.
+</Note>
+
+Verify the connection with `/mcp` inside a Claude Code session — you should see `kelviq ✓ Connected, 51 tools`.
+
+### Claude Desktop
+
+Edit `~/Library/Application Support/Claude/claude_desktop_config.json` (macOS) or the equivalent for your OS:
+
+```json
+{
+  "mcpServers": {
+    "kelviq": {
+      "command": "npx",
+      "args": ["-y", "@kelviq/mcp-server"],
+      "env": {
+        "KELVIQ_SERVER_API_KEY": "server-...",
+        "KELVIQ_CLIENT_API_KEY": "client-..."
+      }
+    }
+  }
+}
+```
+
+Restart Claude Desktop — the hammer icon shows `kelviq` with all tools.
+
+### Cursor
+
+Open **Cursor Settings → MCP**, click **Add new MCP server**, and configure:
+
+| Field | Value |
+|-------|-------|
+| Command | `npx` |
+| Args | `-y @kelviq/mcp-server` |
+| Environment Variables | `KELVIQ_SERVER_API_KEY`, `KELVIQ_CLIENT_API_KEY` |
+
+### Other Clients
+
+Any client supporting stdio MCP servers works. Point it at:
+
+```bash
+npx -y @kelviq/mcp-server
+```
+
+with the env vars listed below.
+
+---
+
+## Step 3: Try It
+
+In a new session, type a prompt like:
+
+> *Search Kelviq docs for license keys.*
+
+or
+
+> *List my Kelviq products.*
+
+Your AI client should pick the right tool, call it, and show the result inline. If you see a `Configuration error`, your env vars didn't make it through — re-check the config above.
+
+---
+
+## Environment Variables
+
+| Variable | Required | Default | Purpose |
+|----------|----------|---------|---------|
+| `KELVIQ_SERVER_API_KEY` | Yes, for all API tools | — | Bearer token for `api.kelviq.com` |
+| `KELVIQ_CLIENT_API_KEY` | Only for `promotion_get` | — | Bearer token for the edge host |
+| `KELVIQ_BASE_URL` | No | `https://api.kelviq.com/api/v1` | Override for sandbox / self-host |
+| `KELVIQ_EDGE_URL` | No | `https://edge.api.kelviq.com/api/v1` | Override the edge host (entitlements + promotions) |
+
+<Tip>
+Docs tools (`docs_search`, `docs_read`) work with no API keys at all. Even without a key, the LLM can answer Kelviq questions from the bundled documentation.
+</Tip>
+
+### Point at Staging
+
+```env
+KELVIQ_BASE_URL=https://stagingapi.kelviq.com/api/v1
+KELVIQ_EDGE_URL=https://edge.stagingapi.kelviq.com/api/v1
+```
+
+Pair these with a **staging-scoped** Server API Key from your dashboard's staging environment.
+
+---
+
+## Tool Reference
+
+Tools are grouped by domain. Each tool name uses `domain_action` form (`customer_create`, `plan_publish`). The LLM picks the right tool from the description automatically — you rarely need to name a tool explicitly.
+
+### Customers
+
+| Tool | Description |
+|------|-------------|
+| `customer_create` | Create a customer. Required: `customerId`. Optional: `email`, `name`, `metadata`, `billingAddress`. |
+| `customer_update` | Patch an existing customer by `customerId`. Only fields you pass are updated. |
+
+### Checkout & Portal
+
+| Tool | Description |
+|------|-------------|
+| `checkout_create_session` | Create a hosted checkout session. Returns `checkoutUrl` + `checkoutSessionId`. |
+| `portal_session_create` | Mint a pre-authenticated customer portal URL. |
+
+### Subscriptions
+
+| Tool | Description |
+|------|-------------|
+| `subscription_create` | Create a subscription directly (skip checkout). |
+| `subscription_list` | List subscriptions, filter by customer, paginated. |
+| `subscription_update` | Change plan / charge period / features. Free plans must use `checkout_create_session` to upgrade. |
+| `subscription_cancel` | Cancel `IMMEDIATE`, `CURRENT_PERIOD_ENDS`, or `SPECIFIC_DATE`. |
+
+### Entitlements, Licenses, Usage
+
+| Tool | Description |
+|------|-------------|
+| `entitlements_get` | Fetch entitlements for a customer. Pass `featureId` to scope. |
+| `license_activate` | Activate a license key for a specific instance. Returns `instanceId`. |
+| `license_deactivate` | Deactivate a license instance. |
+| `license_validate` | Validate a license key (optionally bound to an instance). |
+| `usage_report` | Report metered usage. `behaviour: SET` replaces, `DELTA` increments. |
+
+### Offerings & Promotions
+
+| Tool | Description |
+|------|-------------|
+| `offering_get_product` | Fetch public pricing scoped to a product UUID. Includes localized prices + customer subscription state. |
+| `promotion_get` | Resolve the active promotion for the caller's location. Uses Client API key. |
+
+### Catalog: Products
+
+| Tool | Description |
+|------|-------------|
+| `product_list` | List catalog products. Optional `search` substring + `page`. |
+| `product_create` | Create a product. Required: `name`, `taxCode`. Optional `imageKeys` from `media_presigned_upload`. |
+| `product_retrieve` | Fetch one product by UUID or identifier. |
+| `product_update` | Patch a product. |
+| `product_archive` | Archive (soft-delete) a product. |
+| `product_settings_get` | VPN / Tor / proxy policy, default currency, product URL. |
+| `product_settings_update` | Patch any subset of those settings. |
+| `product_image_update` | Edit display fields of a product image (`name`, `ordering`, `thumbnail`, `enabled`). |
+| `product_image_delete` | Remove an image from a product. |
+
+### Catalog: Features
+
+| Tool | Description |
+|------|-------------|
+| `feature_list` | List catalog features. |
+| `feature_create` | Create a feature. Required: `name`, `featureType` (`BOOLEAN` / `CUSTOMIZABLE` / `METER`). |
+| `feature_retrieve` | Fetch one feature. |
+| `feature_archive` | Archive a feature. Plans referencing it keep working. |
+
+### Catalog: Plans
+
+Plans are versioned. Updates create a draft; `plan_publish` releases it.
+
+| Tool | Description |
+|------|-------------|
+| `plan_list` | List all plans in the account. |
+| `plan_create` | Create a plan under a product. Plan starts in `DRAFT`. |
+| `plan_retrieve` | Fetch one plan. |
+| `plan_update` | Patch a plan. Updates to a published plan automatically create a new draft. |
+| `plan_archive` | Archive a plan. Existing subscriptions keep working. |
+| `plan_publish` | Publish the latest draft. `updateFeatures` / `updatePricing` flags migrate existing customers. |
+| `plan_discard_draft` | Drop the current draft, keep the published version. |
+| `plan_prices_list` | List all prices configured on a plan. |
+| `plan_prices_bulk_set` | Atomically replace all prices. Supports `FLAT` / `PACKAGE` / `TIERED` / `VOLUME` / `STAIRSTEP` models. |
+| `plan_entitlements_list` | List feature entitlements on a plan. |
+| `plan_entitlements_add` | Attach feature entitlements. |
+| `plan_entitlement_update` | Patch a single entitlement's `details`. |
+| `plan_entitlement_delete` | Remove an entitlement. |
+| `plan_file_update` | Edit display fields of a plan-attached file. |
+| `plan_file_delete` | Remove a file from a plan. |
+| `plan_file_download` | Download URL/stream for a plan file (buyer-facing deliverables). |
+
+### Media
+
+| Tool | Description |
+|------|-------------|
+| `media_presigned_upload` | Get a presigned S3 POST policy (max 5 GB). Returns a `fileKey` to pass into `product_create`/`product_update` (`imageKeys`) or `plan_create`/`plan_update` (`fileKeys`). |
+
+### Partner
+
+| Tool | Description |
+|------|-------------|
+| `partner_org_provision` | Provision a Kelviq org under your partner account. Required: `externalId`, `email`. Optional `businessName`. |
+| `partner_org_list` | List orgs you've provisioned. Optional `externalId` filter. |
+| `partner_org_retrieve` | Fetch a partner org by its Kelviq identifier. |
+| `partner_org_retrieve_by_external_id` | Fetch a partner org by your partner-side ID. |
+
+### Docs (no API key required)
+
+| Tool | Description |
+|------|-------------|
+| `docs_search` | Full-text search across the bundled Kelviq docs. Returns `{slug, title, snippet, score}`. |
+| `docs_read` | Fetch a full markdown doc by slug. |
+
+---
+
+## Resources
+
+Resources let your AI client pin pages into context. The server advertises three categories:
+
+| URI pattern | Content |
+|-------------|---------|
+| `kelviq://docs/{section}/{slug}` | Every conceptual page in the Kelviq docs (~59 pages) |
+| `kelviq://openapi.json` | The full OpenAPI 3.0 spec (49 operations, every schema) |
+| `kelviq://README` | Top-level Kelviq overview |
+
+For exhaustive per-endpoint request/response shapes, the **OpenAPI spec is the source of truth**. Ask your assistant *"check the OpenAPI spec for createSubscription"* and it will read the resource directly.
+
+---
+
+## Example Prompts
+
+Describe the outcome, not the API call. A few realistic prompts that exercise the toolchain:
+
+<Accordion title="Build a complete catalog from scratch">
+> *Create a Kelviq product called "Notion Plus" with tax code `saas`, then create three plans (Free, Pro Monthly $19, Pro Yearly $190), add an `api-calls` feature with limits 1000 / 50000 / unlimited, and publish all three plans.*
+
+Calls (in order): `product_create` → `feature_create` → `plan_create` × 3 → `plan_entitlements_add` × 3 → `plan_prices_bulk_set` × 3 → `plan_publish` × 3.
+</Accordion>
+
+<Accordion title="Issue a checkout link">
+> *Create a checkout session for plan `pro-monthly` for a new customer, success URL https://example.com/done.*
+
+Calls: `checkout_create_session`. Returns the `checkoutUrl` you can hand to your buyer.
+</Accordion>
+
+<Accordion title="Provision a partner customer">
+> *Provision a Kelviq org for partner external ID `acme-99`, owner email `ops@acme.com`, business name "Acme Corp".*
+
+Calls: `partner_org_provision`. Returns the new org's identifier + API keys.
+</Accordion>
+
+<Accordion title="License key management">
+> *Activate license `LIC-ABCDE` for customer `geojacob`, instance name "MacBook Pro M3", then validate it.*
+
+Calls: `license_activate` → `license_validate`.
+</Accordion>
+
+<Accordion title="Inspect customer state">
+> *Show me all subscriptions for customer `acme-42` and tell me which features they have access to.*
+
+Calls: `subscription_list` → `entitlements_get`.
+</Accordion>
+
+<Accordion title="Documentation lookup">
+> *How do digital downloads work in Kelviq? What's the file-size limit?*
+
+Calls: `docs_search` → `docs_read`. No API key needed — works offline.
+</Accordion>
+
+---
+
+## Tips for Effective Prompts
+
+- **Mention "Kelviq" early.** LLMs typically have many MCP tools loaded. Saying "create a *Kelviq* customer" steers the model toward this server's tools instead of guessing.
+- **Use `docs_search` for fuzzy questions.** When you're unsure of an identifier or behaviour, ask the LLM to *"search Kelviq docs"* first — it grounds the follow-up calls in real semantics.
+- **Trust the errors.** Tools return `{"error": {"status", "message"}}` shapes for API errors. The LLM reads them and adjusts automatically (e.g. "Invalid product identifier" → asks you for the right one).
+- **Combine tools in one prompt.** The LLM is happy to chain calls. "Create the product, then publish all its plans" is one prompt, not five.
+
+---
+
+## Troubleshooting
+
+### `Executable not found in $PATH: "node"` in Claude Code
+
+GUI/launcher processes don't source `~/.zshrc`, so nvm's `node` isn't visible to them. Pick one fix:
+
+1. **Symlink node into a system path** (recommended):
+   ```bash
+   sudo ln -s "$(which node)" /usr/local/bin/node
+   ```
+   One-time fix for every MCP server you'll ever add.
+
+2. **Use the absolute node path:**
+   ```bash
+   claude mcp add kelviq \
+     --env KELVIQ_SERVER_API_KEY=... \
+     -- /Users/you/.nvm/versions/node/v20.19.0/bin/node \
+        $(npm root -g)/@kelviq/mcp-server/dist/server.js
+   ```
+
+3. **Install Node via Homebrew:**
+   ```bash
+   brew install node
+   ```
+   Puts `node` on the system PATH so all GUI tools see it.
+
+### `error: unknown option '-y'` from `claude mcp add`
+
+`claude` is intercepting `-y` as one of its own flags. Use `--` to separate Claude's args from the actual command:
+
+```bash
+claude mcp add kelviq \
+  --env KELVIQ_SERVER_API_KEY=... \
+  -- npx -y @kelviq/mcp-server
+```
+
+### Tool returns `{"error": {"status": "Configuration error", ...}}`
+
+A required env var is missing. The error message names which one — set it in your client config and reconnect.
+
+### Tool returns `{"error": {"status": "Bad request", "message": "Invalid product identifier"}}`
+
+Your API key works but the identifier doesn't exist on this account. Most common cause: your key is for **production** but the identifier exists only in **staging** (or vice versa). Check `KELVIQ_BASE_URL`.
+
+### Test Without an AI Client
+
+Use the official [MCP Inspector](https://github.com/modelcontextprotocol/inspector) to browse and call tools directly from a browser:
+
+```bash
+KELVIQ_SERVER_API_KEY=... KELVIQ_CLIENT_API_KEY=... \
+  npx -y @modelcontextprotocol/inspector \
+  npx -y @kelviq/mcp-server
+```
+
+---
+
+## Source & Contributing
+
+- **npm** — [`@kelviq/mcp-server`](https://www.npmjs.com/package/@kelviq/mcp-server)
+- **GitHub** — [`kelviq/kelviq-mcp-server`](https://github.com/kelviq/kelviq-mcp-server)
+- **Issues** — [github.com/kelviq/kelviq-mcp-server/issues](https://github.com/kelviq/kelviq-mcp-server/issues)
+- **License** — MIT
+
+The repo is the canonical reference for tool schemas, build process, and contribution guidelines. New Kelviq API endpoints are added by extending the hand-written Zod schemas in `src/schemas/kelviq.ts` and the per-domain files in `src/tools/`.
+
+---
+
+## Need Help?
+
+- Email us at **hi@kelviq.com**
+- [Book a demo](https://tidycal.com/neravath/15-minute-meeting)
