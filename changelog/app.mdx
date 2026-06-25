@@ -4,7 +4,7 @@ description: "Changelog for the Kelviq Dashboard"
 mode: "wide"
 rss: true
 ---
-<Update label="v1.5" description="June 26, 2026">
+<Update label="v1.11" description="June 26, 2026">
 
 
 ![Kelviq release cover for June 26, 2026](/images/changelog/2026-06-26.png)
@@ -98,7 +98,7 @@ We also shipped smaller fixes and cleanup across checkout, pricing, product setu
 
 </Update>
 
-<Update label="v1.5" description="June 19, 2026">
+<Update label="v1.10" description="June 19, 2026">
 
 
 ![Kelviq release cover for June 19, 2026](/images/changelog/2026-06-19.png)
@@ -170,7 +170,7 @@ We improved the custom checkout pricing flow. This is useful for sales led deals
 
 
 
-<Update label="v1.5" description="June 12, 2026">
+<Update label="v1.9" description="June 12, 2026">
 
 
 ![Kelviq release cover for June 12, 2026](/images/changelog/2026-06-12.png)
@@ -237,8 +237,9 @@ You can now handle flows like:
 - Give a sales led customer a longer trial
 
 ```js
-await kelviq.subscriptions.update("sub_123", {
- trialEnd: "2026-06-30"
+await client.subscriptions.update({
+  subscriptionId: "sub_123",
+  trialEnd: "2026-06-30T23:59:59Z"
 });
 ```
 
@@ -365,7 +366,7 @@ Kelviq now disables free plan switching for published plans when switching is no
 
 
 
-<Update label="v1.5" description="June 5, 2026">
+<Update label="v1.8" description="June 5, 2026">
 
 
 ![Kelviq release cover for June 5, 2026](/images/changelog/2026-06-05.png)
@@ -430,7 +431,7 @@ Example: A customer has `100` credits. Different features can consume credits di
 
 ```text
 GPT 5.1 request: 2 credits
-Claude Sonet request: 3 credits
+Claude Sonnet request: 3 credits
 Page crawl: 5 credits
 Long report generation: 20 credits
 ```
@@ -456,17 +457,17 @@ This also enables a reserve-and-settle pattern. You can block a number of tokens
 
 ```js
 // Reserve tokens before the action
-await kelviq.usage.report({
- customerId: "cus_123",
- meter: "tokens",
- value: 1000
+await client.usage.report({
+  customerId: "cus_123",
+  meter: "tokens",
+  value: 1000
 });
 
 // Return the unused tokens after it completes
-await kelviq.usage.report({
- customerId: "cus_123",
- meter: "tokens",
- value: -400
+await client.usage.report({
+  customerId: "cus_123",
+  meter: "tokens",
+  value: -400
 });
 ```
 
@@ -477,13 +478,11 @@ The checkout API now supports locked email and default billing country. This hel
 Example:
 
 ```js
-await kelviq.checkout.create({
- planId: "plan_pro",
- customer: {
-   email: "alex@company.com"
- },
- lockEmail: true,
- defaultBillingCountry: "US"
+await client.checkout.createSession({
+  planIdentifier: "plan-pro",
+  customerId: "cust_789",
+  lockEmail: true,
+  defaultBillingCountry: "US"
 });
 ```
 
@@ -533,7 +532,7 @@ Checkout now supports SEPA. This helps sellers serve more European customers, es
 
 
 
-<Update label="v1.5" description="May 29, 2026">
+<Update label="v1.7" description="May 29, 2026">
 
 
 ![Kelviq release cover for May 29, 2026](/images/changelog/2026-05-29.png)
@@ -702,7 +701,7 @@ Fixed an issue where cancel subscription was visible for one time payments. One 
 
 
 
-<Update label="v1.5" description="May 22, 2026">
+<Update label="v1.6" description="May 22, 2026">
 
 
 ![Kelviq release cover for May 22, 2026](/images/changelog/2026-05-22.png)
@@ -764,9 +763,9 @@ Instead of clicking only on a small button or title, you can click anywhere on t
 
 We renamed the Developers tab to API Key. Most people go there to find their API key, so the label now matches the destination.
 
-Before: -Developers
+Before: **Developers**
 
-Now: -API Key
+Now: **API Key**
 
 
 ## Chart theming support
