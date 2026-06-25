@@ -84,22 +84,6 @@ The Node SDK includes more webhook improvements for safer event handling. This h
 - Billing state sync
 
 
-## App API improvements
-
-We continued improving app APIs. These APIs help developers build custom flows on top of Kelviq.
-
-Examples:
-
-```text
-Create checkout from your app
-Validate licenses
-Report usage
-Create portal sessions
-Sync customer state
-Handle subscription changes
-```
-
-
 ## Final fixes and cleanup
 
 We also shipped smaller fixes and cleanup across checkout, pricing, product setup, and plan setup. This includes improvements for:
@@ -118,21 +102,6 @@ We also shipped smaller fixes and cleanup across checkout, pricing, product setu
 
 
 ![Kelviq release cover for June 19, 2026](/images/changelog/2026-06-19.png)
-
-
-## Published app APIs
-
-We published app APIs for deeper product integrations. These APIs make it easier to connect Kelviq with your own product flows, admin tools, checkout flows, and customer dashboards.
-
-You can use app APIs to build flows like:
-
-- Create checkout sessions from your app
-- Validate licenses
-- Report usage
-- Create customer portal sessions
-- Sync customer state
-- Handle subscription changes
-- Show billing state inside your app
 
 
 ## Organization settings page
@@ -223,7 +192,8 @@ Example response:
  "subscription": {
    "status": "active",
    "plan": "Pro",
-   "current_period_end": "2026-07-12"
+   "trialDaysRemaining": 0
+   ...
  }
 }
 ```
@@ -235,11 +205,11 @@ The Node SDK now supports the License API. You can validate license keys and con
 **Example:**
 
 ```js
-const result = await kelviq.licenses.validate({
+const result = await client.license.validate({
   licenseKey: "LIC-123"
 });
 
-if (result.license.status === "active") {
+if (result.valid) {
   // Unlock product access
 }
 ```
@@ -256,7 +226,7 @@ This is useful for products such as:
 ## Trial end support for subscription updates
 
 
-The Node SDK now supports `trial_end` when updating subscriptions. This gives developers more control over trials. This helps teams extend a trial after sales approval or shorten a trial when a customer upgrades early.
+The Node SDK now supports `trialEnd` when updating subscriptions. This gives developers more control over trials. This helps teams extend a trial after sales approval or shorten a trial when a customer upgrades early.
 
 You can now handle flows like:
 
@@ -268,7 +238,7 @@ You can now handle flows like:
 
 ```js
 await kelviq.subscriptions.update("sub_123", {
- trial_end: "2026-06-30"
+ trialEnd: "2026-06-30"
 });
 ```
 
@@ -280,9 +250,12 @@ Example:
 
 
 ```js
-const session = await kelviq.portal.sessions.create({
- customerId: "cus_123"
+const session = await client.portal.createSession({
+    customerId: "cust_789",
 });
+
+// Redirect your customer to the portal
+res.redirect(session.customerPortalUrl);
 ```
 
 Customers can use the portal to:
@@ -476,13 +449,24 @@ Examples:
 - Credit back usage after a refund
 - Fix a metering mistake
 - Adjust token usage after an LLM call failed
+- Reserve tokens up front and return the unused amount once the action completes
+
+This also enables a reserve-and-settle pattern. You can block a number of tokens in advance, then report a negative value to return whatever wasn't used once the action finishes. For example, reserve `1,000` tokens before an LLM call, then send `-400` if only `600` were consumed.
 
 
 ```js
+// Reserve tokens before the action
 await kelviq.usage.report({
  customerId: "cus_123",
  meter: "tokens",
- value: -500
+ value: 1000
+});
+
+// Return the unused tokens after it completes
+await kelviq.usage.report({
+ customerId: "cus_123",
+ meter: "tokens",
+ value: -400
 });
 ```
 
