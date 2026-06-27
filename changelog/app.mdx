@@ -456,18 +456,22 @@ This also enables a reserve-and-settle pattern. You can block a number of tokens
 
 
 ```js
+import { BEHAVIOUR_CHOICES } from '@kelviq/node-sdk';
+
 // Reserve tokens before the action
-await client.usage.report({
+await client.reporting.reportUsage({
+  value: 1000,
   customerId: "cus_123",
-  meter: "tokens",
-  value: 1000
+  featureId: "tokens",
+  behaviour: BEHAVIOUR_CHOICES.DELTA
 });
 
 // Return the unused tokens after it completes
-await client.usage.report({
+await client.reporting.reportUsage({
+  value: -400,
   customerId: "cus_123",
-  meter: "tokens",
-  value: -400
+  featureId: "tokens",
+  behaviour: BEHAVIOUR_CHOICES.DELTA
 });
 ```
 
