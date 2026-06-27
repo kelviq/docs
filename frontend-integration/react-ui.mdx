@@ -36,7 +36,7 @@ function App() {
   return (
     <KelviqProvider
       accessToken="YOUR_ACCESS_TOKEN"
-      offeringId="YOUR_OFFERING_ID"
+      productId="YOUR_PRODUCT_ID"
       customerId="OPTIONAL_CUSTOMER_ID"
     >
       <KQPricingTable />
@@ -60,7 +60,7 @@ function App() {
   return (
     <KelviqProvider
       accessToken="YOUR_ACCESS_TOKEN"
-      offeringId="YOUR_OFFERING_ID"
+      productId="YOUR_PRODUCT_ID"
       customerId="OPTIONAL_CUSTOMER_ID"
     >
       <KQPricingTable
@@ -90,8 +90,8 @@ The top-level provider component that initializes the SDK and manages the global
 
 | Prop | Type | Description |
 |------|------|-------------|
-| `accessToken` | `string` | Your kelviq client access token |
-| `offeringId` | `string` | The unique identifier for your offering |
+| `accessToken` | `string` | Your kelviq access token |
+| `productId` | `string` | The unique identifier of the product to display the offering for |
 
 #### Optional Props
 
@@ -124,7 +124,8 @@ The main pricing table component that displays all plans and handles user intera
 
 | Prop | Type | Default | Description |
 |------|------|---------|-------------|
-| `customStyles` | `PricingTableStyle` | `{}` | Custom styling configuration |
+| `customStyles` | `PricingTableStyle` | `{}` | Style overrides (colors, typography, layout). Any field you omit falls back to the SDK defaults. |
+| `pricingOptions` | `Partial<PricingOptions>` | `DEFAULT_PRICING_OPTIONS` | Price-formatting options (decimals, currency symbol/code, localization). Partial objects are merged with the defaults. |
 | `customActionButton` | `CustomActionButton` | `undefined` | Custom button component |
 | `customCheckIcon` | `React.ReactNode` | `undefined` | Custom check icon |
 | `customUnCheckIcon` | `React.ReactNode` | `undefined` | Custom uncheck icon |
@@ -190,7 +191,7 @@ Renders a list of pricing plans with billing period switching.
 | Prop | Type | Required | Description |
 |------|------|----------|-------------|
 | `plans` | `OfferingPlan[]` | Yes | Array of plans to display |
-| `pricingTable` | `PricingTable` | Yes | Pricing table configuration |
+| `pricingOptions` | `PricingOptions` | Yes | Price-formatting options |
 | `billingPeriods` | `BillingPeriod[]` | Yes | Available billing periods |
 | `countryCode` | `string` | Yes | Country code for localization |
 | `currencyCode` | `string` | Yes | Currency code (e.g., "USD") |
@@ -212,7 +213,7 @@ Displays a single pricing plan card.
 | Prop | Type | Required | Description |
 |------|------|----------|-------------|
 | `plan` | `OfferingPlan` | Yes | Plan data to display |
-| `pricingTable` | `PricingTable` | Yes | Pricing table configuration |
+| `pricingOptions` | `PricingOptions` | Yes | Price-formatting options |
 | `period` | `ChargePeriodEnum` | Yes | Current billing period |
 | `countryCode` | `string` | Yes | Country code |
 | `currencyCode` | `string` | Yes | Currency code |
@@ -262,8 +263,9 @@ Renders the features list for a plan.
 | `customCheckIcon` | `React.ReactNode` | No | Custom check icon |
 | `customUnCheckIcon` | `React.ReactNode` | No | Custom uncheck icon |
 | `customTooltipIcon` | `React.ReactNode` | No | Custom tooltip icon |
-| `descriptionTooltipEnabled` | `boolean` | No | Enable tooltips |
 | `onUsageChange` | `(featureId: string, quantity: number) => void` | No | Usage change handler |
+
+> Feature tooltips are controlled per-feature by the `displayTooltipDescription` flag on each feature in the offering data, configured in your kelviq dashboard — there is no global tooltip prop.
 
 ---
 
@@ -325,6 +327,16 @@ interface PricingTableStyle {
   typography: PricingTableTypographyConfig;
   layout: PricingTableLayoutConfig;
 }
+
+// Price-formatting options (passed via the `pricingOptions` prop)
+interface PricingOptions {
+  localization: boolean;        // use the offering's locale/currency formatting
+  showDecimal: boolean;         // show decimal places
+  minimumDecimalDigits: number; // minimum decimal places
+  maximumDecimalDigits: number; // maximum decimal places
+  showCurrencySymbol: boolean;  // show the currency symbol (e.g. $)
+  showCurrencyCode: boolean;    // show the currency code (e.g. USD)
+}
 ```
 
 ### Color Configuration
@@ -380,6 +392,7 @@ interface PricingTableLayoutConfig {
   maxWidth: number;
   gap: number;
   align: 'start' | 'center' | 'end';
+  tierSelectionType: 'switch' | 'tabs';
 }
 ```
 
@@ -481,7 +494,37 @@ const customStyles: PricingTableStyle = {
 };
 ```
 
-### 6.3. Custom Action Button
+### 6.3. Price Formatting
+
+How prices are formatted is configured entirely in the SDK via the `pricingOptions` prop. Pass only the fields you want to change — the rest fall back to `DEFAULT_PRICING_OPTIONS`:
+
+```tsx
+<KQPricingTable
+  pricingOptions={{
+    showDecimal: true,
+    minimumDecimalDigits: 0,
+    maximumDecimalDigits: 2,
+    showCurrencySymbol: true,
+    showCurrencyCode: false,
+    localization: true,
+  }}
+/>
+```
+
+Defaults (`DEFAULT_PRICING_OPTIONS`):
+
+```tsx
+{
+  localization: true,
+  showDecimal: true,
+  minimumDecimalDigits: 0,
+  maximumDecimalDigits: 2,
+  showCurrencySymbol: true,
+  showCurrencyCode: false,
+}
+```
+
+### 6.4. Custom Action Button
 
 ```tsx
 const CustomButton: CustomActionButton = ({ onClick, children, plan, disabled }) => (
@@ -505,7 +548,7 @@ const CustomButton: CustomActionButton = ({ onClick, children, plan, disabled })
 <KQPricingTable customActionButton={CustomButton} />
 ```
 
-### 6.4. noStyles Mode
+### 6.5. noStyles Mode
 
 For complete styling control, use the `noStyles` prop:
 
@@ -513,7 +556,7 @@ For complete styling control, use the `noStyles` prop:
 <KQPricingTable noStyles={true} />
 ```
 
-### 6.5. CSS Class Reference
+### 6.6. CSS Class Reference
 
 The kelviq React UI components use consistent CSS class names that you can target for custom styling. All classes are prefixed with `kq-` to avoid naming conflicts.
 
@@ -608,7 +651,7 @@ The SDK automatically handles subscription updates:
 ```tsx
 <KelviqProvider
   accessToken="YOUR_TOKEN"
-  offeringId="YOUR_OFFERING"
+  productId="YOUR_PRODUCT_ID"
   apiConfig={{
     onError: (error) => {
       console.error('kelviq Error:', error);
@@ -688,7 +731,7 @@ const App: React.FC = () => {
       
       <KelviqProvider
         accessToken="your-access-token"
-        offeringId="your-offering-id"
+        productId="your-product-id"
         customerId="optional-customer-id"
         checkoutSuccessUrl="https://yourapp.com/success"
         apiConfig={{
@@ -716,6 +759,7 @@ export default App;
 
 The SDK uses the following default API endpoints:
 
+- **Product Offering API**: `https://api.kelviq.com/api/v1/monetization/product-offering/{productId}/`
 - **Checkout API**: `https://api.kelviq.com/api/v1/checkout/`
 - **Subscription API**: `https://api.kelviq.com/api/v1/subscriptions`
 
@@ -737,7 +781,7 @@ You can override these in the `apiConfig`:
 
 ### Common Issues
 
-1. **Loading State**: Ensure your `accessToken` and `offeringId` are correct
+1. **Loading State**: Ensure your `accessToken` and `productId` are correct
 2. **Styling Issues**: Check CSS variable overrides and custom styles
 3. **API Errors**: Verify API endpoints and network connectivity
 4. **TypeScript Errors**: Ensure all required props are provided
@@ -752,7 +796,7 @@ Enable console logging for debugging:
     onError: (error) => {
       console.log('kelviq Debug:', {
         error: error.message,
-        offeringId: 'your-offering-id',
+        productId: 'your-product-id',
         timestamp: new Date().toISOString()
       });
     }
@@ -768,7 +812,7 @@ If you want to use the sandbox, you need to set the `environment` option to `san
 ```tsx
 <KelviqProvider 
   accessToken="YOUR_ACCESS_TOKEN"
-  offeringId="YOUR_OFFERING_ID" 
+  productId="YOUR_PRODUCT_ID"
   environment="sandbox">
     {/* Your app components */}
 </KelviqProvider>
