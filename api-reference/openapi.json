@@ -155,6 +155,30 @@
           }
         }
       },
+      "CustomerListResponse": {
+        "type": "object",
+        "properties": {
+          "count": {
+            "type": "integer"
+          },
+          "next": {
+            "type": "string",
+            "format": "uri",
+            "nullable": true
+          },
+          "previous": {
+            "type": "string",
+            "format": "uri",
+            "nullable": true
+          },
+          "results": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/CustomerResponse"
+            }
+          }
+        }
+      },
       "CustomerCreateRequest": {
         "type": "object",
         "required": [
@@ -278,6 +302,7 @@
               "YEARLY",
               "WEEKLY",
               "DAILY",
+              "TWENTY_EIGHT_DAYS",
               "THREE_MONTHS",
               "SIX_MONTHS"
             ],
@@ -849,6 +874,7 @@
               "YEARLY",
               "WEEKLY",
               "DAILY",
+              "TWENTY_EIGHT_DAYS",
               "THREE_MONTHS",
               "SIX_MONTHS"
             ],
@@ -1341,6 +1367,7 @@
               "YEARLY",
               "WEEKLY",
               "DAILY",
+              "TWENTY_EIGHT_DAYS",
               "THREE_MONTHS",
               "SIX_MONTHS"
             ],
@@ -2828,7 +2855,7 @@
           },
           "reset": {
             "type": "string",
-            "enum": ["NEVER", "EVERY_DAY", "EVERY_MONTH", "EVERY_QUARTER", "EVERY_YEAR"],
+            "enum": ["NEVER", "EVERY_DAY", "EVERY_28_DAYS", "EVERY_MONTH", "EVERY_QUARTER", "EVERY_YEAR"],
             "example": "EVERY_MONTH"
           },
           "resetTime": {
@@ -2957,7 +2984,7 @@
           "hasUnlimitedUsage": { "type": "boolean", "example": false },
           "reset": {
             "type": "string",
-            "enum": ["NEVER", "EVERY_DAY", "EVERY_MONTH", "EVERY_QUARTER", "EVERY_YEAR"],
+            "enum": ["NEVER", "EVERY_DAY", "EVERY_28_DAYS", "EVERY_MONTH", "EVERY_QUARTER", "EVERY_YEAR"],
             "example": "EVERY_MONTH"
           },
           "resetTime": { "type": "string", "nullable": true, "example": "BEGINNING_OF_PERIOD" },
@@ -3268,6 +3295,83 @@
   ],
   "paths": {
     "/customers/": {
+      "get": {
+        "tags": [
+          "Customers"
+        ],
+        "summary": "List customers",
+        "description": "Retrieves a paginated list of customers for your organization, ordered by creation date (newest first). You can search across the customer's name, email and `customerId`.",
+        "operationId": "listCustomers",
+        "parameters": [
+          {
+            "name": "search",
+            "in": "query",
+            "required": false,
+            "description": "Free-text search across the customer's `name`, `email` and `customerId`.",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "page_size",
+            "in": "query",
+            "required": false,
+            "description": "Number of results to return per page. Defaults to 1000, maximum 10000.",
+            "schema": {
+              "type": "integer"
+            }
+          },
+          {
+            "name": "page",
+            "in": "query",
+            "required": false,
+            "description": "The page number of results to return.",
+            "schema": {
+              "type": "integer"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "A paginated list of customers.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/CustomerListResponse"
+                },
+                "example": {
+                  "count": 1,
+                  "next": null,
+                  "previous": null,
+                  "results": [
+                    {
+                      "id": "a1b2c3d4-e5f6-7890-1234-567890abcdef",
+                      "customerId": "unique-customer-id-123",
+                      "name": "John Doe",
+                      "email": "new.customer@example.com",
+                      "details": {},
+                      "metadata": {
+                        "source": "sdk_import",
+                        "priority": "high"
+                      },
+                      "billingAddress": {
+                        "country": "IN",
+                        "line1": "123 Main Street",
+                        "line2": "Apt 4B",
+                        "postalCode": "560001",
+                        "city": "Bangalore",
+                        "state": "Karnataka"
+                      },
+                      "createdOn": "2025-06-04T06:03:30.195790Z",
+                      "modifiedOn": "2025-06-04T06:03:30.195831Z"
+                    }
+                  ]
+                }
+              }
+            }
+          }
+        }
+      },
       "post": {
         "tags": [
           "Customers"
