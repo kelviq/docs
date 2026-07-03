@@ -50,7 +50,19 @@ Kelviq supports five distinct ways to calculate the cost. Here is how the math w
 
 #### Flat
 
-Customers pay a fixed rate for each unit used. For example you charge \$0.10 per API call. A user makes 150 calls. The total is \$15.00.
+The simplest way to charge for usage. Set one fixed rate for every unit consumed. No tiers, packages, or volume discounts. The total scales directly with usage.
+
+**Best for** API products and services where the cost of serving each unit stays relatively consistent.
+
+**Example** A translation API charging for each character processed.
+
+**Sample calculation**
+
+| | |
+| --- | --- |
+| Rate | \$0.01 per API call |
+| Usage | 15,000 API calls |
+| **Total** | 15,000 × \$0.01 = **\$150** |
 
 <Frame>
   <img height="400" src="/images/flat-pricing.png" />
@@ -60,7 +72,20 @@ Customers pay a fixed rate for each unit used. For example you charge \$0.10 per
 
 #### Package
 
-Customers buy usage units in predefined bundles. For example you charge \$5.00 for a package of 1000 AI tokens. A user consumes 2500 tokens which pushes them into a third package. The total is \$15.00.
+Instead of charging for every unit individually you sell usage in predefined packages. When a customer exceeds one package they are charged for the next full package, even if they only use part of it.
+
+**Best for** Products that want simple pricing, predictable billing increments, and a minimum charge for reserved usage.
+
+**Example** An AI image generator selling images in packages of 100.
+
+**Sample calculation**
+
+| | |
+| --- | --- |
+| Package | 100 images for \$10 |
+| Usage | 205 images |
+| Packages required | 3 |
+| **Total** | 3 × \$10 = **\$30** |
 
 <Frame>
   <img height="400" src="/images/package-pricing.png" />
@@ -70,7 +95,28 @@ Customers buy usage units in predefined bundles. For example you charge \$5.00 f
 
 #### Tiered
 
-Unit price decreases progressively as usage crosses defined thresholds. You fill the lower buckets first. For example units 1 to 100 cost \$1.00 each and units 101 to 200 cost \$0.50 each. A user consumes 150 units. The first 100 cost \$100 and the next 50 cost \$25. The total is \$125.
+Units are filled into pricing buckets. As usage increases it moves into cheaper brackets, while units in earlier brackets remain charged at their original rate.
+
+**Why it's useful** Encourages higher adoption while helping you cover fixed costs for lower-volume users. Especially useful for developer platforms.
+
+**Example** An LLM wrapper platform charging based on token usage.
+
+**Sample calculation**
+
+| Tier | Rate |
+| --- | --- |
+| First 1,000 tokens | \$0.10 / token |
+| Next 4,000 tokens | \$0.05 / token |
+
+A customer uses 3,500 tokens.
+
+| | |
+| --- | --- |
+| Tier 1 | 1,000 × \$0.10 = \$100 |
+| Tier 2 | 2,500 × \$0.05 = \$125 |
+| **Total** | \$100 + \$125 = **\$225** |
+
+Kelviq tracks each pricing bracket automatically, with sub-100ms real-time access checks.
 
 <Frame>
   <img height="400" src="/images/tiered-pricing.png" />
@@ -80,7 +126,27 @@ Unit price decreases progressively as usage crosses defined thresholds. You fill
 
 #### Volume
 
-All units are billed at the rate for the highest usage tier reached. Using the same thresholds as above a user consumes 150 units. Because they reached the second tier every single unit is priced at \$0.50. The total is \$75.
+Similar to tiered pricing, but with one major difference. Once usage reaches a specific threshold, every unit consumed during that billing cycle is charged at the new rate.
+
+**Why it's useful** Creates a strong incentive for high-volume customers to expand their usage by rewarding them with a lower rate across their entire bill.
+
+**Example** An API platform charging based on the number of requests processed.
+
+**Sample calculation**
+
+| Volume | Rate |
+| --- | --- |
+| 1 to 100,000 API calls | \$0.01 / call |
+| 100,001+ API calls | \$0.007 / call (applies to all calls) |
+
+A customer makes 120,000 API calls.
+
+| | |
+| --- | --- |
+| **Total** | 120,000 × \$0.007 = **\$840** |
+| Without the volume discount | 120,000 × \$0.01 = \$1,200 |
+
+Kelviq automatically applies the correct rate when customers cross a volume threshold, with no custom billing logic required.
 
 <Frame>
   <img height="400" src="/images/volume-pricing.png" />
@@ -90,7 +156,22 @@ All units are billed at the rate for the highest usage tier reached. Using the s
 
 #### Stair-step
 
-Customers pay a fixed price for the entire tier regardless of the exact unit count. For example usage between 1 and 100 units costs a flat \$10 and usage between 101 and 200 units costs a flat \$25. A user consumes 150 units. They pay exactly \$25.
+Customers pay a fixed fee based on the usage bracket they fall into, regardless of the exact number of units used within that bracket. There is no per-unit rate.
+
+**Why it's useful** Combines the simplicity of subscription plans with the flexibility of usage-based scaling. Perfect for API plans, infrastructure products, and other services with clear usage bands.
+
+**Example** An email delivery platform charging based on monthly email volume.
+
+**Sample calculation**
+
+| Step | Price |
+| --- | --- |
+| Up to 10,000 emails | Flat \$50 |
+| 10,001 to 50,000 emails | Flat \$150 |
+
+A customer sends 12,000 emails. They fall into the second step and pay a flat **\$150**.
+
+Kelviq automatically moves customers into the correct pricing step as their usage grows, with no custom billing logic required.
 
 <Frame>
   <img height="400" src="/images/stair-step-pricing.png" />
@@ -103,8 +184,6 @@ Customers pay a fixed price for the entire tier regardless of the exact unit cou
 Once you pick a pricing model you define the exact boundaries.
 
 If you select Tiered you specify the first unit and last unit for each bucket. You can charge a per unit price and a flat fee within that same tier.
-
-When you configure prices across multiple intervals Kelviq can automatically prefill a 20 percent yearly discount for you to edit. 
 
 You can also set localized pricing for usage based billing. This lets you define different per unit rates for specific countries and currencies.
 

@@ -4,6 +4,818 @@ description: "Changelog for the Kelviq Dashboard"
 mode: "wide"
 rss: true
 ---
+<Update label="v1.11" description="June 26, 2026">
+
+
+![Kelviq release cover for June 26, 2026](/images/changelog/2026-06-26.png)
+
+
+## Quarterly billing periods
+
+Kelviq now supports quarterly billing periods. Sellers can now offer plans that renew every 3 months.
+
+Example pricing:
+
+
+```text
+Monthly: $29 per month
+Quarterly: $79 per quarter
+Annual: $299 per year
+```
+
+Quarterly billing is useful when monthly feels too short and annual feels too expensive. It works well for:
+
+- AI tools
+- Developer tools
+- Creator products
+- Small business SaaS
+- B2B products with longer buying cycles
+
+
+## Pay as you go improvements
+
+We improved pay as you go support across the product. This makes it easier to set up and review usage based billing.
+
+
+## Usage based pricing improvements
+
+
+We improved the usage based pricing experience in the UI. This helps sellers create usage based plans with less confusion. Supported pricing patterns include:
+
+- Per unit pricing
+- Package pricing
+- Included usage with overage
+- Pay as you go
+- Subscription plus usage
+- Credit based usage
+
+
+Example:
+
+
+```text
+Starter plan: $19 per month
+Includes: 100 AI credits
+Extra credits: $10 per 100 credits
+```
+
+
+## Checkout pricing improvements
+
+
+Checkout now handles more pricing cases across custom amounts, usage based plans, and tax behavior. This helps keep pricing consistent across:
+
+- Pricing page
+- Checkout page
+- Customer portal
+- Transaction details
+- Invoices
+
+
+## Node SDK webhook improvements
+
+The Node SDK includes more webhook improvements for safer event handling. This helps developers build reliable flows for:
+
+- License generation
+- Subscription access
+- Plan changes
+- Customer portal links
+- Usage updates
+- Billing state sync
+
+
+## Final fixes and cleanup
+
+We also shipped smaller fixes and cleanup across checkout, pricing, product setup, and plan setup. This includes improvements for:
+
+- Checkout plan switching
+- Package pricing labels
+- Product setup flows
+- Plan setup flows
+- Checkout management
+- Dashboard clarity
+
+
+</Update>
+
+<Update label="v1.10" description="June 19, 2026">
+
+
+![Kelviq release cover for June 19, 2026](/images/changelog/2026-06-19.png)
+
+
+## Organization settings page
+
+Kelviq now has an Organization settings page. This gives teams a central place to manage organization level settings. The goal is to keep account level setup separate from product level setup.
+
+This can include:
+
+- Organization name
+- Business details
+- Team settings
+- Billing settings
+- Product defaults
+
+## Payout tab is visible before business verification
+
+The payout tab is now visible before business verification is complete. This avoids confusion for new sellers. Before this, some users were not sure where payout setup would appear. Now sellers can see the payout area earlier, even if live payouts are not enabled yet.
+
+
+## Zapier integration
+
+Kelviq now supports Zapier integration. This helps sellers connect Kelviq with other tools without custom code.
+
+Examples:
+
+- Send a Slack message when a new order is created
+- Add a new customer to HubSpot
+- Create a Google Sheets row after checkout
+- Send an onboarding email after payment
+- Notify support when a refund happens
+- Add a buyer to a course platform
+
+
+## Plans removed from the sidebar
+
+We removed Plans from the sidebar because it was confusing. Plans are now managed inside products. This makes the dashboard easier to understand. This matches how sellers usually think about setup:
+
+1. Create a product
+2. Add plans to the product
+3. Create checkout links for those plans
+
+
+## Email removed from checkout list
+
+We removed the separate email field from the checkout list because the customer column already shows the email. This makes the table cleaner and reduces repeated information.
+
+
+## Frontend improvements
+
+We shipped several dashboard improvements focused on clarity and setup speed. This includes:
+
+
+- Cleaner product navigation
+- Better table layout
+- Better empty states
+- Easier checkout link access
+- Clearer plan setup
+- Better plan publishing flow
+
+
+## Custom checkout pricing improvements
+
+We improved the custom checkout pricing flow. This is useful for sales led deals and private pricing. You can create a custom checkout for that customer without adding a public plan.
+
+</Update>
+
+
+
+<Update label="v1.9" description="June 12, 2026">
+
+
+![Kelviq release cover for June 12, 2026](/images/changelog/2026-06-12.png)
+
+
+## Subscription data in license validation
+
+License checks can return subscription context along with the license result. This is important for desktop software, private model tooling, and downloadable products where access is tied to both a license key and a live subscription.
+
+
+Example response:
+
+```json
+{
+ "license": {
+   "key": "LIC-123",
+   "status": "active"
+ },
+ "subscription": {
+   "status": "active",
+   "plan": "Pro",
+   "trialDaysRemaining": 0
+   ...
+ }
+}
+```
+
+## License API support in the Node SDK
+
+The Node SDK now supports the License API. You can validate license keys and connect license status directly to your app. Backend services using `@kelviq/node-sdk` can validate licenses without making manual API requests. For example, a CLI product can validate a license key on launch, confirm the associated subscription is active, and decide whether to unlock premium features.
+
+**Example:**
+
+```js
+const result = await client.license.validate({
+  licenseKey: "LIC-123"
+});
+
+if (result.valid) {
+  // Unlock product access
+}
+```
+
+This is useful for products such as:
+
+* macOS apps
+* WordPress plugins
+* VS Code extensions
+* Figma plugins
+* Desktop developer tools
+* Paid templates
+
+## Trial end support for subscription updates
+
+
+The Node SDK now supports `trialEnd` when updating subscriptions. This gives developers more control over trials. This helps teams extend a trial after sales approval or shorten a trial when a customer upgrades early.
+
+You can now handle flows like:
+
+- Extend a trial by 7 days
+- End a trial immediately
+- Set a custom trial end date
+- Move a customer from trial to paid
+- Give a sales led customer a longer trial
+
+```js
+await client.subscriptions.update({
+  subscriptionId: "sub_123",
+  trialEnd: "2026-06-30T23:59:59Z"
+});
+```
+
+## Portal session support in the Node SDK
+
+The Node SDK now supports customer portal sessions. You can create a signed portal link from your backend and send customers to the portal.
+
+Example:
+
+
+```js
+const session = await client.portal.createSession({
+    customerId: "cust_789",
+});
+
+// Redirect your customer to the portal
+res.redirect(session.customerPortalUrl);
+```
+
+Customers can use the portal to:
+
+- View invoices
+- Update payment method
+- Cancel subscription
+- Manage billing details
+- Access downloads
+- View license keys
+
+
+## Signed customer portal link from order details
+
+You can now generate and send a signed customer portal link directly from the order details page. This is especially useful for support workflows.
+
+**Example:** A customer asks:
+
+```text
+Can you send me my invoice?
+I need to update my payment method.
+I need access to my license details.
+```
+You can open the order, generate a secure customer portal link, and send it to the customer. Customers can then access invoices, update their payment method, manage subscriptions, and view license details on their own. No custom engineering is required for this support workflow.
+
+
+## Webhooks in the dashboard
+
+We added webhook support in the dashboard. This gives developers a clear place to manage webhook related setup. Webhooks are useful when your app needs to react to Kelviq events.
+
+Examples:
+
+- Create a license after checkout
+- Unlock a paid feature
+- Update a subscription
+- Sync customer state
+- Send an onboarding email
+- Disable access after cancellation
+
+
+## Webhook improvements in the Node SDK
+
+The Node SDK now includes webhook improvements. This helps developers verify and handle webhook events more safely.
+
+Example events:
+
+```text
+checkout.completed
+order.created
+subscription.created
+subscription.updated
+subscription.cancelled
+plan.changed
+```
+
+
+## Webhook logs
+
+Kelviq now includes webhook logs. This helps developers debug webhook delivery issues. This is useful when your endpoint is down, slow, or returning an error. You can inspect:
+
+- Event type
+- Delivery status
+- Response code
+- Timestamp
+- Error response
+
+
+## Plan changed webhook
+
+We added a plan changed webhook. This helps your app react when a customer changes plans.
+
+Example: A customer moves from `Starter` to `Pro`.
+
+Your app can listen for the event and update:
+
+- Feature access
+- Usage limits
+- Seat limits
+- Credit balance
+- Internal customer state
+
+
+## Publish plan UI and UX update
+
+
+We updated the publish plan UI and UX. The new flow makes it clearer when a plan is still a draft and when it is ready for customers. This helps reduce mistakes before sharing checkout links.
+
+
+## Plan description in plan detail header
+
+Plan detail pages now show the plan description in the header. This makes it easier to identify similar plans.
+
+Example:
+
+```text
+Pro
+For growing AI teams with higher usage limits
+```
+
+
+## Free plan switch disabled for published plans
+
+Kelviq now disables free plan switching for published plans when switching is not possible. This prevents users from selecting an action that cannot be completed.
+
+</Update>
+
+
+
+
+<Update label="v1.8" description="June 5, 2026">
+
+
+![Kelviq release cover for June 5, 2026](/images/changelog/2026-06-05.png)
+
+
+## Usage based pricing in the dashboard
+
+Merchants can configure metered pricing without leaving the dashboard. A plan can include a base subscription, included usage, and overage pricing for usage beyond the included amount.
+
+
+## Pay as you go
+
+
+Kelviq now supports pay as you go pricing. Your customers can continue using a metered product after included usage runs out, then pay for additional consumption. This fits LLM tools, API platforms, transcription products, and image generation products where hard cutoffs create poor customer experiences.
+
+Example: A customer uses the following in one month:
+
+
+```text
+120,000 tokens
+40 image generations
+500 API calls
+```
+
+Kelviq will calculate the bill based on the pricing rules you set.
+
+## Enable pay as you go from the dashboard
+
+
+You can now enable pay as you go from the dashboard. This helps sellers launch usage based pricing without building their own billing system. A simple AI product can now charge like this:
+
+```text
+Base plan: $20 per month
+Included usage: 100,000 tokens
+Overage: $2 per 10,000 tokens
+```
+
+
+## Usage alerts
+
+Kelviq now supports usage alerts. Usage alerts help you know when a customer reaches an important usage threshold. Merchants can notify customers when metered usage crosses a configured limit. This is especially useful for AI products where usage can grow quickly across tokens, image generations, API calls, embeddings, storage, or compute minutes.
+
+Examples:
+
+- Customer used 80% of included credits
+- Customer crossed 10,000 API calls
+- Customer used more than `$100` in AI model cost
+- Customer is close to the monthly usage limit
+- Customer is likely to need an upgrade soon
+
+
+This helps sellers avoid surprise bills and give customers a better experience.
+
+
+## Usage alerts for status entitlements
+
+
+Usage alerts now work with status entitlements. This helps connect product access with usage state.
+
+Example: A customer has `100` credits. Different features can consume credits differently:
+
+
+```text
+GPT 5.1 request: 2 credits
+Claude Sonnet request: 3 credits
+Page crawl: 5 credits
+Long report generation: 20 credits
+```
+
+Kelviq can help track when the customer is close to the limit and trigger an alert.
+
+
+## Negative usage values
+
+Usage reporting now supports negative values. This is useful when you need to correct usage after it was reported. If an app accidentally reports `125,000` tokens instead of `120,000`, it can send `-5,000` to bring the meter back in line.
+
+Examples:
+
+- Remove duplicate API usage
+- Reverse usage after a failed job
+- Credit back usage after a refund
+- Fix a metering mistake
+- Adjust token usage after an LLM call failed
+- Reserve tokens up front and return the unused amount once the action completes
+
+This also enables a reserve-and-settle pattern. You can block a number of tokens in advance, then report a negative value to return whatever wasn't used once the action finishes. For example, reserve `1,000` tokens before an LLM call, then send `-400` if only `600` were consumed.
+
+
+```js
+import { BEHAVIOUR_CHOICES } from '@kelviq/node-sdk';
+
+// Reserve tokens before the action
+await client.reporting.reportUsage({
+  value: 1000,
+  customerId: "cus_123",
+  featureId: "tokens",
+  behaviour: BEHAVIOUR_CHOICES.DELTA
+});
+
+// Return the unused tokens after it completes
+await client.reporting.reportUsage({
+  value: -400,
+  customerId: "cus_123",
+  featureId: "tokens",
+  behaviour: BEHAVIOUR_CHOICES.DELTA
+});
+```
+
+## Checkout API supports locked email and default billing country
+
+The checkout API now supports locked email and default billing country. This helps create a cleaner checkout flow when your app already knows the customer.
+
+Example:
+
+```js
+await client.checkout.createSession({
+  planIdentifier: "plan-pro",
+  customerId: "cust_789",
+  lockEmail: true,
+  defaultBillingCountry: "US"
+});
+```
+
+This prevents customers from using the wrong email during checkout.
+
+
+## Prefill customer email in checkout links
+
+Checkout links can now prefill the customer email when available. This is useful when checkout starts from your app.
+
+Example: A logged in customer clicks upgrade. Checkout opens with their email already filled in.
+
+
+```text
+alex@company.com
+```
+
+
+This reduces checkout mistakes and support issues.
+
+
+## Lock email using checkout config
+
+Checkout links now support locking the email field using config. This means customers can see the email but cannot edit it. 
+
+This is useful for:
+
+- License keys
+- Account based access
+- Customer portal access
+- Subscription upgrades
+- Team plans
+
+
+## SEPA payment method
+
+Checkout now supports SEPA. This helps sellers serve more European customers, especially B2B customers who prefer bank debit. SEPA is useful for:
+
+- SaaS subscriptions
+- B2B tools
+- Annual contracts
+- European customers
+- Larger invoice amounts
+
+
+</Update>
+
+
+
+<Update label="v1.7" description="May 29, 2026">
+
+
+![Kelviq release cover for May 29, 2026](/images/changelog/2026-05-29.png)
+
+
+## Tax inclusive pricing settings
+
+
+Kelviq now supports tax inclusive pricing settings. This lets you decide whether the price shown to the customer already includes tax.
+
+
+Example: A customer sees:
+
+
+```text
+$20 per month
+```
+
+
+If tax inclusive pricing is enabled, the customer still pays $20 per month.
+
+
+Kelviq calculates the tax portion from that amount. This is useful in markets where customers expect the displayed price to be the final price.
+
+
+## Tax inclusive behavior is shown in checkout
+
+
+Checkout now respects tax inclusive settings so the buyer sees the same pricing behavior that was configured for the plan. This avoids the common confusion where a pricing page says `$49` but checkout unexpectedly adds tax on top.
+
+
+## Tax type and tax percentage in checkout
+
+
+Checkout links now support tax type (such as VAT, GST, Sales Tax, or any other configured tax type) and the tax percentage. This gives customers a clearer view of what they are paying.
+
+
+Example with tax added on top:
+
+
+```text
+Product price: $100
+Tax: 10%
+Total: $110
+```
+
+
+Example with tax included:
+
+
+```text
+Total: €20
+Includes tax: €3.33
+```
+
+
+## Tax behavior in plan details
+
+
+Plan detail pages now show tax behavior. Teams can confirm that a `Pro EU` plan includes VAT, while a `Pro US` plan remains tax exclusive. You can see whether a plan is tax inclusive or tax exclusive before sharing it with customers, helping you avoid setup mistakes.
+
+## Tax code category on products
+
+
+You can now set a tax code category when creating or editing a product. This helps Kelviq apply the right tax treatment based on what you sell.
+
+Examples:
+
+
+- SaaS subscription
+- API access
+- AI credits
+- Digital download
+- License key
+- Course
+- Template
+- Plugin
+
+
+This matters because different product types can have different tax rules.
+
+
+## Tax information in transactions
+
+Transaction views now show tax details so support and finance teams can answer customer questions without leaving the dashboard.
+
+
+You can use this to answer questions like:
+
+
+- What was the product price?
+- How much tax was charged?
+- Was tax included in the price?
+- What did the customer pay in total?
+
+
+## Custom checkout pricing
+
+
+Kelviq now supports custom checkout pricing. This lets you create a checkout with a custom amount instead of always using the fixed public plan price.
+
+
+This is useful for:
+
+- Custom quotes
+- One off payments
+- Sales led plans
+- Manual upgrades
+- Private deals
+- Customer specific pricing
+
+
+Example: A customer agrees to a custom price of `$349 per month`.
+
+You can create a checkout session for that amount without creating a public plan for every custom price.
+
+
+## Custom amount on checkout page
+
+
+Checkout can now show and charge a custom amount. This gives sellers more flexibility when dealing with larger customers or special pricing cases.
+
+
+Example:
+
+
+```text
+Custom plan
+$349 per month
+```
+
+
+## Regional pricing minimum value validation
+
+
+We added validation for regional pricing minimum values. This helps prevent a regional price from becoming too low to process.
+
+
+Example: A plan is priced at `$5`.
+
+
+A very large regional discount could reduce the price below the minimum amount allowed by the payment method. Kelviq now catches this earlier so sellers can fix it before customers reach checkout.
+
+
+## Fixes
+
+**Canada postal code** — 
+Fixed an issue with Canadian postal codes during checkout. Canadian postal codes such as `M5V 2T6` are now handled correctly.
+
+**Checkout plan switching** — 
+Fixed an issue where checkout could fail when customers switched between plans. This improves checkout reliability when customers compare plans before paying.
+
+**Package pricing label** — 
+Fixed the label for package based pricing. This makes package pricing easier for customers to understand at checkout.
+
+Example:
+```text
+$10 per 1,000 API calls
+```
+
+**One time payment cancellation** — 
+Fixed an issue where cancel subscription was visible for one time payments. One time payments do not have a subscription to cancel, so that action is now hidden.
+
+
+</Update>
+
+
+
+<Update label="v1.6" description="May 22, 2026">
+
+
+![Kelviq release cover for May 22, 2026](/images/changelog/2026-05-22.png)
+
+
+## Promotions are now faster and more reliable
+
+
+We moved Promotions storage to DynamoDB. This gives promotion rules 
+a durable home across the dashboard, APIs, and hosted checkout.
+
+Example: A merchant selling an AI support agent can create `STARTUP20`, 
+limit it to the Pro plan, and keep the rule available when checkout 
+links are regenerated.
+
+
+## Promotions are now available in the dashboard
+
+
+We added Promotions to the Kelviq dashboard. Teams can now create, 
+review, and manage offers without asking engineering to touch config. 
+The flow is built around what a billing owner actually needs to know: 
+which plan is discounted, whether the promotion is active, and where 
+the SDK docs are when you need to wire it up from code.
+
+A common flow looks like this:
+
+1. Create a product
+2. Create a plan
+3. Add a promotion
+4. Copy the checkout link
+5. Share the link or add it to your pricing page
+
+## API and SDK docs are linked from Promotions
+
+
+The dashboard now connects promotion setup to the integration docs a developer needs when creating checkout sessions from the backend. This helps developers move from setup to integration faster.
+
+
+## Checkout link empty screen is clearer
+
+
+The empty screen now points users toward creating or copying the right checkout link instead of leaving the page feeling broken.
+
+
+## Checkout links are easier to access
+
+
+You can now get checkout links from product and plan listing pages. This saves time when you are setting up a product and want to quickly copy a checkout link.
+
+
+## Product cards are now fully clickable
+
+
+Instead of clicking only on a small button or title, you can click anywhere on the product card to open it. This makes navigation easier when you have multiple products.
+
+## Developers tab is now API Key
+
+
+We renamed the Developers tab to API Key. Most people go there to find their API key, so the label now matches the destination.
+
+Before: **Developers**
+
+Now: **API Key**
+
+
+## Chart theming support
+
+
+We added theming options for charts, including branded and dark mode. Charts now stay consistent with the rest of your dashboard without manual workarounds.
+
+
+
+## Analytics style update
+
+We updated the analytics UI style to make revenue, customers, 
+transactions, and product data easier to scan.
+
+This is helpful when you want to quickly answer questions like:
+
+
+- How much did we sell today?
+- Which plan is performing better?
+- Which product has the most transactions?
+- Are refunds increasing?
+- Are more customers choosing annual plans?
+
+
+## Docs copy cleanup
+
+We updated docs copy from `archive` to `delete` in more places. 
+This makes the docs match the real product action.
+
+## Fixes
+
+**Duplicate file upload issue** — 
+Fixed an issue where duplicate files could be created during 
+multiple file uploads.
+
+**Plan dialog issue** —
+Fixed an issue where the add plan dialog closed even when the 
+user selected the option to create more plans. Now users can 
+create multiple plans without reopening the dialog each time.
+
+**Feature delete issue** —
+Fixed an issue where a feature was not removed correctly from 
+the list after deletion.
+
+
+</Update>
 
 <Update label="v1.5" description="May 15, 2026">
 

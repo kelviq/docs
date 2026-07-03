@@ -166,7 +166,12 @@
               "changelog/node-sdk",
               "changelog/python-sdk",
               "changelog/js-promotions-ui",
-              "changelog/checkout-api"
+              {
+                "group": "APIs",
+                "pages": [
+                  "changelog/checkout-api"
+                ]
+              }
             ]
           }
         ]
