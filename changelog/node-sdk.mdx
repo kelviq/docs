@@ -5,6 +5,67 @@ mode: "wide"
 rss: true
 ---
 
+<Update label="v2.7.0" description="July 4, 2026">
+
+### New Features
+
+#### Caching & Offline Resilience
+
+The SDK now includes a two-tier cache that keeps entitlement checks fast and lets your app keep working during transient network/API outages.
+
+- **L1 — in-memory** (on by default): entitlements are cached per-process. Fresh entries (within the TTL) are served without a network call; if the API is unreachable or returns a 5xx, the last-known value is served as a fallback.
+- **L2 — distributed** (optional): a shared store (e.g. Redis) so the cache and the offline usage queue are shared across processes and containers, and survive restarts.
+
+Read-through order is **L1 → L2 → API**, with write-through to both on every successful fetch.
+
+```typescript
+const client = new Kelviq({
+  accessToken: process.env.KELVIQ_API_KEY,
+  enableCache: true,   // default true
+  cacheTtlMs: 60_000,  // freshness window in ms (default 60000)
+});
+```
+
+Set `enableCache: false` to disable caching entirely.
+
+#### Offline Usage Queue
+
+Usage/event reports that fail due to a network error are automatically **queued** and replayed on the next report call (or via `client.reporting.flush()`), so measurements are not lost during brief outages. Cached entitlement usage is updated optimistically so access checks stay consistent while offline.
+
+```typescript
+const remaining = await client.reporting.flush(); // returns count still queued
+```
+
+#### Distributed Cache — `RedisStore`
+
+A ready-to-use `RedisStore` (backed by `ioredis`, an optional dependency) can be shared across multiple instances / containers so they use one cache and one durable usage queue.
+
+```typescript
+import { Kelviq, RedisStore } from '@kelviq/node-sdk';
+
+const store = new RedisStore({ url: 'redis://localhost:6379/0', prefix: 'kelviq:prod' });
+const client = new Kelviq({ accessToken: process.env.KELVIQ_API_KEY, cacheStore: store });
+```
+
+You can also bring your own backend by implementing the public `CacheStore` interface and passing it as `cacheStore`. All instances that should share a cache must use the same `prefix`.
+
+#### Subscription Response — `files`, `links`, `license`
+
+`SubscriptionData` now includes three additional fields returned by the subscription detail and create APIs:
+
+- `files` — downloadable files attached to the subscription's plan (`PlanFile[]`).
+- `links` — external links attached to the plan (`PlanLink[]`).
+- `license` — issued licenses associated with the subscription (`SubscriptionLicense[]`).
+
+```typescript
+const sub = license.subscription; // e.g. from a license validation response
+sub?.files?.forEach((f) => console.log(f.name, f.downloadUrl));
+sub?.links?.forEach((l) => console.log(l.name, l.url));
+sub?.license?.forEach((lic) => console.log(lic.licenseKey, lic.activationLimit));
+```
+
+</Update>
+
 <Update label="v2.6.0" description="June 5, 2026">
 
 ### New Features

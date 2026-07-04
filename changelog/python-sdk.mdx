@@ -5,6 +5,79 @@ mode: "wide"
 rss: true
 ---
 
+<Update label="v2.7.0" description="July 4, 2026">
+
+### New Features
+
+#### Caching & Offline Resilience
+
+The SDK now includes a two-tier cache that keeps entitlement checks fast and lets your app keep working during transient network/API outages.
+
+- **L1 — in-memory** (on by default): entitlements are cached per-process. Fresh entries (within the TTL) are served without a network call; if the API is unreachable or returns a 5xx, the last-known value is served as a fallback.
+- **L2 — distributed** (optional): a shared store (e.g. Redis) so the cache and the offline usage queue are shared across processes / gunicorn workers / containers, and survive restarts.
+
+Read-through order is **L1 → L2 → API**, with write-through to both on every successful fetch.
+
+```python
+client = Kelviq.create_sync_client(
+    access_token=ACCESS_TOKEN,
+    enable_cache=True,   # default True
+    cache_ttl=60.0,      # freshness window in seconds (default 60)
+)
+```
+
+Set `enable_cache=False` to disable caching entirely. Both the sync and async clients are supported.
+
+#### Offline Usage Queue
+
+Usage/event reports that fail due to a network error are automatically **queued** and replayed on the next report call (or via `client.reporting.flush()`), so measurements are not lost during brief outages. Cached entitlement usage is updated optimistically so access checks stay consistent while offline.
+
+```python
+remaining = client.reporting.flush()          # returns count still queued
+# async: remaining = await async_client.reporting.flush()
+```
+
+#### Distributed Cache — `RedisStore` / `AsyncRedisStore`
+
+Ready-to-use Redis-backed stores can be shared across multiple processes / gunicorn workers / containers so they use one cache and one durable usage queue. Redis is an optional extra (`pip install "kelviq-sdk[redis]"`).
+
+```python
+from kelviq_sdk import Kelviq, RedisStore
+
+store = RedisStore(url="redis://localhost:6379/0", prefix="kelviq:prod")
+client = Kelviq.create_sync_client(access_token=ACCESS_TOKEN, cache_store=store)
+```
+
+```python
+# Async
+from kelviq_sdk import Kelviq, AsyncRedisStore
+
+store = AsyncRedisStore(url="redis://localhost:6379/0", prefix="kelviq:prod")
+async_client = Kelviq.create_async_client(access_token=ACCESS_TOKEN, cache_store=store)
+```
+
+You can also bring your own backend by implementing the public `CacheStore` interface and passing it as `cache_store`. All workers/tasks that should share a cache must use the same `prefix`.
+
+#### Subscription Response — `files`, `links`, `license`
+
+`SubscriptionData` now includes three additional fields returned by the subscription detail and create APIs:
+
+- `files` — downloadable files attached to the subscription's plan (`List[PlanFile]`).
+- `links` — external links attached to the plan (`List[PlanLink]`).
+- `license` — issued licenses associated with the subscription (`List[SubscriptionLicense]`).
+
+```python
+sub = license.subscription  # e.g. from a license validation response
+for f in sub.files:
+    print(f.name, f.downloadUrl)
+for l in sub.links:
+    print(l.name, l.url)
+for lic in sub.license:
+    print(lic.licenseKey, lic.activationLimit)
+```
+
+</Update>
+
 <Update label="v2.6.0" description="June 5, 2026">
 
 ### New Features
