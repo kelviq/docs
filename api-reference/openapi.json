@@ -3306,6 +3306,9 @@
         "summary": "List customers",
         "description": "Retrieves a paginated list of customers for your organization, ordered by creation date (newest first). You can search across the customer's name, email and `customerId`.",
         "operationId": "listCustomers",
+        "x-mint": {
+          "content": "<Info>Click the base URL in the API playground and select the **Sandbox** host for test data or the **Production** host for live data. Use credentials from the same environment.</Info>"
+        },
         "parameters": [
           {
             "name": "search",
@@ -3383,6 +3386,9 @@
         "summary": "Create a customer",
         "description": "Creates a new customer record within kelviq.",
         "operationId": "createCustomer",
+        "x-mint": {
+          "content": "<Info>Click the base URL in the API playground and select the **Sandbox** host for test data or the **Production** host for live data. Use credentials from the same environment.</Info>"
+        },
         "requestBody": {
           "required": true,
           "content": {
@@ -3436,6 +3442,9 @@
         "summary": "Update a customer",
         "description": "Performs a partial update on an existing customer using their client-defined `customerId`.",
         "operationId": "updateCustomer",
+        "x-mint": {
+          "content": "<Info>Click the base URL in the API playground and select the **Sandbox** host for test data or the **Production** host for live data. Use credentials from the same environment.</Info>"
+        },
         "parameters": [
           {
             "name": "customerId",
@@ -3502,6 +3511,9 @@
         "summary": "Create a checkout session",
         "description": "Creates a new checkout session for a customer to proceed with a purchase or subscription.",
         "operationId": "createCheckoutSession",
+        "x-mint": {
+          "content": "<Info>Click the base URL in the API playground and select the **Sandbox** host for test data or the **Production** host for live data. Use credentials from the same environment.</Info>"
+        },
         "requestBody": {
           "required": true,
           "content": {
@@ -3548,6 +3560,9 @@
         "summary": "Retrieve customer entitlements",
         "description": "Retrieves detailed entitlement information for a customer.\n- If `feature_id` is provided as a query parameter, returns details for that specific feature.\n- If `feature_id` is omitted, returns all entitlements for the customer.\n",
         "operationId": "getCustomerEntitlements",
+        "x-mint": {
+          "content": "<Info>Click the base URL in the API playground and select the **Sandbox** host for test data or the **Production** host for live data. Use credentials from the same environment.</Info>"
+        },
         "parameters": [
           {
             "name": "customer_id",
@@ -3631,6 +3646,9 @@
     "/license/activate/": {
       "post": {
         "operationId": "licenseActivate",
+        "x-mint": {
+          "content": "<Info>Click the base URL in the API playground and select the **Sandbox** host for test data or the **Production** host for live data. Use credentials from the same environment.</Info>"
+        },
         "tags": [
           "License"
         ],
@@ -3767,6 +3785,9 @@
     "/license/deactivate/": {
       "post": {
         "operationId": "licenseDeactivate",
+        "x-mint": {
+          "content": "<Info>Click the base URL in the API playground and select the **Sandbox** host for test data or the **Production** host for live data. Use credentials from the same environment.</Info>"
+        },
         "tags": [
           "License"
         ],
@@ -3831,6 +3852,9 @@
     "/license/validate/": {
       "post": {
         "operationId": "licenseValidate",
+        "x-mint": {
+          "content": "<Info>Click the base URL in the API playground and select the **Sandbox** host for test data or the **Production** host for live data. Use credentials from the same environment.</Info>"
+        },
         "tags": [
           "License"
         ],
@@ -3958,6 +3982,9 @@
         "summary": "Report pre-aggregated usage",
         "description": "Reports pre-aggregated feature usage from your application to kelviq.",
         "operationId": "reportUsage",
+        "x-mint": {
+          "content": "<Info>Click the base URL in the API playground and select the **Sandbox** host for test data or the **Production** host for live data. Use credentials from the same environment.</Info>"
+        },
         "requestBody": {
           "required": true,
           "content": {
@@ -4000,6 +4027,9 @@
         "summary": "Create a subscription",
         "description": "Creates a new subscription for a customer directly, without requiring a checkout session.",
         "operationId": "createSubscription",
+        "x-mint": {
+          "content": "<Info>Click the base URL in the API playground and select the **Sandbox** host for test data or the **Production** host for live data. Use credentials from the same environment.</Info>"
+        },
         "requestBody": {
           "required": true,
           "content": {
@@ -4071,6 +4101,9 @@
         "summary": "Create a charge",
         "description": "Creates a one-time charge billed immediately against the customer's default payment method, without requiring a checkout session.\n\nThe customer must already have a usable payment method on file (a saved payment method or an active subscription). If no default payment method exists, or the off-session charge is declined or requires authentication, the request fails with a `400`.\n\n> **Note:** `chargePeriod` must be `ONE_TIME`. Recurring charge periods are not supported by this endpoint — use [Create a subscription](/api-reference/subscriptions/create-a-subscription) instead.",
         "operationId": "createCharge",
+        "x-mint": {
+          "content": "<Info>Click the base URL in the API playground and select the **Sandbox** host for test data or the **Production** host for live data. Use credentials from the same environment.</Info>"
+        },
         "requestBody": {
           "required": true,
           "content": {
@@ -4142,6 +4175,9 @@
         "summary": "List Subscriptions",
         "description": "Retrieves a paginated list of subscriptions. You can filter the results by customer.",
         "operationId": "listSubscriptions",
+        "x-mint": {
+          "content": "<Info>Click the base URL in the API playground and select the **Sandbox** host for test data or the **Production** host for live data. Use credentials from the same environment.</Info>"
+        },
         "parameters": [
           {
             "name": "customer_id",
@@ -4246,6 +4282,9 @@
         "summary": "Update a subscription",
         "description": "Updates an existing subscription to a new plan, charge period, and/or features.\n\n> **Warning:** Free plans are created as one-time charges. Upgrading from a free plan is not supported via this endpoint. Use the [Create Checkout Session](/api-reference/checkout/create-a-checkout-session) endpoint instead.",
         "operationId": "updateSubscription",
+        "x-mint": {
+          "content": "<Info>Click the base URL in the API playground and select the **Sandbox** host for test data or the **Production** host for live data. Use credentials from the same environment.</Info>"
+        },
         "parameters": [
           {
             "name": "subscriptionId",
@@ -4294,6 +4333,9 @@
         "summary": "Cancel a subscription",
         "description": "Cancels an active subscription for a customer.",
         "operationId": "cancelSubscription",
+        "x-mint": {
+          "content": "<Info>Click the base URL in the API playground and select the **Sandbox** host for test data or the **Production** host for live data. Use credentials from the same environment.</Info>"
+        },
         "parameters": [
           {
             "name": "subscriptionId",
@@ -4343,6 +4385,9 @@
         "summary": "Get Product Offering",
         "description": "Retrieves the public pricing details for a specific product, including all eligible plans, localized pricing, and the customer's current subscription state. Use this to render a pricing page or paywall scoped to a product.",
         "operationId": "getProductOffering",
+        "x-mint": {
+          "content": "<Info>Click the base URL in the API playground and select the **Sandbox** host for test data or the **Production** host for live data. Use credentials from the same environment.</Info>"
+        },
         "parameters": [
           {
             "name": "product_id",
@@ -4670,6 +4715,9 @@
         "summary": "Get promotions",
         "description": "Resolves the active promotion for the caller's detected location. Returns the applicable discount percentage, coupon code, banner widget configuration, and security check results.\n\n<Warning>Use your **Client API Key**, not your Server API Key. Find it under **Settings \u2192 API keys** in the Kelviq dashboard.</Warning>",
         "operationId": "getPromotion",
+        "x-mint": {
+          "content": "<Info>Click the base URL in the API playground and select the **Sandbox** host for test data or the **Production** host for live data. Use credentials from the same environment.</Info>"
+        },
         "servers": [
           {
             "url": "https://edge.sandboxapi.kelviq.com/api/v1",
@@ -4753,6 +4801,9 @@
         "summary": "Create a portal session",
         "description": "Creates a new customer portal session, returning a token and URL to redirect the customer to their billing portal.",
         "operationId": "createPortalSession",
+        "x-mint": {
+          "content": "<Info>Click the base URL in the API playground and select the **Sandbox** host for test data or the **Production** host for live data. Use credentials from the same environment.</Info>"
+        },
         "security": [
           {
             "bearerAuth": []
@@ -4796,6 +4847,9 @@
         "summary": "List products",
         "description": "Returns a paginated list of all products in the organization's catalog. Archived products are excluded.",
         "operationId": "listCatalogProducts",
+        "x-mint": {
+          "content": "<Info>Click the base URL in the API playground and select the **Sandbox** host for test data or the **Production** host for live data. Use credentials from the same environment.</Info>"
+        },
         "security": [{ "bearerAuth": [] }],
         "parameters": [
           {
@@ -4832,6 +4886,9 @@
         "summary": "Create a product",
         "description": "Creates a new product.",
         "operationId": "createCatalogProduct",
+        "x-mint": {
+          "content": "<Info>Click the base URL in the API playground and select the **Sandbox** host for test data or the **Production** host for live data. Use credentials from the same environment.</Info>"
+        },
         "security": [{ "bearerAuth": [] }],
         "requestBody": {
           "required": true,
@@ -4889,6 +4946,9 @@
         "summary": "Retrieve a product",
         "description": "Fetches a product by ID along with its currently published plans.",
         "operationId": "retrieveCatalogProduct",
+        "x-mint": {
+          "content": "<Info>Click the base URL in the API playground and select the **Sandbox** host for test data or the **Production** host for live data. Use credentials from the same environment.</Info>"
+        },
         "security": [{ "bearerAuth": [] }],
         "responses": {
           "200": {
@@ -4908,6 +4968,9 @@
         "summary": "Update a product",
         "description": "Partially updates a product. New images and files can be attached by sending temporary S3 keys in `imageKeys` / `fileKeys`.",
         "operationId": "updateCatalogProduct",
+        "x-mint": {
+          "content": "<Info>Click the base URL in the API playground and select the **Sandbox** host for test data or the **Production** host for live data. Use credentials from the same environment.</Info>"
+        },
         "security": [{ "bearerAuth": [] }],
         "requestBody": {
           "required": true,
@@ -4934,6 +4997,9 @@
         "summary": "Archive a product",
         "description": "Soft-deletes (archives) the product. Already-archived products return 400.",
         "operationId": "deleteCatalogProduct",
+        "x-mint": {
+          "content": "<Info>Click the base URL in the API playground and select the **Sandbox** host for test data or the **Production** host for live data. Use credentials from the same environment.</Info>"
+        },
         "security": [{ "bearerAuth": [] }],
         "responses": {
           "204": {
@@ -4966,6 +5032,9 @@
         "summary": "Retrieve product settings",
         "description": "Retrieves the VPN/TOR/proxy and presentation settings for a product. Settings are auto-created if they don't already exist.",
         "operationId": "getCatalogProductSettings",
+        "x-mint": {
+          "content": "<Info>Click the base URL in the API playground and select the **Sandbox** host for test data or the **Production** host for live data. Use credentials from the same environment.</Info>"
+        },
         "security": [{ "bearerAuth": [] }],
         "responses": {
           "200": {
@@ -4984,6 +5053,9 @@
         "summary": "Update product settings",
         "description": "Updates one or more product settings fields. Changing `currency` re-enables previously disabled prices in the new currency on the latest plans of that product.",
         "operationId": "updateCatalogProductSettings",
+        "x-mint": {
+          "content": "<Info>Click the base URL in the API playground and select the **Sandbox** host for test data or the **Production** host for live data. Use credentials from the same environment.</Info>"
+        },
         "security": [{ "bearerAuth": [] }],
         "requestBody": {
           "required": true,
@@ -5030,6 +5102,9 @@
         "summary": "Update a product image",
         "description": "Updates image metadata such as `name`, `ordering`, `thumbnail`, or `enabled`. Setting `thumbnail` to true automatically clears the flag on the product's other images.",
         "operationId": "updateCatalogProductImage",
+        "x-mint": {
+          "content": "<Info>Click the base URL in the API playground and select the **Sandbox** host for test data or the **Production** host for live data. Use credentials from the same environment.</Info>"
+        },
         "security": [{ "bearerAuth": [] }],
         "requestBody": {
           "required": true,
@@ -5056,6 +5131,9 @@
         "summary": "Delete a product image",
         "description": "Permanently deletes the product image record.",
         "operationId": "deleteCatalogProductImage",
+        "x-mint": {
+          "content": "<Info>Click the base URL in the API playground and select the **Sandbox** host for test data or the **Production** host for live data. Use credentials from the same environment.</Info>"
+        },
         "security": [{ "bearerAuth": [] }],
         "responses": {
           "204": { "description": "Image deleted." },
@@ -5070,6 +5148,9 @@
         "summary": "List features",
         "description": "Returns a paginated list of features for the organization. Archived features are excluded.",
         "operationId": "listCatalogFeatures",
+        "x-mint": {
+          "content": "<Info>Click the base URL in the API playground and select the **Sandbox** host for test data or the **Production** host for live data. Use credentials from the same environment.</Info>"
+        },
         "security": [{ "bearerAuth": [] }],
         "parameters": [
           {
@@ -5098,6 +5179,9 @@
         "summary": "Create a feature",
         "description": "Creates a new feature. For METER features, `featureDetails` must include a `featureSubType` (PRE_AGGREGATED_USAGE or RAW_EVENTS) and `units`. RAW_EVENTS additionally requires a `meter` object with `aggregation` and `filters`.",
         "operationId": "createCatalogFeature",
+        "x-mint": {
+          "content": "<Info>Click the base URL in the API playground and select the **Sandbox** host for test data or the **Production** host for live data. Use credentials from the same environment.</Info>"
+        },
         "security": [{ "bearerAuth": [] }],
         "requestBody": {
           "required": true,
@@ -5135,6 +5219,9 @@
         "tags": ["Features"],
         "summary": "Retrieve a feature",
         "operationId": "retrieveCatalogFeature",
+        "x-mint": {
+          "content": "<Info>Click the base URL in the API playground and select the **Sandbox** host for test data or the **Production** host for live data. Use credentials from the same environment.</Info>"
+        },
         "security": [{ "bearerAuth": [] }],
         "responses": {
           "200": {
@@ -5154,6 +5241,9 @@
         "summary": "Archive a feature",
         "description": "Soft-deletes the feature and updates any published pricing tables that referenced it.",
         "operationId": "deleteCatalogFeature",
+        "x-mint": {
+          "content": "<Info>Click the base URL in the API playground and select the **Sandbox** host for test data or the **Production** host for live data. Use credentials from the same environment.</Info>"
+        },
         "security": [{ "bearerAuth": [] }],
         "responses": {
           "204": {
@@ -5176,6 +5266,9 @@
         "summary": "List plans",
         "description": "Returns one row per plan identifier, picking the most recent version for each. Archived plans, or plans on archived products, are excluded.",
         "operationId": "listCatalogPlans",
+        "x-mint": {
+          "content": "<Info>Click the base URL in the API playground and select the **Sandbox** host for test data or the **Production** host for live data. Use credentials from the same environment.</Info>"
+        },
         "security": [{ "bearerAuth": [] }],
         "responses": {
           "200": {
@@ -5194,6 +5287,9 @@
         "summary": "Create a plan",
         "description": "Creates a new plan against a product. The new plan starts as an unpublished draft (`isLatest=false`) until `POST /plans/{identifier}/publish/` is called.",
         "operationId": "createCatalogPlan",
+        "x-mint": {
+          "content": "<Info>Click the base URL in the API playground and select the **Sandbox** host for test data or the **Production** host for live data. Use credentials from the same environment.</Info>"
+        },
         "security": [{ "bearerAuth": [] }],
         "requestBody": {
           "required": true,
@@ -5240,6 +5336,9 @@
         "summary": "Retrieve a plan",
         "description": "Fetches a plan by identifier. Pass `?version=N` to fetch a specific version; otherwise the latest version is returned.",
         "operationId": "retrieveCatalogPlan",
+        "x-mint": {
+          "content": "<Info>Click the base URL in the API playground and select the **Sandbox** host for test data or the **Production** host for live data. Use credentials from the same environment.</Info>"
+        },
         "security": [{ "bearerAuth": [] }],
         "responses": {
           "200": {
@@ -5259,6 +5358,9 @@
         "summary": "Update a plan",
         "description": "Partial update. If the latest version is already published (`isLatest=true`), a new draft version is created automatically; otherwise the existing draft is mutated.",
         "operationId": "updateCatalogPlan",
+        "x-mint": {
+          "content": "<Info>Click the base URL in the API playground and select the **Sandbox** host for test data or the **Production** host for live data. Use credentials from the same environment.</Info>"
+        },
         "security": [{ "bearerAuth": [] }],
         "requestBody": {
           "required": true,
@@ -5285,6 +5387,9 @@
         "summary": "Archive a plan",
         "description": "Archives all versions of the plan (sets `isArchived=true`).",
         "operationId": "deleteCatalogPlan",
+        "x-mint": {
+          "content": "<Info>Click the base URL in the API playground and select the **Sandbox** host for test data or the **Production** host for live data. Use credentials from the same environment.</Info>"
+        },
         "security": [{ "bearerAuth": [] }],
         "responses": {
           "204": {
@@ -5317,6 +5422,9 @@
         "summary": "Publish a plan",
         "description": "Promotes the most recent draft version of the plan to `isLatest=true`, demotes the previous published version, and syncs the plan to Stripe / internal billing. Optionally migrates existing customers' features or pricing. Fails with 400 if no price exists or required currencies are missing.",
         "operationId": "publishCatalogPlan",
+        "x-mint": {
+          "content": "<Info>Click the base URL in the API playground and select the **Sandbox** host for test data or the **Production** host for live data. Use credentials from the same environment.</Info>"
+        },
         "security": [{ "bearerAuth": [] }],
         "requestBody": {
           "required": false,
@@ -5358,6 +5466,9 @@
         "summary": "Discard draft plan",
         "description": "Permanently deletes the latest draft (non-published) version of the plan. The previously published version remains untouched. Returns 400 if the latest version is already published.",
         "operationId": "discardCatalogPlanDraft",
+        "x-mint": {
+          "content": "<Info>Click the base URL in the API playground and select the **Sandbox** host for test data or the **Production** host for live data. Use credentials from the same environment.</Info>"
+        },
         "security": [{ "bearerAuth": [] }],
         "responses": {
           "204": {
@@ -5398,6 +5509,9 @@
         "summary": "List plan prices",
         "description": "Returns the prices configured on the plan (one per currency), each with its full per-feature charge configuration.",
         "operationId": "listCatalogPlanPrices",
+        "x-mint": {
+          "content": "<Info>Click the base URL in the API playground and select the **Sandbox** host for test data or the **Production** host for live data. Use credentials from the same environment.</Info>"
+        },
         "security": [{ "bearerAuth": [] }],
         "responses": {
           "200": {
@@ -5428,6 +5542,9 @@
         "summary": "Update plan prices",
         "description": "Atomically replaces the plan's prices with the supplied list. If the plan's latest version is published, a new draft version is created and the new prices are attached to it. Duplicate currencies among PAID prices are rejected.",
         "operationId": "bulkSetCatalogPlanPrices",
+        "x-mint": {
+          "content": "<Info>Click the base URL in the API playground and select the **Sandbox** host for test data or the **Production** host for live data. Use credentials from the same environment.</Info>"
+        },
         "security": [{ "bearerAuth": [] }],
         "requestBody": {
           "required": true,
@@ -5475,6 +5592,9 @@
         "summary": "List plan entitlements",
         "description": "Returns the feature entitlements (with per-entitlement `details`) configured on the plan.",
         "operationId": "listCatalogPlanFeatures",
+        "x-mint": {
+          "content": "<Info>Click the base URL in the API playground and select the **Sandbox** host for test data or the **Production** host for live data. Use credentials from the same environment.</Info>"
+        },
         "security": [{ "bearerAuth": [] }],
         "responses": {
           "200": {
@@ -5493,6 +5613,9 @@
         "summary": "Add plan entitlements",
         "description": "Appends one or more feature entitlements to the plan. If the plan's latest version is published, a new draft version is created automatically.",
         "operationId": "addCatalogPlanFeatures",
+        "x-mint": {
+          "content": "<Info>Click the base URL in the API playground and select the **Sandbox** host for test data or the **Production** host for live data. Use credentials from the same environment.</Info>"
+        },
         "security": [{ "bearerAuth": [] }],
         "requestBody": {
           "required": true,
@@ -5539,6 +5662,9 @@
         "summary": "Update plan entitlement",
         "description": "Updates only the `details` (value, reset, hardLimit, rollover, etc.) of one feature entitlement on the plan. A new draft version is created if the latest is published.",
         "operationId": "updateCatalogPlanFeature",
+        "x-mint": {
+          "content": "<Info>Click the base URL in the API playground and select the **Sandbox** host for test data or the **Production** host for live data. Use credentials from the same environment.</Info>"
+        },
         "security": [{ "bearerAuth": [] }],
         "requestBody": {
           "required": true,
@@ -5565,6 +5691,9 @@
         "summary": "Delete plan entitlement",
         "description": "Removes the named feature from the plan's entitlements. A new draft version is created if the latest is published.",
         "operationId": "deleteCatalogPlanFeature",
+        "x-mint": {
+          "content": "<Info>Click the base URL in the API playground and select the **Sandbox** host for test data or the **Production** host for live data. Use credentials from the same environment.</Info>"
+        },
         "security": [{ "bearerAuth": [] }],
         "responses": {
           "204": {
@@ -5604,6 +5733,9 @@
         "summary": "Update a plan file",
         "description": "Updates display metadata on a plan file (name, ordering, enabled). If the plan's latest version is published, a new draft version is created and the file is updated on the new draft.",
         "operationId": "updateCatalogPlanFile",
+        "x-mint": {
+          "content": "<Info>Click the base URL in the API playground and select the **Sandbox** host for test data or the **Production** host for live data. Use credentials from the same environment.</Info>"
+        },
         "security": [{ "bearerAuth": [] }],
         "requestBody": {
           "required": true,
@@ -5631,6 +5763,9 @@
         "summary": "Delete a plan file",
         "description": "Deletes the plan file. If the plan's latest version is published, a new draft version is created and the file is removed from the new draft.",
         "operationId": "deleteCatalogPlanFile",
+        "x-mint": {
+          "content": "<Info>Click the base URL in the API playground and select the **Sandbox** host for test data or the **Production** host for live data. Use credentials from the same environment.</Info>"
+        },
         "security": [{ "bearerAuth": [] }],
         "responses": {
           "204": { "description": "File deleted." },
@@ -5662,6 +5797,9 @@
         "summary": "Download a plan file",
         "description": "Public download endpoint for a plan file. Responds with a 302 redirect to a short-lived forced-download URL on the storage backend. Returns 404 if the file does not exist.",
         "operationId": "downloadCatalogPlanFile",
+        "x-mint": {
+          "content": "<Info>Click the base URL in the API playground and select the **Sandbox** host for test data or the **Production** host for live data. Use credentials from the same environment.</Info>"
+        },
         "security": [],
         "responses": {
           "302": {
@@ -5683,6 +5821,9 @@
         "summary": "Generate a presigned upload URL",
         "description": "Returns a presigned S3 POST policy that lets you upload a single file directly to kelviq's storage bucket (max 5 GB, expires in 1 hour). Use the returned `fileKey` as the value of `imageKeys` / `fileKeys` on the catalog product/plan endpoints.\n\nUpload flow:\n1. `POST /media/` with `fileName` and `fileType`.\n2. Build a `multipart/form-data` request and send every key/value from `fields` as a form field, plus a final `file` field containing the binary.\n3. `POST` that form to the returned `url`. A `204 No Content` response means the upload succeeded.\n4. Pass `fileKey` to the relevant catalog endpoint (e.g. `POST /catalog/products/` with `imageKeys: [fileKey]`).",
         "operationId": "createPresignedUploadUrl",
+        "x-mint": {
+          "content": "<Info>Click the base URL in the API playground and select the **Sandbox** host for test data or the **Production** host for live data. Use credentials from the same environment.</Info>"
+        },
         "security": [{ "bearerAuth": [] }],
         "requestBody": {
           "required": true,
@@ -5724,6 +5865,9 @@
         "summary": "Provision an organization",
         "description": "Creates a new kelviq user + organization on behalf of the partner, issues API keys, and emails the user a link to set their password. Fails with `409` if `email` belongs to an existing kelviq user, or with `400` if `externalId` already exists for this partner.",
         "operationId": "provisionPartnerOrganization",
+        "x-mint": {
+          "content": "<Info>Click the base URL in the API playground and select the **Sandbox** host for test data or the **Production** host for live data. Use credentials from the same environment.</Info>"
+        },
         "security": [{ "partnerKeyAuth": [] }],
         "requestBody": {
           "required": true,
@@ -5760,6 +5904,9 @@
         "summary": "List partner organizations",
         "description": "Returns organizations owned by the authenticated partner. Optionally filter by the partner-side `externalId`.",
         "operationId": "listPartnerOrganizations",
+        "x-mint": {
+          "content": "<Info>Click the base URL in the API playground and select the **Sandbox** host for test data or the **Production** host for live data. Use credentials from the same environment.</Info>"
+        },
         "security": [{ "partnerKeyAuth": [] }],
         "parameters": [
           {
@@ -5813,6 +5960,9 @@
         "summary": "Get a partner organization by identifier",
         "description": "Retrieve a single organization owned by the authenticated partner, looked up by its kelviq UUID.",
         "operationId": "retrievePartnerOrganization",
+        "x-mint": {
+          "content": "<Info>Click the base URL in the API playground and select the **Sandbox** host for test data or the **Production** host for live data. Use credentials from the same environment.</Info>"
+        },
         "security": [{ "partnerKeyAuth": [] }],
         "responses": {
           "200": {
@@ -5844,6 +5994,9 @@
         "summary": "Get a partner organization by external ID",
         "description": "Retrieve a single organization owned by the authenticated partner using the partner-side `externalId`.",
         "operationId": "retrievePartnerOrganizationByExternalId",
+        "x-mint": {
+          "content": "<Info>Click the base URL in the API playground and select the **Sandbox** host for test data or the **Production** host for live data. Use credentials from the same environment.</Info>"
+        },
         "security": [{ "partnerKeyAuth": [] }],
         "responses": {
           "200": {
