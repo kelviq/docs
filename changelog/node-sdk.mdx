@@ -5,6 +5,31 @@ mode: "wide"
 rss: true
 ---
 
+<Update label="v2.7.0-beta.2" description="July 10, 2026">
+
+### New Features
+
+#### Create One-Time Charges
+
+A new `client.charges.create()` method can immediately charge a customer's saved payment method without creating a checkout session.
+
+```typescript
+const charge = await client.charges.create({
+  planIdentifier: "lifetime-access",
+  chargePeriod: "ONE_TIME",
+  customerId: "cust_789",
+  currencyCode: "USD",
+  features: [{ identifier: "seats", quantity: 5 }],
+  ipAddress: "103.154.35.20",
+});
+
+console.log(charge.id, charge.status, charge.amount);
+```
+
+The customer must already have a usable payment method on file. `chargePeriod` is restricted to `"ONE_TIME"`; use the subscriptions API for recurring billing. The SDK includes typed request and response models for charge records.
+
+</Update>
+
 <Update label="v2.7.0" description="July 4, 2026">
 
 ### New Features

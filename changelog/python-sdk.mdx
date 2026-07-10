@@ -5,6 +5,41 @@ mode: "wide"
 rss: true
 ---
 
+<Update label="v2.7.1" description="July 10, 2026">
+
+### New Features
+
+#### Create One-Time Charges
+
+The synchronous and asynchronous clients now provide `client.charges.create()` for immediately charging a customer's saved payment method without creating a checkout session.
+
+```python
+charge = client.charges.create(
+    planIdentifier="lifetime-access",
+    chargePeriod="ONE_TIME",
+    customerId="cust_789",
+    currencyCode="USD",
+    features=[{"identifier": "seats", "quantity": 5}],
+    ipAddress="103.154.35.20",
+)
+
+print(charge.id, charge.status, charge.amount)
+```
+
+**Async variant:**
+
+```python
+charge = await async_client.charges.create(
+    planIdentifier="lifetime-access",
+    chargePeriod="ONE_TIME",
+    customerId="cust_789",
+)
+```
+
+The customer must already have a usable payment method on file. `chargePeriod` is restricted to `"ONE_TIME"`; use the subscriptions API for recurring billing. Pydantic request and response models validate parameters and provide typed charge records.
+
+</Update>
+
 <Update label="v2.7.0" description="July 4, 2026">
 
 ### New Features
