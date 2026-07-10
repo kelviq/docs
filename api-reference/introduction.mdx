@@ -76,6 +76,51 @@ client = Kelviq.create_sync_client(
 
 Omit `environment` or set it to `production` for live traffic.
 
+## Pagination
+
+List endpoints that support pagination use the `page` and `page_size` query parameters.
+
+| Parameter | Type | Description |
+| --- | --- | --- |
+| `page` | integer | Page number to return. |
+| `page_size` | integer | Number of results to return per page. Availability and limits vary by endpoint. |
+
+```bash
+curl "https://sandboxapi.kelviq.com/api/v1/customers/?page=2&page_size=100" \
+  --header "Authorization: Bearer $KELVIQ_SANDBOX_SERVER_API_KEY"
+```
+
+Paginated responses contain the total result count, links to adjacent pages, and the current page of results:
+
+```json
+{
+  "count": 250,
+  "next": "https://sandboxapi.kelviq.com/api/v1/customers/?page=3&page_size=100",
+  "previous": "https://sandboxapi.kelviq.com/api/v1/customers/?page=1&page_size=100",
+  "results": []
+}
+```
+
+For the Customers API, `page_size` defaults to `1000` and accepts a maximum of `10000`. Check each endpoint's parameter reference for its supported pagination options.
+
+## Filtering
+
+Search and filter parameters vary by endpoint and can be combined with pagination when supported.
+
+Use the `search` query parameter for free-text search and endpoint-specific query parameters for filtering.
+
+```bash
+# Search customers
+curl "https://sandboxapi.kelviq.com/api/v1/customers/?search=acme&page=1&page_size=100" \
+  --header "Authorization: Bearer $KELVIQ_SANDBOX_SERVER_API_KEY"
+
+# Filter subscriptions by customer
+curl "https://sandboxapi.kelviq.com/api/v1/subscriptions/?customer_id=customer_123" \
+  --header "Authorization: Bearer $KELVIQ_SANDBOX_SERVER_API_KEY"
+```
+
+Consult the endpoint reference before adding a query parameter; unsupported parameters may be ignored or rejected.
+
 ## Error handling
 
 The API uses standard HTTP status codes and returns detailed error information in the response body.
