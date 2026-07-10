@@ -8,7 +8,11 @@
   "servers": [
     {
       "url": "https://api.kelviq.com/api/v1",
-      "description": "kelviq API Server (General - specific operations might override)"
+      "description": "Production (Live) - kelviq API Server"
+    },
+    {
+      "url": "https://sandboxapi.kelviq.com/api/v1",
+      "description": "Sandbox - kelviq API Server for testing"
     }
   ],
   "tags": [
@@ -3530,7 +3534,11 @@
       "servers": [
         {
           "url": "https://edge.api.kelviq.com/api/v1",
-          "description": "Edge API for Entitlements"
+          "description": "Production (Live) - Edge API for Entitlements"
+        },
+        {
+          "url": "https://edge.sandboxapi.kelviq.com/api/v1",
+          "description": "Sandbox - Edge API for Entitlements"
         }
       ],
       "get": {
@@ -4665,7 +4673,11 @@
         "servers": [
           {
             "url": "https://edge.api.kelviq.com/api/v1",
-            "description": "Kelviq Edge API"
+            "description": "Production (Live) - Kelviq Edge API"
+          },
+          {
+            "url": "https://edge.sandboxapi.kelviq.com/api/v1",
+            "description": "Sandbox - Kelviq Edge API"
           }
         ],
         "parameters": [
