@@ -1,0 +1,116 @@
+---
+title: "Sandbox environment"
+description: "Build and test your Kelviq integration without affecting production data or processing real payments"
+---
+
+Kelviq's sandbox is a separate environment for development and testing. You can configure products and plans, create customers, exercise checkout flows, and test your integration without affecting your live organization or processing real payments.
+
+## How isolation works
+
+Sandbox and production use separate data and credentials.
+
+| Resource | Sandbox behavior |
+| --- | --- |
+| Data | Products, plans, customers, subscriptions, and orders are isolated from production |
+| API keys | Work only with sandbox hosts |
+| Payments | Use test card details; no real charge is made |
+
+This separation prevents development activity from changing live customer or billing data. Before launch, configure the resources your integration needs in production and replace all sandbox credentials and URLs.
+
+## Get started
+
+1. Sign in to the [Kelviq dashboard](https://app.kelviq.com).
+2. Open the organization dropdown and click **Enter sandbox**.
+3. Create the products, plans, prices, and other test data you need.
+4. Open **Settings → API keys** and copy the sandbox key required by your integration.
+
+<Warning>
+Never use a production Server API Key in test code. Store Server API Keys in environment variables and use Client API Keys only in supported browser integrations.
+</Warning>
+
+## Connect to the sandbox API
+
+Use the sandbox hosts with sandbox-scoped credentials:
+
+| API | Sandbox base URL |
+| --- | --- |
+| Core API | `https://sandboxapi.kelviq.com/api/v1` |
+| Edge API | `https://edge.sandboxapi.kelviq.com/api/v1` |
+
+For example:
+
+```bash
+curl https://sandboxapi.kelviq.com/api/v1/catalog/products/ \
+  --header "Authorization: Bearer $KELVIQ_SANDBOX_SERVER_API_KEY" \
+  --header "Accept: application/json"
+```
+
+Changing only the URL is not enough: the request must also use an API key created while the dashboard is in Sandbox mode.
+
+## Use the sandbox with an SDK
+
+Set `environment` to `sandbox` when initializing an official SDK.
+
+<CodeGroup>
+
+```typescript Node.js
+import { Kelviq } from "@kelviq/node-sdk";
+
+const client = new Kelviq({
+  accessToken: process.env.KELVIQ_SANDBOX_SERVER_API_KEY,
+  environment: "sandbox",
+});
+```
+
+```python Python
+from kelviq_sdk import Kelviq
+
+client = Kelviq.create_sync_client(
+    access_token=KELVIQ_SANDBOX_SERVER_API_KEY,
+    environment="sandbox",
+)
+```
+
+```tsx React
+<KelviqProvider
+  customerId="YOUR_TEST_CUSTOMER_ID"
+  accessToken="YOUR_SANDBOX_CLIENT_API_KEY"
+  environment="sandbox"
+>
+  {children}
+</KelviqProvider>
+```
+
+</CodeGroup>
+
+See the [Node SDK](/backend-integration/node-sdk), [Python SDK](/backend-integration/python-sdk), or [frontend SDK guides](/frontend-integration/react-sdk) for full setup instructions.
+
+## Test checkout
+
+Create a checkout in the sandbox and use Stripe test card details. Use any future expiration date and a valid test CVC.
+
+| Card number | Result |
+| --- | --- |
+| `4242 4242 4242 4242` | Successful payment |
+| `4000 0000 0000 0002` | Declined payment |
+| `4000 0025 0000 3155` | Payment requiring authentication |
+
+<Warning>
+Do not enter a real card number in the sandbox.
+</Warning>
+
+After payment, confirm that the test order, customer, subscription, and entitlements have the expected state in Sandbox mode.
+
+## Prepare for production
+
+Before accepting live payments:
+
+1. Complete the required [business review and payout setup](/getstarted/review-process).
+2. Configure and publish your production products and plans.
+3. Replace sandbox API keys with production API keys.
+4. Replace sandbox base URLs or set each SDK's environment to `production`.
+5. Run a final check that no sandbox credentials or hosts remain in your production configuration.
+
+<Tip>
+Use clearly named variables such as `KELVIQ_SANDBOX_SERVER_API_KEY` and `KELVIQ_PRODUCTION_SERVER_API_KEY` to reduce the chance of mixing environments.
+</Tip>

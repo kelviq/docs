@@ -7,12 +7,12 @@
   },
   "servers": [
     {
-      "url": "https://api.kelviq.com/api/v1",
-      "description": "Production (Live) - kelviq API Server"
+      "url": "https://sandboxapi.kelviq.com/api/v1",
+      "description": "Sandbox — Test payments"
     },
     {
-      "url": "https://sandboxapi.kelviq.com/api/v1",
-      "description": "Sandbox - kelviq API Server for testing"
+      "url": "https://api.kelviq.com/api/v1",
+      "description": "Production — Live payments"
     }
   ],
   "tags": [
@@ -3533,12 +3533,12 @@
     "/entitlements/": {
       "servers": [
         {
-          "url": "https://edge.api.kelviq.com/api/v1",
-          "description": "Production (Live) - Edge API for Entitlements"
+          "url": "https://edge.sandboxapi.kelviq.com/api/v1",
+          "description": "Sandbox — Test environment"
         },
         {
-          "url": "https://edge.sandboxapi.kelviq.com/api/v1",
-          "description": "Sandbox - Edge API for Entitlements"
+          "url": "https://edge.api.kelviq.com/api/v1",
+          "description": "Production — Live environment"
         }
       ],
       "get": {
@@ -4672,12 +4672,12 @@
         "operationId": "getPromotion",
         "servers": [
           {
-            "url": "https://edge.api.kelviq.com/api/v1",
-            "description": "Production (Live) - Kelviq Edge API"
+            "url": "https://edge.sandboxapi.kelviq.com/api/v1",
+            "description": "Sandbox — Test environment"
           },
           {
-            "url": "https://edge.sandboxapi.kelviq.com/api/v1",
-            "description": "Sandbox - Kelviq Edge API"
+            "url": "https://edge.api.kelviq.com/api/v1",
+            "description": "Production — Live environment"
           }
         ],
         "parameters": [

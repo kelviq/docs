@@ -92,6 +92,7 @@
           {
             "group": "Guides",
             "pages": [
+              "guides/sandbox",
               "guides/subscription-integration",
               "guides/subscription-integration-for-nextjs",
               "guides/webhooks",
@@ -118,6 +119,7 @@
           {
             "group": "Get Started",
             "pages": [
+              "api-reference/introduction",
               "api-reference/authentication"
             ]
           },

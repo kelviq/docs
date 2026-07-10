@@ -1,0 +1,77 @@
+---
+title: "Introduction"
+sidebarTitle: "Introduction"
+description: "Base URLs, environments, and authentication for the Kelviq API"
+---
+
+The Kelviq API is available in two environments. Use the sandbox while building and testing your integration, then switch to production when you are ready to accept live payments.
+
+## Base URLs
+
+### Production
+
+Use for live customers, production data, and real payments.
+
+| API | Base URL |
+| --- | --- |
+| Core API | `https://api.kelviq.com/api/v1` |
+| Edge API | `https://edge.api.kelviq.com/api/v1` |
+
+### Sandbox
+
+Use for development, integration testing, and test payments.
+
+| API | Base URL |
+| --- | --- |
+| Core API | `https://sandboxapi.kelviq.com/api/v1` |
+| Edge API | `https://edge.sandboxapi.kelviq.com/api/v1` |
+
+The Core API manages resources such as products, plans, customers, subscriptions, and checkout sessions. The Edge API serves latency-sensitive features such as entitlements and promotions.
+
+<Info>
+Sandbox and production are isolated. API keys and data created in one environment do not work or appear in the other.
+</Info>
+
+[Learn how the sandbox works →](/guides/sandbox)
+
+## Authentication
+
+Kelviq uses API keys. Send your Server API Key as a Bearer token when calling the API from your backend:
+
+```bash
+curl https://sandboxapi.kelviq.com/api/v1/catalog/products/ \
+  --header "Authorization: Bearer $KELVIQ_SANDBOX_SERVER_API_KEY" \
+  --header "Accept: application/json"
+```
+
+Use a Client API Key for supported browser integrations. Never expose a Server API Key in client-side code.
+
+[Read the authentication guide →](/api-reference/authentication)
+
+## Switching environments
+
+For direct API calls, change the base URL and use the matching environment's API key. Official Kelviq SDKs accept an `environment` option:
+
+<CodeGroup>
+
+```typescript Node.js
+import { Kelviq } from "@kelviq/node-sdk";
+
+const client = new Kelviq({
+  accessToken: process.env.KELVIQ_SANDBOX_SERVER_API_KEY,
+  environment: "sandbox",
+});
+```
+
+```python Python
+from kelviq_sdk import Kelviq
+
+client = Kelviq.create_sync_client(
+    access_token=KELVIQ_SANDBOX_SERVER_API_KEY,
+    environment="sandbox",
+)
+```
+
+</CodeGroup>
+
+Omit `environment` or set it to `production` for live traffic.
