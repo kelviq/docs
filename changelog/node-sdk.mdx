@@ -5,6 +5,40 @@ mode: "wide"
 rss: true
 ---
 
+<Update label="v2.7.2" description="July 14, 2026">
+
+### New Features
+
+#### List, Retrieve, and Create Subscriptions
+
+The subscriptions module now supports the complete read and create workflow:
+
+- `client.subscriptions.list()` retrieves a paginated subscription list with optional customer and pagination filters.
+- `client.subscriptions.retrieve()` retrieves a subscription by its Kelviq UUID.
+- `client.subscriptions.create()` creates a subscription directly for a customer.
+
+```typescript
+const page = await client.subscriptions.list({
+  customerId: "cust_789",
+  page: 1,
+  pageSize: 20,
+});
+
+const subscription = await client.subscriptions.retrieve({
+  subscriptionId: page.results[0].id,
+});
+
+const created = await client.subscriptions.create({
+  planIdentifier: "plan-pro-monthly",
+  chargePeriod: "MONTHLY",
+  customerId: "cust_789",
+});
+```
+
+New TypeScript models cover paginated results, create payloads, product and plan details, features, files, links, and issued licenses.
+
+</Update>
+
 <Update label="v2.7.0-beta.2" description="July 10, 2026">
 
 ### New Features
@@ -73,21 +107,6 @@ const client = new Kelviq({ accessToken: process.env.KELVIQ_API_KEY, cacheStore:
 ```
 
 You can also bring your own backend by implementing the public `CacheStore` interface and passing it as `cacheStore`. All instances that should share a cache must use the same `prefix`.
-
-#### Subscription Response — `files`, `links`, `license`
-
-`SubscriptionData` now includes three additional fields returned by the subscription detail and create APIs:
-
-- `files` — downloadable files attached to the subscription's plan (`PlanFile[]`).
-- `links` — external links attached to the plan (`PlanLink[]`).
-- `license` — issued licenses associated with the subscription (`SubscriptionLicense[]`).
-
-```typescript
-const sub = license.subscription; // e.g. from a license validation response
-sub?.files?.forEach((f) => console.log(f.name, f.downloadUrl));
-sub?.links?.forEach((l) => console.log(l.name, l.url));
-sub?.license?.forEach((lic) => console.log(lic.licenseKey, lic.activationLimit));
-```
 
 </Update>
 

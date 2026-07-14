@@ -789,7 +789,188 @@ An instance of ReportUsageResponse (Pydantic model), which includes:
 
 ## Subscriptions
 
-The subscriptions module allows you to manage customer subscriptions, including updates and cancellation. You can access these operations via the `subscriptions` attribute on an initialized Kelviq client instance.
+The subscriptions module allows you to list, retrieve, create, update, and cancel customer subscriptions. You can access these operations via the `subscriptions` attribute on an initialized Kelviq client instance.
+
+### List subscriptions
+
+Retrieves a paginated list of subscriptions, optionally filtered by customer.
+
+**Synchronous:**
+
+```python
+page = client.subscriptions.list(
+    customerId="cust_789",
+    page=1,
+    page_size=20,
+)
+
+for subscription in page.results:
+    print(subscription.id, subscription.status)
+```
+
+**Asynchronous:**
+
+```python
+page = await async_client.subscriptions.list(
+    customerId="cust_789",
+    page=1,
+    page_size=20,
+)
+
+for subscription in page.results:
+    print(subscription.id, subscription.status)
+```
+
+<Accordion title="Response">
+
+  ```json
+  {
+    "count": 1,
+    "next": null,
+    "previous": null,
+    "results": [
+      {
+        "id": "09d706ca-58f3-4fb2-818f-5b8623d67e6e",
+        "startDate": "2025-07-28",
+        "endDate": null,
+        "status": "active",
+        "trialDaysRemaining": 0,
+        "customerId": "cust_789",
+        "billingType": "SUBSCRIPTION",
+        "files": [],
+        "links": [],
+        "license": []
+      }
+    ]
+  }
+  ```
+</Accordion>
+
+**Optional Parameters:**
+
+* `customerId` (str): Filters subscriptions by the client-defined customer identifier.
+* `page` (int): Page number to retrieve.
+* `page_size` (int): Number of subscriptions to return per page.
+
+**Returns:**
+
+A `PaginatedSubscriptionResponse` containing `count`, `next`, `previous`, and a `results` list of `SubscriptionData` models.
+
+### Retrieve a subscription
+
+Retrieves one subscription using its Kelviq subscription ID.
+
+**Synchronous:**
+
+```python
+subscription = client.subscriptions.retrieve(
+    subscriptionId="09d706ca-58f3-4fb2-818f-5b8623d67e6e",
+)
+
+print(subscription.id, subscription.status)
+for file in subscription.files:
+    print(file.name, file.downloadUrl)
+for link in subscription.links:
+    print(link.name, link.url)
+for license in subscription.license:
+    print(license.licenseKey, license.activationLimit)
+```
+
+**Asynchronous:**
+
+```python
+subscription = await async_client.subscriptions.retrieve(
+    subscriptionId="09d706ca-58f3-4fb2-818f-5b8623d67e6e",
+)
+
+print(subscription.id, subscription.status)
+```
+
+<Accordion title="Response">
+
+  ```json
+  {
+    "id": "09d706ca-58f3-4fb2-818f-5b8623d67e6e",
+    "externalSubscriptionId": "sub_1RpoZoSBstCzyocS7iPmith3",
+    "startDate": "2025-07-28",
+    "endDate": null,
+    "billingPeriodStartTime": "2025-07-28T10:46:34Z",
+    "billingPeriodEndTime": "2025-08-28T10:46:34Z",
+    "amount": "261.00",
+    "recurrence": "month",
+    "currency": "usd",
+    "status": "active",
+    "trialDaysRemaining": 0,
+    "customerId": "cust_789",
+    "billingType": "SUBSCRIPTION",
+    "recurrenceUnit": 1,
+    "recurrenceType": "MONTH",
+    "files": [],
+    "links": [],
+    "license": []
+  }
+  ```
+</Accordion>
+
+**Required Parameters:**
+
+* `subscriptionId` (str): The Kelviq UUID of the subscription.
+
+**Returns:**
+
+A `SubscriptionData` model. A missing subscription raises `NotFoundError`.
+
+### Create a subscription
+
+Creates a subscription directly for a customer without requiring a checkout session.
+
+**Synchronous:**
+
+```python
+from kelviq_sdk import ChargePeriod
+
+subscription = client.subscriptions.create(
+    planIdentifier="plan-pro-monthly",
+    chargePeriod=ChargePeriod.MONTHLY,
+    customerId="cust_789",
+    successUrl="https://example.com/subscription/success",
+    features=[{"identifier": "seats", "quantity": 5}],
+    ipAddress="103.154.35.20",
+)
+
+print(subscription.id, subscription.status)
+```
+
+**Asynchronous:**
+
+```python
+subscription = await async_client.subscriptions.create(
+    planIdentifier="plan-pro-monthly",
+    chargePeriod="MONTHLY",
+    customerId="cust_789",
+    successUrl="https://example.com/subscription/success",
+    features=[{"identifier": "seats", "quantity": 5}],
+    ipAddress="103.154.35.20",
+)
+
+print(subscription.id, subscription.status)
+```
+
+**Required Parameters:**
+
+* `planIdentifier` (str): Identifier of the plan to subscribe to.
+* `chargePeriod` (str | ChargePeriod): Billing period such as `MONTHLY`, `YEARLY`, `WEEKLY`, or `DAILY`.
+* `customerId` (str): Client-defined identifier of the customer.
+
+**Optional Parameters:**
+
+* `successUrl` (str): URL to redirect to after successful subscription creation.
+* `features` (List[Dict[str, Any]]): Feature identifiers and requested quantities.
+* `ipAddress` (str): Customer IP address used for location-based pricing.
+
+**Returns:**
+
+A `CreateSubscriptionResponse` model containing the created subscription, including its plan files, links, and issued licenses when available.
 
 
 ### Updates an existing subscription to a new plan

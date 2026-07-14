@@ -1016,6 +1016,27 @@
             "type": "string",
             "description": "The customer identifier associated with this subscription.",
             "example": "geojacob"
+          },
+          "files": {
+            "type": "array",
+            "description": "Downloadable files attached to the subscription's plan.",
+            "items": {
+              "$ref": "#/components/schemas/PlanFile"
+            }
+          },
+          "links": {
+            "type": "array",
+            "description": "External links attached to the subscription's plan.",
+            "items": {
+              "$ref": "#/components/schemas/PlanLink"
+            }
+          },
+          "license": {
+            "type": "array",
+            "description": "Issued licenses associated with the subscription.",
+            "items": {
+              "$ref": "#/components/schemas/SubscriptionLicense"
+            }
           }
         }
       },
@@ -1971,6 +1992,27 @@
           "recurrenceType": {
             "type": "string",
             "nullable": true
+          },
+          "files": {
+            "type": "array",
+            "description": "Downloadable files attached to the subscription's plan.",
+            "items": {
+              "$ref": "#/components/schemas/PlanFile"
+            }
+          },
+          "links": {
+            "type": "array",
+            "description": "External links attached to the subscription's plan.",
+            "items": {
+              "$ref": "#/components/schemas/PlanLink"
+            }
+          },
+          "license": {
+            "type": "array",
+            "description": "Issued licenses associated with the subscription.",
+            "items": {
+              "$ref": "#/components/schemas/SubscriptionLicense"
+            }
           }
         }
       },
@@ -2617,9 +2659,9 @@
       "PlanFile": {
         "type": "object",
         "properties": {
-          "id": { "type": "string", "format": "uuid", "readOnly": true, "example": "7a3e3411-cef0-4f4e-bdb6-1f74a4f4d2c0" },
-          "name": { "type": "string", "example": "Plan Terms.pdf" },
-          "file": { "type": "string", "readOnly": true, "example": "media/.../plans/<id>/<uuid>/terms.pdf" },
+          "id": { "type": "string", "format": "uuid", "readOnly": true, "example": "bf9f0fe0-c9c0-436d-8811-e412d0365470" },
+          "name": { "type": "string", "example": "custom-pricinig.png" },
+          "file": { "type": "string", "format": "uri", "readOnly": true, "example": "https://cdn.kelviq.com/media/organizations/8/plan/1ad723d2-40eb-4bf0-b924-557e6697e788/53c28d460fed421a81f6c6e90114ff4f/custom-pricinig.png" },
           "ordering": { "type": "integer", "example": 0 },
           "enabled": { "type": "boolean", "example": true },
           "downloadUrl": {
@@ -2627,7 +2669,57 @@
             "format": "uri",
             "readOnly": true,
             "description": "URL clients can hit to download the file. Will redirect to a forced-download URL.",
-            "example": "https://api.kelviq.com/api/v1/catalog/plans/pro-monthly/file/7a3e3411-cef0-4f4e-bdb6-1f74a4f4d2c0/download/"
+            "example": "https://api.kelviq.com/api/v1/catalog/plans/10-july/file/bf9f0fe0-c9c0-436d-8811-e412d0365470/download/"
+          }
+        }
+      },
+      "SubscriptionLicense": {
+        "type": "object",
+        "description": "An issued license associated with a subscription.",
+        "properties": {
+          "id": {
+            "type": "string",
+            "format": "uuid",
+            "nullable": true,
+            "example": "f81efb90-5f29-4dd1-9c7b-be4085e473de"
+          },
+          "licenseKey": {
+            "type": "string",
+            "nullable": true,
+            "description": "The issued license key.",
+            "example": "10K-080A3A89-8709-4EB5-80BE-BD37B518CCA1"
+          },
+          "activatedOn": {
+            "type": "string",
+            "format": "date-time",
+            "nullable": true,
+            "description": "When the license was first activated.",
+            "example": null
+          },
+          "expiresOn": {
+            "type": "string",
+            "format": "date-time",
+            "nullable": true,
+            "description": "When the license expires, if applicable.",
+            "example": null
+          },
+          "activationUsage": {
+            "type": "integer",
+            "nullable": true,
+            "description": "Number of currently active instances.",
+            "example": 0
+          },
+          "activationLimit": {
+            "type": "integer",
+            "nullable": true,
+            "description": "Maximum number of allowed concurrent activations.",
+            "example": 2
+          },
+          "enabled": {
+            "type": "boolean",
+            "nullable": true,
+            "description": "Whether the license is enabled.",
+            "example": true
           }
         }
       },
@@ -4019,80 +4111,6 @@
         }
       }
     },
-    "/subscriptions/create/": {
-      "post": {
-        "tags": [
-          "Subscriptions"
-        ],
-        "summary": "Create a subscription",
-        "description": "Creates a new subscription for a customer directly, without requiring a checkout session.",
-        "operationId": "createSubscription",
-        "x-mint": {
-          "content": "<Info>Click the base URL in the API playground and select the **Sandbox** host for test data or the **Production** host for live data. Use credentials from the same environment.</Info>"
-        },
-        "requestBody": {
-          "required": true,
-          "content": {
-            "application/json": {
-              "schema": {
-                "$ref": "#/components/schemas/CreateSubscriptionRequest"
-              }
-            }
-          }
-        },
-        "responses": {
-          "201": {
-            "description": "Subscription Created",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/CreateSubscriptionResponse"
-                },
-                "example": {
-                  "id": "520ca8a5-9fc0-4d6a-bc7a-2ba331595441",
-                  "startDate": "2026-02-07",
-                  "endDate": null,
-                  "billingPeriodStartTime": "2026-02-07T06:02:05Z",
-                  "billingPeriodEndTime": "2026-02-08T06:02:05Z",
-                  "amount": "2000.00",
-                  "recurrence": "month",
-                  "currency": "USD",
-                  "status": "trialing",
-                  "product": {
-                    "name": "Invoice Test",
-                    "id": "88e437b8-6017-405b-9328-e0f4e140bb79",
-                    "identifier": "invoice-test"
-                  },
-                  "plan": {
-                    "name": "iUltra",
-                    "identifier": "i-ultra"
-                  },
-                  "features": [],
-                  "trialDaysRemaining": 1,
-                  "customerId": "geojacob",
-                  "billingType": "SUBSCRIPTION",
-                  "recurrenceUnit": 1,
-                  "recurrenceType": "MONTH"
-                }
-              }
-            }
-          },
-          "400": {
-            "description": "Bad Request - Validation or business logic error.",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/DetailErrorResponse"
-                },
-                "example": {
-                  "detail": "Customer does not exist."
-                }
-              }
-            }
-          }
-        }
-      }
-    },
     "/charges/": {
       "post": {
         "tags": [
@@ -4264,9 +4282,238 @@
                       "customerId": "testuser",
                       "billingType": "SUBSCRIPTION",
                       "recurrenceUnit": 1,
-                      "recurrenceType": "MONTH"
+                      "recurrenceType": "MONTH",
+                      "files": [
+                        {
+                          "id": "bf9f0fe0-c9c0-436d-8811-e412d0365470",
+                          "name": "custom-pricinig.png",
+                          "file": "https://cdn.kelviq.com/media/organizations/8/plan/1ad723d2-40eb-4bf0-b924-557e6697e788/53c28d460fed421a81f6c6e90114ff4f/custom-pricinig.png",
+                          "ordering": 0,
+                          "enabled": true,
+                          "downloadUrl": "https://api.kelviq.com/api/v1/catalog/plans/10-july/file/bf9f0fe0-c9c0-436d-8811-e412d0365470/download/"
+                        }
+                      ],
+                      "links": [
+                        {
+                          "name": "Product documentation",
+                          "url": "https://example.com/docs"
+                        }
+                      ],
+                      "license": [
+                        {
+                          "id": "f81efb90-5f29-4dd1-9c7b-be4085e473de",
+                          "licenseKey": "10K-080A3A89-8709-4EB5-80BE-BD37B518CCA1",
+                          "activatedOn": null,
+                          "expiresOn": null,
+                          "activationUsage": 0,
+                          "activationLimit": 2,
+                          "enabled": true
+                        }
+                      ]
                     }
                   ]
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/subscriptions/create/": {
+      "post": {
+        "tags": [
+          "Subscriptions"
+        ],
+        "summary": "Create a subscription",
+        "description": "Creates a new subscription for a customer directly, without requiring a checkout session.",
+        "operationId": "createSubscription",
+        "x-mint": {
+          "content": "<Info>Click the base URL in the API playground and select the **Sandbox** host for test data or the **Production** host for live data. Use credentials from the same environment.</Info>"
+        },
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CreateSubscriptionRequest"
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "Subscription Created",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/CreateSubscriptionResponse"
+                },
+                "example": {
+                  "id": "520ca8a5-9fc0-4d6a-bc7a-2ba331595441",
+                  "startDate": "2026-02-07",
+                  "endDate": null,
+                  "billingPeriodStartTime": "2026-02-07T06:02:05Z",
+                  "billingPeriodEndTime": "2026-02-08T06:02:05Z",
+                  "amount": "2000.00",
+                  "recurrence": "month",
+                  "currency": "USD",
+                  "status": "trialing",
+                  "product": {
+                    "name": "Invoice Test",
+                    "id": "88e437b8-6017-405b-9328-e0f4e140bb79",
+                    "identifier": "invoice-test"
+                  },
+                  "plan": {
+                    "name": "iUltra",
+                    "identifier": "i-ultra"
+                  },
+                  "features": [],
+                  "trialDaysRemaining": 1,
+                  "customerId": "geojacob",
+                  "billingType": "SUBSCRIPTION",
+                  "recurrenceUnit": 1,
+                  "recurrenceType": "MONTH",
+                  "files": [
+                    {
+                      "id": "bf9f0fe0-c9c0-436d-8811-e412d0365470",
+                      "name": "custom-pricinig.png",
+                      "file": "https://cdn.kelviq.com/media/organizations/8/plan/1ad723d2-40eb-4bf0-b924-557e6697e788/53c28d460fed421a81f6c6e90114ff4f/custom-pricinig.png",
+                      "ordering": 0,
+                      "enabled": true,
+                      "downloadUrl": "https://api.kelviq.com/api/v1/catalog/plans/10-july/file/bf9f0fe0-c9c0-436d-8811-e412d0365470/download/"
+                    }
+                  ],
+                  "links": [
+                    {
+                      "name": "Product documentation",
+                      "url": "https://example.com/docs"
+                    }
+                  ],
+                  "license": [
+                    {
+                      "id": "f81efb90-5f29-4dd1-9c7b-be4085e473de",
+                      "licenseKey": "10K-080A3A89-8709-4EB5-80BE-BD37B518CCA1",
+                      "activatedOn": null,
+                      "expiresOn": null,
+                      "activationUsage": 0,
+                      "activationLimit": 2,
+                      "enabled": true
+                    }
+                  ]
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad Request - Validation or business logic error.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/DetailErrorResponse"
+                },
+                "example": {
+                  "detail": "Customer does not exist."
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/subscriptions/{subscriptionId}/": {
+      "get": {
+        "tags": [
+          "Subscriptions"
+        ],
+        "summary": "Retrieve a Subscription",
+        "description": "Retrieves a subscription by its Kelviq subscription ID.",
+        "operationId": "retrieveSubscription",
+        "x-mint": {
+          "content": "<Info>Click the base URL in the API playground and select the **Sandbox** host for test data or the **Production** host for live data. Use credentials from the same environment.</Info>"
+        },
+        "parameters": [
+          {
+            "name": "subscriptionId",
+            "in": "path",
+            "required": true,
+            "description": "The unique Kelviq identifier of the subscription.",
+            "example": "09d706ca-58f3-4fb2-818f-5b8623d67e6e",
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Subscription details.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Subscription"
+                },
+                "example": {
+                  "id": "09d706ca-58f3-4fb2-818f-5b8623d67e6e",
+                  "externalSubscriptionId": "sub_1RpoZoSBstCzyocS7iPmith3",
+                  "startDate": "2025-07-28",
+                  "endDate": null,
+                  "billingPeriodStartTime": "2025-07-28T10:46:34Z",
+                  "billingPeriodEndTime": "2025-08-28T10:46:34Z",
+                  "amount": "261.00",
+                  "recurrence": "month",
+                  "currency": "usd",
+                  "status": "active",
+                  "product": "Aphelo",
+                  "plan": {
+                    "name": "Premium",
+                    "identifier": "premium1"
+                  },
+                  "features": [],
+                  "trialDaysRemaining": 0,
+                  "customerId": "testuser",
+                  "billingType": "SUBSCRIPTION",
+                  "recurrenceUnit": 1,
+                  "recurrenceType": "MONTH",
+                  "files": [
+                    {
+                      "id": "bf9f0fe0-c9c0-436d-8811-e412d0365470",
+                      "name": "custom-pricinig.png",
+                      "file": "https://cdn.kelviq.com/media/organizations/8/plan/1ad723d2-40eb-4bf0-b924-557e6697e788/53c28d460fed421a81f6c6e90114ff4f/custom-pricinig.png",
+                      "ordering": 0,
+                      "enabled": true,
+                      "downloadUrl": "https://api.kelviq.com/api/v1/catalog/plans/10-july/file/bf9f0fe0-c9c0-436d-8811-e412d0365470/download/"
+                    }
+                  ],
+                  "links": [
+                    {
+                      "name": "Product documentation",
+                      "url": "https://example.com/docs"
+                    }
+                  ],
+                  "license": [
+                    {
+                      "id": "f81efb90-5f29-4dd1-9c7b-be4085e473de",
+                      "licenseKey": "10K-080A3A89-8709-4EB5-80BE-BD37B518CCA1",
+                      "activatedOn": null,
+                      "expiresOn": null,
+                      "activationUsage": 0,
+                      "activationLimit": 2,
+                      "enabled": true
+                    }
+                  ]
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Subscription not found.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/DetailErrorResponse"
+                },
+                "example": {
+                  "detail": "Subscription not found."
                 }
               }
             }

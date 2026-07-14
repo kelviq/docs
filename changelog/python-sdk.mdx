@@ -5,6 +5,40 @@ mode: "wide"
 rss: true
 ---
 
+<Update label="v2.7.2" description="July 14, 2026">
+
+### New Features
+
+#### List, Retrieve, and Create Subscriptions
+
+The synchronous and asynchronous subscription clients now support the complete read and create workflow:
+
+- `client.subscriptions.list()` retrieves a paginated subscription list with optional customer and pagination filters.
+- `client.subscriptions.retrieve()` retrieves a subscription by its Kelviq UUID.
+- `client.subscriptions.create()` creates a subscription directly for a customer.
+
+```python
+page = client.subscriptions.list(
+    customerId="cust_789",
+    page=1,
+    page_size=20,
+)
+
+subscription = client.subscriptions.retrieve(
+    subscriptionId=page.results[0].id,
+)
+
+created = client.subscriptions.create(
+    planIdentifier="plan-pro-monthly",
+    chargePeriod="MONTHLY",
+    customerId="cust_789",
+)
+```
+
+All three methods are also available on `async_client` and return validated Pydantic models. New models cover paginated results, create payloads, product and plan details, features, files, links, and issued licenses.
+
+</Update>
+
 <Update label="v2.7.1" description="July 10, 2026">
 
 ### New Features
@@ -92,24 +126,6 @@ async_client = Kelviq.create_async_client(access_token=ACCESS_TOKEN, cache_store
 ```
 
 You can also bring your own backend by implementing the public `CacheStore` interface and passing it as `cache_store`. All workers/tasks that should share a cache must use the same `prefix`.
-
-#### Subscription Response — `files`, `links`, `license`
-
-`SubscriptionData` now includes three additional fields returned by the subscription detail and create APIs:
-
-- `files` — downloadable files attached to the subscription's plan (`List[PlanFile]`).
-- `links` — external links attached to the plan (`List[PlanLink]`).
-- `license` — issued licenses associated with the subscription (`List[SubscriptionLicense]`).
-
-```python
-sub = license.subscription  # e.g. from a license validation response
-for f in sub.files:
-    print(f.name, f.downloadUrl)
-for l in sub.links:
-    print(l.name, l.url)
-for lic in sub.license:
-    print(lic.licenseKey, lic.activationLimit)
-```
 
 </Update>
 
