@@ -737,7 +737,7 @@ The subscriptions module allows you to list, retrieve, create, update, and cance
 
 ### List subscriptions
 
-Retrieves a paginated list of subscriptions, optionally filtered by customer.
+Retrieves a paginated list of subscriptions for a customer.
 
 ```typescript
 const page = await client.subscriptions.list({
@@ -776,9 +776,12 @@ for (const subscription of page.results) {
   ```
 </Accordion>
 
+**Required Parameters:**
+
+* `customerId` (string): The client-defined identifier of the customer whose subscriptions will be returned.
+
 **Optional Parameters:**
 
-* `customerId` (string): Filters subscriptions by the client-defined customer identifier.
 * `page` (number): Page number to retrieve.
 * `pageSize` (number): Number of subscriptions to return per page.
 

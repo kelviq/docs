@@ -793,7 +793,7 @@ The subscriptions module allows you to list, retrieve, create, update, and cance
 
 ### List subscriptions
 
-Retrieves a paginated list of subscriptions, optionally filtered by customer.
+Retrieves a paginated list of subscriptions for a customer.
 
 **Synchronous:**
 
@@ -846,9 +846,12 @@ for subscription in page.results:
   ```
 </Accordion>
 
+**Required Parameters:**
+
+* `customerId` (str): The client-defined identifier of the customer whose subscriptions will be returned.
+
 **Optional Parameters:**
 
-* `customerId` (str): Filters subscriptions by the client-defined customer identifier.
 * `page` (int): Page number to retrieve.
 * `page_size` (int): Number of subscriptions to return per page.
 
