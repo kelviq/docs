@@ -1,11 +1,35 @@
 ---
-title: "Checkout API"
-description: "Changelog for Checkout API"
+title: "API"
+description: "Changelog for the Kelviq API"
 mode: "wide"
 rss: true
 ---
 
-<Update label="Latest Updates" description="May 7, 2026">
+<Update label="Latest Updates" description="July 14, 2026">
+
+### New Features
+
+#### Subscription List, Create, and Retrieve APIs
+
+The Subscriptions API now includes three new endpoints for reading and creating subscriptions:
+
+- **`GET /subscriptions/` — List subscriptions**: Retrieves a paginated list for a customer. The `customer_id` query parameter is required.
+- **`POST /subscriptions/create/` — Create a subscription**: Creates a subscription directly for a customer without requiring a checkout session.
+- **`GET /subscriptions/{subscriptionId}/` — Retrieve a subscription**: Retrieves a subscription by its Kelviq UUID.
+
+Subscription list, create, and retrieve responses now include:
+
+- `files` — downloadable files attached to the subscription's plan.
+- `links` — external links attached to the plan.
+- `license` — issued licenses associated with the subscription.
+
+#### One-Time Charges
+
+The new `POST /charges/` endpoint immediately charges a customer's saved payment method without creating a checkout session. The `chargePeriod` must be `ONE_TIME`.
+
+</Update>
+
+<Update label="Custom Dynamic Amounts" description="May 7, 2026">
 
 ### New Features
 
