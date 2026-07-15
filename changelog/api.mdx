@@ -5,7 +5,23 @@ mode: "wide"
 rss: true
 ---
 
-<Update label="Latest Updates" description="July 14, 2026">
+<Update label="v1.3.0" description="July 16, 2026">
+
+### New Features
+
+#### List, Create, and Retrieve Refunds
+
+The Refunds API now supports the complete refund workflow:
+
+- **`GET /refunds/` — List refunds**: Returns a paginated list of refunds for the authenticated organization, with search, status, date-range, and pagination filters.
+- **`POST /refunds/` — Create a refund**: Creates a full or partial refund for an order. Provide `amountUnits` or `amount` for a partial refund, or omit both to refund the remaining balance.
+- **`GET /refunds/{refundId}/` — Retrieve a refund**: Returns a refund by its Kelviq UUID.
+
+Create requests use `orderId` to identify the order. List results, newly created refunds, and retrieved refunds share the same response format, including the refund amount, reason, status, failure details, internal note, and associated order.
+
+</Update>
+
+<Update label="v1.2.0" description="July 14, 2026">
 
 ### New Features
 
@@ -29,7 +45,34 @@ The new `POST /charges/` endpoint immediately charges a customer's saved payment
 
 </Update>
 
-<Update label="Custom Dynamic Amounts" description="May 7, 2026">
+<Update label="v1.0.0" description="May 7, 2026">
+
+### New Features
+
+#### Enhanced Checkout Configuration
+You can now pass additional configuration parameters when [creating a checkout session via the API](https://docs.kelviq.com/api-reference/checkout/create-a-checkout-session). These new fields allow for tighter control over the customer experience:
+
+* **`lockEmail`**: When set to `true`, the email address field on the checkout page is disabled, preventing customers from changing the email associated with the session.
+* **`discountsEnabled`**: A boolean to explicitly allow or disallow discount code application on the checkout page.
+* **`defaultBillingCountry`**: Pre-fills the billing country field (e.g., `"IN"`).
+
+**Example Payload:**
+
+```json
+{
+  "planIdentifier": "base",
+  "successUrl": "[https://kelviq.com/checkout/success](https://kelviq.com/checkout/success)",
+  "chargePeriod": "MONTHLY",
+  "customerId": "sachin",
+  "lockEmail": true,
+  "discountsEnabled": false,
+  "defaultBillingCountry": "IN"
+}
+```
+
+</Update>
+
+<Update label="v1.1.0" description="May 7, 2026">
 
 ### New Features
 
@@ -53,33 +96,6 @@ Added support for custom dynamic amounts on the checkout page. You can now pass 
   "custom_amount": 1200,
   "tax_behavior": "INCLUSIVE",
   "currency_code": "INR"
-}
-```
-
-</Update>
-
-<Update label="v2.1.0" description="May 7, 2026">
-
-### New Features
-
-#### Enhanced Checkout Configuration
-You can now pass additional configuration parameters when [creating a checkout session via the API](https://docs.kelviq.com/api-reference/checkout/create-a-checkout-session). These new fields allow for tighter control over the customer experience:
-
-* **`lockEmail`**: When set to `true`, the email address field on the checkout page is disabled, preventing customers from changing the email associated with the session.
-* **`discountsEnabled`**: A boolean to explicitly allow or disallow discount code application on the checkout page.
-* **`defaultBillingCountry`**: Pre-fills the billing country field (e.g., `"IN"`).
-
-**Example Payload:**
-
-```json
-{
-  "planIdentifier": "base",
-  "successUrl": "[https://kelviq.com/checkout/success](https://kelviq.com/checkout/success)",
-  "chargePeriod": "MONTHLY",
-  "customerId": "sachin",
-  "lockEmail": true,
-  "discountsEnabled": false,
-  "defaultBillingCountry": "IN"
 }
 ```
 

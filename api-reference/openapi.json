@@ -25,7 +25,8 @@
     { "name": "Plan Files", "description": "Files attached to plans, and signed download links." },
     { "name": "Media", "description": "Generate presigned S3 upload URLs for product/plan images and files." },
     { "name": "Partner", "description": "Partner integration APIs (organization provisioning, lookup)." },
-    { "name": "Charges", "description": "One-time payments charged immediately against a customer's default payment method." }
+    { "name": "Charges", "description": "One-time payments charged immediately against a customer's default payment method." },
+    { "name": "Refunds", "description": "Full and partial refunds for paid orders." }
   ],
   "components": {
     "securitySchemes": {
@@ -3367,6 +3368,142 @@
           }
         }
       },
+      "RefundCreateRequest": {
+        "type": "object",
+        "description": "Parameters for a full or partial refund. Omit both amount fields to refund the order's entire remaining refundable balance.",
+        "properties": {
+          "orderId": {
+            "type": "string",
+            "description": "The ID of an order owned by the authenticated organization.",
+            "example": "ORD-20260715123000-A1B2C"
+          },
+          "amountUnits": {
+            "type": "integer",
+            "format": "int64",
+            "minimum": 1,
+            "description": "Amount to refund in the currency's minor unit (for example, cents for USD). Takes precedence when `amount` is also provided.",
+            "example": 2500
+          },
+          "amount": {
+            "type": "number",
+            "format": "decimal",
+            "exclusiveMinimum": true,
+            "minimum": 0,
+            "description": "Amount to refund in the currency's major unit (for example, dollars for USD). Used only when `amountUnits` is omitted. For zero-decimal currencies, provide a whole number.",
+            "example": 25
+          },
+          "reason": {
+            "type": "string",
+            "description": "Reason for the refund. Defaults to `REQUESTED_BY_CUSTOMER`.",
+            "enum": [
+              "DUPLICATE",
+              "FRAUDULENT",
+              "REQUESTED_BY_CUSTOMER",
+              "OTHER"
+            ],
+            "example": "REQUESTED_BY_CUSTOMER"
+          },
+          "internalNote": {
+            "type": "string",
+            "nullable": true,
+            "description": "Optional internal note associated with the refund.",
+            "example": "Customer requested a partial refund."
+          }
+        },
+        "required": ["orderId"]
+      },
+      "RefundListResponse": {
+        "type": "object",
+        "properties": {
+          "count": {
+            "type": "integer",
+            "example": 1
+          },
+          "next": {
+            "type": "string",
+            "format": "uri",
+            "nullable": true,
+            "example": null
+          },
+          "previous": {
+            "type": "string",
+            "format": "uri",
+            "nullable": true,
+            "example": null
+          },
+          "results": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/RefundResponse"
+            }
+          }
+        }
+      },
+      "RefundResponse": {
+        "type": "object",
+        "description": "A refund returned by list, create, and retrieve operations.",
+        "properties": {
+          "id": {
+            "type": "string",
+            "format": "uuid",
+            "example": "7c2f3a91-2d4e-4a8b-9b1c-6f0a2e5d9c11"
+          },
+          "reason": {
+            "type": "string",
+            "nullable": true,
+            "enum": [
+              "DUPLICATE",
+              "DASHBOARD_INITIATED",
+              "FRAUDULENT",
+              "REQUESTED_BY_CUSTOMER",
+              "OTHER"
+            ],
+            "example": "REQUESTED_BY_CUSTOMER"
+          },
+          "amountUnits": {
+            "type": "integer",
+            "format": "int64",
+            "example": 2500
+          },
+          "amount": {
+            "type": "number",
+            "format": "decimal",
+            "example": 25
+          },
+          "internalNote": {
+            "type": "string",
+            "nullable": true,
+            "example": "Customer requested a partial refund."
+          },
+          "failureReason": {
+            "type": "string",
+            "nullable": true,
+            "example": null
+          },
+          "status": {
+            "type": "string",
+            "enum": ["PENDING", "PROCESSING", "SUCCEEDED", "FAILED", "CANCELED"],
+            "example": "SUCCEEDED"
+          },
+          "order": {
+            "type": "object",
+            "description": "The complete serialized order associated with the refund.",
+            "additionalProperties": true
+          }
+        }
+      },
+      "RefundErrorResponse": {
+        "type": "object",
+        "description": "Validation errors are keyed by request field. Payment-provider and business-logic errors use the `error` property.",
+        "additionalProperties": true,
+        "properties": {
+          "error": {
+            "type": "string",
+            "description": "A human-readable validation, business logic, or payment-provider error.",
+            "example": "Amount exceeds order total."
+          }
+        }
+      },
       "PartnerOrganizationList": {
         "type": "object",
         "description": "List response for partner organizations.",
@@ -4107,6 +4244,191 @@
                 }
               }
             }
+          }
+        }
+      }
+    },
+    "/refunds/": {
+      "get": {
+        "tags": [
+          "Refunds"
+        ],
+        "summary": "List refunds",
+        "description": "Returns a paginated list of refunds for the authenticated organization, ordered newest first.",
+        "operationId": "listRefunds",
+        "x-mint": {
+          "content": "<Info>Click the base URL in the API playground and select the **Sandbox** host for test data or the **Production** host for live data. Use credentials from the same environment.</Info>"
+        },
+        "parameters": [
+          {
+            "name": "search",
+            "in": "query",
+            "required": false,
+            "description": "Search by refund ID, order ID, payment-provider refund ID, or customer name, email, or ID.",
+            "schema": { "type": "string" }
+          },
+          {
+            "name": "status",
+            "in": "query",
+            "required": false,
+            "description": "Filter by refund status.",
+            "schema": {
+              "type": "string",
+              "enum": ["PENDING", "PROCESSING", "SUCCEEDED", "FAILED", "CANCELED"]
+            }
+          },
+          {
+            "name": "start_date",
+            "in": "query",
+            "required": false,
+            "description": "Include refunds created on or after this date.",
+            "schema": { "type": "string", "format": "date" }
+          },
+          {
+            "name": "end_date",
+            "in": "query",
+            "required": false,
+            "description": "Include refunds created on or before this date.",
+            "schema": { "type": "string", "format": "date" }
+          },
+          {
+            "name": "page_size",
+            "in": "query",
+            "required": false,
+            "description": "Number of results per page. Defaults to 1000, maximum 10000.",
+            "schema": { "type": "integer", "minimum": 1, "maximum": 10000 }
+          },
+          {
+            "name": "page",
+            "in": "query",
+            "required": false,
+            "description": "Page number to return.",
+            "schema": { "type": "integer", "minimum": 1 }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "A paginated list of refunds.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/RefundListResponse"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized — missing or invalid API key."
+          }
+        }
+      },
+      "post": {
+        "tags": [
+          "Refunds"
+        ],
+        "summary": "Create a refund",
+        "description": "Creates a full or partial refund for an order owned by the authenticated organization. Specify either `amountUnits` or `amount` for a partial refund; omit both to refund the entire remaining refundable balance. The amount must be positive and cannot exceed the order's remaining refundable balance.",
+        "operationId": "createRefund",
+        "x-mint": {
+          "content": "<Info>Click the base URL in the API playground and select the **Sandbox** host for test data or the **Production** host for live data. Use credentials from the same environment.</Info>"
+        },
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/RefundCreateRequest"
+              },
+              "examples": {
+                "partialRefund": {
+                  "summary": "Partial refund",
+                  "value": {
+                    "orderId": "ORD-20260715123000-A1B2C",
+                    "amountUnits": 2500,
+                    "reason": "REQUESTED_BY_CUSTOMER",
+                    "internalNote": "Customer requested a partial refund."
+                  }
+                },
+                "fullRefund": {
+                  "summary": "Full refund of the remaining balance",
+                  "value": {
+                    "orderId": "ORD-20260715123000-A1B2C"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Refund initiated. The returned status reflects the payment provider's current result.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/RefundResponse"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Invalid amount or reason, insufficient refundable balance, or a payment-provider error.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/RefundErrorResponse"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized — missing or invalid API key."
+          },
+          "404": {
+            "description": "Order not found for the authenticated organization."
+          }
+        }
+      }
+    },
+    "/refunds/{refundId}/": {
+      "get": {
+        "tags": [
+          "Refunds"
+        ],
+        "summary": "Retrieve a refund",
+        "description": "Returns a refund owned by the authenticated organization.",
+        "operationId": "retrieveRefund",
+        "x-mint": {
+          "content": "<Info>Click the base URL in the API playground and select the **Sandbox** host for test data or the **Production** host for live data. Use credentials from the same environment.</Info>"
+        },
+        "parameters": [
+          {
+            "name": "refundId",
+            "in": "path",
+            "required": true,
+            "description": "The UUID of the refund.",
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            },
+            "example": "7c2f3a91-2d4e-4a8b-9b1c-6f0a2e5d9c11"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Refund details.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/RefundResponse"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized — missing or invalid API key."
+          },
+          "404": {
+            "description": "Refund not found for the authenticated organization."
           }
         }
       }
