@@ -83,10 +83,19 @@ List endpoints that support pagination use the `page` and `page_size` query para
 | Parameter | Type | Description |
 | --- | --- | --- |
 | `page` | integer | Page number to return. |
-| `page_size` | integer | Number of results to return per page. Availability and limits vary by endpoint. |
+| `page_size` | integer | Number of results to return per page. The maximum is `100`. |
+
+Pagination defaults depend on the resource:
+
+| Endpoints | Default `page_size` | Maximum `page_size` |
+| --- | ---: | ---: |
+| Products, Plans, Plan Versions, and Features | `100` | `100` |
+| All other paginated APIs | `10` | `100` |
+
+You can request fewer results by setting `page_size`. Values above `100` are capped at `100`.
 
 ```bash
-curl "https://sandboxapi.kelviq.com/api/v1/customers/?page=2&page_size=100" \
+curl "https://sandboxapi.kelviq.com/api/v1/customers/?page=2&page_size=10" \
   --header "Authorization: Bearer $KELVIQ_SANDBOX_SERVER_API_KEY"
 ```
 
@@ -95,13 +104,11 @@ Paginated responses contain the total result count, links to adjacent pages, and
 ```json
 {
   "count": 250,
-  "next": "https://sandboxapi.kelviq.com/api/v1/customers/?page=3&page_size=100",
-  "previous": "https://sandboxapi.kelviq.com/api/v1/customers/?page=1&page_size=100",
+  "next": "https://sandboxapi.kelviq.com/api/v1/customers/?page=3&page_size=10",
+  "previous": "https://sandboxapi.kelviq.com/api/v1/customers/?page=1&page_size=10",
   "results": []
 }
 ```
-
-For the Customers API, `page_size` defaults to `1000` and accepts a maximum of `10000`. Check each endpoint's parameter reference for its supported pagination options.
 
 ## Filtering
 
@@ -111,7 +118,7 @@ Use the `search` query parameter for free-text search and endpoint-specific quer
 
 ```bash
 # Search customers
-curl "https://sandboxapi.kelviq.com/api/v1/customers/?search=acme&page=1&page_size=100" \
+curl "https://sandboxapi.kelviq.com/api/v1/customers/?search=acme&page=1&page_size=10" \
   --header "Authorization: Bearer $KELVIQ_SANDBOX_SERVER_API_KEY"
 
 # Filter subscriptions by customer
