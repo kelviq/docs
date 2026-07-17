@@ -86,7 +86,8 @@
           {
             "group": "Customer-portal",
             "pages": [
-              "customer-portal/overview"
+              "customer-portal/overview",
+              "customer-portal/managing-payment-methods"
             ]
           },
           {
