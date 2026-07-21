@@ -181,7 +181,8 @@ const response = await fetch(
     },
     body: JSON.stringify({
       planIdentifier: "enterprise",
-      chargePeriod: "MONTHLY"
+      chargePeriod: "MONTHLY",
+      paymentBehavior: "activate_on_payment"
     })
   }
 );
@@ -203,6 +204,27 @@ const data = await response.json();
 |-----------|-------------|
 | `planIdentifier` | The identifier of the new plan |
 | `chargePeriod` | Billing cycle: `"MONTHLY"`, `"YEARLY"`, etc. |
+
+### Optional Parameters
+
+| Parameter | Description |
+|-----------|-------------|
+| `paymentBehavior` | Set to `"activate_on_payment"` to keep the current subscription active until payment for the change succeeds. Omit it to apply the update immediately. |
+
+### Activation after payment
+
+Use `activate_on_payment` when a plan change should not affect access until Kelviq has collected payment.
+
+| Payment path | What happens |
+| --- | --- |
+| Saved card with no customer action | Kelviq processes the payment immediately. The updated subscription becomes `active`, and the previous subscription becomes `superseded`. |
+| UPI, 3DS, or another method requiring customer action | The updated subscription starts as `incomplete`. The existing subscription stays `active` until payment succeeds. |
+| Payment succeeds | The updated subscription becomes `active`, and the previous subscription becomes `superseded`. |
+| The immediate charge fails, or payment is not completed before expiry | The updated subscription becomes `incomplete_expired`. The existing subscription remains `active`. |
+
+<Warning>
+  Do not grant the new plan's entitlements just because the update request returned successfully. Confirm that the updated subscription is `active`, or read the customer's current entitlements.
+</Warning>
 
 ---
 
@@ -286,8 +308,10 @@ Use your **Client API Key** for this endpoint, not your Server API Key.
    → Show/hide features based on access
 
 4. User wants to upgrade
-   → Update subscription via API
-   → Entitlements update automatically
+   → Update the subscription with paymentBehavior: "activate_on_payment"
+   → Keep the existing subscription active while payment is pending
+   → After payment succeeds, the new subscription becomes active
+   → The previous subscription becomes superseded
 ```
 
 ---

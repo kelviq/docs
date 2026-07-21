@@ -35,11 +35,42 @@ Check the current subscription status with the Kelviq SDK or API. If your applic
 
 ## Change a subscription
 
-Plan upgrades and downgrades take effect immediately. As soon as the change is processed, Kelviq applies the new plan and its feature limits.
+By default, plan upgrades and downgrades take effect immediately. As soon as the change is processed, Kelviq applies the new plan and its feature limits.
+
+For a paid change, you can wait until payment succeeds before activating the new plan. Pass `paymentBehavior: "activate_on_payment"` when you update the subscription:
+
+```json
+{
+  "planIdentifier": "premium-plan",
+  "chargePeriod": "MONTHLY",
+  "paymentBehavior": "activate_on_payment"
+}
+```
+
+Omit `paymentBehavior` to keep the default immediate-update behavior.
+
+### Wait for payment before changing access
+
+`activate_on_payment` keeps the customer's current subscription active while payment for the change is pending. This prevents an unpaid plan change from replacing working access.
+
+| Payment stage | Current subscription | Updated subscription |
+| --- | --- | --- |
+| A saved card is charged successfully without customer action | Changes to `superseded` | Changes to `active` |
+| UPI, a 3DS card, or another method requires customer action | Remains `active` | Starts as `incomplete` |
+| The customer completes payment | Changes to `superseded` | Changes to `active` |
+| The immediate charge fails, or the customer does not complete payment before expiry | Remains `active` | Changes to `incomplete_expired` |
+
+Card payments that do not require authentication are usually completed during the update request, so the status change can happen immediately. When the payment method requires customer action, continue using the existing subscription until the updated subscription becomes `active`.
+
+<Warning>
+  A successful update API response does not always mean the new plan is active. When you use `activate_on_payment`, check the subscription status or the customer's current entitlements before granting access to the new plan.
+</Warning>
 
 ### Upgrades
 
 Kelviq prorates the price change against the time left in the current billing period. It credits the unused portion of the old plan, charges for the remaining portion of the new plan, and collects the net difference.
+
+With `activate_on_payment`, Kelviq waits for that payment to succeed before activating the upgraded plan.
 
 For example, if a customer moves from a $100 monthly plan to a $200 monthly plan halfway through the period, the approximate calculation is:
 
@@ -53,7 +84,7 @@ The exact amount depends on when the upgrade is processed. Existing usage counte
 
 ### Downgrades
 
-Downgrades also apply immediately. If the customer has unused value on the higher-priced plan, Kelviq converts it to account credit and applies that credit to future invoices.
+Under the default payment behavior, downgrades also apply immediately. If the customer has unused value on the higher-priced plan, Kelviq converts it to account credit and applies that credit to future invoices.
 
 <Warning>
   An immediate downgrade can lower a customer's limits below their current usage. Check the customer's entitlements after the change and decide how your application should handle any over-limit state.
@@ -61,7 +92,7 @@ Downgrades also apply immediately. If the customer has unused value on the highe
 
 ## Cancel a subscription
 
-When cancelling, choose whether the subscription should end immediately or at the end of the current billing period. A plan downgrade and a subscription cancellation are separate actions: downgrades apply immediately, while cancellations follow the option you select.
+When cancelling, choose whether the subscription should end immediately or at the end of the current billing period. A plan downgrade and a subscription cancellation are separate actions: the downgrade follows the payment behavior you choose, while the cancellation follows the timing option you select.
 
 ## Refund a cancelled subscription
 

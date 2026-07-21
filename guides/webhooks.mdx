@@ -113,7 +113,11 @@ Subscription payloads use `billing_period_start_time` and `billing_period_end_ti
 
 ### Plan changes
 
-When a subscription changes plans, Kelviq charges any prorated difference immediately and sends `subscription.plan_changed`. After the generated invoice is paid, Kelviq sends the related order and invoice events.
+By default, Kelviq applies a plan change immediately, charges any prorated difference, and sends `subscription.plan_changed`. After the generated invoice is paid, Kelviq sends the related order and invoice events.
+
+If you update a subscription with `paymentBehavior: "activate_on_payment"`, the existing subscription remains `active` while payment is pending. A payment method that requires customer action leaves the updated subscription in `incomplete`. After payment succeeds, the updated subscription becomes `active` and the previous subscription becomes `superseded`. If an immediate charge fails, or the customer does not complete payment before expiry, the updated subscription becomes `incomplete_expired` and the existing subscription remains active.
+
+Do not provision the new plan from the update API response alone. Read the latest subscription status or query the customer's current entitlements before changing access.
 
 ### Partial and full refunds
 
