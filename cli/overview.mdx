@@ -29,9 +29,7 @@ export const pro = plan({
 });
 ```
 
-<Info>
-The CLI currently ships the **read side** of pricing-as-code: authoring, pulling, and inspecting. `kelviq push` — deploying a config file to your account — is in development. Until it ships, apply changes in the [dashboard](https://app.kelviq.com) and run `kelviq pull` to keep your config file in sync.
-</Info>
+The loop is complete in both directions: `kelviq pull` turns a live environment into a config file, and `kelviq push` deploys a config file back — with a diff preview, draft-first writes, and explicit gates before anything customer-facing changes. `kelviq promote` moves your whole sandbox catalog to production the same way.
 
 ---
 
@@ -83,9 +81,28 @@ diff sandbox.config.ts production.config.ts
 
 Because the config format references everything by stable `identifier` slugs — never per-environment UUIDs — the two files are directly comparable. A clean diff means your environments genuinely match; anything else shows you exactly where they don't. Run it before a launch, after a migration, or whenever "it worked in sandbox" needs verifying.
 
-### Review pricing changes like code
+### Review pricing changes like code — then deploy them
 
-Propose a pricing change by editing `kelviq.config.ts` in a pull request — the reviewer sees exactly what changes: the new limit, the removed entitlement, the price that swapped. Today, once the PR is approved, you apply it in the [dashboard](https://app.kelviq.com) and run `kelviq pull` to confirm the applied state matches what was reviewed. When `push` ships, that last manual step becomes `kelviq push` — same file, same review, no transcription.
+Propose a pricing change by editing `kelviq.config.ts` in a pull request — the reviewer sees exactly what changes: the new limit, the removed entitlement, the price that swapped. After the merge, deploying is one command with a preview built in:
+
+```shell
+kelviq push --dry-run   # exactly what would change, zero writes
+kelviq push             # apply as drafts, after showing the diff and asking
+kelviq push --publish   # and publish the changed plans, after a second confirmation
+```
+
+Everything push writes is a **draft** by default — nothing a customer sees changes until you publish, and migrating existing customers to new entitlements or pricing always requires its own explicit flags. Pricing changes get the full GitOps treatment: PR → review → merge → push, with the dashboard as a viewer rather than the editor.
+
+### Promote sandbox to production
+
+Build and test your pricing in sandbox, then move it to production in one reviewed step:
+
+```shell
+kelviq promote --dry-run   # read-only: exactly what production would change
+kelviq promote             # apply it, drafts first, confirmation required
+```
+
+Promote matches resources across environments by identifier — no files, no UUID bookkeeping — and inherits every one of push's safety rails.
 
 ### Give your AI tools your pricing model
 
@@ -108,7 +125,7 @@ Each Kelviq surface has a distinct job — the CLI doesn't replace the others:
 | Tool | Use it for |
 |---|---|
 | **CLI** (this) | Managing the **catalog itself** — the definition of your products, features, plans, and prices — as versioned code. |
-| [Dashboard](https://app.kelviq.com) | Visual management, analytics, customer operations, and (until `push` ships) applying catalog changes. |
+| [Dashboard](https://app.kelviq.com) | Visual management, analytics, customer operations, feature renames — and reviewing the drafts push creates. |
 | [Backend](/backend-integration/node-sdk) & [frontend SDKs](/frontend-integration/react-sdk) | Your **application's** runtime integration — checkouts, entitlement checks, usage reporting inside your product. |
 | [MCP server](/guides/mcp-server) | Driving the Kelviq API conversationally from Claude, Cursor, or any MCP client. |
 | [REST API](/api-reference/introduction) | Everything, programmatically — the layer all of the above are built on. |
@@ -169,6 +186,17 @@ kelviq env
 
 Prints which environment the CLI targets and which keys are configured — useful before any command that touches your account.
 
+### Step 5: Make a change and deploy it
+
+Edit the config — bump a limit, add a plan — then:
+
+```shell
+kelviq push --dry-run   # see exactly what would change
+kelviq push             # apply it as drafts, after confirmation
+```
+
+When you're happy, `kelviq push --publish` makes the changed plans live, and `kelviq promote` carries the whole catalog from sandbox to production.
+
 ---
 
 ## The commands
@@ -180,6 +208,8 @@ Prints which environment the CLI targets and which keys are configured — usefu
 | [`kelviq logout`](/cli/commands#kelviq-logout) | Remove stored API keys. |
 | [`kelviq env`](/cli/commands#kelviq-env) | Show the configured environment and key status. |
 | [`kelviq pull`](/cli/commands#kelviq-pull) | Write your remote catalog to `kelviq.config.ts`. |
+| [`kelviq push`](/cli/commands#kelviq-push) | Deploy a `kelviq.config.ts`: diff, confirm, draft-first writes, optional publish and prune. |
+| [`kelviq promote`](/cli/commands#kelviq-promote) | Move the sandbox catalog to production with the same preview and gates. |
 
 See the full [command reference](/cli/commands) for every flag, and the [`kelviq.config.ts` reference](/cli/kelviq-config) for the file format.
 
@@ -187,7 +217,5 @@ See the full [command reference](/cli/commands) for every flag, and the [`kelviq
 
 ## What's coming
 
-- **`kelviq push`** — the write side: deploy a `kelviq.config.ts` to your account. Designed safety-first: a `--dry-run` diff preview, draft-only writes by default (nothing a customer sees changes without an explicit publish), and hard gates around publishing and customer migration. This completes the GitOps loop — pricing changes go PR → review → merge → push, with the dashboard as a viewer rather than the editor.
-- **`kelviq promote`** — environment promotion: move your sandbox catalog to production in one command. Same engine and safety rails as `push` — a `--dry-run` diff of exactly what production would change, draft-first writes, and an explicit `--publish` gate — so "test in sandbox, promote to prod" becomes a reviewed, previewable step instead of a manual re-entry.
 - **Catalog browse commands** — list and inspect products, features, and plans without a full pull.
 - **Browser-based login** — a pairing flow that mints a scoped key from your dashboard session, replacing paste-a-key.

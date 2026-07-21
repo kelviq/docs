@@ -9,9 +9,10 @@ Every Kelviq organization has a **sandbox** environment alongside production —
 ```shell
 kelviq pull           # sandbox
 kelviq pull --prod    # production
+kelviq push --prod    # production, after a diff + confirmation
 ```
 
-There is deliberately no configuration that makes an unqualified command touch production — `--prod` is always explicit, per command.
+There is deliberately no configuration that makes an unqualified command touch production — `--prod` is always explicit, per command. The one command that inherently targets production, `kelviq promote`, says so in its name, shows you the full diff of what production would change, and requires confirmation before writing (plus a typed production confirmation before any `--prune` archive). Promote needs **both** keys configured: sandbox to read, production to write.
 
 The environment is selected by **which API key is used**, not by a different host: sandbox keys operate on sandbox data, production keys on production data, against the same API base URL.
 
