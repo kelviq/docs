@@ -35,6 +35,88 @@ The CLI currently ships the **read side** of pricing-as-code: authoring, pulling
 
 ---
 
+## Why pricing-as-code?
+
+Your pricing model decides what customers are billed, what features they can reach, and what limits they hit. It is production infrastructure. But when it lives only in a dashboard, it's managed unlike any other production infrastructure you run:
+
+- **Changes are invisible to your engineering workflow.** A plan edit doesn't show up in a pull request, doesn't get a review, and doesn't appear in `git log`. The first your team hears of it may be a support ticket.
+- **There's no meaningful diff.** "What exactly changed in our Pro plan last quarter?" has no good answer when the only record is the current dashboard state.
+- **Environments drift silently.** Sandbox and production start identical and slowly diverge — a limit tweaked in one, a price fixed in the other — until "it worked in sandbox" stops meaning anything.
+- **The model lives in people's heads.** Understanding your own packaging means clicking through screens, plan by plan, feature by feature.
+
+A `kelviq.config.ts` under version control changes each of those:
+
+| Without | With pricing-as-code |
+|---|---|
+| Dashboard edits leave no trail | Every change is a commit — author, date, diff, and the PR discussion that approved it |
+| Pricing changes skip review | Pricing changes go through the same pull-request review as any other production change |
+| Sandbox/production drift is invisible | Pull both environments and `diff` them — drift is a one-command check |
+| The catalog is spread across dashboard screens | The whole monetization model is one readable file — onboarding is "read this" |
+| Mistakes surface at runtime, via the API | The file is **typed**: a misspelled field or invalid enum is a compile-time error with a "did you mean" suggestion, before Kelviq ever sees it |
+
+The concepts in the file map one-to-one to Kelviq's own — products, features, plans, entitlements, prices. If you know the [core concepts](/quickstart/core-concepts), you already know the format.
+
+---
+
+## What you can do today
+
+### Put your catalog under version control
+
+If you've already built your pricing in the dashboard, one command gets it into git:
+
+```shell
+kelviq pull
+git add kelviq.config.ts && git commit -m "Snapshot pricing catalog"
+```
+
+From here on, re-running `kelviq pull --force` and committing captures every catalog change as a diff. Run it on a schedule in CI and dashboard edits stop being invisible — they become commits your team can read.
+
+### Catch drift between sandbox and production
+
+Pull both environments and compare:
+
+```shell
+kelviq pull -o sandbox.config.ts --force
+kelviq pull --prod -o production.config.ts --force
+diff sandbox.config.ts production.config.ts
+```
+
+Because the config format references everything by stable `identifier` slugs — never per-environment UUIDs — the two files are directly comparable. A clean diff means your environments genuinely match; anything else shows you exactly where they don't. Run it before a launch, after a migration, or whenever "it worked in sandbox" needs verifying.
+
+### Review pricing changes like code
+
+Propose a pricing change by editing `kelviq.config.ts` in a pull request — the reviewer sees exactly what changes: the new limit, the removed entitlement, the price that swapped. Today, once the PR is approved, you apply it in the [dashboard](https://app.kelviq.com) and run `kelviq pull` to confirm the applied state matches what was reviewed. When `push` ships, that last manual step becomes `kelviq push` — same file, same review, no transcription.
+
+### Give your AI tools your pricing model
+
+A typed, self-contained TypeScript file is something coding assistants are genuinely good at working with — ask one to "add a Team plan between Pro and Enterprise with 25 seats" and the builders' types keep it honest; anything invalid fails to compile. Pair the CLI with the [Kelviq MCP server](/guides/mcp-server) and your assistant can read the config for context *and* apply catalog changes through the API today.
+
+### Start a new project from a template
+
+```shell
+kelviq init
+```
+
+Writes a starter `kelviq.config.ts` to edit by hand — useful when you're designing pricing for a new product and want to sketch the model in code (with autocomplete and validation) before anything exists in Kelviq.
+
+---
+
+## How it fits with the rest of Kelviq
+
+Each Kelviq surface has a distinct job — the CLI doesn't replace the others:
+
+| Tool | Use it for |
+|---|---|
+| **CLI** (this) | Managing the **catalog itself** — the definition of your products, features, plans, and prices — as versioned code. |
+| [Dashboard](https://app.kelviq.com) | Visual management, analytics, customer operations, and (until `push` ships) applying catalog changes. |
+| [Backend](/backend-integration/node-sdk) & [frontend SDKs](/frontend-integration/react-sdk) | Your **application's** runtime integration — checkouts, entitlement checks, usage reporting inside your product. |
+| [MCP server](/guides/mcp-server) | Driving the Kelviq API conversationally from Claude, Cursor, or any MCP client. |
+| [REST API](/api-reference/introduction) | Everything, programmatically — the layer all of the above are built on. |
+
+A useful rule of thumb: SDKs are how your **product** talks to Kelviq at runtime; the CLI is how your **team** manages what Kelviq is configured to sell.
+
+---
+
 ## Installation
 
 Requires Node.js 18 or newer.
@@ -105,6 +187,6 @@ See the full [command reference](/cli/commands) for every flag, and the [`kelviq
 
 ## What's coming
 
-- **`kelviq push`** — deploy a `kelviq.config.ts` to your account, with a diff preview (`--dry-run`), draft-only writes by default, and explicit gates around publishing and customer migration.
+- **`kelviq push`** — the write side: deploy a `kelviq.config.ts` to your account. Designed safety-first: a `--dry-run` diff preview, draft-only writes by default (nothing a customer sees changes without an explicit publish), and hard gates around publishing and customer migration. This completes the GitOps loop — pricing changes go PR → review → merge → push, with the dashboard as a viewer rather than the editor.
 - **Catalog browse commands** — list and inspect products, features, and plans without a full pull.
 - **Browser-based login** — a pairing flow that mints a scoped key from your dashboard session, replacing paste-a-key.

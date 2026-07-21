@@ -6,6 +6,8 @@ icon: 'file-code'
 
 `kelviq.config.ts` is a plain TypeScript file that declares your pricing catalog. You author it by hand (starting from `kelviq init`) or generate it from a live environment with `kelviq pull` — the two are interchangeable starting points.
 
+The format follows one design idea: the file describes the **desired state** of your catalog, and nothing else. Anything that's an artifact of a particular deployment — UUIDs, draft/published status, server-generated timestamps — stays out, which is what makes the same file portable across sandbox and production and meaningful to diff over time. It's TypeScript rather than YAML or JSON for one reason: **types**. Your editor autocompletes every field, invalid enums fail to compile, and a config that type-checks is a config the CLI can read.
+
 A config file imports three **builders** from `@kelviq/cli/config` and exports the results:
 
 ```ts
