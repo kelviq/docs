@@ -5,6 +5,27 @@ mode: "wide"
 rss: true
 ---
 
+<Update label="v2.7.3" description="July 21, 2026">
+
+### New Features
+
+#### Activate Subscription Updates After Payment
+
+The synchronous and asynchronous `client.subscriptions.update()` methods now support `paymentBehavior="activate_on_payment"`. This keeps the current subscription active while payment for the update is pending.
+
+```python
+subscription = client.subscriptions.update(
+    subscriptionId="78058918-9746-4280-9b9b-1bd5115eec6e",
+    planIdentifier="premium-plan",
+    chargePeriod="MONTHLY",
+    paymentBehavior="activate_on_payment",
+)
+```
+
+The SDK validates the option and serializes it as `payment_behavior`. The new plan and features are applied only after payment succeeds; if the pending update expires, the existing subscription remains active and unchanged.
+
+</Update>
+
 <Update label="v2.7.2" description="July 14, 2026">
 
 ### New Features

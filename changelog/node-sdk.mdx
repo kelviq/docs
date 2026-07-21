@@ -5,6 +5,29 @@ mode: "wide"
 rss: true
 ---
 
+<Update label="v2.7.3" description="July 21, 2026">
+
+### New Features
+
+#### Activate Subscription Updates After Payment
+
+`client.subscriptions.update()` now supports `paymentBehavior`. Use the exported `PAYMENT_BEHAVIORS.ACTIVATE_ON_PAYMENT` constant to keep the current subscription active until payment for the update succeeds.
+
+```typescript
+import { CHARGE_PERIOD_CHOICES, PAYMENT_BEHAVIORS } from "@kelviq/node-sdk";
+
+const subscription = await client.subscriptions.update({
+  subscriptionId: "78058918-9746-4280-9b9b-1bd5115eec6e",
+  planIdentifier: "premium-plan",
+  chargePeriod: CHARGE_PERIOD_CHOICES.MONTHLY,
+  paymentBehavior: PAYMENT_BEHAVIORS.ACTIVATE_ON_PAYMENT,
+});
+```
+
+The SDK serializes the option as `payment_behavior: "activate_on_payment"`. If payment is not completed and the pending update expires, the existing subscription remains active and unchanged.
+
+</Update>
+
 <Update label="v2.7.2" description="July 14, 2026">
 
 ### New Features

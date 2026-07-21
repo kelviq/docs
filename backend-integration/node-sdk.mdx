@@ -935,14 +935,15 @@ A `CreateSubscriptionResponse` containing the created subscription, including it
 
 
 ```typescript
-import { CHARGE_PERIOD_CHOICES } from '@kelviq/node-sdk';
+import { CHARGE_PERIOD_CHOICES, PAYMENT_BEHAVIORS } from '@kelviq/node-sdk';
 
 try {
     const response = await client.subscriptions.update({
       subscriptionId: "sub_node_78058918",
       planIdentifier: "premium-plan-node",
       chargePeriod: CHARGE_PERIOD_CHOICES.MONTHLY,
-      trialEnd: "2025-12-31T23:59:59Z" // or "now" to end the trial immediately
+      trialEnd: "2027-12-31T23:59:59Z", // or "now" to end the trial immediately
+      paymentBehavior: PAYMENT_BEHAVIORS.ACTIVATE_ON_PAYMENT
     });
 } catch (e) {
     console.error(`Error updating subscription: ${e}`);
@@ -985,8 +986,9 @@ try {
         * Example: `[{"identifier": "seats", "quantity": 10}, {"identifier": "projects", "quantity": 5}]`
 * `trialEnd` (string): Controls the trial period for the updated subscription. Accepts either:
     * The literal string `"now"` to end any active trial immediately.
-    * An ISO 8601 datetime string (e.g. `"2025-12-31T23:59:59Z"`) to set a new trial end date. The datetime must be in the future. Naive datetimes (no timezone designator) are interpreted as UTC.
+    * An ISO 8601 datetime string (e.g. `"2027-12-31T23:59:59Z"`) to set a new trial end date. The datetime must be in the future. Naive datetimes (no timezone designator) are interpreted as UTC.
     * If omitted, the existing trial behavior on the subscription is preserved.
+* `paymentBehavior` (`PaymentBehavior`): Set to `PAYMENT_BEHAVIORS.ACTIVATE_ON_PAYMENT` (the value `"activate_on_payment"`) to keep the current subscription active while payment is pending. The new plan and features are applied only after payment succeeds. If the pending update expires, the current subscription remains unchanged. Omit this field to use the default immediate-update behavior.
 
 The SDK validates `trialEnd` client-side — invalid datetime strings or past datetimes throw `InvalidRequestError` before the request is sent.
 
