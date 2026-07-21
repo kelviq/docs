@@ -1,72 +1,53 @@
 ---
-title: 'Managing Your Payment Methods'
-description: 'A guide for managing payment methods for your subscriptions.'
+title: "Managing payment methods"
+description: "How your customers add, update, and remove payment methods"
 ---
 
+## Multiple customer records with one email
 
-## Why Do I Have Multiple Customer Accounts?
+More than one customer record can use the same email address. Each record has a unique customer ID and keeps its own subscriptions, payment methods, and billing details.
 
-You might notice that you have multiple customer accounts under your profile, even if you are using a single email address.
+If a customer sees more than one record in the portal, they should select the record connected to the subscription they want to manage.
 
-When you subscribe to multiple products using the same email address, our system automatically creates a **separate customer ID** for each product subscription. This is intentionally designed so that you can independently manage the payment methods for each individual product—such as setting a default payment method, adding a new payment method, or deleting an existing one.
+## How Kelviq chooses a payment method
 
-If you have multiple products managed under the *same* customer ID, those products will be listed together under that specific customer profile.
+When a subscription renews, Kelviq first charges the payment method selected when the subscription was created.
 
-**Key takeaway:** Each separate customer account has its own:
+If that payment method fails because it has expired, has insufficient funds, or cannot be processed, Kelviq uses the saved default payment method as a fallback.
 
-* Assigned products and active subscriptions
-* Payment methods
-* Billing details
+## How customers pay a failed card invoice
 
-Make sure you are viewing the correct customer account from your Settings when updating payment methods or checking your subscription statuses.
+If an automatic card payment fails, your customer gets an email with a link to pay the invoice. They can also open **Settings > Billing** in the Customer Portal to add or update a payment method.
 
----
+Paying an invoice manually does not turn off automatic payments. The customer's payment authorization remains active for future renewals.
 
-## Payment Methods and Fallback
+See [Failed subscription payments](/product-catalog/subscriptions#failed-subscription-payments) for the card retry schedule.
 
-When managing your subscriptions and billing details, it's important to understand how payment methods are prioritized to ensure your services remain uninterrupted.
+## How customers manage payment methods
 
-### Default Payment Method
+### Add a payment method
 
-In your Billing Settings, you can add multiple payment methods (such as credit cards, Amazon pay, Link, UPI etc.. ) and designate one as your **Default Payment Method**.
+1. The customer opens **Settings** from the main menu and selects **Billing**.
+2. They select the customer record they want to update.
+3. They click **Add Payment Method**.
+4. They enter the payment details and click **Save**.
 
-### How the Fallback Works
+The new payment method appears under **Saved payment methods**.
 
-When a subscription renews or an automatic charge occurs, the system will primarily attempt to charge the payment method that was selected at the time of subscription.
+### Set the default payment method
 
-However, if the primary payment method used for the subscription fails (e.g., due to an expired card, insufficient funds, or a processing error), the system will automatically use your **Saved Default Payment Method** as a fallback.
+The default payment method is used as a fallback if the payment method attached to a subscription fails.
 
-This fallback mechanism ensures that your subscription remains active and you do not experience any disruption in service.
+1. The customer opens **Settings > Billing**.
+2. They find the payment method they want to use as the default.
+3. They click the star icon next to it.
 
----
+The portal adds a **Default** badge to the selected payment method.
 
-## Managing Your Payment Methods
+### Delete a payment method
 
-Below are detailed instructions on how to keep your billing information up to date across your customer accounts.
+Customers cannot delete their current default payment method. They must set another payment method as the default first.
 
-### Adding a Payment Method
-
-You can add multiple payment methods to ensure you always have a valid card on file for your subscriptions.
-
-1. Navigate to **Settings** from the main menu and select the **Billing** tab.
-2. Locate the specific customer account you wish to update (if you have multiple accounts).
-3. Click on the **Add Payment Method** button.
-4. Securely enter your new credit card details (card number, expiration date, and CVC or other payment methods) and click save. The card will now appear under your "Saved payment methods".
-
-### Setting a Default Payment Method
-
-Your default payment method acts as a reliable fallback if an active subscription charge fails.
-
-1. Navigate to **Settings** > **Billing**.
-2. Find the card you want to prioritize under your saved payment methods.
-3. Click the **star icon** next to the saved card to set the it as default. You should see a "DEFAULT" badge appear next to the card, indicating it is now your primary fallback payment method
-
----
-
-### Deleting a Payment Method
-
-If a card has expired or you no longer want to use it for future billing, you can easily remove it. *Note: You cannot delete a card that is currently set as your default payment method.*
-
-1. Navigate to **Settings** > **Billing**.
-2. Locate the saved card you want to remove.
-3. Click the **trash can icon** next to the payment method to remove payment method from your account.
+1. The customer opens **Settings > Billing**.
+2. They find the payment method they want to remove.
+3. They click the trash icon next to it.

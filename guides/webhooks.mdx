@@ -30,6 +30,25 @@ Your signing secret is shown only once. If you lose it, you must regenerate it f
 
 ---
 
+## Inspect and resend deliveries
+
+Open **Settings → Webhooks** and select an endpoint to view its delivery logs. Each delivery shows the event type, status, response code, and response body.
+
+To retry a delivery:
+
+1. Fix the endpoint or deployment issue that caused the delivery to fail.
+2. Open the failed delivery in the webhook logs.
+3. Click **Resend**.
+4. Review the new delivery attempt and its response.
+
+Kelviq also retries failed deliveries automatically. A manual resend is useful when the endpoint is working again and you want to retry immediately.
+
+<Warning>
+  Automatic retries and manual resends can deliver the same event more than once. Process webhooks idempotently using the event `id` or the `webhook-id` header.
+</Warning>
+
+---
+
 ## Event Types
 
 | Event | Description |
@@ -49,6 +68,61 @@ Your signing secret is shown only once. If you lose it, you must regenerate it f
 | `invoice.paid` | An invoice was paid and funds were collected. |
 | `refund.created` | A refund was initiated. |
 | `refund.updated` | A refund's status changed (e.g., from pending to completed). |
+
+---
+
+## Checkout, subscription, and payment lifecycle
+
+### Checkout and subscription creation
+
+`checkout.completed` confirms that checkout finished successfully, but it does not include `subscription_id`. Kelviq creates the subscription after checkout and sends its ID in `subscription.created`.
+
+Use your customer identifier or checkout `metadata` to correlate the two events. See [Add metadata to checkout](/checkout/checkout-metadata) for request and webhook examples. Do not treat the checkout redirect as proof that a subscription has been created.
+
+### Successful invoice payments
+
+Kelviq sends `invoice.paid` whenever an invoice is paid, including invoices that are created directly with a `PAID` status. Use this event for payment-driven work such as recording revenue, starting an asynchronous provisioning job, or notifying an internal system.
+
+For request-time access checks, query the customer's current entitlements instead of relying on a local webhook-derived subscription state.
+
+### Subscription end dates
+
+Subscription webhook objects now include `end_date` inside `data.object`. The field contains an ISO 8601 date when the subscription has a known end date and is `null` while no end date is set.
+
+Use `end_date` for the subscription's scheduled or final end. `billing_period_end_time` describes the current billing period instead and should not be treated as the subscription's cancellation date.
+
+### Failed renewal payments
+
+Kelviq does not currently send a separate `payment.failed` event. For a failed card renewal:
+
+1. The subscription moves to `past_due`.
+2. Kelviq emails the customer a payment link.
+3. Kelviq sends `subscription.updated` with the new subscription state.
+4. Kelviq retries collection up to eight times over 14 days.
+5. If all recovery attempts fail, Kelviq cancels the subscription and sends `subscription.cancelled`.
+
+Do not remove access when you receive the first `subscription.updated` with `past_due` unless that is your own policy. Use the final subscription status or a live entitlement check to decide when access should end.
+
+<Note>
+  The retry window applies only to card payments. Kelviq does not retry a failed non-card renewal; the subscription is cancelled after the failure.
+</Note>
+
+### Billing period field names
+
+Subscription payloads use `billing_period_start_time` and `billing_period_end_time`. Match these names exactly when parsing dates. They describe the current billing period; use `end_date` for the subscription's scheduled or final end.
+
+### Plan changes
+
+When a subscription changes plans, Kelviq charges any prorated difference immediately and sends `subscription.plan_changed`. After the generated invoice is paid, Kelviq sends the related order and invoice events.
+
+### Partial and full refunds
+
+`order.refunded` identifies whether the order is partially or fully refunded through its `status`:
+
+* `PARTIAL_REFUND` for a partial refund
+* `REFUNDED` for a full refund
+
+The `order.refunded` payload does not include the refunded amount. Read `amount` or `amount_units` from `refund.created` and `refund.updated` when you need the exact value.
 
 ---
 
@@ -1074,7 +1148,7 @@ func main() {
 ## Best Practices
 
 - **Return `2xx` fast.** Acknowledge the webhook immediately and process it asynchronously. Long-running handlers increase the risk of timeouts and duplicate retries.
-- **Make handlers idempotent.** The same event may be delivered more than once. Use `data.id` (the event UUID) as a deduplication key.
+- **Make handlers idempotent.** The same event may be delivered more than once. Use the top-level event `id` or the `webhook-id` header as the deduplication key.
 - **Validate the timestamp.** Reject requests where `webhook-timestamp` is more than 5 minutes from your server's clock to prevent replay attacks.
 - **Use `hmac.compare_digest` / `hmac.Equal` / `crypto.timingSafeEqual`.** Constant-time comparison prevents timing side-channel attacks.
 - **Store the raw body before parsing.** Signature verification operates on the raw bytes, not the deserialized object.

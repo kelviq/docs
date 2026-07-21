@@ -43,6 +43,12 @@ You can create records manually.
   <img height="200" src="/images/create-customer-modal.png" />
 </Frame>
 
+<Note>
+  More than one customer record can use the same email address, but every record must have a unique **Identifier**. The API calls this value `customerId`.
+
+  When recreating a test customer, you can reuse the email address, but you must provide a new Identifier. An Identifier cannot be reused after its customer is archived. If you receive a `customer already exists` error, check the Identifier first.
+</Note>
+
 ## Manage existing customers
 
 You can edit details or revoke access from the list view.
@@ -65,6 +71,8 @@ Archiving makes a customer inactive and revokes their access. Click the **three 
 </Frame>
 You will see a confirmation warning. Click **Confirm** to proceed.
 
+Kelviq archives customers; it does not hard-delete them. The archived record keeps its Identifier, so that value cannot be reused. To create another customer with the same email address, use a new Identifier.
+
 <Warning>
   You cannot archive a customer with an active subscription. You must cancel their subscription first.
 </Warning>
@@ -84,20 +92,35 @@ This page holds the source of truth for that user. You can see their unique Bill
 This section lists active and past plans. It shows the status, such as Active or Canceled, and the relevant dates.
 
 **Add a subscription**
-You can manually subscribe a customer to a plan from here.
+You can generate a checkout link for a customer from here. The plan must already exist and have a published price.
 
 <Frame>
   <img height="200" src="/images/add-subscription.png" />
 </Frame>
 
-1.  Click **Add subscription**.
-2.  Set the **Billing period** and **Currency**.
-3.  Select the **Features** included in this specific sub.
-4.  Set the **Usage limits** or allowances.
-5.  Choose a **Start date**. You can also adjust the **Free trial** period here.
+1. Click **Add subscription**.
+2. Select a published plan.
+3. Choose the **Billing period** and **Currency**.
+4. Enter quantities for priced features when required.
+5. Enter the checkout **Success URL**.
+6. Click **Generate checkout link** and share it with the customer.
+
+The subscription starts only after the customer completes checkout. This flow does not create a plan or accept a negotiated custom amount. For either case, see [Create an Enterprise plan](/product-catalog/create-an-enterprise-plan).
 
 **Edit a subscription**
 You can also modify an existing subscription. Click on the subscription card to update terms, change status, or extend trial dates.
+
+### Files, links, and license keys
+
+The customer detail page shows the deliverables the customer received through their plans:
+
+* **Files** — View and download digital files available to the customer.
+* **Links** — Open private or external resource links attached to the plan.
+* **License keys** — View issued license keys and use the available license-management controls.
+
+These sections let support teams confirm access without opening each order separately.
+
+For catalog setup, see [Digital Downloads](/product-catalog/digital-downloads), [Links](/product-catalog/links), and [License Key Management](/product-catalog/license-keys).
 
 
 ### Entitlements

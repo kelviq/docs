@@ -65,6 +65,59 @@ from kelviq_sdk import Kelviq
 async_client = Kelviq.create_async_client(access_token=ACCESS_TOKEN)
 ```
 
+## Caching and offline resilience
+
+Entitlement caching is enabled by default for both synchronous and asynchronous clients. The SDK keeps a per-process in-memory cache with a 60-second freshness window. Reads use a fresh memory entry first, then an optional distributed cache, and then the Entitlement API.
+
+If the API is unreachable or returns a server error, the SDK returns the last known cached entitlement response when one exists. If the customer or feature has never been cached, the original request error is raised.
+
+```python
+client = Kelviq.create_sync_client(
+    access_token=ACCESS_TOKEN,
+    enable_cache=True,  # default: True
+    cache_ttl=60.0,     # default: 60 seconds
+)
+```
+
+Set `enable_cache=False` to disable caching.
+
+### Share the cache across workers
+
+The in-memory cache and offline reporting queue belong to one process and disappear when it restarts. Use the optional Redis store when multiple workers, processes, or containers need one shared, durable cache and queue.
+
+```shell
+pip install "kelviq-sdk[redis]"
+```
+
+```python
+from kelviq_sdk import Kelviq, RedisStore
+
+store = RedisStore(
+    url="redis://localhost:6379/0",
+    prefix="kelviq:production",
+)
+
+client = Kelviq.create_sync_client(
+    access_token=ACCESS_TOKEN,
+    cache_store=store,
+)
+```
+
+For an asynchronous client, use `AsyncRedisStore`. Use the same prefix for every worker that should share state.
+
+### Replay queued usage
+
+When a usage or event report fails because of a network problem, the SDK queues it and retries automatically on the next report call. You can also flush the queue explicitly:
+
+```python
+remaining = client.reporting.flush()
+# Async: remaining = await async_client.reporting.flush()
+```
+
+`remaining` is the number of reports still queued. Without Redis, the queue exists only in the current process.
+
+See [When the Entitlement API is unavailable](/product-catalog/entitlements#when-the-entitlement-api-is-unavailable) for access-control fallback guidance.
+
 #### Enum Helpers
 
 The SDK provides `ChargePeriod` and `CancellationType` enum classes to prevent typos when passing required string parameters:
@@ -311,6 +364,8 @@ print(f"Checkout Session URL: {response.checkoutUrl}")
         * `"WEEKLY"` / `ChargePeriod.WEEKLY`
 
         * `"DAILY"` / `ChargePeriod.DAILY`
+
+        * `"TWENTY_EIGHT_DAYS"` / `ChargePeriod.TWENTY_EIGHT_DAYS`
 
         * `"THREE_MONTHS"` / `ChargePeriod.THREE_MONTHS`
 
@@ -962,7 +1017,7 @@ print(subscription.id, subscription.status)
 **Required Parameters:**
 
 * `planIdentifier` (str): Identifier of the plan to subscribe to.
-* `chargePeriod` (str | ChargePeriod): Billing period such as `MONTHLY`, `YEARLY`, `WEEKLY`, or `DAILY`.
+* `chargePeriod` (str | ChargePeriod): Billing period such as `MONTHLY`, `YEARLY`, `WEEKLY`, `DAILY`, or `TWENTY_EIGHT_DAYS`.
 * `customerId` (str): Client-defined identifier of the customer.
 
 **Optional Parameters:**
@@ -1035,6 +1090,7 @@ except Exception as e:
     * `"YEARLY"` / `ChargePeriod.YEARLY`
     * `"WEEKLY"` / `ChargePeriod.WEEKLY`
     * `"DAILY"` / `ChargePeriod.DAILY`
+    * `"TWENTY_EIGHT_DAYS"` / `ChargePeriod.TWENTY_EIGHT_DAYS`
     * `"THREE_MONTHS"` / `ChargePeriod.THREE_MONTHS`
     * `"SIX_MONTHS"` / `ChargePeriod.SIX_MONTHS`
 
@@ -1511,6 +1567,7 @@ Always pass the **raw** request body (e.g. `request.data` in Flask) to `validate
 | `subscription.updated` | A subscription was updated |
 | `subscription.cancelled` | A subscription was cancelled |
 | `subscription.plan_changed` | A subscription plan was changed |
+| `feature.usage_alert` | A feature's usage crossed a configured threshold |
 | `invoice.created` | A new invoice was created |
 | `invoice.paid` | An invoice was paid |
 | `refund.created` | A refund was initiated |

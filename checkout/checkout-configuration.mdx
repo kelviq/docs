@@ -27,27 +27,38 @@ Checkout links are generated at the **product level**. Each link can include one
 3. **Select plans** → Choose which plans to include
 4. **Configure options** → Set defaults and features
 5. **Copy link** → Share with customers
-<Frame>
-      <img height="200" src="/images/generate-checkout.png" />
-</Frame>
+
 ### Link Format
 
-Generated checkout links follow this pattern:
+A production checkout link starts with your product UUID:
 
 ```
-https://checkout.kelviq.com/products/{PRODUCT_ID}
-  ?enabled={PLAN_1_ID},{PLAN_2_ID}
-  &plan_identifier={DEFAULT_PLAN_ID}
-  &charge_period={DEFAULT_PERIOD}
+https://www.kelviq.com/buy/{PRODUCT_UUID}/
 ```
 
-Example:
+Sandbox links use `https://www.kelviq.com/sandbox/buy/{PRODUCT_UUID}/`. Copy the link from the dashboard so the environment and product UUID are correct. The old product identifier is not used in checkout URLs.
+
+Add query parameters to control what the customer sees:
+
+| Parameter | What it controls | Example |
+| --- | --- | --- |
+| `enabled` | Comma-separated plan identifiers shown at checkout | `basic,pro` |
+| `plan_identifier` | Plan selected when checkout opens | `pro` |
+| `charge_period` | Billing period selected when checkout opens | `MONTHLY` |
+| `discounts_enabled` | Whether the discount-code field is available | `true` |
+| `discount_code` | A valid discount code to apply automatically | `LAUNCH20` |
+| `customer_id` | Customer record associated with checkout | `cust_789` |
+| `success_url` | Where to send the customer after a successful checkout | `https://example.com/checkout/success` |
+
+For example:
+
+```text
+https://www.kelviq.com/buy/123e4567-e89b-12d3-a456-426614174000/?enabled=basic,pro&plan_identifier=pro&charge_period=MONTHLY&discounts_enabled=true&discount_code=LAUNCH20&customer_id=cust_789&success_url=https%3A%2F%2Fexample.com%2Fcheckout%2Fsuccess
 ```
-https://checkout.kelviq.com/products/prod_abc123
-  ?enabled=plan_basic,plan_pro
-  &plan_identifier=plan_pro
-  &charge_period=monthly
-```
+
+URL-encode `success_url` and any other parameter value that contains reserved characters.
+
+[See every supported static checkout parameter and complete examples →](/checkout/static-checkout-url)
 
 ## Multi-Plan Checkout
 
@@ -115,7 +126,7 @@ Plan: Pro
 
 In your checkout link:
 ```
-&charge_period=monthly
+&charge_period=MONTHLY
 ```
 
 ### Pricing by Period
@@ -177,9 +188,9 @@ Plan: Professional
 
 ## Advanced Checkout Configuration
 
-### Custom Return URL
+### Success and Cancellation URLs
 
-After checkout succeeds, redirect customers to your custom URL:
+After checkout succeeds, redirect customers to your own confirmation or onboarding page:
 
 ```
 Customer completes purchase
@@ -193,10 +204,77 @@ You can:
 - Continue onboarding
 ```
 
-Configure in your checkout link via API or dashboard:
+For a static checkout link, add the URL-encoded `success_url` parameter:
+
+```text
+&success_url=https%3A%2F%2Fyourdomain.com%2Fcheckout-success
 ```
-&return_url=https://yourdomain.com/checkout-success
+
+When creating a checkout session through the API, use `successUrl`. You can also provide `cancelUrl` to redirect the customer if they cancel payment.
+
+### Checkout Session Options
+
+`POST /api/v1/checkout/` accepts options that let you tailor a checkout session without changing the underlying plan.
+
+| Field | What it does |
+| --- | --- |
+| `successUrl` | Redirects the customer after a successful checkout |
+| `cancelUrl` | Redirects the customer if payment is cancelled |
+| `plansEnabled` | Limits checkout to a comma-separated list of plan identifiers |
+| `discountsEnabled` | Shows or hides discount-code entry; defaults to `true` |
+| `discountCode` | Applies a valid discount code before checkout opens |
+| `lockEmail` | Prevents the customer from changing the pre-filled email address |
+| `defaultBillingCountry` | Pre-fills the billing country using a two-letter ISO country code |
+| `currencyCode`, `customAmount`, `taxBehavior` | Sets a custom charge and its tax treatment |
+| `metadata` | Attaches your own key-value data to the checkout session |
+
+For a complete request, webhook example, and implementation guidance, see [Add metadata to checkout](/checkout/checkout-metadata).
+
+```javascript
+const response = await fetch("https://api.kelviq.com/api/v1/checkout/", {
+  method: "POST",
+  headers: {
+    "Content-Type": "application/json",
+    Authorization: `Bearer ${process.env.KELVIQ_SERVER_API_KEY}`,
+  },
+  body: JSON.stringify({
+    planIdentifier: "pro",
+    chargePeriod: "MONTHLY",
+    customerId: "customer-123",
+    successUrl: "https://example.com/checkout/success",
+    cancelUrl: "https://example.com/pricing",
+    plansEnabled: "basic,pro",
+    discountsEnabled: true,
+    discountCode: "LAUNCH20",
+    lockEmail: true,
+    defaultBillingCountry: "US",
+  }),
+});
+
+const { checkoutUrl } = await response.json();
 ```
+
+### Visual Customization Preview
+
+<Warning>
+  The `customization` object is available on the staging checkout API, but its production schema has not been published. Keep it out of production integrations until it appears in the API reference.
+</Warning>
+
+On staging, pass a checkout color override like this:
+
+```json
+{
+  "planIdentifier": "pro",
+  "chargePeriod": "MONTHLY",
+  "customerId": "customer-123",
+  "successUrl": "https://example.com/checkout/success",
+  "customization": {
+    "color": "red"
+  }
+}
+```
+
+Visibility controls for the **Features & limits** section, along with label, placeholder, and button overrides, are still being finalized. Their field names and behavior are not part of the public API contract yet.
 
 ### Discount Code Integration
 
@@ -214,6 +292,8 @@ Customer at checkout:
 ```
 
 Discount codes are applied automatically if the customer enters a valid code.
+
+[See API and static-link examples for applying a discount code →](/checkout/apply-a-discount-code)
 
 ### Tax Collection
 
@@ -338,7 +418,7 @@ Product: My Course
 ├─ Plan: Full Access ($49)
 └─ Billing: One-time payment
 
-Link: ?enabled=full_access&plan_identifier=full_access&charge_period=one_time
+Link: ?enabled=full_access&plan_identifier=full_access&charge_period=ONE_TIME
 ```
 
 ### Example 2: Tiered Plans
@@ -353,7 +433,7 @@ Product: Pro Templates
 
 Link: ?enabled=starter,pro,enterprise
        &plan_identifier=pro
-       &charge_period=monthly
+       &charge_period=MONTHLY
 ```
 
 ### Example 3: Free + Paid
@@ -367,7 +447,7 @@ Product: Productivity App
 
 Link: ?enabled=free,premium
        &plan_identifier=free
-       &charge_period=monthly
+       &charge_period=MONTHLY
 ```
 
 ## Payment Methods
@@ -376,6 +456,7 @@ Kelviq uses **Stripe** as its payment processor. Stripe supports:
 
 - **Credit/Debit Cards** - Visa, Mastercard, American Express, Discover
 - **Digital Wallets** - Apple Pay, Google Pay
+- **UPI and UPI AutoPay** - UPI payments and recurring subscription mandates for eligible customers in India
 - **Bank Transfers** - ACH, SEPA, etc. (regional)
 - **Local Methods** - iDEAL, Bancontact, Giropay, EPS (regional)
 
@@ -384,6 +465,10 @@ Customers select their preferred payment method at checkout.
 <Info>
   Payment method availability depends on customer location and Stripe's local support. Cards are universally supported.
 </Info>
+
+### Does Kelviq support UPI AutoPay?
+
+Yes. Kelviq supports UPI AutoPay for recurring subscriptions. Eligible customers in India can authorize the recurring payment at checkout. Availability depends on support from the customer's bank and UPI app.
 
 ## Currency & Localization
 

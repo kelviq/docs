@@ -1,0 +1,149 @@
+---
+title: "Create a one-time charge"
+description: "Charge a customer's saved payment method without sending them through checkout"
+---
+
+Use the Create Charge API when an existing customer has agreed to a one-time purchase and already has a usable payment method saved in Kelviq. The payment is attempted immediately, so the customer does not need to complete another checkout session.
+
+Common examples include selling an add-on after the original checkout or collecting a one-time setup fee from an existing customer.
+
+<Warning>
+  Create a charge from your backend only. It requires a Server API Key, which must never be exposed in browser or mobile-app code.
+</Warning>
+
+## Before you start
+
+Make sure all of the following are true:
+
+- The customer already exists in the same Kelviq environment as your API key.
+- The customer has a usable default payment method from a previous checkout or an active subscription.
+- The plan has a one-time price and you know its plan identifier.
+- You have the customer's unique `customerId`.
+
+Sandbox and production are isolated. A sandbox customer or payment method cannot be charged with a production key, and the reverse is also true.
+
+## Create the charge
+
+Send `POST /api/v1/charges/` with the plan and customer identifiers. `chargePeriod` must be `ONE_TIME`.
+
+<CodeGroup>
+
+```bash cURL
+curl --request POST \
+  --url https://sandboxapi.kelviq.com/api/v1/charges/ \
+  --header "Authorization: Bearer $KELVIQ_SANDBOX_SERVER_API_KEY" \
+  --header "Content-Type: application/json" \
+  --data '{
+    "planIdentifier": "lifetime-access",
+    "chargePeriod": "ONE_TIME",
+    "customerId": "cust_789",
+    "currencyCode": "USD",
+    "features": [
+      {
+        "identifier": "seats",
+        "quantity": 5
+      }
+    ]
+  }'
+```
+
+```typescript Node.js SDK
+import { Kelviq } from "@kelviq/node-sdk";
+
+const client = new Kelviq({
+  accessToken: process.env.KELVIQ_SANDBOX_SERVER_API_KEY,
+  environment: "sandbox",
+});
+
+const charge = await client.charges.create({
+  planIdentifier: "lifetime-access",
+  chargePeriod: "ONE_TIME",
+  customerId: "cust_789",
+  currencyCode: "USD",
+  features: [{ identifier: "seats", quantity: 5 }],
+});
+
+console.log(charge.id, charge.status, charge.amount);
+```
+
+```python Python SDK
+import os
+from kelviq_sdk import Kelviq
+
+client = Kelviq.create_sync_client(
+    access_token=os.environ["KELVIQ_SANDBOX_SERVER_API_KEY"],
+    environment="sandbox",
+)
+
+charge = client.charges.create(
+    planIdentifier="lifetime-access",
+    chargePeriod="ONE_TIME",
+    customerId="cust_789",
+    currencyCode="USD",
+    features=[{"identifier": "seats", "quantity": 5}],
+)
+
+print(charge.id, charge.status, charge.amount)
+```
+
+</CodeGroup>
+
+The `features` and `currencyCode` fields are optional. Include `features` when the customer is choosing a quantity, such as five seats. If the customer already has a currency, `currencyCode` must match it.
+
+## Handle the response
+
+A successful request returns `201 Created` with the charge record:
+
+```json
+{
+  "id": "7c2f3a91-2d4e-4a8b-9b1c-6f0a2e5d9c11",
+  "startDate": "2026-06-20",
+  "endDate": null,
+  "billingPeriodStartTime": null,
+  "billingPeriodEndTime": null,
+  "amount": "49.00",
+  "recurrence": "",
+  "currency": "USD",
+  "status": "active",
+  "product": {
+    "name": "Invoice Test",
+    "id": "88e437b8-6017-405b-9328-e0f4e140bb79",
+    "identifier": "invoice-test"
+  },
+  "plan": {
+    "name": "Lifetime Access",
+    "identifier": "lifetime-access"
+  },
+  "features": [],
+  "trialDaysRemaining": 0,
+  "customerId": "cust_789",
+  "billingType": "ONE_TIME"
+}
+```
+
+Store the returned `id` with your own purchase record. You can also confirm the payment from **Sales → Orders** in the Kelviq dashboard.
+
+## Handle failed charges
+
+The API returns `400 Bad Request` when Kelviq cannot complete the payment. The response includes a `detail` message describing the problem.
+
+| Cause | What to do |
+| --- | --- |
+| No default payment method | Send the customer through checkout so they can add a payment method. |
+| Payment declined | Ask the customer to update their payment method, then try again with their approval. |
+| Payment requires authentication | Use checkout so the customer can complete the required authentication. |
+| `chargePeriod` is not `ONE_TIME` | Use `ONE_TIME`, or use the Subscriptions API for recurring billing. |
+| API key and customer are in different environments | Use the matching sandbox or production key and customer. |
+
+Do not automatically retry a `400` response. If a request times out and the outcome is unclear, check **Sales → Orders** before sending it again to avoid charging the customer twice.
+
+## When to use checkout instead
+
+Use a [checkout session](/checkout/checkout-configuration) when the customer needs to:
+
+- enter a payment method for the first time;
+- complete card or bank authentication;
+- review and confirm the purchase in a hosted payment flow; or
+- start a recurring subscription.
+
+For every request field and response property, see [Create a charge API reference](/api-reference/charges/create-a-charge).

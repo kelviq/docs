@@ -101,6 +101,42 @@ Do not enter a real card number in the sandbox.
 
 After payment, confirm that the test order, customer, subscription, and entitlements have the expected state in Sandbox mode.
 
+## Test a subscription renewal
+
+Use a daily billing interval to test a renewal without waiting for a monthly or yearly billing cycle.
+
+1. Enter Sandbox mode in the Kelviq dashboard.
+2. Open the test plan you want to use.
+3. Under **Billing cycles**, select **Daily** and enter a test price.
+4. Publish the plan.
+5. Start a subscription with a sandbox test card.
+6. After the next billing cycle, check the order, invoice, subscription status, and entitlements in Sandbox mode.
+
+If you create the checkout session through the API, set `chargePeriod` to `DAILY`:
+
+```json
+{
+  "planIdentifier": "sandbox-renewal-test",
+  "chargePeriod": "DAILY",
+  "customerId": "test-customer-001",
+  "successUrl": "https://example.com/billing/success"
+}
+```
+
+<Note>
+  Any sandbox organization can request Daily billing. It is not limited to selected accounts. If **Daily** does not appear in the dashboard, contact [Kelviq support](mailto:hi@kelviq.com) to have it enabled.
+</Note>
+
+## Can I test production with my own card?
+
+No. Do not place a live order using your own card just to test production credentials. Payment providers can treat a self-payment as suspicious and block the card, even when the amount is small. There is no safe minimum price for this test.
+
+Use one of these options instead:
+
+* Keep payment and renewal testing in Sandbox.
+* If you need to inspect the production checkout, [create a 100% discount code](/product-catalog/discounts) so no real payment is collected.
+* Check production credentials, URLs, and environment settings without completing a purchase.
+
 ## Prepare for production
 
 Before accepting live payments:

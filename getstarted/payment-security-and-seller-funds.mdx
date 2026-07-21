@@ -1,0 +1,94 @@
+---
+title: "Payment security and seller funds"
+description: "How Kelviq protects card details, routes payments through Stripe, and handles payouts, account reviews, and migrations"
+---
+
+When a customer buys through Kelviq Checkout, Kelviq is the Merchant of Record and Stripe processes the payment. Stripe also provides the connected account used for your payouts. Here is where the card details, money, and subscription records go at each stage.
+
+<Note>
+This page is an operational overview. If it conflicts with the [Seller Agreement](/legal/master-service-agreement), the agreement controls.
+</Note>
+
+## How does a payment move?
+
+<Steps>
+  <Step title="The customer enters their payment details">
+    Kelviq Checkout uses [Stripe Elements](https://docs.stripe.com/payments/elements). Stripe tokenizes sensitive payment details in the browser, so the full card number and CVC do not pass through or get stored on Kelviq's servers.
+  </Step>
+  <Step title="Stripe processes the charge">
+    The charge and its PaymentIntent are created on Kelviq's Stripe platform account because Kelviq is the Merchant of Record.
+  </Step>
+  <Step title="Kelviq calculates your share">
+    Kelviq accounts for applicable taxes, platform fees, refunds, and other adjustments before calculating your net revenue.
+  </Step>
+  <Step title="Your revenue moves to your connected account">
+    Kelviq creates a separate transfer to your Stripe Express connected account. The funds appear there after Stripe makes them available.
+  </Step>
+  <Step title="Stripe pays your bank account">
+    You can withdraw cleared funds to the bank account attached to your connected account.
+  </Step>
+</Steps>
+
+<Info>
+Kelviq uses Stripe Connect's **separate charges and transfers** model. It does not use direct charges or destination charges. See the [full payment flow](/legal/payment-flow-diagram) for the technical breakdown.
+</Info>
+
+## Who handles the card details?
+
+The checkout may carry Kelviq's design, but Stripe provides the sensitive payment fields. Stripe.js tokenizes the details inside those fields and returns identifiers Kelviq can use to complete the payment. Kelviq receives the payment result, not the customer's full card number or CVC.
+
+Stripe can also request 3D Secure authentication when it is required by the card issuer or recommended for fraud prevention. This adds an identity check without exposing the customer's card details to Kelviq.
+
+Banks can still decline or reverse a payment, customers can open disputes, and Stripe or a card network can request a review. Kelviq handles those events as the Merchant of Record.
+
+## Where does the money actually sit?
+
+During processing, the money appears in Stripe balances. It first appears in Kelviq's Stripe platform balance. After the separate transfer, your share appears in your Stripe connected-account balance. Stripe then sends the payout to your registered bank account.
+
+A Kelviq payout balance is not a bank deposit, escrow account, or insured investment. It represents amounts due under the Seller Agreement and can change because of refunds, chargebacks, fees, currency conversion, or a valid reserve.
+
+You can track this flow in two places:
+
+- The Kelviq **Payouts** dashboard shows processing funds, cleared funds, withdrawals, and payout history.
+- Your Stripe connected-account details show the verified business and bank account used for payouts.
+
+Read [Payouts](/payouts/overview) for the dashboard workflow.
+
+## What protects my funds if Kelviq closes my account?
+
+The Seller Agreement sets out Kelviq's payout obligations and when a payout can be delayed or reserved:
+
+- Completed transactions move to your available balance after processing.
+- Final payouts remain due if Kelviq ends the service, subject to open disputes and a permitted reserve.
+- A reserve must have a stated amount or percentage and an expected duration.
+- A post-termination reserve can remain in place for up to 180 days to cover refunds, chargebacks, or other transaction liabilities.
+
+This is not a guarantee that nothing can go wrong. A processor failure, bank delay, dispute, compliance action, or insolvency can still affect the timing or recovery of funds. What you do have is a written payment flow, transaction records, and contractual payout terms against which you can check Kelviq's handling of your money. Review [Payout Terms](/legal/master-service-agreement#7-payout-terms) and [Reserves and Holdbacks](/legal/master-service-agreement#8-reserves-and-holdbacks) for the controlling language.
+
+## How much notice will I get before a suspension?
+
+There is no single advance-notice period for every suspension, including every non-fraud suspension. Kelviq may need to act quickly because of suspected fraud, prohibited activity, failed verification, a legal requirement, a payment-network instruction, or a restriction on the connected Stripe account.
+
+The 30-day notice in the Seller Agreement applies when Kelviq terminates an account for convenience. It does not apply to the grounds for immediate termination listed in that agreement. If you believe a policy suspension or termination was made in error, you can appeal it. Kelviq responds to appeals within 10 business days under the [Acceptable Use Policy](/legal/approved-prohibited-policy#83-appeal-process).
+
+### Will my customers' subscriptions cancel immediately?
+
+Not in every case. A suspension and a subscription cancellation are separate actions. However, Kelviq may need to block checkout or future renewals, depending on why the account was restricted. The Seller Agreement does not promise uninterrupted subscription collection during a suspension. If a notice does not clearly say which functions are affected, contact [support@kelviq.com](mailto:support@kelviq.com) before making changes for your customers.
+
+## Where do the Stripe Customer and Subscription records live?
+
+Kelviq manages the buyer-facing Stripe Customer, PaymentIntent, invoice, and Subscription records on its Stripe platform account. Your Stripe Express connected account receives transfers and payouts; it does not receive an independent copy of every platform billing object.
+
+An ID such as `cus_...` or `sub_...` points to an object inside the Stripe account where it was created. It cannot simply be reassigned to another Stripe account. Under the [Seller Agreement](/legal/master-service-agreement#111-buyer-data), Kelviq controls buyer payment and transaction data in its role as Merchant of Record. You still own your product and content, and Kelviq provides the buyer information needed for fulfillment and customer support.
+
+## Can I move to another provider?
+
+A billing migration is possible in some cases, but it is not an automatic account transfer. Contact [support@kelviq.com](mailto:support@kelviq.com) before closing your Kelviq account or disconnecting Stripe. Kelviq will review the request with Stripe and the receiving provider, then explain what can be transferred.
+
+Stripe supports secure exports of eligible card data to a PCI DSS Level 1 payment processor. Some credentials, including cards saved through Link, cannot be exported. Subscription records and payment history also need to be mapped or recreated in the new billing system; moving card data alone does not move an active subscription.
+
+Migration scope and timing depend on the receiving provider, Stripe's requirements, applicable privacy rules, and any unresolved refunds, disputes, or reserves. See [Stripe's payment-data export process](https://docs.stripe.com/get-started/data-migrations/pan-export) for the processor-level requirements.
+
+## Questions about your account
+
+For an account-specific explanation of a payout, reserve, suspension, or migration, email [support@kelviq.com](mailto:support@kelviq.com). Include your Kelviq business name and the relevant transaction, payout, or subscription IDs, but never send a full card number or CVC.

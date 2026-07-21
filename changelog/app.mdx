@@ -4,6 +4,92 @@ description: "Changelog for the Kelviq Dashboard"
 mode: "wide"
 rss: true
 ---
+<Update label="v1.13" description="July 17, 2026">
+
+## Safer discount creation
+
+Fixed-amount discounts now include an explicit currency selector. Kelviq places the currency from your organization profile first in the selector, while still letting you review and choose the currency for the discount.
+
+Discount validation is also more reliable:
+
+* Kelviq shows an error when a fixed-amount discount's currency does not match the selected price.
+* When **Limit discount to selected products** is enabled, every restriction row must include a product before the discount can be created.
+* Recurring discounts are enabled by default, with controls for a fixed number of billing cycles or a discount that applies forever.
+* Discount fields no longer move the text cursor while you type.
+
+## Trials now follow the selected billing model
+
+Trials are available only when a plan has at least one recurring price. One-time-only plans no longer expose trial settings or show a trial at checkout.
+
+If a plan starts with both recurring and one-time pricing and the final recurring price is later disabled, Kelviq now removes the trial behavior from the remaining one-time offer.
+
+## Resend webhook deliveries from the dashboard
+
+Webhook delivery logs now include a **Resend** action. If a delivery fails because an endpoint is unavailable or returns an error, you can fix the endpoint and retry the delivery from the Kelviq dashboard.
+
+The new attempt appears in the delivery logs, where you can inspect its status and response without waiting for another event.
+
+<Note>
+  A resend can deliver the same event more than once. Webhook handlers should use the event `id` or `webhook-id` header as an idempotency key.
+</Note>
+
+## Faster feature selection
+
+After a feature is added from the **Manage features & limits** dialog, Kelviq now clears the search field. You can immediately search for and add another feature without deleting the previous query.
+
+## Customer portal fixes
+
+We fixed two customer portal edge cases:
+
+* Login code input is normalized to uppercase as the customer types.
+* The cancel action remains available for an active subscription when an associated order has been refunded.
+
+</Update>
+
+<Update label="v1.12" description="July 10, 2026">
+
+## Flexible 28-day subscriptions
+
+Kelviq now supports subscriptions that renew every 28 days. This gives sellers a predictable four-week billing option alongside monthly, quarterly, and annual billing.
+
+The new period is supported throughout the billing flow, including checkout, subscriptions, orders, emails, usage resets, and analytics. Monthly recurring revenue now normalizes 28-day subscriptions to a monthly equivalent instead of treating one 28-day invoice as one month of revenue.
+
+## Customer deliverables in one place
+
+Customer detail pages now include the files, links, and license keys delivered through a customer's plans. Support teams can review a customer's access and manage license keys without opening the related order first.
+
+This makes common support requests faster, including:
+
+* Finding a purchased download
+* Opening a private resource link
+* Reviewing an issued license key
+* Managing a customer's license access
+
+## Better feature and usage configuration
+
+We improved the feature-management experience for metered and configurable entitlements:
+
+* Numeric values now use number inputs where appropriate.
+* Credit rollover appears before usage alerts, matching the order in which these settings are configured.
+* Feature names can be edited from the feature row's action menu.
+* Regional prices now carry over the base price's usage reset, usage alert, and credit rollover settings.
+
+These changes reduce repetitive setup and keep entitlement behavior consistent across base and regional prices.
+
+## Business details are easier to find
+
+Business verification is now available from **Settings → Business details** as well as the onboarding flow. Kelviq also uses the country from the organization profile to make the relevant country option easier to find during verification.
+
+## Cleaner catalog, settings, and sandbox navigation
+
+We simplified several dashboard workflows:
+
+* Product identifiers are no longer shown or requested in the product interface. Kelviq uses the product's internal UUID.
+* The sandbox no longer shows a **Start selling** action, because live selling is completed from the production environment.
+* Settings navigation has clearer visual separation between groups.
+
+</Update>
+
 <Update label="v1.11" description="June 26, 2026">
 
 

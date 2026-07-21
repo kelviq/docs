@@ -22,7 +22,7 @@
         "groups": [
           {
             "group": "Get Started",
-            "pages": ["getstarted/introduction-to-kelviq", "getstarted/merchant-of-record", "getstarted/fees", "getstarted/review-process"]
+            "pages": ["getstarted/introduction-to-kelviq", "getstarted/merchant-of-record", "getstarted/payment-security-and-seller-funds", "getstarted/fees", "getstarted/review-process"]
           },
           {
             "group": "Quickstart",
@@ -33,9 +33,14 @@
             "pages": [
               "product-catalog/products",
               "product-catalog/plans",
+              "product-catalog/create-an-enterprise-plan",
+              "product-catalog/create-a-feature",
               "product-catalog/one-time-payments",
               "product-catalog/subscriptions",
+              "product-catalog/seat-based-pricing",
               "product-catalog/usage-based-billing",
+              "product-catalog/pay-as-you-go",
+              "product-catalog/usage-alerts",
               "product-catalog/free-and-trials",
               "product-catalog/location-based-pricing",
               "product-catalog/digital-downloads",
@@ -59,13 +64,17 @@
           {
             "group": "Checkout",
             "pages": [
-              "checkout/checkout-configuration"
+              "checkout/checkout-configuration",
+              "checkout/static-checkout-url",
+              "checkout/apply-a-discount-code",
+              "checkout/checkout-metadata"
             ]
           },
           {
             "group": "Sales",
             "pages": [
               "sales/orders",
+              "sales/create-a-one-time-charge",
               "sales/checkout-sessions"
             ]
           },
@@ -94,6 +103,7 @@
             "group": "Guides",
             "pages": [
               "guides/sandbox",
+              "guides/migrate-from-cashfree",
               "guides/subscription-integration",
               "guides/subscription-integration-for-nextjs",
               "guides/webhooks",

@@ -7,14 +7,14 @@ AI products perform actual work. Flat rate subscriptions force you to guess at a
 
 ## Set up a usage plan
 
-To add consumption tracking to a plan open your pricing configuration and expand the usage pricing card.
+To add consumption tracking to a plan, open its pricing configuration and expand **Usage charges**.
 <Frame>
   <img height="200" src="/images/usage-pricing-card.png" />
 </Frame>
 
 ### 1. Select or create a metered feature
 
-Choose the specific metric you want to track from the dropdown list. You can select an existing feature like Platform API or Tokens consumed. To create a new metered feature just type a name like API request and hit enter.
+Choose the metric you want to track from the dropdown list, such as API requests or tokens consumed. If the list is empty, [create a Meter feature](/product-catalog/create-a-feature) from **Product catalog → Features**, then return to the plan.
 
 <Frame>
   <img height="200" src="/images/select-metered-feature.png" />
@@ -32,10 +32,10 @@ Select how payments are structured.
 Customers pay upfront for a baseline allotment of usage. This gives your users a predictable budget. They buy a set bucket of AI tokens or API requests at the start of the month. They consume what they paid for and avoid surprise overages.
 
 **Pay as you go**
-Customers pay in arrears based on exactly what they consumed. AI agents run autonomously and their usage fluctuates wildly. A user might trigger a research workflow that consumes massive amounts of compute overnight. Pay as you go ensures the agent keeps working without interruption while you capture the exact margin for the underlying infrastructure costs. We tally the final unit count at the end of the billing period and charge the card.
+Customers pay for their recorded usage at the end of the monthly subscription period. You can bill for API calls, tokens, storage, compute time, or another metered feature, either on its own or alongside a monthly base price. See [Pay as you go](/product-catalog/pay-as-you-go) for setup, usage reporting, sandbox testing, and troubleshooting.
 
 <Note>
-  The pay as you go model only works on monthly plans.
+  Monthly must be the plan's only billing period. Pay as you go does not support Stair-step pricing or credit rollover.
 </Note>
 
 ### 3. Configure the pricing model
@@ -187,33 +187,51 @@ If you select Tiered you specify the first unit and last unit for each bucket. Y
 
 You can also set localized pricing for usage based billing. This lets you define different per unit rates for specific countries and currencies.
 
+#### Regional pricing and usage controls
+
+When you add a regional price, Kelviq carries over the base price's usage reset, usage alert, and credit rollover settings. This keeps entitlement behavior consistent while allowing the monetary price and currency to vary by region.
+
+Update these controls on the base price when you want the same behavior across its regional prices.
 
 
 ### 5. Set the usage reset cadence
 
-Configure how often the usage meter clears out. 
+Configure how often the usage meter resets. Credit rollover is calculated when this reset happens.
 
-You can set the reset to Never for lifetime limits. You can also choose to reset it Every week or Every month. 
+Use **Never** for a lifetime limit, or choose a recurring reset such as every week or every month. A meter set to **Never** has no period boundary at which to roll unused credits forward.
 
-For monthly resets you can align the timing perfectly by setting it to the first day of each month or tying it directly to the subscription start date.
+For monthly resets, choose either the first day of the month or the customer's subscription start date.
 
 ### 6. Configure rollover and alerts
 
-If your customers buy usage upfront you can let them keep what they do not use. Toggle Credit rollover to define how much carries over to the next billing cycle. You can set a specific percentage of unused units to roll over and apply a hard limit on the total units.
+#### Credit rollover
+
+Credit rollover lets a customer keep part of an advance commitment they did not use before the meter resets. It is available for **Advance commitment** usage prices, not **Pay as you go** prices.
+
+To configure it:
+
+1. In the plan editor, expand **Usage charges** and open the metered feature.
+2. Choose **Advance commitment** as the billing model.
+3. Set the included **Value** and a recurring **Usage reset**.
+4. Turn on **Credit rollover**.
+5. Enter the **Percentage** of unused units to carry forward. The value can be from 0% to 100%.
+6. Enter a **Limit** in units to cap the rollover amount.
 
 <Frame>
   <img height="400" src="/images/credits-rollover.png" />
 </Frame>
 
-Keep your users informed as they consume their quota. Toggle Usage alerts and set your threshold type. 
+For example, suppose a plan includes 10,000 credits each month. The customer has 2,000 credits left when the meter resets, and rollover is set to 50% with a 750-unit limit. Fifty percent of the unused balance is 1,000 credits, so the limit reduces the rollover to 750. The customer's next period starts with 10,750 credits.
 
-<Frame>
-  <img height="200" src="/images/usage-alerts.png" />
-</Frame>
+<Note>
+  The rollover limit and the usage hard limit do different jobs. The rollover limit caps the credits carried into a new period. The hard limit stops additional usage when the customer's balance reaches zero.
+</Note>
 
-You can click Add threshold to stack multiple percentage alerts. For example you can notify them at 75 percent and again at 90 percent so they are never surprised by a cutoff or an unexpected bill. 
+#### Usage alerts
 
-To receive these alerts you must create a webhook for the feature.usage_alert event.
+Usage alerts watch a metered feature for percentage or absolute-unit thresholds. When a customer crosses a threshold, Kelviq sends `feature.usage_alert` to your subscribed webhook endpoint. Your application can then send an email, show an in-app warning, or start an upgrade flow.
+
+See [Usage alerts](/product-catalog/usage-alerts) for dashboard and API configuration, the webhook payload, a Node.js handler, and sandbox testing steps.
 
 ### 7. Stack multiple usage metrics
 
@@ -222,3 +240,21 @@ To receive these alerts you must create a webhook for the feature.usage_alert ev
 </Frame>
 
 AI products rarely track just one variable. You can add as many metered usage features as you want to a single plan. Just click the Add usage pricing button at the bottom of the section to set up another metric.
+
+## Model a plan with different kinds of limits
+
+Not every plan limit should be a meter. Choose the feature type based on what the value means and how your application will use it.
+
+| Plan capability | Feature type | Suggested configuration |
+| --- | --- | --- |
+| Messages | Meter | Reset every month |
+| Training runs | Meter | Reset every day |
+| Active agents | Customizable | Store the plan's allowed count |
+| Knowledge sources | Customizable | Store the plan's allowed count |
+| WhatsApp access | Boolean | Enable on the plans that include it |
+| Analytics | Boolean | Enable on the plans that include it |
+| Priority support | Boolean | Enable on the plans that include it |
+
+For metered limits, consider usage alerts at 80% and 90%. These thresholds give customers time to reduce usage or upgrade before they reach a hard limit. Rollover and overage behavior depend on your pricing policy; do not enable them automatically for every meter.
+
+When a customer changes plans, Kelviq retains their existing usage counters and evaluates them against the new limits. A customer who has already consumed more than the downgraded limit may therefore become over limit as soon as the downgrade takes effect.

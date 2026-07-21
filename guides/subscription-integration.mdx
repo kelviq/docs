@@ -98,7 +98,7 @@ Redirect user to `checkoutUrl` → They complete payment → Redirected back to 
 | Parameter | Description |
 |-----------|-------------|
 | `planIdentifier` | The identifier of the plan (e.g., `"pro"`, `"enterprise"`) |
-| `chargePeriod` | Billing cycle: `"MONTHLY"`, `"YEARLY"`, `"ONE_TIME"`, `"WEEKLY"`, `"DAILY"`, `"THREE_MONTHS"`, `"SIX_MONTHS"` |
+| `chargePeriod` | Billing cycle: `"MONTHLY"`, `"YEARLY"`, `"ONE_TIME"`, `"WEEKLY"`, `"DAILY"`, `"TWENTY_EIGHT_DAYS"`, `"THREE_MONTHS"`, `"SIX_MONTHS"` |
 | `successUrl` | URL to redirect after successful payment |
 
 ### Optional Parameters
@@ -157,6 +157,10 @@ const activeSubscription = results.find(s => s.status === "active");
   ]
 }
 ```
+
+<Note>
+  Kelviq handles failed card payment retries and emails the customer a link to pay. Your application does not need its own retry process or payment recovery screen. See [Failed subscription payments](/product-catalog/subscriptions#failed-subscription-payments).
+</Note>
 
 ---
 
