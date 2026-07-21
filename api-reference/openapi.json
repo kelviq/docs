@@ -1423,8 +1423,17 @@
           "trialEnd": {
             "type": "string",
             "nullable": true,
-            "description": "Controls the trial period for the updated subscription. Accepts either the literal string `\"now\"` to end any active trial immediately, or an ISO 8601 datetime string (e.g. `\"2025-05-22 08:27:45.430732\"`) to set a new trial end date. The datetime must be in the future. If omitted, the existing trial behavior is preserved.",
-            "example": "2025-12-31 23:59:59"
+            "description": "Controls the trial period for the updated subscription. Accepts either the literal string `\"now\"` to end any active trial immediately, or an ISO 8601 datetime string (e.g. `\"2027-12-31 23:59:59\"`) to set a new trial end date. The datetime must be in the future. If omitted, the existing trial behavior is preserved.",
+            "example": "2027-12-31 23:59:59"
+          },
+          "paymentBehavior": {
+            "type": "string",
+            "enum": [
+              "activate_on_payment"
+            ],
+            "nullable": true,
+            "description": "Controls when a paid subscription update takes effect. Set to `\"activate_on_payment\"` to keep the current subscription active while payment is pending and apply the new plan, charge period, and features only after payment succeeds. If payment is not completed, the pending update expires and the current subscription remains unchanged. If omitted, the update uses the default immediate behavior.",
+            "example": "activate_on_payment"
           }
         }
       },
@@ -4853,7 +4862,7 @@
           "Subscriptions"
         ],
         "summary": "Update a subscription",
-        "description": "Updates an existing subscription to a new plan, charge period, and/or features.\n\n> **Warning:** Free plans are created as one-time charges. Upgrading from a free plan is not supported via this endpoint. Use the [Create Checkout Session](/api-reference/checkout/create-a-checkout-session) endpoint instead.",
+        "description": "Updates an existing subscription to a new plan, charge period, and/or features. Set `paymentBehavior` to `activate_on_payment` when the change should take effect only after payment succeeds.\n\n> **Warning:** Free plans are created as one-time charges. Upgrading from a free plan is not supported via this endpoint. Use the [Create Checkout Session](/api-reference/checkout/create-a-checkout-session) endpoint instead.",
         "operationId": "updateSubscription",
         "x-mint": {
           "content": "<Info>Click the base URL in the API playground and select the **Sandbox** host for test data or the **Production** host for live data. Use credentials from the same environment.</Info>"

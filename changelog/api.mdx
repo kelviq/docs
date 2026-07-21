@@ -5,6 +5,26 @@ mode: "wide"
 rss: true
 ---
 
+<Update label="v1.3.1" description="July 21, 2026">
+
+### New Features
+
+#### Activate Subscription Updates After Payment
+
+`POST /subscriptions/{subscriptionId}/update/` now accepts the optional `paymentBehavior` field. Set it to `activate_on_payment` to keep the customer's current subscription active while payment for the change is pending.
+
+```json
+{
+  "planIdentifier": "premium-plan",
+  "chargePeriod": "MONTHLY",
+  "paymentBehavior": "activate_on_payment"
+}
+```
+
+The new plan, billing period, and feature changes are applied only after payment succeeds. If the pending update expires before payment is completed, the current subscription remains unchanged. Omitting `paymentBehavior` preserves the existing immediate-update behavior.
+
+</Update>
+
 <Update label="v1.3.0" description="July 16, 2026">
 
 ### New Features
@@ -45,7 +65,7 @@ The new `POST /charges/` endpoint immediately charges a customer's saved payment
 
 </Update>
 
-<Update label="v1.0.0" description="May 7, 2026">
+<Update label="v1.1.0" description="May 7, 2026">
 
 ### New Features
 
@@ -72,7 +92,7 @@ You can now pass additional configuration parameters when [creating a checkout s
 
 </Update>
 
-<Update label="v1.1.0" description="May 7, 2026">
+<Update label="v1.0.0" description="May 7, 2026">
 
 ### New Features
 
