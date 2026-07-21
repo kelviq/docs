@@ -188,5 +188,6 @@ See the full [command reference](/cli/commands) for every flag, and the [`kelviq
 ## What's coming
 
 - **`kelviq push`** — the write side: deploy a `kelviq.config.ts` to your account. Designed safety-first: a `--dry-run` diff preview, draft-only writes by default (nothing a customer sees changes without an explicit publish), and hard gates around publishing and customer migration. This completes the GitOps loop — pricing changes go PR → review → merge → push, with the dashboard as a viewer rather than the editor.
+- **`kelviq promote`** — environment promotion: move your sandbox catalog to production in one command. Same engine and safety rails as `push` — a `--dry-run` diff of exactly what production would change, draft-first writes, and an explicit `--publish` gate — so "test in sandbox, promote to prod" becomes a reviewed, previewable step instead of a manual re-entry.
 - **Catalog browse commands** — list and inspect products, features, and plans without a full pull.
 - **Browser-based login** — a pairing flow that mints a scoped key from your dashboard session, replacing paste-a-key.
