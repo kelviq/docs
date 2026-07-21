@@ -1,0 +1,139 @@
+---
+title: "kelviq.config.ts reference"
+description: "The pricing-as-code file format: builders, fields, and the rules that keep it portable."
+icon: 'file-code'
+---
+
+`kelviq.config.ts` is a plain TypeScript file that declares your pricing catalog. You author it by hand (starting from `kelviq init`) or generate it from a live environment with `kelviq pull` — the two are interchangeable starting points.
+
+A config file imports three **builders** from `@kelviq/cli/config` and exports the results:
+
+```ts
+import { product, feature, plan } from '@kelviq/cli/config';
+
+export const app = product({
+  identifier: 'my-app',
+  name: 'My App',
+  taxCode: 'saas',
+});
+
+export const apiCalls = feature({
+  identifier: 'api-calls',
+  name: 'API calls',
+  type: 'METER',
+});
+
+export const seats = feature({
+  identifier: 'seats',
+  name: 'Seats',
+  type: 'CUSTOMIZABLE',
+});
+
+export const pro = plan({
+  identifier: 'pro',
+  name: 'Pro',
+  product: 'my-app',
+  entitlements: [
+    { feature: 'seats', value: 5 },
+    { feature: 'api-calls', value: 10000, reset: 'EVERY_MONTH', hardLimit: false },
+  ],
+  prices: [
+    {
+      priceType: 'PAID',
+      currency: 'USD',
+    },
+  ],
+});
+```
+
+The builders are typed: your editor autocompletes every field, and a misspelled or wrongly-typed field is a **compile-time error** with a "did you mean" suggestion — validation happens before any API call.
+
+How the CLI reads the file: every export created by `product()` / `feature()` / `plan()` is collected, regardless of its export name. Other exports (helper constants, functions) are ignored, so you can organize the file however you like — split values, comment freely, generate plans in a loop. Duplicate identifiers within a kind are a hard error.
+
+---
+
+## The identity rule
+
+Every cross-reference in the format — `plan.product`, `entitlements[].feature` — is an **identifier slug, never a UUID**. Identifiers are lowercase URL-safe slugs matching `^[a-z0-9][a-z0-9-_]*$` (for example `pro`, `api-calls`, `seats_v2`).
+
+The Kelviq API sometimes wants UUIDs internally; the CLI resolves identifiers to UUIDs at sync time so your config file stays portable — the same file works against sandbox and production, where the same catalog has different UUIDs.
+
+The plan lifecycle (draft → published) is also deliberately absent: the config describes **desired state**, not deployment state. Lifecycle is handled at sync time.
+
+---
+
+## product()
+
+| Field | Type | Required | Description |
+|---|---|---|---|
+| `identifier` | slug | yes | Stable identifier, the join key across environments. |
+| `name` | string | yes | Display name. |
+| `taxCode` | enum | yes | One of: `saas`, `saas_business`, `software`, `videocontent`, `informationservice`, `ebook`, `digitalgraphic`, `videogame`, `eservice`, `training`. |
+| `description` | string | no | Free-text description. |
+
+---
+
+## feature()
+
+| Field | Type | Required | Description |
+|---|---|---|---|
+| `identifier` | slug | yes | Stable identifier, referenced from plan entitlements. |
+| `name` | string | yes | Display name. |
+| `type` | enum | yes | `BOOLEAN` (on/off), `CUSTOMIZABLE` (a configurable limit), or `METER` (usage-tracked). |
+| `description` | string | no | Free-text description. |
+| `featureDetails` | object | no | Type-specific detail payload, passed through to the API. |
+| `meter` | object | no | Meter configuration for `METER` features, passed through to the API. |
+| `metadata` | object | no | Arbitrary key-value metadata. |
+
+---
+
+## plan()
+
+| Field | Type | Required | Description |
+|---|---|---|---|
+| `identifier` | slug | yes | Stable identifier. |
+| `name` | string | yes | Display name. |
+| `product` | slug | yes | Identifier of the parent product. |
+| `description` | string | no | Free-text description. |
+| `isVisible` | boolean | no | Whether the plan is publicly visible. |
+| `entitlements` | array | no | What the plan grants — see below. |
+| `prices` | array | no | The plan's price set — see below. |
+| `metadata` | object | no | Arbitrary key-value metadata. |
+
+### Entitlements
+
+Each entry grants a feature to the plan:
+
+| Field | Type | Required | Description |
+|---|---|---|---|
+| `feature` | slug | yes | Identifier of the granted feature. |
+| `value` | boolean or number | no | The grant: `true`/`false` for `BOOLEAN` features, a number for limits. |
+| `hasUnlimitedUsage` | boolean | no | Grant unlimited usage instead of a numeric value. |
+| `reset` | enum | no | Usage reset cadence: `NEVER`, `EVERY_DAY`, `EVERY_MONTH`, `EVERY_QUARTER`, `EVERY_YEAR`. |
+| `hardLimit` | boolean | no | Whether usage is blocked at the limit. |
+| `usageAlerts` | object | no | Alert configuration, passed through to the API. |
+
+Entitlements accept additional keys beyond these — the shape varies by feature type, and unrecognized keys are passed through to the API rather than rejected.
+
+### Prices
+
+The price envelope is validated; the charge structures inside it are deliberately loose and passed through to the API as-is:
+
+| Field | Type | Required | Description |
+|---|---|---|---|
+| `priceType` | enum | yes | `FREE`, `PAID`, or `CUSTOM`. |
+| `currency` | string | no | ISO currency code, e.g. `USD`. |
+| `freeTrial` | boolean | no | Whether the price includes a free trial. |
+| `trialPeriod` | number | no | Trial length in days. |
+| `taxBehavior` | enum | no | `INCLUSIVE`, `EXCLUSIVE`, or `UNSPECIFIED`. |
+| `chargeCatalogPrice` | array of objects | no | The full charge structure (price models, tiers, billing periods). Passed through verbatim — see the plan-prices endpoints in the [API Reference](/api-reference/introduction) for the shape. |
+
+<Info>
+A pulled config reproduces your remote prices in full, including nested charge structures. You rarely need to author `chargeCatalogPrice` by hand — pull an existing plan and adapt it.
+</Info>
+
+---
+
+## Schemas as values
+
+Everything the builders validate against is exported from `@kelviq/cli/config` if you want to reuse it — `productDefSchema`, `featureDefSchema`, `planDefSchema`, `entitlementDefSchema`, `priceDefSchema`, `kelviqConfigSchema`, the enums (`taxCodeSchema`, `featureTypeSchema`, `priceTypeSchema`, `resetSchema`, `taxBehaviorSchema`, `identifierSchema`), and their TypeScript types (`ProductDef`, `FeatureDef`, `PlanDef`, and so on). They're standard [Zod](https://zod.dev) schemas.

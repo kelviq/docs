@@ -1,0 +1,89 @@
+---
+title: "Environments & authentication"
+description: "How the CLI targets sandbox vs. production, where keys live, and how to authenticate in CI."
+icon: 'layer-group'
+---
+
+Every Kelviq organization has a **sandbox** environment alongside production — see the [sandbox guide](/guides/sandbox). The CLI is sandbox-first: every command targets sandbox unless you explicitly pass `--prod`.
+
+```shell
+kelviq pull           # sandbox
+kelviq pull --prod    # production
+```
+
+There is deliberately no configuration that makes an unqualified command touch production — `--prod` is always explicit, per command.
+
+The environment is selected by **which API key is used**, not by a different host: sandbox keys operate on sandbox data, production keys on production data, against the same API base URL.
+
+---
+
+## Getting keys
+
+The CLI authenticates with **Server API Keys** from the dashboard:
+
+1. Sign in at [app.kelviq.com](https://app.kelviq.com).
+2. Go to **Settings → [API keys](https://app.kelviq.com/settings/api-keys)**.
+3. Copy the Server API Key for the environment you want (sandbox and production have separate keys).
+
+<Warning>
+Server API Keys have full API access. Never expose them in client-side code, commit them to version control, or paste them into shared chats. The CLI never echoes or logs a key.
+</Warning>
+
+---
+
+## Key storage
+
+`kelviq login` stores keys in a per-user config file:
+
+```text
+~/.config/kelviq/config.json
+```
+
+- The file is created with owner-only permissions (`0600`), inside a `0700` directory.
+- `XDG_CONFIG_HOME` is respected if set (the file lives at `$XDG_CONFIG_HOME/kelviq/config.json`).
+- Sandbox and production keys are stored as separate entries; `kelviq logout` removes them individually (`--prod`) or together (`--all`).
+
+---
+
+## Environment variables
+
+Environment variables **override** the stored config file — useful for CI, containers, and one-off overrides without touching your stored keys:
+
+| Variable | Purpose |
+|---|---|
+| `KELVIQ_SANDBOX_SERVER_API_KEY` | Server key for the sandbox environment (the default target). |
+| `KELVIQ_SERVER_API_KEY` | Server key for the production environment (`--prod`). |
+| `KELVIQ_BASE_URL` | Override the API base URL. You almost never need this. |
+| `KELVIQ_EDGE_URL` | Override the edge API URL. You almost never need this. |
+
+A typical CI setup skips `kelviq login` entirely:
+
+```yaml
+# e.g. GitHub Actions
+env:
+  KELVIQ_SANDBOX_SERVER_API_KEY: ${{ secrets.KELVIQ_SANDBOX_SERVER_API_KEY }}
+```
+
+```shell
+kelviq pull --force   # authenticates from the environment variable
+```
+
+If a command needs a key and finds none — neither in the environment nor stored — it fails with a message naming the exact variable to set and where to get a key.
+
+---
+
+## Checking your setup
+
+`kelviq env` prints the full picture without calling the API:
+
+```text
+Environment : sandbox (default — use --prod to target production)
+Base URL    : https://api.kelviq.com/api/v1
+Sandbox key : set
+Prod key    : missing
+Org         : unknown — Kelviq has no key-introspection endpoint yet
+```
+
+<Info>
+`set` means a key is configured (stored or via environment variable) — not that it's valid. Kelviq has no key-introspection endpoint yet, so the CLI can't verify a key or display your organization name; an invalid key surfaces on the first real API call, such as `kelviq pull`.
+</Info>

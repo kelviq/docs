@@ -1,0 +1,123 @@
+---
+title: "Command reference"
+description: "Every Kelviq CLI command, flag by flag."
+icon: 'square-terminal'
+---
+
+All commands support `--help`. The CLI targets your **sandbox** environment unless you pass `--prod` — see [Environments & authentication](/cli/environments).
+
+---
+
+## kelviq init
+
+Writes a starter `kelviq.config.ts` to the current directory.
+
+```shell
+kelviq init
+kelviq init -o pricing/kelviq.config.ts
+kelviq init --force
+```
+
+| Flag | Description |
+|---|---|
+| `-o, --output <path>` | Where to write the file. Defaults to `kelviq.config.ts` in the current directory. |
+| `--force` | Overwrite the file if it already exists. Without it, `init` refuses rather than clobbering your edits. |
+
+The starter file defines one product, one feature, and one plan using the typed builders from `@kelviq/cli/config` — see the [format reference](/cli/kelviq-config).
+
+---
+
+## kelviq login
+
+Stores a Server API key for the CLI to use.
+
+```shell
+kelviq login          # store a sandbox key (default)
+kelviq login --prod   # store a production key
+```
+
+| Flag | Description |
+|---|---|
+| `--prod` | Store the key for the production environment instead of sandbox. |
+
+What it does:
+
+1. Prints the dashboard's [API keys page](https://app.kelviq.com/settings/api-keys) URL and tries to open it in your default browser.
+2. Prompts you to paste the key. In an interactive terminal the input is **masked**; the key is never echoed back or logged.
+3. Stores it in `~/.config/kelviq/config.json` with owner-only permissions (`0600`).
+
+<Warning>
+Paste a **Server API Key**, not a Client API Key. Server keys have full API access — treat the config file like any other credential store, and never commit it anywhere.
+</Warning>
+
+Kelviq has no key-introspection endpoint yet, so `login` cannot verify the key is valid or show which organization it belongs to — the first `pull` is where a bad key surfaces.
+
+For CI and other non-interactive contexts, skip `login` entirely and set an environment variable instead — see [Environments & authentication](/cli/environments#environment-variables).
+
+---
+
+## kelviq logout
+
+Removes stored API keys.
+
+```shell
+kelviq logout          # remove the stored sandbox key
+kelviq logout --prod   # remove the stored production key
+kelviq logout --all    # remove both
+```
+
+| Flag | Description |
+|---|---|
+| `--prod` | Remove the production key instead of sandbox. |
+| `--all` | Remove both sandbox and production keys. |
+
+`logout` only touches the stored config file. Keys supplied via environment variables are unaffected — unset those in your shell or CI configuration.
+
+<Info>
+Removing a key locally does not revoke it. To revoke a key, delete it from the [API keys page](https://app.kelviq.com/settings/api-keys) in the dashboard.
+</Info>
+
+---
+
+## kelviq env
+
+Shows which environment and keys the CLI is configured with. Read-only — it never calls the API.
+
+```shell
+kelviq env
+```
+
+```text
+Environment : sandbox (default — use --prod to target production)
+Base URL    : https://api.kelviq.com/api/v1
+Sandbox key : set
+Prod key    : missing
+Org         : unknown — Kelviq has no key-introspection endpoint yet
+```
+
+Key rows show `set` or `missing` only — `env` reports what's configured locally and does not validate keys against the API.
+
+---
+
+## kelviq pull
+
+Fetches your remote catalog and writes it as a `kelviq.config.ts`.
+
+```shell
+kelviq pull                    # pull the sandbox catalog
+kelviq pull --prod             # pull the production catalog
+kelviq pull -o pricing.config.ts
+kelviq pull --force            # overwrite an existing file
+```
+
+| Flag | Description |
+|---|---|
+| `--prod` | Pull from the production environment instead of sandbox. |
+| `-o, --output <path>` | Where to write the config. Defaults to `kelviq.config.ts` in the current directory. |
+| `--force` | Overwrite the output file if it already exists. Without it, `pull` refuses rather than overwriting local edits. |
+
+What it fetches: all products, all features, the **latest version** of each plan, and each plan's prices and entitlements. Every cross-reference in the generated file uses `identifier` slugs, never UUIDs — the file is stable across environments that share identifiers.
+
+On success, `pull` prints the path it wrote and a **warnings list** for anything it couldn't represent in the config format (for example, plan fields like `license`, `links`, `countries`, and `files` are dropped, with one warning each). Warnings are informational — the file it wrote is still valid.
+
+On failure — missing key, network error, unexpected API response — `pull` writes `pull failed: <reason>` to stderr and exits non-zero without touching the output file.

@@ -154,6 +154,15 @@
               "frontend-integration/react-promotions-ui",
               "frontend-integration/promotions-ui-js"
             ]
+          },
+          {
+            "group": "CLI",
+            "pages": [
+              "cli/overview",
+              "cli/commands",
+              "cli/kelviq-config",
+              "cli/environments"
+            ]
           }
         ]
       },

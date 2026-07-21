@@ -1,0 +1,110 @@
+---
+title: "Kelviq CLI"
+description: "Pricing-as-code for Kelviq — define your products, features, and plans in TypeScript and sync them with your account from the terminal."
+icon: 'terminal'
+---
+
+The Kelviq CLI (`@kelviq/cli`) lets you manage your pricing catalog as **code** instead of dashboard clicks. Your products, features, plans, entitlements, and prices live in a single typed TypeScript file — `kelviq.config.ts` — that you can review, diff, and version-control like the rest of your codebase.
+
+```ts
+import { product, feature, plan } from '@kelviq/cli/config';
+
+export const app = product({
+  identifier: 'my-app',
+  name: 'My App',
+  taxCode: 'saas',
+});
+
+export const seats = feature({
+  identifier: 'seats',
+  name: 'Seats',
+  type: 'CUSTOMIZABLE',
+});
+
+export const pro = plan({
+  identifier: 'pro',
+  name: 'Pro',
+  product: 'my-app',
+  entitlements: [{ feature: 'seats', value: 5 }],
+});
+```
+
+<Info>
+The CLI currently ships the **read side** of pricing-as-code: authoring, pulling, and inspecting. `kelviq push` — deploying a config file to your account — is in development. Until it ships, apply changes in the [dashboard](https://app.kelviq.com) and run `kelviq pull` to keep your config file in sync.
+</Info>
+
+---
+
+## Installation
+
+Requires Node.js 18 or newer.
+
+```shell
+npm install -g @kelviq/cli
+```
+
+Verify the install:
+
+```shell
+kelviq --version
+```
+
+---
+
+## Quickstart
+
+### Step 1: Authenticate
+
+```shell
+kelviq login
+```
+
+`login` opens the dashboard's [API keys page](https://app.kelviq.com/settings/api-keys) in your browser and prompts you to paste a **Server API Key**. Input is masked and the key is stored locally with owner-only file permissions.
+
+The CLI targets your **sandbox** environment by default. To store a production key too, run `kelviq login --prod`. See [Environments & authentication](/cli/environments) for how keys are stored and how to use environment variables instead (for example, in CI).
+
+### Step 2: Pull your catalog
+
+```shell
+kelviq pull
+```
+
+`pull` fetches your sandbox catalog — products, features, plans, entitlements, and prices — and writes it as a `kelviq.config.ts` in the current directory. If you've already set up pricing in the dashboard, this is the fastest way to get it under version control.
+
+### Step 3: Or start from scratch
+
+```shell
+kelviq init
+```
+
+`init` writes a starter `kelviq.config.ts` you can edit by hand. The file is plain TypeScript with full autocomplete — misspell a field and the compiler tells you before Kelviq ever sees it.
+
+### Step 4: Check where you're pointed
+
+```shell
+kelviq env
+```
+
+Prints which environment the CLI targets and which keys are configured — useful before any command that touches your account.
+
+---
+
+## The commands
+
+| Command | What it does |
+|---|---|
+| [`kelviq init`](/cli/commands#kelviq-init) | Write a starter `kelviq.config.ts`. |
+| [`kelviq login`](/cli/commands#kelviq-login) | Paste and store a Server API key. |
+| [`kelviq logout`](/cli/commands#kelviq-logout) | Remove stored API keys. |
+| [`kelviq env`](/cli/commands#kelviq-env) | Show the configured environment and key status. |
+| [`kelviq pull`](/cli/commands#kelviq-pull) | Write your remote catalog to `kelviq.config.ts`. |
+
+See the full [command reference](/cli/commands) for every flag, and the [`kelviq.config.ts` reference](/cli/kelviq-config) for the file format.
+
+---
+
+## What's coming
+
+- **`kelviq push`** — deploy a `kelviq.config.ts` to your account, with a diff preview (`--dry-run`), draft-only writes by default, and explicit gates around publishing and customer migration.
+- **Catalog browse commands** — list and inspect products, features, and plans without a full pull.
+- **Browser-based login** — a pairing flow that mints a scoped key from your dashboard session, replacing paste-a-key.
