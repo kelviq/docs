@@ -157,6 +157,7 @@
           },
           {
             "group": "CLI",
+            "tag": "Beta",
             "pages": [
               "cli/overview",
               "cli/commands",

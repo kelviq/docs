@@ -4,6 +4,10 @@ description: "Pricing-as-code for Kelviq — define your products, features, and
 icon: 'terminal'
 ---
 
+<Note>
+**The Kelviq CLI is in beta.** It's fully functional — and safe by design, with previews and confirmations before every write — but commands, flags, and the `--json` output shape may still change between releases. Pin an exact version in CI and review the release notes before upgrading.
+</Note>
+
 The Kelviq CLI (`@kelviq/cli`) lets you manage your pricing catalog as **code** instead of dashboard clicks. Your products, features, plans, entitlements, and prices live in a single typed TypeScript file — `kelviq.config.ts` — that you can review, diff, and version-control like the rest of your codebase.
 
 ```ts
