@@ -6,6 +6,8 @@ icon: 'square-terminal'
 
 All commands support `--help`. The CLI targets your **sandbox** environment unless you pass `--prod` — see [Environments & authentication](/cli/environments).
 
+Output is colorized on interactive terminals (green creates, yellow updates, red archives) and automatically plain when piped. Disable colors explicitly with the global `--no-color` flag or the `NO_COLOR` environment variable.
+
 ---
 
 ## kelviq init
@@ -96,7 +98,7 @@ Prod key    : missing
 Org         : unknown — Kelviq has no key-introspection endpoint yet
 ```
 
-Key rows show `set` or `missing` only — `env` reports what's configured locally and does not validate keys against the API.
+Key rows show `set` or `missing` only — `env` reports what's configured locally and does not validate keys against the API. `kelviq env --json` emits the same report as JSON (never any part of a key's value).
 
 ---
 
@@ -148,6 +150,20 @@ kelviq push pricing.config.ts  # explicit config path
 | `--migrate-pricing` | With `--publish`: migrate existing customers to the published plan's pricing. |
 | `--prune` | Archive remote-only plans/features that the CLI created (see below). |
 | `--allow-prod-prune` | Required in place of the interactive typed confirmation to `--prune` production non-interactively. |
+| `--verbose` | Expand aggregated warnings (e.g. list every stripped server-owned price field individually). |
+| `--json` | With `--dry-run` only: emit the machine-readable plan-of-record as JSON on stdout. |
+
+The diff shows **what actually changes**, value to value — `~ update plan "pro": name "Pro" → "Pro Plan"` — so the confirmation gate is reviewable at a glance.
+
+### Scripting with `--json`
+
+`kelviq push --dry-run --json` prints exactly one JSON document: `{environment, direction, changes, summary, operations, prune, publish, featureDrift, errors, warnings}`. The `changes` boolean makes drift checks a one-liner in CI:
+
+```shell
+kelviq push --dry-run --json | jq -e '.changes | not' || echo "catalog has drifted"
+```
+
+`--json` is valid only with `--dry-run` (JSON mode never mixes with prompts or writes), always exits 0 on a successful render, and emits `{"error": …}` documents on failures. The shape is a documented, versioned contract — see the repo README.
 
 ### What push writes — and in what order
 
@@ -201,6 +217,7 @@ kelviq promote --publish       # and publish the changed plans
 | `--publish` / `--migrate-features` / `--migrate-pricing` | Same semantics as `push`. |
 | `--prune` | Archive marker-carrying production plans/features absent from sandbox. Always crosses the production-prune gate. |
 | `--allow-prod-prune` | Non-interactive stand-in for the typed production confirmation. |
+| `--verbose` / `--json` | Same semantics as `push` (`--json` requires `--dry-run`). |
 
 Promote reads and writes **no local file** — it fetches the sandbox catalog in memory and reconciles production toward it, matching resources by identifier (which is why the config format bans per-environment UUIDs). It needs both keys configured: sandbox to read, production to write.
 
