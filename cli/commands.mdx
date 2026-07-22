@@ -42,7 +42,7 @@ kelviq login --prod   # store a production key
 
 What it does:
 
-1. Prints the dashboard's [API keys page](https://app.kelviq.com/settings/api-keys) URL and tries to open it in your default browser.
+1. Prints the dashboard's [API keys page](https://app.kelviq.com/settings/api-keys) URL and tries to open it in your default browser — already switched to the environment you're logging into (sandbox by default, production with `--prod`), so the key on screen is the key the CLI expects.
 2. Prompts you to paste the key. In an interactive terminal the input is **masked**; the key is never echoed back or logged.
 3. Stores it in `~/.config/kelviq/config.json` with owner-only permissions (`0600`).
 
