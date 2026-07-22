@@ -14,7 +14,14 @@ kelviq push --prod    # production, after a diff + confirmation
 
 There is deliberately no configuration that makes an unqualified command touch production — `--prod` is always explicit, per command. The one command that inherently targets production, `kelviq promote`, says so in its name, shows you the full diff of what production would change, and requires confirmation before writing (plus a typed production confirmation before any `--prune` archive). Promote needs **both** keys configured: sandbox to read, production to write.
 
-The environment is selected by **which API key is used**, not by a different host: sandbox keys operate on sandbox data, production keys on production data, against the same API base URL.
+Each environment has its own API host and its own keys — the CLI selects both together:
+
+| Environment | API host | Key |
+|---|---|---|
+| Sandbox (default) | `https://sandboxapi.kelviq.com/api/v1` | Sandbox Server API Key |
+| Production (`--prod`) | `https://api.kelviq.com/api/v1` | Production Server API Key |
+
+Always pair the key with its own environment's host — a key from one environment doesn't belong on the other's host, and the CLI never mixes them.
 
 ---
 
@@ -54,7 +61,8 @@ Environment variables **override** the stored config file — useful for CI, con
 |---|---|
 | `KELVIQ_SANDBOX_SERVER_API_KEY` | Server key for the sandbox environment (the default target). |
 | `KELVIQ_SERVER_API_KEY` | Server key for the production environment (`--prod`). |
-| `KELVIQ_BASE_URL` | Override the API base URL. You almost never need this. |
+| `KELVIQ_SANDBOX_BASE_URL` | Override the sandbox API base URL. You almost never need this. |
+| `KELVIQ_BASE_URL` | Override the production API base URL. You almost never need this. |
 | `KELVIQ_EDGE_URL` | Override the edge API URL. You almost never need this. |
 
 A typical CI setup skips `kelviq login` entirely:
@@ -79,7 +87,8 @@ If a command needs a key and finds none — neither in the environment nor store
 
 ```text
 Environment : sandbox (default — use --prod to target production)
-Base URL    : https://api.kelviq.com/api/v1
+Sandbox URL : https://sandboxapi.kelviq.com/api/v1
+Prod URL    : https://api.kelviq.com/api/v1
 Sandbox key : set
 Prod key    : missing
 Org         : unknown — Kelviq has no key-introspection endpoint yet
