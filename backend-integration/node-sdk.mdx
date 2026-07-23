@@ -916,7 +916,7 @@ console.log(subscription.id, subscription.status);
 **Required Parameters:**
 
 * `planIdentifier` (string): Identifier of the plan to subscribe to.
-* `chargePeriod` (`ChargePeriod`): Billing period such as `MONTHLY`, `YEARLY`, `WEEKLY`, `DAILY`, or `TWENTY_EIGHT_DAYS`.
+* `chargePeriod` (`ChargePeriod`): By default, organizations can use `MONTHLY`, `THREE_MONTHS`, `SIX_MONTHS`, `YEARLY`, and `ONE_TIME`. To enable `DAILY`, `WEEKLY`, or `TWENTY_EIGHT_DAYS`, contact [hi@kelviq.com](mailto:hi@kelviq.com).
 * `customerId` (string): Client-defined identifier of the customer.
 
 **Optional Parameters:**
@@ -1380,7 +1380,7 @@ Use `express.raw()` (not `express.json()`) so that the raw request body is prese
 | `subscription.updated` | A subscription was updated |
 | `subscription.cancelled` | A subscription was cancelled |
 | `subscription.plan_changed` | A subscription plan was changed |
-| `feature.usage_alert` | A feature's usage crossed a configured threshold |
+| `feature.usage_alert` | A feature's usage crossed a threshold configured when the entitlement was added to the plan |
 | `invoice.created` | A new invoice was created |
 | `invoice.paid` | An invoice was paid |
 | `refund.created` | A refund was initiated |

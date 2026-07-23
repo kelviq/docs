@@ -33,6 +33,8 @@ The new plan, billing period, and feature changes are applied only after payment
 
 Checkout and subscription creation now support a four-week billing period. Pass `TWENTY_EIGHT_DAYS` as `chargePeriod` when creating an eligible checkout session or subscription.
 
+This is useful for products sold in fixed four-week cycles: renewals happen on the same weekday every four weeks, and metered usage can reset on the same schedule instead of following calendar months.
+
 ```json
 {
   "planIdentifier": "four-week-pro",
@@ -61,6 +63,8 @@ Subscription webhook payloads now include `end_date` inside `data.object`. The f
   }
 }
 ```
+
+Merchants can use this value to schedule access removal, customer notifications, and account cleanup without making a separate request for the latest subscription.
 
 ### Fixes
 

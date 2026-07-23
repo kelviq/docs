@@ -254,28 +254,6 @@ const response = await fetch("https://api.kelviq.com/api/v1/checkout/", {
 const { checkoutUrl } = await response.json();
 ```
 
-### Visual Customization Preview
-
-<Warning>
-  The `customization` object is available on the staging checkout API, but its production schema has not been published. Keep it out of production integrations until it appears in the API reference.
-</Warning>
-
-On staging, pass a checkout color override like this:
-
-```json
-{
-  "planIdentifier": "pro",
-  "chargePeriod": "MONTHLY",
-  "customerId": "customer-123",
-  "successUrl": "https://example.com/checkout/success",
-  "customization": {
-    "color": "red"
-  }
-}
-```
-
-Visibility controls for the **Features & limits** section, along with label, placeholder, and button overrides, are still being finalized. Their field names and behavior are not part of the public API contract yet.
-
 ### Discount Code Integration
 
 Allow customers to apply discount codes at checkout:

@@ -103,7 +103,11 @@ After payment, confirm that the test order, customer, subscription, and entitlem
 
 ## Test a subscription renewal
 
-Use a daily billing interval to test a renewal without waiting for a monthly or yearly billing cycle.
+<Note>
+  Daily billing is not enabled by default. Any sandbox organization can request it by contacting [Kelviq support](mailto:hi@kelviq.com).
+</Note>
+
+After Daily billing is enabled, use it to test a renewal without waiting for a monthly or yearly billing cycle.
 
 1. Enter Sandbox mode in the Kelviq dashboard.
 2. Open the test plan you want to use.
@@ -122,10 +126,6 @@ If you create the checkout session through the API, set `chargePeriod` to `DAILY
   "successUrl": "https://example.com/billing/success"
 }
 ```
-
-<Note>
-  Any sandbox organization can request Daily billing. It is not limited to selected accounts. If **Daily** does not appear in the dashboard, contact [Kelviq support](mailto:hi@kelviq.com) to have it enabled.
-</Note>
 
 ## Can I test production with my own card?
 

@@ -13,9 +13,9 @@ Fixed-amount discounts now include an explicit currency selector. Kelviq places 
 Discount validation is also more reliable:
 
 * Kelviq shows an error when a fixed-amount discount's currency does not match the selected price.
-* When **Limit discount to selected products** is enabled, every restriction row must include a product before the discount can be created.
-* Recurring discounts are enabled by default, with controls for a fixed number of billing cycles or a discount that applies forever.
-* Discount fields no longer move the text cursor while you type.
+* Product-restricted discounts now use stricter product-selection validation during creation.
+* Recurring discounts are now enabled by default, matching the behavior many users expected. You can still limit a discount to a fixed number of billing cycles or let it apply forever.
+* Fixed a bug that moved the cursor to the end of a discount field while typing.
 
 ## Trials now follow the selected billing model
 

@@ -29,8 +29,9 @@ You need:
 
 - a server API key from **Settings → API Keys**;
 - a plan identifier and supported charge period;
-- a backend endpoint that creates checkout sessions; and
-- a webhook endpoint subscribed to `checkout.completed`.
+- a backend endpoint that creates checkout sessions.
+
+A webhook endpoint is optional. Subscribe it to `checkout.completed` if you want to receive the metadata when checkout finishes.
 
 Keep the server API key in your backend. Never expose it in browser or mobile code.
 

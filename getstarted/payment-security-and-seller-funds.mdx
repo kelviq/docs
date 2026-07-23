@@ -3,7 +3,7 @@ title: "Payment security and seller funds"
 description: "How Kelviq protects card details, routes payments through Stripe, and handles payouts, account reviews, and migrations"
 ---
 
-When a customer buys through Kelviq Checkout, Kelviq is the Merchant of Record and Stripe processes the payment. Stripe also provides the connected account used for your payouts. Here is where the card details, money, and subscription records go at each stage.
+When a customer buys through Kelviq Checkout, Kelviq is the Merchant of Record and Stripe processes the payment. The customer's raw card details go directly to Stripe through secure payment fields; they are not passed to Kelviq or your connected account. Stripe also provides the connected account used for your payouts. Here is how payment data, money, and subscription records move at each stage.
 
 <Note>
 This page is an operational overview. If it conflicts with the [Seller Agreement](/legal/master-service-agreement), the agreement controls.
