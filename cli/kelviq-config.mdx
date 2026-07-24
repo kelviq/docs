@@ -111,11 +111,15 @@ Each entry grants a feature to the plan:
 | `feature` | slug | yes | Identifier of the granted feature. |
 | `value` | boolean or number | no | The grant: `true`/`false` for `BOOLEAN` features, a number for limits. |
 | `hasUnlimitedUsage` | boolean | no | Grant unlimited usage instead of a numeric value. |
-| `reset` | enum | no | Usage reset cadence: `NEVER`, `EVERY_DAY`, `EVERY_MONTH`, `EVERY_QUARTER`, `EVERY_YEAR`. |
+| `reset` | enum | no | Usage reset cadence: `NEVER`, `EVERY_DAY`, `EVERY_28_DAYS`, `EVERY_MONTH`, `EVERY_QUARTER`, `EVERY_YEAR`. |
 | `hardLimit` | boolean | no | Whether usage is blocked at the limit. |
 | `usageAlerts` | object | no | Alert configuration, passed through to the API. |
 
 Entitlements accept additional keys beyond these — the shape varies by feature type, and unrecognized keys are passed through to the API rather than rejected.
+
+<Info>
+Some enum values (for example `EVERY_28_DAYS`) are only available when enabled for your account. The CLI's enum fields autocomplete the standard values but accept any string: values it doesn't recognize are passed through verbatim, and the API validates them when you push. This means new server-side values work without a CLI update.
+</Info>
 
 ### Prices
 
