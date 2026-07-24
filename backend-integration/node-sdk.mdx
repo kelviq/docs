@@ -1237,8 +1237,12 @@ const session = await client.portal.createSession({
     customerId: "cust_789",
 });
 
+// Build the signed portal link — customerPortalUrl alone does not
+// authenticate; the token must be appended as a query parameter.
+const portalLink = `${session.customerPortalUrl}?token=${session.token}`;
+
 // Redirect your customer to the portal
-res.redirect(session.customerPortalUrl);
+res.redirect(portalLink);
 ```
 
 <Accordion title="Response">
@@ -1261,7 +1265,7 @@ An instance of `CreatePortalSessionResponse` (TypeScript Interface), which inclu
 
 * `token` : The session token that authenticates the customer portal session.
 * `email` : The email address of the customer.
-* `customerPortalUrl` : The URL to redirect the customer to their customer portal. This link is pre-authenticated — no login required.
+* `customerPortalUrl` : The customer's billing portal base URL. **This URL alone does not authenticate the session** — append the `token` as a query parameter (`${customerPortalUrl}?token=${token}`) to produce the signed link you share with the customer. The token expires, so create a fresh session per visit.
 
 ---
 ## Webhooks

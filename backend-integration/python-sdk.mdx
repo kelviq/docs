@@ -1409,7 +1409,7 @@ All methods are available in both synchronous and asynchronous versions, dependi
 ### Creates a new customer portal session
 
 `create_session(...)`
-This operation creates a new portal session for a customer, returning a pre-authenticated URL that you can redirect them to.
+This operation creates a new portal session for a customer. Combine the returned `customerPortalUrl` and `token` into a signed link (`{customerPortalUrl}?token={token}`) and redirect the customer there.
 
 **Synchronous**:
 
@@ -1417,8 +1417,10 @@ This operation creates a new portal session for a customer, returning a pre-auth
 session = client.portal.create_session(
     customerId="cust_789",
 )
-# Redirect your customer to the portal
-print(f"Portal URL: {session.customerPortalUrl}")
+# Build the signed portal link — customerPortalUrl alone does not
+# authenticate; the token must be appended as a query parameter.
+portal_link = f"{session.customerPortalUrl}?token={session.token}"
+print(f"Portal URL: {portal_link}")
 ```
 
 **Asynchronous**:
@@ -1427,17 +1429,17 @@ print(f"Portal URL: {session.customerPortalUrl}")
 session = await async_client.portal.create_session(
     customerId="cust_789",
 )
-# Redirect your customer to the portal
-print(f"Portal URL: {session.customerPortalUrl}")
+portal_link = f"{session.customerPortalUrl}?token={session.token}"
+print(f"Portal URL: {portal_link}")
 ```
 
 <Accordion title="Response">
 
   ```json
   {
-      "token": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...",
+      "token": "cpt-4f7c5dc4-da9f-447b-d447-6266dc35ed6d:23fca530-adeb-4685-b3d5-9928c6d38275",
       "email": "customer@example.com",
-      "customerPortalUrl": "https://portal.kelviq.com/session/eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9..."
+      "customerPortalUrl": "https://www.kelviq.com/portal/aphelo/"
   }
   ```
 </Accordion>
@@ -1452,7 +1454,7 @@ An instance of `CreatePortalSessionResponse` (Pydantic model), which includes:
 
 * `token` (str): The session token that authenticates the customer portal session.
 * `email` (str): The email address of the customer.
-* `customerPortalUrl` (str): The URL to redirect the customer to their customer portal. This link is pre-authenticated — no login required.
+* `customerPortalUrl` (str): The customer's billing portal base URL. **This URL alone does not authenticate the session** — append the `token` as a query parameter (`{customerPortalUrl}?token={token}`) to produce the signed link you share with the customer. The token expires, so create a fresh session per visit.
 
 
 ---
