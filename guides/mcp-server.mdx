@@ -8,7 +8,7 @@ description: "Control Kelviq from Claude, Cursor, and any AI assistant that spea
 Instead of asking your assistant to "write me a curl command," you describe the outcome ("create a Pro plan under product X and publish it") and it does the work in a single turn.
 
 <Info>
-**51 tools across 13 domains** (customers, checkout, subscriptions, entitlements, licenses, usage, offerings, promotions, portal, catalog products, catalog plans, catalog features, partner organizations) plus **61 resources** including the full OpenAPI spec.
+**45 tools** spanning customers, checkout, subscriptions, entitlements, licenses, usage, offerings, promotions, the customer portal, and full catalog management (products, plans, features) — plus **61 resources** including the full OpenAPI spec.
 </Info>
 
 
@@ -59,7 +59,7 @@ claude mcp add kelviq \
 The `--` separator is required so that `claude` doesn't intercept `-y` as one of its own flags. Put all `--env` arguments **before** the `--`.
 </Note>
 
-Verify the connection with `/mcp` inside a Claude Code session — you should see `kelviq ✓ Connected, 51 tools`.
+Verify the connection with `/mcp` inside a Claude Code session — you should see `kelviq ✓ Connected, 45 tools`.
 
 ### Claude Desktop
 
@@ -122,10 +122,11 @@ Your AI client should pick the right tool, call it, and show the result inline. 
 
 | Variable | Required | Default | Purpose |
 |----------|----------|---------|---------|
-| `KELVIQ_SERVER_API_KEY` | Yes, for all API tools | — | Bearer token for `api.kelviq.com` |
-| `KELVIQ_CLIENT_API_KEY` | Only for `promotion_get` | — | Bearer token for the edge host |
-| `KELVIQ_BASE_URL` | No | `https://api.kelviq.com/api/v1` | Override for sandbox / self-host |
-| `KELVIQ_EDGE_URL` | No | `https://edge.api.kelviq.com/api/v1` | Override the edge host (entitlements + promotions) |
+| `KELVIQ_SERVER_API_KEY` | Yes, for all API tools | — | Server API key (Bearer token for the core API) |
+| `KELVIQ_CLIENT_API_KEY` | Only for `promotion_get` | — | Client API key (Bearer token for the edge host) |
+| `KELVIQ_ENV` | No | `production` | Set to `sandbox` to target your sandbox environment — switches both API hosts automatically. Use a sandbox key with it: keys only work against their own environment. |
+| `KELVIQ_BASE_URL` | No | per `KELVIQ_ENV` | Advanced: override the core API host |
+| `KELVIQ_EDGE_URL` | No | per `KELVIQ_ENV` | Advanced: override the edge host (entitlements + promotions) |
 
 <Tip>
 Docs tools (`docs_search`, `docs_read`) work with no API keys at all. Even without a key, the LLM can answer Kelviq questions from the bundled documentation.
@@ -158,13 +159,13 @@ Tools are grouped by domain. Each tool name uses `domain_action` form (`customer
 | Tool | Description |
 |------|-------------|
 | `checkout_create_session` | Create a hosted checkout session. Returns `checkoutUrl` + `checkoutSessionId`. |
-| `portal_session_create` | Mint a pre-authenticated customer portal URL. |
+| `portal_session_create` | Create a customer portal session. Share the returned `signedPortalUrl` with the customer — the bare `customerPortalUrl` does not authenticate on its own. |
 
 ### Subscriptions
 
 | Tool | Description |
 |------|-------------|
-| `subscription_create` | Create a subscription directly (skip checkout). |
+| `subscription_create` | Create a subscription directly (skip checkout). Requires off-session charging to be enabled for your organization — otherwise use `checkout_create_session`. |
 | `subscription_list` | List subscriptions, filter by customer, paginated. |
 | `subscription_update` | Change plan / charge period / features. Free plans must use `checkout_create_session` to upgrade. |
 | `subscription_cancel` | Cancel `IMMEDIATE`, `CURRENT_PERIOD_ENDS`, or `SPECIFIC_DATE`. |
@@ -191,7 +192,7 @@ Tools are grouped by domain. Each tool name uses `domain_action` form (`customer
 | Tool | Description |
 |------|-------------|
 | `product_list` | List catalog products. Optional `search` substring + `page`. |
-| `product_create` | Create a product. Required: `name`, `taxCode`. Optional `imageKeys` from `media_presigned_upload`. |
+| `product_create` | Create a product. Required: `name`, `taxCode`. Optional `imageKeys` (S3 file keys from the `POST /media/` API endpoint). |
 | `product_retrieve` | Fetch one product by UUID or identifier. |
 | `product_update` | Patch a product. |
 | `product_archive` | Archive (soft-delete) a product. |
@@ -223,7 +224,6 @@ Plans are versioned. Updates create a draft; `plan_publish` releases it.
 | `plan_publish` | Publish the latest draft. `updateFeatures` / `updatePricing` flags migrate existing customers. |
 | `plan_discard_draft` | Drop the current draft, keep the published version. |
 | `plan_prices_list` | List all prices configured on a plan. |
-| `plan_prices_bulk_set` | Atomically replace all prices. Supports `FLAT` / `PACKAGE` / `TIERED` / `VOLUME` / `STAIRSTEP` models. |
 | `plan_entitlements_list` | List feature entitlements on a plan. |
 | `plan_entitlements_add` | Attach feature entitlements. |
 | `plan_entitlement_update` | Patch a single entitlement's `details`. |
@@ -231,21 +231,6 @@ Plans are versioned. Updates create a draft; `plan_publish` releases it.
 | `plan_file_update` | Edit display fields of a plan-attached file. |
 | `plan_file_delete` | Remove a file from a plan. |
 | `plan_file_download` | Download URL/stream for a plan file (buyer-facing deliverables). |
-
-### Media
-
-| Tool | Description |
-|------|-------------|
-| `media_presigned_upload` | Get a presigned S3 POST policy (max 5 GB). Returns a `fileKey` to pass into `product_create`/`product_update` (`imageKeys`) or `plan_create`/`plan_update` (`fileKeys`). |
-
-### Partner
-
-| Tool | Description |
-|------|-------------|
-| `partner_org_provision` | Provision a Kelviq org under your partner account. Required: `externalId`, `email`. Optional `businessName`. |
-| `partner_org_list` | List orgs you've provisioned. Optional `externalId` filter. |
-| `partner_org_retrieve` | Fetch a partner org by its Kelviq identifier. |
-| `partner_org_retrieve_by_external_id` | Fetch a partner org by your partner-side ID. |
 
 ### Docs (no API key required)
 
@@ -274,22 +259,16 @@ For exhaustive per-endpoint request/response shapes, the **OpenAPI spec is the s
 
 Describe the outcome, not the API call. A few realistic prompts that exercise the toolchain:
 
-<Accordion title="Build a complete catalog from scratch">
-> *Create a Kelviq product called "Notion Plus" with tax code `saas`, then create three plans (Free, Pro Monthly $19, Pro Yearly $190), add an `api-calls` feature with limits 1000 / 50000 / unlimited, and publish all three plans.*
+<Accordion title="Build a catalog from scratch">
+> *Create a Kelviq product called "Notion Plus" with tax code `saas`, then create three plans (Free, Pro Monthly, Pro Yearly), add an `api-calls` feature with limits 1000 / 50000 / unlimited, and publish all three plans.*
 
-Calls (in order): `product_create` → `feature_create` → `plan_create` × 3 → `plan_entitlements_add` × 3 → `plan_prices_bulk_set` × 3 → `plan_publish` × 3.
+Calls (in order): `product_create` → `feature_create` → `plan_create` × 3 → `plan_entitlements_add` × 3 → `plan_publish` × 3. Set each plan's prices in the [dashboard](https://app.kelviq.com) or with the [Kelviq CLI](/cli/overview), which manages pricing as reviewable code.
 </Accordion>
 
 <Accordion title="Issue a checkout link">
 > *Create a checkout session for plan `pro-monthly` for a new customer, success URL https://example.com/done.*
 
 Calls: `checkout_create_session`. Returns the `checkoutUrl` you can hand to your buyer.
-</Accordion>
-
-<Accordion title="Provision a partner customer">
-> *Provision a Kelviq org for partner external ID `acme-99`, owner email `ops@acme.com`, business name "Acme Corp".*
-
-Calls: `partner_org_provision`. Returns the new org's identifier + API keys.
 </Accordion>
 
 <Accordion title="License key management">
