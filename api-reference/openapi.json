@@ -4524,7 +4524,7 @@
           "Subscriptions"
         ],
         "summary": "List Subscriptions",
-        "description": "Retrieves a paginated list of subscriptions for a customer.",
+        "description": "Retrieves a paginated list of subscriptions. Optionally filter the results by customer.",
         "operationId": "listSubscriptions",
         "x-mint": {
           "content": "<Info>Click the base URL in the API playground and select the **Sandbox** host for test data or the **Production** host for live data. Use credentials from the same environment.</Info>"
@@ -4533,8 +4533,8 @@
           {
             "name": "customer_id",
             "in": "query",
-            "required": true,
-            "description": "The client-defined unique identifier of the customer whose subscriptions will be returned.",
+            "required": false,
+            "description": "Optional. The client-defined unique identifier of the customer whose subscriptions will be returned.",
             "schema": {
               "type": "string"
             }
