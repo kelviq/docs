@@ -3,7 +3,7 @@ title: "MCP Server"
 description: "Control Kelviq from Claude, Cursor, and any AI assistant that speaks the Model Context Protocol."
 ---
 
-`@kelviq/mcp-server` is the official [Model Context Protocol](https://modelcontextprotocol.io) server for Kelviq. It plugs into any MCP-compatible client — Claude Code, Claude Desktop, Cursor, Zed — and exposes the full Kelviq API as **typed tools** that the LLM can call directly, plus the entire Kelviq documentation as **searchable resources**.
+`@kelviq/mcp-server` is the official [Model Context Protocol](https://modelcontextprotocol.io) server for Kelviq. It plugs into any MCP-compatible client — Claude Code, Claude Desktop, Cursor, Windsurf, VS Code, Antigravity — and exposes the full Kelviq API as **typed tools** that the LLM can call directly, plus the entire Kelviq documentation as **searchable resources**.
 
 Instead of asking your assistant to "write me a curl command," you describe the outcome ("create a Pro plan under product X and publish it") and it does the work in a single turn.
 
@@ -44,10 +44,11 @@ Never commit API keys to version control or paste them into shared chats. Use yo
 
 ## Step 2: Add the Server to Your AI Client
 
-Pick the section that matches your client.
+Every client uses the same underlying command — `npx -y @kelviq/mcp-server` — with your two keys passed as environment variables. What differs is the config file location and, in a few cases, the root JSON key. Pick the tab for your client.
 
-### Claude Code (CLI)
+<Tabs>
 
+<Tab title="Claude Code">
 ```bash
 claude mcp add kelviq \
   --env KELVIQ_SERVER_API_KEY=<your-server-key> \
@@ -60,9 +61,9 @@ The `--` separator is required so that `claude` doesn't intercept `-y` as one of
 </Note>
 
 Verify the connection with `/mcp` inside a Claude Code session — you should see `kelviq ✓ Connected, 51 tools`.
+</Tab>
 
-### Claude Desktop
-
+<Tab title="Claude Desktop">
 Edit `~/Library/Application Support/Claude/claude_desktop_config.json` (macOS) or the equivalent for your OS:
 
 ```json
@@ -81,19 +82,109 @@ Edit `~/Library/Application Support/Claude/claude_desktop_config.json` (macOS) o
 ```
 
 Restart Claude Desktop — the hammer icon shows `kelviq` with all tools.
+</Tab>
 
-### Cursor
+<Tab title="Cursor">
+Open **Cursor Settings → Tools and MCP → Add new MCP server**, or edit `.cursor/mcp.json` (project) / `~/.cursor/mcp.json` (global) directly:
 
-Open **Cursor Settings → MCP**, click **Add new MCP server**, and configure:
+```json
+{
+  "mcpServers": {
+    "kelviq": {
+      "command": "npx",
+      "args": ["-y", "@kelviq/mcp-server"],
+      "env": {
+        "KELVIQ_SERVER_API_KEY": "server-...",
+        "KELVIQ_CLIENT_API_KEY": "client-..."
+      }
+    }
+  }
+}
+```
 
-| Field | Value |
-|-------|-------|
-| Command | `npx` |
-| Args | `-y @kelviq/mcp-server` |
-| Environment Variables | `KELVIQ_SERVER_API_KEY`, `KELVIQ_CLIENT_API_KEY` |
+Project-level config overrides global config when a server of the same name exists in both.
+</Tab>
 
-### Other Clients
+<Tab title="Windsurf / Devin Desktop">
+As of June 2026, Windsurf was rebranded **Devin Desktop** by Cognition. Existing installs update automatically — same editor, new name. The MCP config location also changed with the rebrand:
+- **Devin Desktop (current):** `%APPDATA%\devin\config.json` (Windows) — via **Settings → Devin Local → Configuration → MCP servers**
+- **Legacy Windsurf installs:** `~/.codeium/windsurf/mcp_config.json`
+Add Kelviq under the `mcpServers` key:
+ 
+```json
+{
+  "mcpServers": {
+    "kelviq": {
+      "command": "npx",
+      "args": ["-y", "@kelviq/mcp-server"],
+      "env": {
+        "KELVIQ_SERVER_API_KEY": "server-...",
+        "KELVIQ_CLIENT_API_KEY": "client-..."
+      }
+    }
+  }
+}
+```
+ 
+Save, then refresh or restart the app — `kelviq` should appear under **MCP servers** in Settings, where you can enable it and toggle individual tools.
+ 
+<Note>
+If your `config.json` isn't empty, check its existing top-level structure before pasting — merge `kelviq` alongside whatever's already there rather than overwriting the file.
+</Note>
+</Tab>
 
+<Tab title="VS Code (Copilot)">
+Add a `.vscode/mcp.json` in your workspace, or run **"MCP: Open User Configuration"** from the Command Palette for a global `mcp.json`. VS Code uses `servers`, not `mcpServers`, as the root key:
+```json
+{
+  "servers": {
+    "kelviq": {
+      "command": "npx",
+      "args": ["-y", "@kelviq/mcp-server"],
+      "env": {
+        "KELVIQ_SERVER_API_KEY": "server-...",
+        "KELVIQ_CLIENT_API_KEY": "client-..."
+      }
+    }
+  }
+}
+```
+ 
+Save, then click the **Start** CodeLens above the `kelviq` entry (or reload the window) and confirm it under the tools icon in Copilot Chat's Agent mode.
+ 
+<Tip>
+Already have Kelviq configured in Cursor or Windsurf? Under **Settings → Chat → MCP → Discovery**, check the matching box (e.g. "Windsurf configurations") to auto-import that server instead of retyping it. You can also use the `inputs` array to be prompted for the keys instead of storing them in plaintext.
+</Tip>
+</Tab>
+
+
+<Tab title="Antigravity">
+Open the "..." menu in the Agent panel → **MCP Servers** → **Manage MCP Servers** → **View raw config**. This opens `mcp_config.json` at:
+
+- **Windows:** `C:\Users\<USERNAME>\.gemini\antigravity\mcp_config.json`
+- **macOS/Linux:** `~/.gemini/antigravity/mcp_config.json`
+
+```json
+{
+  "mcpServers": {
+    "kelviq": {
+      "command": "npx",
+      "args": ["-y", "@kelviq/mcp-server"],
+      "env": {
+        "KELVIQ_SERVER_API_KEY": "server-...",
+        "KELVIQ_CLIENT_API_KEY": "client-..."
+      }
+    }
+  }
+}
+```
+
+<Note>
+The Antigravity **CLI** (as opposed to the IDE) uses a separate config path: `~/.gemini/antigravity-cli/mcp_config.json`.
+</Note>
+</Tab>
+
+<Tab title="Other Clients">
 Any client supporting stdio MCP servers works. Point it at:
 
 ```bash
@@ -101,6 +192,9 @@ npx -y @kelviq/mcp-server
 ```
 
 with the env vars listed below.
+</Tab>
+
+</Tabs>
 
 ---
 
