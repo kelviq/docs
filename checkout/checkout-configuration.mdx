@@ -190,7 +190,7 @@ Plan: Professional
 
 ### Success and Cancellation URLs
 
-After checkout succeeds, redirect customers to your own confirmation or onboarding page:
+The success URL is optional when you link to or embed Kelviq Checkout directly. Add it only when you want Kelviq to redirect the customer to your own confirmation or onboarding page after checkout succeeds:
 
 ```
 Customer completes purchase
@@ -204,13 +204,13 @@ You can:
 - Continue onboarding
 ```
 
-For a static checkout link, add the URL-encoded `success_url` parameter:
+For a static checkout link, add the URL-encoded `success_url` parameter when you want this redirect:
 
 ```text
 &success_url=https%3A%2F%2Fyourdomain.com%2Fcheckout-success
 ```
 
-When creating a checkout session through the API, use `successUrl`. You can also provide `cancelUrl` to redirect the customer if they cancel payment.
+When creating a checkout session through the API, use the optional `successUrl` field. You can also provide `cancelUrl` to redirect the customer if they cancel payment.
 
 ### Checkout Session Options
 

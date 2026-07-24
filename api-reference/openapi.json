@@ -316,7 +316,7 @@
           "customerId": {
             "type": "string",
             "nullable": true,
-            "description": "The ID of the customer initiating the checkout. If not provided, a new customer may be created depending on server logic. Email addresses may be shared by multiple customer records, but each customerId must be unique.",
+            "description": "The customerId of the customer initiating the checkout. If omitted, Kelviq creates a new customer and generates a unique customerId. Multiple customer records can share the same email address, but every customerId must be unique.",
             "example": "cust_789"
           },
           "features": {
