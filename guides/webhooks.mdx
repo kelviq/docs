@@ -87,7 +87,7 @@ For request-time access checks, query the customer's current entitlements instea
 
 ### Subscription end dates
 
-Subscription webhook objects now include `end_date` inside `data.object`. The field contains an ISO 8601 date when the subscription has a known end date and is `null` while no end date is set.
+Subscription webhook objects include `end_date` inside `data.object`. Kelviq sets the field when a subscription has been cancelled or is scheduled to cancel on a future date. Otherwise, the value is `null`.
 
 Use `end_date` for the subscription's scheduled or final end. `billing_period_end_time` describes the current billing period instead and should not be treated as the subscription's cancellation date.
 
