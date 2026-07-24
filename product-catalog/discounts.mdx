@@ -5,9 +5,14 @@ description: 'Create coupons and promotional codes'
 
 You can manage all your coupons from the **Product Catalog**.
 
-Navigate to **Product Catalog > Discounts** to see a list of every active and expired code. You can create two types of discounts:
-* **Percentage:** A relative cut (e.g. 20% off).
-* **Fixed amount:** A specific dollar value (e.g. $10 off).
+Navigate to **Product Catalog > Discounts** to see a list of every active and expired code.
+
+You can create two types of discounts:
+
+* **Percentage** — Reduces an eligible price by a percentage, such as 20%.
+* **Fixed amount** — Subtracts a specific amount in a selected currency, such as USD 10 or INR 500.
+
+For a fixed-amount discount, select the currency next to the amount. Kelviq places the currency from your organization profile first in the list, but you should still review the selection before creating the discount.
 
 ## Create a discount
 
@@ -37,10 +42,11 @@ Navigate to **Product Catalog > Discounts** to see a list of every active and ex
 You can control exactly how and when a discount applies.
 
 ### Duration
-For recurring subscriptions, you define how long the discount lasts.
-* **Once:** Applies only to the first invoice.
-* **Forever:** Applies to every invoice indefinitely.
-* **Repeating:** Applies for a specific number of billing cycles (e.g. "3 months off").
+Recurring discount settings are enabled by default. Choose how long the discount should apply:
+
+* Enter a number of billing cycles for a limited recurring discount.
+* Select **Discount applies forever** to apply it to every eligible recurring invoice.
+* Turn off **Recurring discount** when the code should apply only to the initial purchase.
 
 ### Usage & expiry
 Control the scarcity of the coupon.
@@ -48,12 +54,19 @@ Control the scarcity of the coupon.
 * **Expiry date:** Set a hard deadline when the code stops working.
 
 ### Product restrictions
-By default, a discount applies to your entire catalog. You can restrict it to specific items.
+By default, a discount applies to the entire catalog. To restrict it:
 
-1. Toggle **Limit discount on selected products**.
-2. Select the products you want to include.
-3. **Refine scope:** You can go even deeper by selecting specific price points.
-   * *Example:* Apply the discount only to the "Pro Plan - Yearly" interval, while excluding the "Monthly" version.
+1. Enable **Limit discount to selected products**.
+2. Select a product in every restriction row you add.
+3. Optionally select a specific plan price. Choose **Applies to all plans** to include every price under that product.
+
+Kelviq will not create the discount while a restriction row has no product selected.
+
+For fixed-amount discounts, the discount currency must match the currency of the selected price. Kelviq shows a validation error when the currencies do not match.
+
+## Apply a discount at checkout
+
+Customers can enter a code themselves, or you can pre-apply one through the Checkout API or a static checkout link. See [Apply a discount code at checkout](/checkout/apply-a-discount-code) for working examples and field names.
 
 ## Management
 

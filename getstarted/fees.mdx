@@ -1,11 +1,11 @@
 ---
 title: "Fees"
-description: "Kelviq's transparent pricing structure"
+description: "Understand Kelviq's transaction fees and additional charges"
 ---
 
-Kelviq operates as a [Merchant of Record](/getstarted/merchant-of-record), handling payments, tax compliance, and global selling on your behalf. Our pricing is simple and all-inclusive—no hidden fees, no monthly minimums.
+Kelviq operates as a [Merchant of Record](/getstarted/merchant-of-record), handling payments, tax compliance, and global selling on your behalf. You pay a transaction fee when a payment succeeds. There are no setup fees, monthly fees, or minimum transaction requirements.
 
-## What's Included
+## What's included
 
 Your transaction fee covers everything you need to sell globally:
 
@@ -20,75 +20,87 @@ Your transaction fee covers everything you need to sell globally:
 - Feature and entitlement management
 - Customer billing portal
 
-## Transaction Fees
+## Transaction fees
 
-Fees are charged only on successful transactions:
+Every successful payment starts with a base fee. The base rate changes after your organization processes &#36;5,000 in total sales volume. A recurring charge or international card can add another percentage to the same transaction.
 
-| Fee Type | Rate | Description |
-|----------|------|-------------|
-| Base fee | 3.5% + $0.40 | Applied to every transaction |
-| International cards | +1.5% | Cards issued outside the US |
-| Recurring billing | +0.7% | Subscription and renewal charges |
+| Fee component | Rate | When it applies |
+| --- | --- | --- |
+| Base fee, up to &#36;5,000 in total volume | 2.9% + &#36;0.40 | Successful transactions processed before your organization reaches &#36;5,000 in total sales |
+| Base fee, after &#36;5,000 in total volume | 3.5% + &#36;0.40 | Subsequent successful transactions after your organization reaches &#36;5,000 in total sales |
+| Recurring billing | +0.7% | Subscription payments and renewals |
+| International card | +1.5% | Cards issued outside the United States |
 
 <Note>
-Fees are calculated on the transaction amount before tax.
+  The recurring and international-card percentages are added to the applicable base rate. The fixed &#36;0.40 is charged once per successful transaction.
 </Note>
 
-## Fee Examples
+### How the &#36;5,000 threshold works
 
-<AccordionGroup>
-  <Accordion title="One-time purchase (domestic card)">
-    **$100 product, US customer, US-issued card**
+The threshold is based on your organization's cumulative processed sales volume, not the number of payments or the volume for a single month. You pay 2.9% + &#36;0.40 on transactions processed before reaching &#36;5,000. After your total processed volume reaches &#36;5,000, subsequent transactions use the 3.5% + &#36;0.40 base rate.
 
-    | Component | Calculation | Amount |
-    |-----------|-------------|--------|
-    | Base fee | $100 × 3.5% | $3.50 |
-    | Fixed fee | — | $0.40 |
-    | **Total fee** | | **$3.90** |
+The rate change does not alter fees on transactions that were already processed.
 
-    You receive: $96.10
-  </Accordion>
+## All fee combinations
 
-  <Accordion title="One-time purchase (international card)">
-    **$100 product, UK customer, UK-issued card**
+The additional percentages stack when a charge is both recurring and paid with an international card.
 
-    | Component | Calculation | Amount |
-    |-----------|-------------|--------|
-    | Base fee | $100 × 3.5% | $3.50 |
-    | Fixed fee | — | $0.40 |
-    | International | $100 × 1.5% | $1.50 |
-    | **Total fee** | | **$5.40** |
+| Transaction type | Up to &#36;5,000 in total volume | After &#36;5,000 in total volume |
+| --- | --- | --- |
+| One-time payment, domestic card | 2.9% + &#36;0.40 | 3.5% + &#36;0.40 |
+| One-time payment, international card | 4.4% + &#36;0.40 | 5.0% + &#36;0.40 |
+| Subscription, domestic card | 3.6% + &#36;0.40 | 4.2% + &#36;0.40 |
+| Subscription, international card | 5.1% + &#36;0.40 | 5.7% + &#36;0.40 |
 
-    You receive: $94.60
-  </Accordion>
+### Example fees on a &#36;100 charge
 
-  <Accordion title="Subscription (domestic card)">
-    **$50/month subscription, US customer, US-issued card**
+This example uses a &#36;100 gross charge. If the payment includes tax, the gross amount is the full amount charged to the customer.
 
-    | Component | Calculation | Amount |
-    |-----------|-------------|--------|
-    | Base fee | $50 × 3.5% | $1.75 |
-    | Fixed fee | — | $0.40 |
-    | Recurring | $50 × 0.7% | $0.35 |
-    | **Total fee** | | **$2.50** |
+| Transaction type | Fee before the &#36;5,000 threshold | Fee after the &#36;5,000 threshold |
+| --- | ---: | ---: |
+| One-time payment, domestic card | &#36;3.30 | &#36;3.90 |
+| One-time payment, international card | &#36;4.80 | &#36;5.40 |
+| Subscription, domestic card | &#36;4.00 | &#36;4.60 |
+| Subscription, international card | &#36;5.50 | &#36;6.10 |
 
-    You receive: $47.50 per month
-  </Accordion>
+## How fees appear in Transactions
 
-  <Accordion title="Subscription (international card)">
-    **$50/month subscription, German customer, German-issued card**
+The **Fee** column under **Payouts → Transactions** shows the total fee deducted from a payment. It combines the applicable base rate, recurring fee, and international-card fee into one amount. Tax is shown separately.
 
-    | Component | Calculation | Amount |
-    |-----------|-------------|--------|
-    | Base fee | $50 × 3.5% | $1.75 |
-    | Fixed fee | — | $0.40 |
-    | International | $50 × 1.5% | $0.75 |
-    | Recurring | $50 × 0.7% | $0.35 |
-    | **Total fee** | | **$3.25** |
+For a successful transaction:
 
-    You receive: $46.75 per month
-  </Accordion>
-</AccordionGroup>
+```text
+Net = Gross - Fee - Tax
+```
+
+[Learn how to read the Transactions page →](/payouts/transactions)
+
+## Payout fees
+
+Transaction fees and payout fees happen at different stages. The transaction fee is deducted when a customer pays. A payout fee can apply later, when Stripe Connect sends your cleared Kelviq balance to your bank account or eligible debit card.
+
+Stripe's standard Connect provider fees for USD payouts are:
+
+| Payout fee | Rate | When it applies |
+| --- | --- | --- |
+| Monthly active payout account | &#36;2.00 | Any month in which one or more payouts are sent to your bank account or debit card |
+| Standard payout | 0.25% + &#36;0.25 | Each payout sent to your bank account or debit card |
+| Cross-border payout | Starting at +0.25% | When funds are paid to a connected account in another country |
+| Currency conversion | Variable | When Stripe must convert the payout into another currency |
+
+For example, the standard provider fee on a &#36;1,000 USD payout is &#36;2.75:
+
+```text
+($1,000 × 0.25%) + $0.25 = $2.75
+```
+
+If that is the first payout for the account during the month, the &#36;2.00 monthly active-account fee can also apply. Cross-border and currency-conversion fees, when required, are additional.
+
+<Note>
+  Payout pricing can vary by the connected account's country, payout currency, and Stripe pricing agreement. These fees are separate from the **Fee** shown for an individual customer transaction.
+</Note>
+
+[Learn how Kelviq payouts work →](/payouts/overview)
 
 ## Refunds
 
@@ -103,7 +115,7 @@ When you issue a refund to a customer, the original transaction fee is **retaine
 Our payment partners charge non-refundable processing fees on the original transaction. We pass this cost structure through to maintain transparent pricing.
 </Warning>
 
-## Disputes & Chargebacks
+## Disputes and chargebacks
 
 When a customer disputes a charge with their bank, a **$15 fee** applies regardless of the dispute outcome.
 
@@ -112,7 +124,7 @@ When a customer disputes a charge with their bank, a **$15 fee** applies regardl
 | You win | $15 | Returned to you |
 | You lose | $15 | Refunded to customer |
 
-### Reducing Disputes
+### Reducing disputes
 
 <CardGroup cols={2}>
   <Card title="Clear billing descriptors" icon="receipt">

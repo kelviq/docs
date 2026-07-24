@@ -94,6 +94,34 @@ You don't need to:
 
 ---
 
+## When the Entitlement API is unavailable
+
+Kelviq serves entitlement checks through its edge API. The service targets P95 response times below 100 ms and an uptime SLA above 99.99%, but your access-control path should still account for a temporary network or API failure.
+
+### Node and Python SDK fallback
+
+The current Node and Python SDKs cache entitlement responses by default. Each process keeps a fresh in-memory entry for 60 seconds. If the edge API is unreachable or returns a server error, the SDK can return the last known entitlement state instead of failing the access check.
+
+The in-memory cache is local to one process and is lost when that process restarts. For multiple application instances, workers, or containers, configure the optional Redis store. It shares the cache across instances and keeps the fallback state available through application restarts.
+
+Usage and event reports that fail because of a temporary network problem are queued. The SDK retries them on the next report call, or you can flush the queue explicitly. An in-memory queue is suitable for one process; use Redis when the queue must be shared and durable.
+
+<Warning>
+  The SDK cannot return a last known value for a customer or feature that has never been fetched. Decide whether your application should deny access, allow limited access, or show a temporary error when no cached state exists.
+</Warning>
+
+See the [Node SDK caching configuration](/backend-integration/node-sdk#caching-and-offline-resilience) or [Python SDK caching configuration](/backend-integration/python-sdk#caching-and-offline-resilience) for setup examples.
+
+### Calling the API directly
+
+If you call the Entitlement API without an SDK, keep your own last-known response in an in-memory or persistent cache. Store when the value was fetched, set a maximum fallback age that matches the risk of the feature, and refresh the record after the API recovers.
+
+Use a short fallback window for high-risk actions such as exporting sensitive data or using an expensive metered feature. A longer window may be reasonable for low-risk interface features. Do not silently grant access when there is no previous entitlement state.
+
+If your architecture already maintains subscription state through webhooks, you can continue using that model. Process webhook events idempotently and reconcile the local record against the Entitlement API after an outage.
+
+---
+
 ## Feature Types
 
 Kelviq supports three types of features to cover all access control scenarios.
@@ -225,7 +253,7 @@ For complete checkout API options, see the [Node SDK Documentation](https://docs
 | **New customer ID** | Customer created automatically, entitlements assigned |
 | **Existing customer** | Entitlements updated based on new purchase |
 | **Upgrade** | New plan entitlements replace old ones |
-| **Downgrade** | Adjusted at end of current billing period |
+| **Downgrade** | New plan entitlements replace old ones immediately |
 
 ### Automatic Assignment
 
@@ -316,6 +344,18 @@ For complete SDK reference including all methods and parameters, see the [Node S
 <Warning>
 The sandbox environment is completely separate from production. Use different API keys and note that sandbox data won't appear in production.
 </Warning>
+
+---
+
+## Manage feature definitions
+
+Open **Product Catalog → Features** to create and manage reusable feature definitions. See [Create a feature in Kelviq](/product-catalog/create-a-feature) for the complete dashboard and API workflows.
+
+* Use the row action menu to edit a feature name.
+* Metered values, percentages, and rollover limits use numeric inputs.
+* When configuring a metered entitlement, set the usage reset and hard-limit behavior first, then configure credit rollover and usage alerts.
+
+When adding features to a plan from **Manage features & limits**, search for a feature and click **Add**. Kelviq clears the search after the feature is added so you can search for the next feature immediately.
 
 ---
 
@@ -419,27 +459,25 @@ When you set up inheritance:
 #### Upgrade
 - New plan entitlements replace old ones
 - Happens immediately
-- Usage meters may reset or carry over (configurable)
+- Existing usage counters are retained and evaluated against the new limits
 
 #### Downgrade
-- New entitlements take effect at end of billing period
-- Customer keeps current access until then
-- Prevents mid-cycle disruption
+- New plan entitlements replace old ones immediately
+- Existing usage counters are retained
+- A customer can become over limit when the new limit is below current usage
 
 #### Cancellation
-- Entitlements remain active until period ends
-- Customer can use features they paid for
-- Access revoked when subscription expires
+- Immediate cancellation revokes plan access immediately
+- Period-end cancellation keeps entitlements active until the subscription expires
 
 #### Failed Payment
-- Grace period begins (configurable)
-- Customer retains access during grace period
-- After grace period: access revoked
-- Entitlements restored when payment succeeds
+- A failed card renewal moves the subscription to `past_due`
+- Kelviq retries card payments for up to 14 days before cancellation
+- Failed non-card renewals are not retried and the subscription is cancelled
 
 #### Refund
-- Entitlements revoked immediately
-- Customer loses access to plan features
+- Cancelling mid-period does not automatically create a refund
+- The merchant decides whether to issue a full, partial, or no refund
 
 <Info>
 Manage subscriptions programmatically using the [Subscriptions API](https://docs.kelviq.com/backend-integration/node-sdk#subscriptions).

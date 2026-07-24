@@ -192,14 +192,14 @@
         "properties": {
           "customerId": {
             "type": "string",
-            "description": "A unique identifier for the customer that you define.",
+            "description": "A stable identifier for this customer record. You define this value, and it must be unique within your Kelviq organization.",
             "example": "unique-customer-id-456"
           },
           "email": {
             "type": "string",
             "format": "email",
             "nullable": true,
-            "description": "The email address of the customer.",
+            "description": "The customer's email address. Email addresses do not have to be unique. More than one customer record can use the same email if each record has a different customerId.",
             "example": "another.new.customer@example.com"
           },
           "name": {
@@ -316,7 +316,7 @@
           "customerId": {
             "type": "string",
             "nullable": true,
-            "description": "The ID of the customer initiating the checkout. If not provided, a new customer may be created depending on server logic.\n\n**Note:** Even if a unique customer ID is provided, if the email address already exists in the system, the subscription will be created for that existing email \u2014 not the new customer ID. This is to preserve the uniqueness of the email address.",
+            "description": "The customerId of the customer initiating the checkout. If omitted, Kelviq creates a new customer and generates a unique customerId. Multiple customer records can share the same email address, but every customerId must be unique.",
             "example": "cust_789"
           },
           "features": {

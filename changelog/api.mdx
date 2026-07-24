@@ -5,23 +5,66 @@ mode: "wide"
 rss: true
 ---
 
-<Update label="v1.3.1" description="July 21, 2026">
+<Update label="v1.4.0" description="July 17, 2026">
 
 ### New Features
 
-#### Activate Subscription Updates After Payment
+#### 28-day subscription billing
 
-`POST /subscriptions/{subscriptionId}/update/` now accepts the optional `paymentBehavior` field. Set it to `activate_on_payment` to keep the customer's current subscription active while payment for the change is pending.
+Checkout and subscription creation now support a four-week billing period. Pass `TWENTY_EIGHT_DAYS` as `chargePeriod` when creating an eligible checkout session or subscription.
+
+This is useful for products sold in fixed four-week cycles: renewals happen on the same weekday every four weeks, and metered usage can reset on the same schedule instead of following calendar months.
 
 ```json
 {
-  "planIdentifier": "premium-plan",
-  "chargePeriod": "MONTHLY",
-  "paymentBehavior": "activate_on_payment"
+  "planIdentifier": "four-week-pro",
+  "chargePeriod": "TWENTY_EIGHT_DAYS",
+  "customerId": "customer_123",
+  "successUrl": "https://app.example.com/billing/success"
 }
 ```
 
-The new plan, billing period, and feature changes are applied only after payment succeeds. If the pending update expires before payment is completed, the current subscription remains unchanged. Omitting `paymentBehavior` preserves the existing immediate-update behavior.
+Metered features that follow the same cadence can use `EVERY_28_DAYS` as their usage reset period.
+
+The new billing period works across renewals, orders, invoices, emails, and subscription reporting. Organizations must enable the 28-day period before using it on a plan.
+
+#### Subscription end dates in webhook payloads
+
+Subscription webhook payloads now include `end_date` inside `data.object`. The field contains an ISO 8601 date when the subscription has a known end date and `null` when no end date is set.
+
+```json
+{
+  "type": "subscription.cancelled",
+  "data": {
+    "object": {
+      "id": "sub_123",
+      "end_date": "2026-08-17"
+    }
+  }
+}
+```
+
+Merchants can use this value to schedule access removal, customer notifications, and account cleanup without making a separate request for the latest subscription.
+
+### Fixes
+
+#### Reliable `invoice.paid` webhook delivery
+
+Kelviq now emits `invoice.paid` when an invoice is created with a `PAID` status. Previously, these invoices could emit only `invoice.created`, which meant integrations waiting for `invoice.paid` did not receive confirmation that payment had been collected.
+
+The event payload has not changed. Continue to use `data.object.status`, `data.object.paid_at`, and `data.object.subscription_id` when processing the event.
+
+</Update>
+
+<Update label="Customer email rules" description="July 17, 2026">
+
+### Changes
+
+#### Multiple customers can use the same email
+
+More than one customer record can now use the same email address. This removes the previous one-customer-per-email restriction.
+
+Each record must still have a unique `customerId`. Archiving a customer does not release that ID, so it cannot be assigned to a new record.
 
 </Update>
 

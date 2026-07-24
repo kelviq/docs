@@ -1,0 +1,226 @@
+---
+title: "Add metadata to checkout"
+description: "Attach your own IDs and context to a checkout session, then read them from the checkout.completed webhook"
+---
+
+Metadata lets you carry context from your application through a Kelviq checkout. Add an object when you create the session, and Kelviq returns the same object in the `checkout.completed` webhook.
+
+A common example is an order reference:
+
+```json
+{
+  "metadata": {
+    "order_ref": "ABC-123",
+    "workspace_id": "ws_acme",
+    "source": "pricing_page"
+  }
+}
+```
+
+Use metadata for values that help your backend connect a completed checkout to its own records, such as an internal order ID, workspace ID, campaign, or signup source.
+
+<Warning>
+  Do not put API keys, passwords, card details, or other sensitive information in metadata. Metadata is returned in webhook payloads and may appear in operational logs.
+</Warning>
+
+## Before you start
+
+You need:
+
+- a server API key from **Settings → API Keys**;
+- a plan identifier and supported charge period;
+- a backend endpoint that creates checkout sessions.
+
+A webhook endpoint is optional. Subscribe it to `checkout.completed` if you want to receive the metadata when checkout finishes.
+
+Keep the server API key in your backend. Never expose it in browser or mobile code.
+
+## Add metadata when creating the session
+
+Pass `metadata` at the top level of the Checkout API request body. Kelviq preserves the keys exactly as supplied, so `order_ref` and `orderRef` are different keys.
+
+<CodeGroup>
+
+```bash cURL
+curl --request POST \
+  --url https://sandboxapi.kelviq.com/api/v1/checkout/ \
+  --header "Authorization: Bearer $KELVIQ_SANDBOX_SERVER_API_KEY" \
+  --header "Content-Type: application/json" \
+  --data '{
+    "planIdentifier": "pro",
+    "chargePeriod": "MONTHLY",
+    "customerId": "cust_789",
+    "successUrl": "https://example.com/checkout/success",
+    "metadata": {
+      "order_ref": "ABC-123",
+      "workspace_id": "ws_acme",
+      "source": "pricing_page"
+    }
+  }'
+```
+
+```typescript Node.js SDK
+import { Kelviq, CHARGE_PERIOD_CHOICES } from "@kelviq/node-sdk";
+
+const client = new Kelviq({
+  accessToken: process.env.KELVIQ_SANDBOX_SERVER_API_KEY,
+});
+
+const session = await client.checkout.createSession({
+  planIdentifier: "pro",
+  chargePeriod: CHARGE_PERIOD_CHOICES.MONTHLY,
+  customerId: "cust_789",
+  successUrl: "https://example.com/checkout/success",
+  metadata: {
+    order_ref: "ABC-123",
+    workspace_id: "ws_acme",
+    source: "pricing_page",
+  },
+});
+```
+
+```python Python SDK
+import os
+from kelviq_sdk import Kelviq
+
+client = Kelviq.create_sync_client(
+    access_token=os.environ["KELVIQ_SANDBOX_SERVER_API_KEY"]
+)
+
+session = client.checkout.create_session(
+    planIdentifier="pro",
+    chargePeriod="MONTHLY",
+    customerId="cust_789",
+    successUrl="https://example.com/checkout/success",
+    metadata={
+        "order_ref": "ABC-123",
+        "workspace_id": "ws_acme",
+        "source": "pricing_page",
+    },
+)
+```
+
+</CodeGroup>
+
+The response contains the hosted checkout URL and the Kelviq session ID:
+
+```json
+{
+  "checkoutUrl": "https://kelviq.com/checkout/cs_eeCGdGayc5oTMdGNV5XocfRk6o87K0vlwwCuKeiE7BLU9/",
+  "checkoutSessionId": "cs_eeCGdGayc5oTMdGNV5XocfRk6o87K0vlwwCuKeiE7BLU9"
+}
+```
+
+Redirect the customer to `checkoutUrl`. The create response does not echo the metadata, so save `checkoutSessionId` alongside your internal record if you also need to look up the Kelviq session later.
+
+<Info>
+  This guide uses the sandbox host and a sandbox server API key. Switch both to production together when you are ready to accept live payments.
+</Info>
+
+## Read metadata after checkout
+
+When payment succeeds, the `checkout.completed` event includes the metadata at `data.object.metadata`:
+
+```json
+{
+  "id": "1619afec-caab-40c7-827c-6af4f3acc9a3",
+  "type": "checkout.completed",
+  "data": {
+    "object": {
+      "id": "cs_jBy6ViggULoyDMW9ikaw4ydur1NUa6dCORT6vqKPbPPW8",
+      "metadata": {
+        "order_ref": "ABC-123",
+        "workspace_id": "ws_acme",
+        "source": "pricing_page"
+      }
+    }
+  }
+}
+```
+
+Verify the webhook signature before reading or acting on the payload. After verification, you can use the metadata to find the matching record in your system:
+
+```typescript
+import { validateEvent } from "@kelviq/node-sdk";
+import express from "express";
+
+const app = express();
+
+app.post(
+  "/webhooks/kelviq",
+  express.raw({ type: "application/json" }),
+  async (req, res) => {
+    let event;
+
+    try {
+      event = validateEvent(
+        req.body,
+        req.headers,
+        process.env.KELVIQ_WEBHOOK_SECRET,
+      );
+    } catch {
+      return res.status(400).send("Invalid webhook signature");
+    }
+
+    if (event.type === "checkout.completed") {
+      const metadata = event.data.object.metadata ?? {};
+
+      // Replace this with your queue or application service.
+      await queueCheckoutProvisioning({
+        eventId: event.id,
+        orderRef: metadata.order_ref,
+        checkoutSessionId: event.data.object.id,
+      });
+    }
+
+    return res.sendStatus(202);
+  },
+);
+```
+
+Use the webhook event `id`, not a metadata value, as your idempotency key. Kelviq can deliver the same event more than once during automatic retries or a manual resend.
+
+[Learn how to register an endpoint and verify signatures →](/guides/webhooks)
+
+## Choose useful metadata
+
+Keep the object small and focused on correlation. A stable naming convention makes webhook handlers easier to maintain.
+
+| Value | Example | Why keep it |
+| --- | --- | --- |
+| Internal order reference | `order_ref: "ABC-123"` | Finds the pending order in your database |
+| Account or workspace ID | `workspace_id: "ws_acme"` | Connects the purchase to the right tenant |
+| Signup source | `source: "pricing_page"` | Records where the checkout started |
+| Campaign reference | `campaign: "launch_2026"` | Attributes the checkout to a campaign |
+
+Metadata is helpful context, but it is not proof of payment or authorization. Confirm `event.type`, verify the signature, and use Kelviq's resource IDs when calling Kelviq APIs.
+
+### Checkout metadata and customer metadata are different
+
+Checkout metadata describes one checkout session. Customer metadata describes the customer record and can be managed through the Customers API. Adding metadata to a checkout session does not replace or update customer metadata.
+
+## Test the complete flow
+
+1. Create a session with a sandbox server API key and recognizable test metadata.
+2. Open the returned `checkoutUrl` and complete a sandbox payment.
+3. Open **Settings → Webhooks**, then inspect the `checkout.completed` delivery.
+4. Confirm that `data.object.metadata` contains the same keys and values.
+5. Resend the delivery and confirm that your idempotency check prevents duplicate work.
+
+## Troubleshooting
+
+| Problem | Check |
+| --- | --- |
+| Metadata is missing from the webhook | Make sure `metadata` is at the top level of the checkout request and that you are inspecting `checkout.completed`. |
+| A handler cannot find a key | Key names are preserved verbatim. Check spelling, capitalization, and underscores. |
+| The request returns `401` | Use a server API key for the same environment as the API host. |
+| Signature verification fails | Verify the raw request body before JSON parsing. In Express, use `express.raw()` on the webhook route. |
+| Provisioning runs twice | Deduplicate by the event `id` or `webhook-id`, including deliveries triggered by **Resend**. |
+
+## Related documentation
+
+- [Checkout configuration](/checkout/checkout-configuration)
+- [Checkout API reference](/api-reference/checkout/create-a-checkout-session)
+- [Webhooks](/guides/webhooks)
+- [Node SDK](/backend-integration/node-sdk)
+- [Python SDK](/backend-integration/python-sdk)

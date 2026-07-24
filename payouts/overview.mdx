@@ -43,3 +43,35 @@ Below the metrics, you will see a list of every payout we have sent to your bank
 * Check the status of past transfers.
 * See the exact date the funds landed.
 * View the destination bank account for each transfer.
+
+## Payout questions
+
+### Can I receive payouts if Stripe does not offer standalone accounts in my country?
+
+Kelviq payouts use Stripe Connect, which is separate from opening your own standalone Stripe merchant account. You may still be eligible for Kelviq payouts even if standalone Stripe accounts are not offered in your country.
+
+Your country must appear in Kelviq's payout onboarding flow, and you must complete Stripe Connect's identity and bank-account checks. See the [supported payout countries](/getstarted/review-process#supported-payout-countries) before setting up live payments.
+
+### How long does a payout take?
+
+Sales funds usually become available for payout after seven days. After Kelviq sends the payout, allow another few business days for your bank to post it. Bank holidays, compliance reviews, reserves, and the receiving bank can extend this timing.
+
+### What is the minimum payout?
+
+The minimum payout amount is $10, or the equivalent amount in the payout currency.
+
+### Are there payout fees?
+
+Yes. Payout fees are separate from the transaction fee deducted when a customer pays. Under Stripe Connect's standard USD pricing, an active payout account costs &#36;2.00 for any month in which at least one payout is sent. Each standard payout costs 0.25% + &#36;0.25.
+
+Cross-border payouts start at an additional 0.25%. Currency conversion can add another provider fee when the payout currency does not match the connected bank account. Rates can vary by country, currency, and Stripe pricing agreement.
+
+[See the full transaction and payout fee schedule →](/getstarted/fees#payout-fees)
+
+### Do I need a registered company?
+
+No. You can complete payout onboarding as an individual. If you are a sole proprietor and do not have a separate registered company, select **Individual** and provide your own legal and tax details.
+
+### Can I receive a payout in another currency?
+
+Yes. For example, a seller in Canada can receive a payout in USD when the connected bank account accepts USD and that payout currency is available through Stripe Connect. The payout currency follows the connected bank account. If conversion is required, Stripe applies its exchange rate and any conversion fees.

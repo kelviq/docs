@@ -68,6 +68,58 @@ const client = new Kelviq({ accessToken: ACCESS_TOKEN });
 
 ```
 
+## Caching and offline resilience
+
+Entitlement caching is enabled by default. The SDK keeps a per-process in-memory cache with a 60-second freshness window. Reads follow this order: fresh memory cache, optional distributed cache, then the Entitlement API. A successful API response refreshes both cache levels.
+
+If the API is unreachable or returns a server error, the SDK returns the last known cached entitlement response when one exists. If the customer or feature has never been cached, the original request error is thrown.
+
+```typescript
+const client = new Kelviq({
+  accessToken: process.env.KELVIQ_SERVER_API_KEY,
+  enableCache: true,   // default: true
+  cacheTtlMs: 60_000,  // default: 60 seconds
+});
+```
+
+Set `enableCache: false` to disable caching.
+
+### Share the cache across instances
+
+The in-memory cache and offline reporting queue belong to one Node process and disappear when it restarts. Use the optional Redis store when multiple processes or containers need one shared, durable cache and queue.
+
+```shell
+npm install ioredis
+```
+
+```typescript
+import { Kelviq, RedisStore } from '@kelviq/node-sdk';
+
+const store = new RedisStore({
+  url: process.env.REDIS_URL,
+  prefix: 'kelviq:production',
+});
+
+const client = new Kelviq({
+  accessToken: process.env.KELVIQ_SERVER_API_KEY,
+  cacheStore: store,
+});
+```
+
+Use the same prefix for every instance that should share state.
+
+### Replay queued usage
+
+When a usage or event report fails because of a network problem, the SDK queues it and retries automatically on the next report call. You can also flush the queue explicitly:
+
+```typescript
+const remaining = await client.reporting.flush();
+```
+
+`remaining` is the number of reports still queued. Without Redis, the queue exists only in the current process.
+
+See [When the Entitlement API is unavailable](/product-catalog/entitlements#when-the-entitlement-api-is-unavailable) for access-control fallback guidance.
+
 
 
 
@@ -260,6 +312,8 @@ const response = await client.checkout.createSession({
         * `"WEEKLY"`
 
         * `"DAILY"`
+
+        * `"TWENTY_EIGHT_DAYS"`
 
         * `"THREE_MONTHS"`
 
@@ -862,7 +916,7 @@ console.log(subscription.id, subscription.status);
 **Required Parameters:**
 
 * `planIdentifier` (string): Identifier of the plan to subscribe to.
-* `chargePeriod` (`ChargePeriod`): Billing period such as `MONTHLY`, `YEARLY`, `WEEKLY`, or `DAILY`.
+* `chargePeriod` (`ChargePeriod`): By default, organizations can use `MONTHLY`, `THREE_MONTHS`, `SIX_MONTHS`, `YEARLY`, and `ONE_TIME`. To enable `DAILY`, `WEEKLY`, or `TWENTY_EIGHT_DAYS`, contact [hi@kelviq.com](mailto:hi@kelviq.com).
 * `customerId` (string): Client-defined identifier of the customer.
 
 **Optional Parameters:**
@@ -916,6 +970,7 @@ try {
     * `"YEARLY"`
     * `"WEEKLY"`
     * `"DAILY"`
+    * `"TWENTY_EIGHT_DAYS"`
     * `"THREE_MONTHS"`
     * `"SIX_MONTHS"`
 
@@ -1329,6 +1384,7 @@ Use `express.raw()` (not `express.json()`) so that the raw request body is prese
 | `subscription.updated` | A subscription was updated |
 | `subscription.cancelled` | A subscription was cancelled |
 | `subscription.plan_changed` | A subscription plan was changed |
+| `feature.usage_alert` | A feature's usage crossed a threshold configured when the entitlement was added to the plan |
 | `invoice.created` | A new invoice was created |
 | `invoice.paid` | An invoice was paid |
 | `refund.created` | A refund was initiated |
