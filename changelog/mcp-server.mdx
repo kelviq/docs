@@ -1,0 +1,62 @@
+---
+title: "MCP Server"
+description: "Changelog for @kelviq/mcp-server"
+mode: "wide"
+rss: true
+---
+
+<Update label="v0.4.0" description="July 24, 2026">
+
+### New Features
+
+#### Full checkout surface
+
+`checkout_create_session` now accepts every field the API supports — including `customAmount` (with `taxBehavior` and `currencyCode`) for custom-priced sessions, `discountCode` to pre-apply a coupon, `metadata` (returned verbatim on the `checkout.completed` webhook), `discountsEnabled`, `lockEmail`, and `defaultBillingCountry`. Previously these were silently dropped before the request was sent.
+
+#### Subscription update options
+
+`subscription_update` now supports `trialEnd` (`"now"` or an ISO 8601 datetime) and `paymentBehavior: "activate_on_payment"` to keep the current subscription active until payment for the update succeeds.
+
+#### Safety annotations on every tool
+
+All 45 tools now declare [MCP tool annotations](https://modelcontextprotocol.io/docs/concepts/tools#tool-annotations) — `readOnlyHint`, `destructiveHint`, `idempotentHint` — so MCP clients can auto-approve reads while asking for confirmation on destructive operations like `plan_archive` or `subscription_cancel`.
+
+#### Guided prompts
+
+Three built-in MCP prompts encode the golden-path workflows: `setup_product` (catalog bootstrap end-to-end), `launch_plan` (add a plan to an existing product), and `diagnose_customer` (entitlement/subscription cross-check). In Claude Code they appear as slash commands, e.g. `/kelviq:setup_product`.
+
+### Fixes
+
+- The server now reports its real version to MCP clients (it was pinned to an old value).
+- An automated spec-conformance suite now guards every request schema against the OpenAPI spec, so new API fields can no longer be silently dropped.
+
+</Update>
+
+<Update label="v0.3.0" description="July 24, 2026">
+
+### New Features
+
+#### Sandbox environment support
+
+Set `KELVIQ_ENV=sandbox` to target your sandbox environment — the server switches both API hosts (`sandboxapi.kelviq.com` and `edge.sandboxapi.kelviq.com`) automatically. Keys only work against their own environment, and an invalid `KELVIQ_ENV` value fails fast at startup instead of silently hitting production.
+
+#### Signed portal links
+
+`portal_session_create` now returns a ready-to-share `signedPortalUrl` — the portal URL with the session token already appended. The bare `customerPortalUrl` does not authenticate on its own; always share the signed link.
+
+### Breaking Changes
+
+Six tools were removed: `media_presigned_upload`, the four `partner_org_*` tools, and `plan_prices_bulk_set`. Plan pricing is managed in the dashboard or with the [Kelviq CLI](/cli/overview) (`kelviq push`), which previews and confirms every price change; `plan_prices_list` (read) remains available.
+
+### Improvements
+
+- `subscription_create` now documents that it requires off-session charging to be enabled for your organization, with `checkout_create_session` as the fallback.
+- The missing-key error links directly to the API-keys page in the right dashboard mode for your environment.
+
+</Update>
+
+<Update label="v0.2.0 – v0.2.3" description="June 16–17, 2026">
+
+Initial public release of `@kelviq/mcp-server`: the full Kelviq API as typed MCP tools plus the entire documentation as searchable resources, followed by packaging fixes and consolidation onto a single edge host.
+
+</Update>

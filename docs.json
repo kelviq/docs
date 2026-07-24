@@ -179,6 +179,7 @@
               "changelog/node-sdk",
               "changelog/python-sdk",
               "changelog/js-promotions-ui",
+              "changelog/mcp-server",
               "changelog/api"
             ]
           }

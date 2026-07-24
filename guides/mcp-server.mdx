@@ -8,7 +8,7 @@ description: "Control Kelviq from Claude, Cursor, and any AI assistant that spea
 Instead of asking your assistant to "write me a curl command," you describe the outcome ("create a Pro plan under product X and publish it") and it does the work in a single turn.
 
 <Info>
-**45 tools** spanning customers, checkout, subscriptions, entitlements, licenses, usage, offerings, promotions, the customer portal, and full catalog management (products, plans, features) — plus **61 resources** including the full OpenAPI spec.
+**45 tools** spanning customers, checkout, subscriptions, entitlements, licenses, usage, offerings, promotions, the customer portal, and full catalog management (products, plans, features) — plus **69 resources** including the full OpenAPI spec, and **3 guided prompts** for the most common workflows. Every tool carries [MCP safety annotations](https://modelcontextprotocol.io/docs/concepts/tools#tool-annotations), so clients can auto-approve read-only calls while confirming destructive ones.
 </Info>
 
 
@@ -254,6 +254,16 @@ Resources let your AI client pin pages into context. The server advertises three
 For exhaustive per-endpoint request/response shapes, the **OpenAPI spec is the source of truth**. Ask your assistant *"check the OpenAPI spec for createSubscription"* and it will read the resource directly.
 
 ---
+
+## Built-in Prompts
+
+The server ships three MCP prompts that encode Kelviq's golden-path workflows — including the gotchas (plans start as invisible drafts until published; entitlements attach by feature UUID; pricing is set in the dashboard or with the [Kelviq CLI](/cli/overview), not through the MCP server). In Claude Code they appear as slash commands (e.g. `/kelviq:setup_product`); other MCP clients list them under prompts.
+
+| Prompt | Arguments | What it guides |
+|--------|-----------|----------------|
+| `setup_product` | `productName?`, `planName?` | Full catalog bootstrap: product → features → plan → entitlements → publish → verify. |
+| `launch_plan` | `productId?`, `planName?` | Add and publish a new plan on an existing product, reusing existing features. |
+| `diagnose_customer` | `customerId` | Cross-check a customer's entitlements, subscriptions, and plan configuration; ends with concrete next actions. |
 
 ## Example Prompts
 
