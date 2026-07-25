@@ -1,0 +1,148 @@
+---
+title: "Agent Toolkit"
+description: "Install Kelviq into Claude Code with one plugin — or add the Kelviq skills to any of 70+ AI coding agents."
+---
+
+The [Kelviq Agent Toolkit](https://github.com/kelviq/agent-toolkit) packages everything an AI coding agent needs to work with Kelviq — the full [MCP server](/guides/mcp-server) plus five **Agent Skills** that teach the agent Kelviq's workflows — behind a single install.
+
+Skills are the missing half of tool access. The MCP server gives your agent 45 typed tools, but tools alone don't tell it that a new plan sits in DRAFT until published, that checkout is the default way to charge a customer, or that a retried usage report can double-count. The skills carry exactly that working knowledge, and they load automatically whenever a task looks Kelviq-shaped.
+
+<Note>
+**The Agent Toolkit is new.** The skills and their names are stable, but content will keep improving alongside the platform. The bundled MCP server is always the latest published `@kelviq/mcp-server` — no toolkit update needed when the server improves.
+</Note>
+
+---
+
+## Install — Claude Code
+
+Two commands, in any Claude Code session:
+
+```
+/plugin marketplace add kelviq/agent-toolkit
+/plugin install kelviq@kelviq
+```
+
+This installs the full bundle: the MCP server is configured for you (no `claude mcp add`, no `--` separator gotchas) and all five skills are available immediately.
+
+The server reads your API keys from environment variables. Set them in your shell profile before starting Claude Code:
+
+```bash
+export KELVIQ_SERVER_API_KEY="<your-server-key>"
+export KELVIQ_CLIENT_API_KEY="<your-client-key>"   # only needed for promotion_get
+```
+
+Get keys at [app.kelviq.com/settings/api-keys](https://app.kelviq.com/settings/api-keys).
+
+**Verify**: run `/mcp` — you should see `kelviq ✓ Connected, 45 tools`. Then ask something Kelviq-shaped ("set up a Pro plan for my product") and watch the relevant skill activate.
+
+<Tip>
+No keys yet? Install anyway. The docs tools (`docs_search`, `docs_read`) work without any credentials, so your agent can answer Kelviq questions from the documentation immediately. API tools return a clear `Configuration error` until a key is set.
+</Tip>
+
+---
+
+## Install — any other agent
+
+The five skills are also published through the open skills ecosystem, installable into 70+ agents (Cursor, Codex, GitHub Copilot, OpenCode, Zed, and more):
+
+```bash
+npx skills add kelviq/agent-toolkit
+```
+
+Add `--skill <name>` to install a single skill instead of the full set:
+
+```bash
+npx skills add kelviq/agent-toolkit --skill setup-payments
+```
+
+<Note>
+This path installs **skills only** — it doesn't configure an MCP server for you. Each skill starts with a short Setup section showing the `.mcp.json` snippet to connect `@kelviq/mcp-server` on your agent; see the [MCP server guide](/guides/mcp-server) for client-specific instructions.
+</Note>
+
+---
+
+## The five skills
+
+| Skill | What it teaches |
+|---|---|
+| `kelviq` | The hub. Connecting any agent to Kelviq, the ground rules (docs-first, error handling, confirm-before-destructive), the concept model (identifiers vs UUIDs, feature types, plan lifecycle, environments), and routing to the right skill or prompt for the task. |
+| `pricing-plans` | Designing and publishing the catalog: products, features, plans, entitlements, the DRAFT → publish lifecycle, and customer-migration decisions on publish. |
+| `setup-payments` | Selling plans and managing subscribers: checkout sessions, subscriptions, trials, upgrades, cancellation, and authenticated customer portal links. |
+| `usage-based-billing` | Enforcing what was sold: runtime entitlement checks served from the edge, safe usage reporting for metered features, and the license key lifecycle. |
+| `pricing-as-code` | The [Kelviq CLI](/cli/overview) workflow: pull the live catalog into `kelviq.config.ts`, edit in git, preview the diff, apply, and promote sandbox to production. |
+
+### `kelviq` — the hub
+
+Loads for any Kelviq task that doesn't match a more specific skill. It carries the knowledge every other skill assumes:
+
+- **Identifiers vs UUIDs** — when an endpoint wants the URL-safe `identifier` and when it wants the UUID, and how to resolve one from the other.
+- **Feature types** — `BOOLEAN` (flag), `CUSTOMIZABLE` (numeric quantity), `METER` (usage-tracked), and how entitlement shapes differ per type.
+- **Plan lifecycle** — plans are created in DRAFT and invisible until published; updating a published plan creates a new draft.
+- **Environments** — `KELVIQ_ENV=sandbox` for safe testing, and why "not found" errors often mean "right key, wrong environment".
+- **A customer-access diagnosis flow** — comparing what a customer *has* (`entitlements_get`), what they *bought* (`subscription_list`), and what their plan *grants* (`plan_entitlements_list`).
+
+### `pricing-plans`
+
+The golden path from empty account to published plan: create the product, create the features, create the plan (in DRAFT), attach entitlements, set prices, publish, verify. Includes the two decisions agents most often get wrong: whether to migrate existing customers on publish (`updateFeatures` / `updatePricing` — always a deliberate, confirmed choice), and where prices are managed (the dashboard or the CLI — the MCP server deliberately has no price-write tool).
+
+### `setup-payments`
+
+Checkout-first selling. The skill teaches that `checkout_create_session` is the default way to charge a customer — direct subscription creation charges off-session and is only enabled for some organizations — plus trial handling (`trialEnd`), safe plan changes (`paymentBehavior`), cancellation types, and the customer portal (always the signed URL from `portal_session_create`; a bare portal URL doesn't authenticate).
+
+### `usage-based-billing`
+
+Runtime enforcement. Entitlement checks via the edge-served `entitlements_get` (built to be cheap enough to call on the request path), the difference between `SET` and `DELTA` usage reporting — and why a blindly retried `DELTA` double-counts — plus license key activation, validation, and deactivation with `instanceId` handling.
+
+### `pricing-as-code`
+
+Wraps the [Kelviq CLI](/cli/overview) loop for agents: `kelviq pull` → edit `kelviq.config.ts` in a branch → `kelviq push --dry-run` → review → apply → `kelviq promote` from sandbox to production. The skill has a built-in safety rule: an agent may run dry-runs and show you diffs freely, but **applying a real change always requires your explicit approval** — it will never chain a dry-run into an unattended `--yes`.
+
+---
+
+## Skills, prompts, and tools — how they fit
+
+The toolkit layers three things, each doing what it's best at:
+
+1. **Tools** (from the MCP server) do the work — 45 typed API calls, each carrying [safety annotations](https://modelcontextprotocol.io/docs/concepts/tools#tool-annotations) so clients can auto-approve reads and confirm destructive writes.
+2. **Skills** (from this toolkit) supply the judgment — which tool, in what order, with which confirmations. They activate automatically based on what you ask.
+3. **Prompts** (from the MCP server) are guided, step-by-step flows you invoke explicitly — `setup_product`, `launch_plan`, and `diagnose_customer`. The skills route to them rather than duplicating them.
+
+Deep reference detail (field lists, price shapes, config schemas) intentionally lives in none of these — the skills direct the agent to `docs_search` / `docs_read`, so answers always come from the current documentation.
+
+---
+
+## Testing safely with sandbox
+
+Set `KELVIQ_ENV=sandbox` (with sandbox API keys) and every tool call targets your sandbox environment — separate data, separate keys, nothing crosses to production. Leave it unset for production. See the [sandbox guide](/guides/sandbox) for details.
+
+```bash
+export KELVIQ_ENV="sandbox"
+export KELVIQ_SERVER_API_KEY="<your-sandbox-server-key>"
+```
+
+---
+
+## Updating
+
+- **MCP server**: nothing to do. The toolkit runs `npx -y @kelviq/mcp-server`, which always resolves to the latest published version.
+- **Skills** (Claude Code): `/plugin marketplace update kelviq` pulls the latest marketplace content.
+- **Skills** (other agents): re-run `npx skills add kelviq/agent-toolkit`.
+
+---
+
+## Troubleshooting
+
+**`kelviq:` tools aren't available** — on Claude Code, check `/mcp`; if the server isn't listed, reinstall the plugin. On other agents, the skills-only install doesn't include the server — follow the Setup section in any installed skill or the [MCP server guide](/guides/mcp-server).
+
+**`Configuration error` from API tools** — `KELVIQ_SERVER_API_KEY` isn't visible to the process that launched your agent. Set it in your shell profile (not just the current terminal) and restart the agent.
+
+**"Not found" on an identifier you can see in the dashboard** — your key and `KELVIQ_ENV` are probably pointing at the other environment. Sandbox and production are fully separate; a key only works against its own environment.
+
+---
+
+## Related
+
+- [MCP server guide](/guides/mcp-server) — manual per-client setup, full tool list, architecture
+- [Kelviq CLI](/cli/overview) — the pricing-as-code workflow the `pricing-as-code` skill teaches
+- [Sandbox](/guides/sandbox) — test environment setup
+- [github.com/kelviq/agent-toolkit](https://github.com/kelviq/agent-toolkit) — the toolkit source
