@@ -26,7 +26,8 @@
     { "name": "Media", "description": "Generate presigned S3 upload URLs for product/plan images and files." },
     { "name": "Partner", "description": "Partner integration APIs (organization provisioning, lookup)." },
     { "name": "Charges", "description": "One-time payments charged immediately against a customer's default payment method." },
-    { "name": "Refunds", "description": "Full and partial refunds for paid orders." }
+    { "name": "Refunds", "description": "Full and partial refunds for paid orders." },
+    { "name": "Payment Methods", "description": "Saved customer payment methods (cards, etc.)." }
   ],
   "components": {
     "securitySchemes": {
@@ -3527,6 +3528,83 @@
             "example": 1
           }
         }
+      },
+      "PaymentMethodCustomer": {
+        "type": "object",
+        "description": "Summary of the customer a payment method belongs to.",
+        "properties": {
+          "customerId": {
+            "type": "string",
+            "description": "The client-provided customer identifier.",
+            "example": "geo-jacob"
+          },
+          "name": { "type": "string", "nullable": true, "example": "Geo Jacob" },
+          "email": { "type": "string", "format": "email", "nullable": true, "example": "geojacob@example.com" },
+          "billingAddress": { "$ref": "#/components/schemas/BillingAddress" }
+        }
+      },
+      "PaymentMethodResponse": {
+        "type": "object",
+        "description": "A saved payment method returned by list operations.",
+        "properties": {
+          "id": {
+            "type": "integer",
+            "description": "Server-generated unique identifier for the payment method record.",
+            "example": 482
+          },
+          "customer": { "$ref": "#/components/schemas/PaymentMethodCustomer" },
+          "methodType": {
+            "type": "string",
+            "description": "The payment method type, as reported by the payment provider (e.g. `card`, `sepa_debit`, `amazon_pay`).",
+            "example": "card"
+          },
+          "methodData": {
+            "type": "object",
+            "additionalProperties": true,
+            "description": "Payment-provider-specific details about the payment method. For `card`, includes `brand`, `last4`, `expMonth`, `expYear`, `funding`, `country`.",
+            "example": {
+              "brand": "visa",
+              "last4": "4242",
+              "expMonth": 12,
+              "expYear": 2029,
+              "funding": "credit",
+              "country": "US"
+            }
+          },
+          "isDefault": {
+            "type": "boolean",
+            "description": "Whether this is the customer's default payment method.",
+            "example": true
+          },
+          "status": {
+            "type": "string",
+            "description": "The payment method's status. List results only ever include `succeeded`.",
+            "enum": ["succeeded", "requires_action"],
+            "example": "succeeded"
+          },
+          "createdOn": {
+            "type": "string",
+            "description": "Payment method created date and time.",
+            "example": "2026-04-02T06:12:04.123456Z"
+          },
+          "modifiedOn": {
+            "type": "string",
+            "description": "Payment method last updated date and time.",
+            "example": "2026-04-02T06:12:04.123456Z"
+          }
+        }
+      },
+      "PaymentMethodListResponse": {
+        "type": "object",
+        "properties": {
+          "count": { "type": "integer", "example": 1 },
+          "next": { "type": "string", "format": "uri", "nullable": true, "example": null },
+          "previous": { "type": "string", "format": "uri", "nullable": true, "example": null },
+          "results": {
+            "type": "array",
+            "items": { "$ref": "#/components/schemas/PaymentMethodResponse" }
+          }
+        }
       }
     }
   },
@@ -6630,6 +6708,58 @@
           },
           "401": { "description": "Unauthorized — missing or invalid `X-Kelviq-Partner-Key` header." },
           "404": { "description": "Organization not found for this partner." }
+        }
+      }
+    },
+    "/payment-methods/": {
+      "get": {
+        "tags": ["Payment Methods"],
+        "summary": "List payment methods",
+        "description": "Returns a paginated list of saved payment methods for the authenticated organization, ordered by creation date (newest first). Only payment methods with status `succeeded` are included. Narrow results with `customerId` and/or `customerEmail`.",
+        "operationId": "listPaymentMethods",
+        "x-mint": {
+          "content": "<Info>Click the base URL in the API playground and select the **Sandbox** host for test data or the **Production** host for live data. Use credentials from the same environment.</Info>"
+        },
+        "parameters": [
+          {
+            "name": "customerId",
+            "in": "query",
+            "required": false,
+            "description": "Filter to payment methods belonging to the customer with this client-provided `customerId`.",
+            "schema": { "type": "string" }
+          },
+          {
+            "name": "customerEmail",
+            "in": "query",
+            "required": false,
+            "description": "Filter to payment methods belonging to the customer with this email address.",
+            "schema": { "type": "string", "format": "email" }
+          },
+          {
+            "name": "page_size",
+            "in": "query",
+            "required": false,
+            "description": "Number of results per page. Defaults to 10, maximum 100.",
+            "schema": { "type": "integer", "minimum": 1, "maximum": 100 }
+          },
+          {
+            "name": "page",
+            "in": "query",
+            "required": false,
+            "description": "Page number to return.",
+            "schema": { "type": "integer", "minimum": 1 }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "A paginated list of payment methods.",
+            "content": {
+              "application/json": {
+                "schema": { "$ref": "#/components/schemas/PaymentMethodListResponse" }
+              }
+            }
+          },
+          "401": { "description": "Unauthorized — missing or invalid API key." }
         }
       }
     }

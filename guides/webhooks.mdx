@@ -49,6 +49,9 @@ Your signing secret is shown only once. If you lose it, you must regenerate it f
 | `invoice.paid` | An invoice was paid and funds were collected. |
 | `refund.created` | A refund was initiated. |
 | `refund.updated` | A refund's status changed (e.g., from pending to completed). |
+| `payment_method.created` | A new payment method was added for a customer. |
+| `payment_method.updated` | A payment method's status or default state changed. |
+| `payment_method.deleted` | A payment method was removed from a customer. |
 
 ---
 
@@ -800,6 +803,135 @@ The request body is a JSON object with the following top-level fields:
     },
     "previous_attributes": {
       "status": "PROCESSING"
+    }
+  }
+}
+```
+</Accordion>
+
+<Accordion title="Example: payment_method.created payload">
+```json
+{
+  "id": "7f9c9a3e-2b41-4b7a-9d2e-5c8f1a6b3d4e",
+  "type": "payment_method.created",
+  "created_at": "2026-04-02T06:12:04Z",
+  "data": {
+    "object": {
+      "id": 482,
+      "object": "payment_method",
+      "organization": "9b759915-5387-4e61-90e9-2162318e8d17",
+      "customer_id": "geo-jacob",
+      "customer": {
+        "id": "936cf361-3a4b-454c-a464-41ccc7600c2d",
+        "name": "Geo Jacob",
+        "email": "geojacob@example.com",
+        "customer_id": "geo-jacob",
+        "billing_address": {
+          "line1": null,
+          "line2": null,
+          "city": null,
+          "state": null,
+          "postal_code": "680121",
+          "country": "IN"
+        }
+      },
+      "method_type": "card",
+      "method_data": {
+        "brand": "visa",
+        "last4": "4242",
+        "exp_month": 12,
+        "exp_year": 2029,
+        "funding": "credit",
+        "country": "US"
+      },
+      "is_default": true,
+      "status": "succeeded"
+    }
+  }
+}
+```
+</Accordion>
+
+<Accordion title="Example: payment_method.updated payload">
+```json
+{
+  "id": "b1d4e5f6-3c72-4a9b-8e1d-6f2a9c4b7e8d",
+  "type": "payment_method.updated",
+  "created_at": "2026-04-02T06:15:47Z",
+  "data": {
+    "object": {
+      "id": 482,
+      "object": "payment_method",
+      "organization": "9b759915-5387-4e61-90e9-2162318e8d17",
+      "customer_id": "geo-jacob",
+      "customer": {
+        "id": "936cf361-3a4b-454c-a464-41ccc7600c2d",
+        "name": "Geo Jacob",
+        "email": "geojacob@example.com",
+        "customer_id": "geo-jacob",
+        "billing_address": {
+          "line1": null,
+          "line2": null,
+          "city": null,
+          "state": null,
+          "postal_code": "680121",
+          "country": "IN"
+        }
+      },
+      "method_type": "card",
+      "method_data": {
+        "brand": "visa",
+        "last4": "4242",
+        "exp_month": 12,
+        "exp_year": 2029,
+        "funding": "credit",
+        "country": "US"
+      },
+      "is_default": true,
+      "status": "succeeded"
+    }
+  }
+}
+```
+</Accordion>
+
+<Accordion title="Example: payment_method.deleted payload">
+```json
+{
+  "id": "e3a2b1c0-9d8e-47f6-b5a4-1c2d3e4f5a6b",
+  "type": "payment_method.deleted",
+  "created_at": "2026-04-02T06:20:12Z",
+  "data": {
+    "object": {
+      "id": 482,
+      "object": "payment_method",
+      "organization": "9b759915-5387-4e61-90e9-2162318e8d17",
+      "customer_id": "geo-jacob",
+      "customer": {
+        "id": "936cf361-3a4b-454c-a464-41ccc7600c2d",
+        "name": "Geo Jacob",
+        "email": "geojacob@example.com",
+        "customer_id": "geo-jacob",
+        "billing_address": {
+          "line1": null,
+          "line2": null,
+          "city": null,
+          "state": null,
+          "postal_code": "680121",
+          "country": "IN"
+        }
+      },
+      "method_type": "card",
+      "method_data": {
+        "brand": "visa",
+        "last4": "4242",
+        "exp_month": 12,
+        "exp_year": 2029,
+        "funding": "credit",
+        "country": "US"
+      },
+      "is_default": false,
+      "status": "succeeded"
     }
   }
 }
