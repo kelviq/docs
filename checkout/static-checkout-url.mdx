@@ -1,0 +1,204 @@
+---
+title: "Customize a static checkout URL"
+description: "Choose plans, set a billing period, attach a customer, apply a discount, and control the success redirect in a Kelviq checkout link"
+---
+
+A static checkout URL is a shareable link for one published product. You can use the link exactly as Kelviq generates it, or add query parameters to control what the customer sees when checkout opens.
+
+Static links work well on pricing pages, in emails, and behind a purchase button. If the checkout needs data that only your backend knows, use the [Checkout API](/api-reference/checkout/create-a-checkout-session) instead.
+
+## Copy the checkout URL
+
+1. Open **Product Catalog → Products**.
+2. Select a published product.
+3. Click **Get link** or **Copy checkout link**.
+4. Choose the plans and default billing period.
+5. Copy the generated URL.
+
+Production links use this format:
+
+```text
+https://www.kelviq.com/buy/{PRODUCT_UUID}/
+```
+
+Sandbox links include `/sandbox/`:
+
+```text
+https://www.kelviq.com/sandbox/buy/{PRODUCT_UUID}/
+```
+
+The product UUID is part of the copied link. Do not replace it with the old product identifier.
+
+## Available query parameters
+
+The dashboard adds the plan, billing-period, and discount options you select. You can add `customer_id` and `success_url` when your integration needs them.
+
+| Parameter | Value | What it changes |
+| --- | --- | --- |
+| `enabled` | Comma-separated plan identifiers | Limits checkout to the listed plans |
+| `plan_identifier` | One plan identifier | Selects the plan shown first |
+| `charge_period` | A supported billing-period value | Selects the initial billing period |
+| `discounts_enabled` | `true` or `false` | Shows or hides discount-code entry |
+| `discount_code` | An active discount code | Applies the code when checkout opens |
+| `customer_id` | Your unique customer ID | Links checkout to a specific customer record |
+| `success_url` | A URL-encoded URL | Redirects the customer after successful checkout |
+
+Use these values for `charge_period`:
+
+| Value | Billing period |
+| --- | --- |
+| `ONE_TIME` | One-time payment |
+| `DAILY` | Daily |
+| `WEEKLY` | Weekly |
+| `TWENTY_EIGHT_DAYS` | Every 28 days |
+| `MONTHLY` | Monthly |
+| `THREE_MONTHS` | Every three months |
+| `SIX_MONTHS` | Every six months |
+| `YEARLY` | Yearly |
+
+The selected plan must support the selected period. If you use `enabled`, include the value from `plan_identifier` in that list.
+
+## Build a link safely
+
+Use `?` before the first query parameter and `&` before each additional parameter:
+
+```text
+https://www.kelviq.com/buy/{PRODUCT_UUID}/?enabled=starter,pro&plan_identifier=pro&charge_period=MONTHLY
+```
+
+Using `URL` and `URLSearchParams` is safer than joining strings by hand. It handles characters that must be encoded:
+
+```javascript
+const checkoutUrl = new URL(
+  "https://www.kelviq.com/buy/{PRODUCT_UUID}/",
+);
+
+checkoutUrl.searchParams.set("enabled", "starter,pro");
+checkoutUrl.searchParams.set("plan_identifier", "pro");
+checkoutUrl.searchParams.set("charge_period", "MONTHLY");
+checkoutUrl.searchParams.set("discounts_enabled", "true");
+checkoutUrl.searchParams.set("discount_code", "LAUNCH20");
+checkoutUrl.searchParams.set("customer_id", "cust_789");
+checkoutUrl.searchParams.set(
+  "success_url",
+  "https://example.com/checkout/success",
+);
+
+console.log(checkoutUrl.toString());
+```
+
+The resulting URL is equivalent to:
+
+```text
+https://www.kelviq.com/buy/{PRODUCT_UUID}/?enabled=starter%2Cpro&plan_identifier=pro&charge_period=MONTHLY&discounts_enabled=true&discount_code=LAUNCH20&customer_id=cust_789&success_url=https%3A%2F%2Fexample.com%2Fcheckout%2Fsuccess
+```
+
+## Common configurations
+
+### Select a plan and billing period
+
+Show the Starter and Pro plans, with Pro monthly selected when checkout opens:
+
+```text
+?enabled=starter,pro&plan_identifier=pro&charge_period=MONTHLY
+```
+
+### Hide discount-code entry
+
+```text
+?discounts_enabled=false
+```
+
+`discounts_enabled` defaults to `true`.
+
+### Apply a discount code
+
+```text
+?discounts_enabled=true&discount_code=LAUNCH20
+```
+
+The discount must be active and valid for the selected product, plan, currency, and date. [Learn how checkout discounts work →](/checkout/apply-a-discount-code)
+
+### Link checkout to a customer
+
+```text
+?customer_id=cust_789
+```
+
+Use the stable, unique customer ID from your application. When the customer record already has an email address, Kelviq can prefill it at checkout.
+
+<Warning>
+  A customer-specific URL should not be published as a general checkout link. Query parameters can appear in browser history, analytics, and server logs. Use an opaque customer ID and never put an email address, API key, or secret in the URL.
+</Warning>
+
+### Redirect after successful checkout
+
+```text
+?success_url=https%3A%2F%2Fexample.com%2Fcheckout%2Fsuccess
+```
+
+Encode the full destination URL. In JavaScript, `URLSearchParams` does this for you. In other environments, use the standard URL-encoding function provided by the language or framework.
+
+<Warning>
+  A visit to `success_url` is not proof of payment. Customers can open that page directly. Confirm payment through `checkout.completed`, the resulting subscription or order, or a current entitlement check.
+</Warning>
+
+## Static URL names and API names
+
+Static checkout links use snake_case query parameters. The Checkout API and backend SDKs use camelCase request fields.
+
+| Static URL | Checkout API or SDK |
+| --- | --- |
+| `enabled` | `plansEnabled` |
+| `plan_identifier` | `planIdentifier` |
+| `charge_period` | `chargePeriod` |
+| `discounts_enabled` | `discountsEnabled` |
+| `discount_code` | `discountCode` |
+| `customer_id` | `customerId` |
+| `success_url` | `successUrl` |
+
+Do not put camelCase names into the URL. For example, `successUrl` belongs in an API request; `success_url` belongs in a static checkout URL.
+
+## When to use the Checkout API
+
+Use the Checkout API or a backend SDK when you need per-session options that are not part of the static URL contract, including:
+
+- a cancellation URL;
+- feature quantities;
+- location-based pricing through the customer's IP address;
+- custom amounts, currency, or tax behavior;
+- a locked email or default billing country; or
+- checkout metadata for webhook correlation.
+
+The API creates a short-lived checkout session and returns `checkoutUrl` and `checkoutSessionId`. Keep the server API key on your backend.
+
+[Create a checkout session with the API →](/api-reference/checkout/create-a-checkout-session)
+
+## Test the link
+
+1. Enter sandbox mode and copy a sandbox checkout link.
+2. Add one customization at a time.
+3. Open the link and confirm the visible plans, selected period, discount behavior, and customer details.
+4. Complete a sandbox checkout.
+5. Confirm the success redirect and the `checkout.completed` webhook.
+
+Keep sandbox products, customers, discounts, and API credentials together. A live customer ID or discount code will not work against a sandbox checkout.
+
+## Troubleshooting
+
+| Problem | Check |
+| --- | --- |
+| A parameter is ignored | Match the snake_case name exactly. Query parameter names are case-sensitive. |
+| The wrong billing period opens | Use an uppercase value such as `MONTHLY`, and confirm that the selected plan supports it. |
+| The default plan is not available | Add that plan identifier to `enabled`, or remove `enabled` to show every available plan. |
+| The success URL breaks the checkout link | URL-encode the complete value instead of inserting an unescaped URL. |
+| A discount does not apply | Check its status, dates, redemption limit, product and plan restrictions, and currency. |
+| The wrong customer is selected | Check `customer_id` and make sure the customer exists in the same environment as the checkout link. |
+| A sandbox link cannot find live data | Create or select the matching record in sandbox. Sandbox and production data are separate. |
+
+## Related documentation
+
+- [Checkout configuration](/checkout/checkout-configuration)
+- [Apply a discount code at checkout](/checkout/apply-a-discount-code)
+- [Add metadata to checkout](/checkout/checkout-metadata)
+- [Webhooks](/guides/webhooks)

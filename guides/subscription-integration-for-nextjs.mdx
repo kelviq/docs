@@ -279,7 +279,12 @@ Create `app/api/subscriptions/update/route.ts`:
 import { NextRequest, NextResponse } from "next/server";
 
 export async function POST(request: NextRequest) {
-  const { subscriptionId, planIdentifier, chargePeriod } = await request.json();
+  const {
+    subscriptionId,
+    planIdentifier,
+    chargePeriod,
+    paymentBehavior,
+  } = await request.json();
 
   const response = await fetch(
     `${process.env.KELVIQ_API_BASE_URL}/subscriptions/${subscriptionId}/update/`,
@@ -292,6 +297,7 @@ export async function POST(request: NextRequest) {
       body: JSON.stringify({
         planIdentifier,
         chargePeriod: chargePeriod || "MONTHLY",
+        paymentBehavior,
       }),
     }
   );
@@ -319,15 +325,22 @@ async function handlePlanChange(newPlanId: string) {
         subscriptionId: current.id,
         planIdentifier: newPlanId,
         chargePeriod: "MONTHLY",
+        paymentBehavior: "activate_on_payment",
       }),
     });
 
-    alert("Plan updated!");
+    alert("Plan change started. The new plan becomes active after payment succeeds.");
   } else {
     // No subscription, redirect to checkout
   }
 }
 ```
+
+With `activate_on_payment`, the existing subscription remains `active` while payment is pending. If the payment method requires UPI approval or 3DS authentication, the updated subscription starts as `incomplete`. After payment succeeds, the updated subscription becomes `active` and the previous subscription becomes `superseded`. If an immediate charge fails, or the customer does not complete payment before expiry, the updated subscription becomes `incomplete_expired` and the existing subscription stays active.
+
+<Warning>
+  Do not unlock the new plan immediately after this route returns. Check the updated subscription status or fetch the customer's current entitlements first.
+</Warning>
 
 ---
 

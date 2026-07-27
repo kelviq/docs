@@ -1,0 +1,131 @@
+---
+title: "Create an Enterprise plan"
+description: "Set up a reusable Enterprise tier or a bespoke customer deal in Kelviq"
+---
+
+An Enterprise plan is a plan in your product catalog. It is not created from the customer page and it is not a separate Kelviq resource type.
+
+Create the plan under a product first. You can then use it in one of two ways:
+
+| What you sell | Recommended setup |
+| --- | --- |
+| The same Enterprise package at a published price | Create a paid Enterprise plan, publish it, then generate checkout for the customer from their detail page. |
+| A negotiated price for each customer | Create an Enterprise plan as the access template, choose **Custom** pricing, and create checkout with `customAmount` after the deal is agreed. |
+
+<Info>
+  Think of the plan as the product and entitlement template. The checkout session holds the price agreed with a specific customer.
+</Info>
+
+## Create the plan
+
+<Steps>
+  <Step title="Open the product">
+    Go to **Product Catalog → Products** and select the product the Enterprise plan belongs to.
+  </Step>
+  <Step title="Create the plan">
+    Click **+ Create plan** and enter:
+
+    - **Plan name:** `Enterprise`
+    - **Identifier:** `enterprise`
+    - **Description:** A short description of the package shown to customers
+
+    Keep the identifier stable. Your checkout and entitlement integrations use it as `planIdentifier`.
+  </Step>
+  <Step title="Choose the pricing approach">
+    Use **Paid** when every Enterprise customer pays one published price. Add the billing periods and currencies you sell.
+
+    Use **Custom** when the price is negotiated. Pricing tables show the plan as **Custom** with a **Contact Us** action instead of sending the buyer straight to checkout.
+  </Step>
+  <Step title="Add access and deliverables">
+    Add the features, limits, usage allowances, files, license keys, and links included in the Enterprise agreement.
+
+    For example, the plan might enable SSO and audit logs, allow 100 seats, and include a higher API limit.
+  </Step>
+  <Step title="Publish the plan">
+    Review the configuration and click **Publish**. A draft plan cannot be used for a live customer checkout.
+  </Step>
+</Steps>
+
+## Sell a fixed-price Enterprise plan
+
+Use the customer detail page when the Enterprise plan already has the correct price.
+
+1. Open **Customers** and select the customer.
+2. Click **Add Subscription**.
+3. Select the published Enterprise plan.
+4. Choose its billing period and currency.
+5. Enter quantities for priced features, such as seats, when required.
+6. Enter the URL where Kelviq should send the customer after checkout.
+7. Click **Generate checkout link** and share the link with the customer.
+
+The customer must complete checkout. Generating the link does not activate the subscription or prove that payment succeeded.
+
+<Note>
+  **Add Subscription** selects an existing plan. It does not create an Enterprise plan, and it does not provide a field for a negotiated custom amount.
+</Note>
+
+## Sell a bespoke Enterprise deal
+
+For negotiated pricing, keep one Enterprise plan as the common access template. Create a checkout session with the amount, currency, tax treatment, customer ID, and billing period agreed in the contract.
+
+```bash
+curl --request POST \
+  --url https://sandboxapi.kelviq.com/api/v1/checkout/ \
+  --header "Authorization: Bearer $KELVIQ_SANDBOX_SERVER_API_KEY" \
+  --header "Content-Type: application/json" \
+  --data '{
+    "planIdentifier": "enterprise",
+    "customerId": "acme-123",
+    "chargePeriod": "MONTHLY",
+    "currencyCode": "USD",
+    "customAmount": 349,
+    "taxBehavior": "EXCLUSIVE",
+    "successUrl": "https://app.example.com/billing/success",
+    "discountsEnabled": false,
+    "metadata": {
+      "dealId": "deal-2026-1042"
+    }
+  }'
+```
+
+`customAmount` overrides the plan's standard checkout price for this session. `taxBehavior` is required: use `INCLUSIVE` when tax is already part of the agreed amount, or `EXCLUSIVE` when Kelviq should add tax at checkout. A Server API Key request must also include `currencyCode`.
+
+The response contains `checkoutUrl`. Send the customer to that URL to review the amount and complete payment.
+
+<Warning>
+  Create custom checkout sessions on your backend. Never expose a Server API Key in browser code.
+</Warning>
+
+See the [Checkout configuration guide](/checkout/checkout-configuration#checkout-session-options) and [Create a checkout session API reference](/api-reference/checkout/create-a-checkout-session) for the complete request schema.
+
+## Handle the Contact Us action
+
+If you use Kelviq's React pricing table, route custom-plan clicks to your sales form or booking page:
+
+```tsx
+<KQPricingTable
+  onCustomPriceClick={({ plan }) => {
+    window.location.assign(`/contact-sales?plan=${plan.identifier}`);
+  }}
+/>
+```
+
+This starts the sales conversation. After you agree on price and terms, create the customer record and custom checkout session from your backend.
+
+[Read the React UI custom-price documentation →](/frontend-integration/react-ui#72-custom-price-plans)
+
+## Customer-specific access
+
+You do not need a new catalog plan for every small exception. After the customer buys the Enterprise plan, open their detail page and override a feature value or usage limit for that customer.
+
+Create a separate plan when the package itself is meaningfully different and you expect to reuse or report on it as a distinct offering. Use customer overrides for one-off limits such as extra seats, API calls, or storage.
+
+## Check the setup before sharing checkout
+
+- The plan is published in the same environment as the customer and API key.
+- The `customerId` matches the stable ID from your application.
+- The billing period, currency, and custom amount match the signed quote.
+- The tax behavior matches how the price was presented.
+- The plan contains the promised features, limits, and deliverables.
+
+Test the flow in sandbox first. After payment, confirm the order and subscription in Kelviq, then check the customer's entitlements before granting access in your application.

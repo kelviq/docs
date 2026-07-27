@@ -7,6 +7,8 @@ A plan is the commercial package you offer to customers. It bundles your pricing
 
 You can create multiple plans for a single product. For example, you might have a "Starter" plan for hobbyists and a "Pro" plan for businesses.
 
+For sales-led pricing, see [Create an Enterprise plan](/product-catalog/create-an-enterprise-plan). It covers both reusable Enterprise tiers and bespoke customer amounts.
+
 ## Plan structure
 
 Every plan consists of configurable components that define what the user gets.
@@ -84,6 +86,8 @@ Once your plan draft exists you can configure how you charge. We split these int
 
 * [One time payments](/product-catalog/one-time-payments)
 * [Subscriptions](/product-catalog/subscriptions)
+* [Enterprise and bespoke plans](/product-catalog/create-an-enterprise-plan)
+* [Seat based pricing](/product-catalog/seat-based-pricing)
 * [Usage based pricing](/product-catalog/usage-based-billing)
 * [Free plans and trials](/product-catalog/free-and-trials)
 * [Location based pricing](/product-catalog/location-based-pricing)
@@ -105,9 +109,17 @@ Select the intervals you want to offer. You can enable multiple intervals for a 
 <Frame>
   <img height="200" src="/images/billing-cycle.png" />
 </Frame>
+* **28 days:** A recurring four-week subscription.
 * **Monthly / Yearly:** Standard recurring subscriptions.
 * **3 Months:** Quarterly billing.
+* **6 Months:** Billing twice a year.
 * **One time:** A single non-recurring payment (lifetime deal).
+
+The 28-day period is useful when you need a consistent four-week renewal schedule rather than a calendar-month renewal.
+
+<Tip>
+  To test a renewal without waiting for a full month, use a daily billing interval in Sandbox mode. See [Test a subscription renewal](/guides/sandbox#test-a-subscription-renewal).
+</Tip>
 
 ### Location based pricing
 You can set specific prices for different countries rather than relying on auto-conversion.
@@ -167,6 +179,10 @@ Because the new version replaces the old one, you need to decide what happens to
 When you click **Publish**, we will ask you to confirm the rollout strategy.
 * **For price changes:** You decide whether to grandfather existing users on the old price or migrate them to the new one.
 * **For feature changes:** You decide whether to push the new entitlements to existing users immediately or keep them on their legacy configuration.
+
+If you grandfather existing customers, they keep their current price and only new customers see the updated price. If you migrate existing customers, the new price applies to their future renewals.
+
+Most recurring card and debit-card payments do not require the customer to approve the new price again. Some payment methods have additional rules. For example, an Indian UPI AutoPay mandate may require the customer to approve a renewal when the updated amount exceeds the applicable regulatory threshold.
 
 If you change your mind while editing, you can click **Discard** to delete the unpublished version and revert to the live state.
 

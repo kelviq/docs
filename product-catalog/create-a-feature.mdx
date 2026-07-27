@@ -1,0 +1,116 @@
+---
+title: "Create a feature in Kelviq"
+description: "Create Boolean, Meter, or Customizable features in the Kelviq dashboard or with the API, then add them to a plan as entitlements."
+---
+
+A feature is something your product can enable, limit, or measure for a customer. Examples include analytics access, team size, API calls, storage, and AI credits.
+
+Create the feature once, then reuse it across plans. Creating a feature does not grant it to anyone. You must add it to a plan as an entitlement before customers receive access.
+
+## Choose a feature type
+
+| Dashboard option | API value | Use it for |
+| --- | --- | --- |
+| Switch/boolean | `BOOLEAN` | On-or-off access, such as analytics, SSO, or priority support |
+| Meter | `METER` | A quantity that is purchased or consumed, such as seats, API calls, storage, or credits |
+| Customizable | `CUSTOMIZABLE` | A plan-specific numeric limit or setting, such as maximum projects or upload size |
+
+<Tip>
+  Use an identifier that is short, stable, and easy to use in code, such as `api-calls` or `advanced-analytics`. You can rename a feature later, but its identifier and type cannot be changed after creation.
+</Tip>
+
+## Method 1: Create a feature in the dashboard
+
+1. Open **Product catalog → Features** in the [Kelviq dashboard](https://app.kelviq.com/features).
+2. Click **Create feature**.
+3. Enter a **Feature name**. This is the readable name shown in the dashboard.
+4. Enter an **Identifier**. Your application uses this value when checking access or reporting usage.
+5. Add a **Description** if your team needs more context about what the feature controls.
+6. Choose the **Feature type**:
+   - **Switch/boolean** for on-or-off access.
+   - **Meter** for purchased or consumed quantities.
+   - **Customizable** for a numeric limit or setting.
+7. For a Meter feature, enter the singular and plural units. For example, use `call` and `calls`, or `seat` and `seats`.
+8. Click **Create**.
+
+Turn on **Create more** before saving if you want the form to remain open for another feature.
+
+<Note>
+  The dashboard creates Meter features for pre-aggregated usage. Your application reports the quantity with the usage reporting API or an SDK. A purchased quantity such as seats can also come from checkout or a subscription update.
+</Note>
+
+## Method 2: Create a feature with the API
+
+Use the Catalog Features API when features are managed from an internal tool, provisioning script, or automated setup flow. Send the Server API Key from a trusted backend.
+
+```bash
+curl --request POST \
+  --url https://api.kelviq.com/api/v1/catalog/features/ \
+  --header "Authorization: Bearer $KELVIQ_SERVER_API_KEY" \
+  --header "Content-Type: application/json" \
+  --data '{
+    "name": "API Calls",
+    "identifier": "api-calls",
+    "description": "Number of API calls available in a billing period.",
+    "featureType": "METER",
+    "featureDetails": {
+      "featureSubType": "PRE_AGGREGATED_USAGE",
+      "units": {
+        "singular": "call",
+        "plural": "calls"
+      }
+    }
+  }'
+```
+
+Use `https://sandboxapi.kelviq.com/api/v1/catalog/features/` with a sandbox Server API Key when testing. Sandbox and production features are separate.
+
+### Request fields
+
+| Field | Required | Description |
+| --- | --- | --- |
+| `name` | Yes | Readable feature name |
+| `featureType` | Yes | `BOOLEAN`, `METER`, or `CUSTOMIZABLE` |
+| `identifier` | No | Stable code-facing identifier; Kelviq generates one from the name when omitted |
+| `description` | No | Internal explanation of what the feature controls |
+| `featureDetails` | For Meter setup | Meter subtype and units |
+| `meter` | For raw-event meters | Aggregation and filter configuration |
+| `metadata` | No | Additional key-value data for your own workflow |
+
+For a Boolean or Customizable feature, the request can be shorter:
+
+```json
+{
+  "name": "Advanced Analytics",
+  "identifier": "advanced-analytics",
+  "featureType": "BOOLEAN"
+}
+```
+
+The API returns `201 Created` with the new feature, including its Kelviq UUID. See the [Create a feature API reference](/api-reference/features/create-a-feature) for the complete request and response schema.
+
+## Add the feature to a plan
+
+The feature remains independent until you attach it to a plan:
+
+1. Open **Product catalog → Products** and select a product.
+2. Open the plan you want to configure.
+3. Go to **Features & limits** and choose **Manage features & limits**.
+4. Search for the feature and add it to the plan.
+5. Configure the entitlement value:
+   - Enable or disable a Boolean feature.
+   - Enter the allowed value for a Customizable feature.
+   - Set the limit, reset cadence, hard-limit behavior, rollover, or alerts for a Meter feature.
+6. Save the plan. Publish the draft when it is ready for customers.
+
+Read [Features and limits](/product-catalog/entitlements) to check access from your application, [Usage-based pricing](/product-catalog/usage-based-billing) to price metered consumption, or [Seat-based pricing](/product-catalog/seat-based-pricing) to sell purchased quantities.
+
+## Common problems
+
+| Problem | What to check |
+| --- | --- |
+| The feature does not appear for customers | Confirm that it was added to the correct plan and that the plan version was published |
+| Usage reports return a feature error | Send the exact feature identifier, not its display name |
+| A Meter feature cannot be created | Enter both the singular and plural unit names |
+| The feature exists in Sandbox but not Production | Create it separately in the production environment |
+| The identifier or type is wrong | Create a new feature; these fields cannot be changed after creation |
