@@ -33,7 +33,6 @@
             "pages": [
               "product-catalog/products",
               "product-catalog/plans",
-              "product-catalog/create-an-enterprise-plan",
               "product-catalog/create-a-feature",
               "product-catalog/one-time-payments",
               "product-catalog/subscriptions",
