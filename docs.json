@@ -97,8 +97,7 @@
               "guides/subscription-integration",
               "guides/subscription-integration-for-nextjs",
               "guides/webhooks",
-              "guides/mcp-server",
-              "guides/agent-toolkit"
+              "guides/mcp-server"
             ]
           },
           {
