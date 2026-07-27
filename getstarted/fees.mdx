@@ -77,28 +77,11 @@ Net = Gross - Fee - Tax
 
 ## Payout fees
 
-Transaction fees and payout fees happen at different stages. The transaction fee is deducted when a customer pays. A payout fee can apply later, when Stripe Connect sends your cleared Kelviq balance to your bank account or eligible debit card.
-
-Stripe's standard Connect provider fees for USD payouts are:
-
-| Payout fee | Rate | When it applies |
-| --- | --- | --- |
-| Monthly active payout account | &#36;2.00 | Any month in which one or more payouts are sent to your bank account or debit card |
-| Standard payout | 0.25% + &#36;0.25 | Each payout sent to your bank account or debit card |
-| Cross-border payout | Starting at +0.25% | When funds are paid to a connected account in another country |
-| Currency conversion | Variable | When Stripe must convert the payout into another currency |
-
-For example, the standard provider fee on a &#36;1,000 USD payout is &#36;2.75:
-
-```text
-($1,000 × 0.25%) + $0.25 = $2.75
-```
-
-If that is the first payout for the account during the month, the &#36;2.00 monthly active-account fee can also apply. Cross-border and currency-conversion fees, when required, are additional.
-
 <Note>
-  Payout pricing can vary by the connected account's country, payout currency, and Stripe pricing agreement. These fees are separate from the **Fee** shown for an individual customer transaction.
+  Currently, Kelviq is bearing the payout fee.
 </Note>
+
+Transaction fees and payout fees happen at different stages. The transaction fee is deducted when a customer pays. A payout fee would typically apply later when funds are sent to your bank account or eligible debit card, but Kelviq currently covers this cost.
 
 [Learn how Kelviq payouts work →](/payouts/overview)
 
