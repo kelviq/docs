@@ -958,6 +958,12 @@ Always verify the signature before processing a webhook. Skipping verification e
 
 Kelviq signs every request using **HMAC-SHA256**. To verify a request:
 
+<Note>
+Using [Better Auth](/backend-integration/better-auth)? `@kelviq/better-auth`'s
+`webhooks()` sub-plugin implements this verification for you, with named
+handlers per event type.
+</Note>
+
 1. Read the `webhook-id` and `webhook-timestamp` headers.
 2. Construct the signed string by concatenating: `{webhook-id}.{webhook-timestamp}.{raw-request-body}` (joined with `.`)
 3. Compute HMAC-SHA256 over the signed string using your endpoint's signing secret as the key.

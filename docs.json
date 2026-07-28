@@ -137,6 +137,7 @@
             "group": "Backend Integration",
             "pages": [
               "backend-integration/python-sdk",
+              "backend-integration/better-auth",
               "backend-integration/node-sdk"
             ]
           },

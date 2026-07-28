@@ -1,0 +1,387 @@
+---
+title: "Better Auth"
+description: "Wire Kelviq billing into your Better Auth server with @kelviq/better-auth"
+icon: 'shield-halved'
+---
+
+## Overview
+
+`@kelviq/better-auth` is a
+[Better Auth](https://better-auth.com) plugin that puts billing directly on
+your auth server: it creates a Kelviq customer automatically on signup and
+exposes checkout, customer portal, entitlement, and usage-reporting endpoints
+from the same server that already handles your sessions.
+
+Kelviq's `customerId` is caller-defined, so the plugin uses Better Auth's
+`user.id` as the Kelviq customer id directly — there is no external-id
+mapping to maintain. Entitlement checks are then available straight off your
+auth client (`authClient.kelviq.hasAccess(...)`), without a separate billing
+SDK call from the frontend.
+
+## Install
+
+```shell
+npm install @kelviq/better-auth @kelviq/node-sdk better-auth
+```
+
+`better-auth` (`>=1.6.0`) and `@kelviq/node-sdk` (`>=2.0.0`) are peer
+dependencies — bring your own versions.
+
+<Warning>
+The package is not yet published to npm — the plugin API documented on this
+page is final, but the install command above will not resolve until the
+first release ships.
+</Warning>
+
+## Server setup
+
+Construct an `@kelviq/node-sdk` client with your **Server API Key** and pass
+it into `kelviq()`, then add whichever sub-plugins you need via `use`:
+
+```typescript
+import { betterAuth } from 'better-auth';
+import { Kelviq } from '@kelviq/node-sdk';
+import { kelviq, portal, checkout, entitlements, usage, webhooks } from '@kelviq/better-auth';
+
+const kelviqClient = new Kelviq({ accessToken: process.env.KELVIQ_SERVER_API_KEY! });
+
+export const auth = betterAuth({
+  // ...your existing config
+  plugins: [
+    kelviq({
+      client: kelviqClient,
+      createCustomerOnSignUp: true,
+      getCustomerCreateParams: ({ user }) => ({
+        metadata: { source: 'better-auth' },
+      }),
+      use: [
+        portal(),
+        checkout({
+          plans: [
+            { slug: 'pro', planIdentifier: 'plan-pro', chargePeriod: 'MONTHLY' },
+            { slug: 'free', planIdentifier: 'plan-free', chargePeriod: 'ONE_TIME' },
+          ],
+          successUrl: '/success?checkout_id={CHECKOUT_ID}',
+        }),
+        entitlements(),
+        usage(),
+        webhooks({
+          secret: process.env.KELVIQ_WEBHOOK_SECRET!,
+        }),
+      ],
+    }),
+  ],
+});
+```
+
+<Warning>
+**Security warning:** the `Kelviq` client instance carries your Server API
+Key. Construct it only in server-side code and pass it into `kelviq()` —
+never import `@kelviq/node-sdk` or this client into anything that ships to
+the browser. `@kelviq/better-auth/client` (used below) never imports the
+server package, by design.
+</Warning>
+
+## Customer lifecycle
+
+Set `createCustomerOnSignUp: true` to create a Kelviq customer after every
+new Better Auth signup, with `customerId` set to `user.id`. The customer's
+email and name are kept in sync automatically whenever the Better Auth user
+record changes.
+
+Use `getCustomerCreateParams` to attach extra data at creation time. It only
+accepts `metadata` — the Kelviq customer-create call this plugin makes does
+not carry a `billingAddress` field:
+
+```typescript
+getCustomerCreateParams: ({ user }) => ({
+  metadata: { plan: 'trial', source: 'better-auth' },
+}),
+```
+
+<Note>
+A Kelviq outage never blocks registration. If customer creation or the
+sync-on-update call fails, the error is caught and logged through Better
+Auth's logger — signup and profile updates always succeed regardless of
+Kelviq's availability.
+</Note>
+
+## Client setup
+
+Add `kelviqClient()` to your Better Auth client to get typed
+`authClient.kelviq.*` methods:
+
+```typescript
+import { createAuthClient } from 'better-auth/client';
+import { kelviqClient } from '@kelviq/better-auth/client';
+
+export const authClient = createAuthClient({
+  plugins: [kelviqClient()],
+});
+```
+
+## Portal
+
+```typescript
+const { data } = await authClient.kelviq.portal();
+window.location.href = data.url;
+```
+
+`POST /kelviq/portal` resolves the authenticated session, creates a fresh
+Kelviq customer portal session for `customerId === session.user.id`, and
+returns the already-signed portal URL. The underlying token is short-lived
+and single-use — create a new session (call `portal()` again) per visit
+rather than caching the URL. An unauthenticated request gets a `401`.
+
+## Checkout
+
+Configure `checkout()` with a `plans` map from a stable `slug` to the actual
+Kelviq `planIdentifier` and `chargePeriod`:
+
+```typescript
+checkout({
+  plans: [
+    { slug: 'pro', planIdentifier: 'plan-pro', chargePeriod: 'MONTHLY' },
+    { slug: 'free', planIdentifier: 'plan-free', chargePeriod: 'ONE_TIME' },
+  ],
+  successUrl: '/success?checkout_id={CHECKOUT_ID}', // relative paths resolve against baseURL
+  authenticatedUsersOnly: true, // default
+}),
+```
+
+```typescript
+const { data } = await authClient.kelviq.checkout({ slug: 'pro' });
+window.location.href = data.url; // hosted checkout page
+```
+
+`POST /kelviq/checkout` resolves a plan either by `{ slug }` (looked up in
+`plans` — slug wins if both are given) or directly by `{ planIdentifier,
+chargePeriod }`. An unknown slug returns `400` listing the known slugs.
+`customerId` is never accepted from the request — it is always the session
+user's id.
+
+`chargePeriod` accepts any Kelviq charge period, including `ONE_TIME` — use
+it for free or one-off plans that don't recur.
+
+`authenticatedUsersOnly` defaults to `true`, in which case an unauthenticated
+request gets a `401`. Set it to `false` to allow anonymous checkout:
+`customerId` is then omitted from the checkout session, and Kelviq
+creates or reuses a customer by the email entered on the hosted checkout
+page.
+
+## Entitlements
+
+<Note>
+This is the differentiator over wiring a separate billing SDK into your
+frontend: entitlement checks are available directly on the same auth client
+your app already uses for sessions.
+</Note>
+
+```typescript
+entitlements(),
+```
+
+```typescript
+const { data } = await authClient.kelviq.entitlements(); // every entitlement for the signed-in user
+const { data } = await authClient.kelviq.entitlement({ query: { featureId: 'seats' } });
+const { data } = await authClient.kelviq.hasAccess({ query: { featureId: 'seats' } }); // { hasAccess: boolean }
+```
+
+Three authenticated `GET` endpoints, all scoped to the session user:
+`/kelviq/entitlements` (all entitlements), `/kelviq/entitlement?featureId=...`
+(one entitlement), and `/kelviq/has-access?featureId=...`
+(`{ hasAccess: boolean }`). `customerId` is never accepted from the request —
+one signed-in user can never read another user's entitlements by supplying a
+different id.
+
+<Note>
+These endpoints are for **frontend** gating (show/hide UI) only. Backend code
+should call the `@kelviq/node-sdk` client's `entitlements` module directly —
+routing a server-side gating check back through the auth server would be an
+unnecessary extra hop.
+</Note>
+
+## Usage reporting
+
+```typescript
+usage({ allowClientReporting: true }), // default: false — the endpoint 403s
+```
+
+```typescript
+await authClient.kelviq.usage({ featureId: 'api-calls', value: 1, behaviour: 'DELTA' });
+```
+
+`POST /kelviq/usage` reports usage for the *signed-in* user's Kelviq
+customer — `customerId` is never accepted from the request.
+
+<Warning>
+`allowClientReporting` defaults to `false` and the endpoint returns `403`
+until you opt in. Client-originated usage reporting is spoofable by whoever
+is logged in, and a `DELTA` report replayed by a flaky client double-counts
+usage. Prefer reporting usage from your backend via the `@kelviq/node-sdk`
+client's `reporting.reportUsage(...)` directly, where you control exactly
+when and how often a report fires. Only enable client reporting for trusted
+client-side metering, such as a `SET` report of a value the client can
+reliably observe once.
+</Warning>
+
+## Webhooks
+
+Register an endpoint in the Kelviq dashboard (**Settings → Webhooks**) using
+your app's own domain and Better Auth's `basePath` (`/api/auth` by default):
+
+```
+https://<your-app>/api/auth/kelviq/webhooks
+```
+
+The dashboard generates a signing secret in the format `kq_whsec_<random>`,
+shown once — store it as `KELVIQ_WEBHOOK_SECRET` and pass it to `webhooks()`:
+
+```typescript
+import { webhooks } from '@kelviq/better-auth';
+
+kelviq({
+  client: kelviqClient,
+  use: [
+    webhooks({
+      secret: process.env.KELVIQ_WEBHOOK_SECRET!,
+      onCheckoutCompleted: async ({ data }) => {
+        // grant access, e.g. mark the order's customer as entitled
+      },
+      onSubscriptionCancelled: async ({ data }) => {
+        // revoke access
+      },
+      onPayload: async (event) => {
+        // catch-all: called for every verified event, including ones this
+        // package doesn't have a named handler for yet
+      },
+    }),
+  ],
+});
+```
+
+<Note>
+This endpoint is unauthenticated by design — there is no
+`authClient.kelviq.webhooks()`, and none is intended. Kelviq's servers are
+the caller, not your frontend, so it's deliberately excluded from the typed
+client. The `webhook-signature` header (verified with
+`crypto.timingSafeEqual` against an HMAC-SHA256 of the raw request body) is
+the only authentication.
+</Note>
+
+All 15 event types have a named handler option:
+
+| Handler | Event |
+|---|---|
+| `onCheckoutCompleted` | `checkout.completed` |
+| `onCustomerCreated` | `customer.created` |
+| `onCustomerUpdated` | `customer.updated` |
+| `onOrderCreated` | `order.created` |
+| `onOrderUpdated` | `order.updated` |
+| `onOrderRefunded` | `order.refunded` |
+| `onSubscriptionCreated` | `subscription.created` |
+| `onSubscriptionUpdated` | `subscription.updated` |
+| `onSubscriptionCancelled` | `subscription.cancelled` |
+| `onSubscriptionPlanChanged` | `subscription.plan_changed` |
+| `onFeatureUsageAlert` | `feature.usage_alert` |
+| `onInvoiceCreated` | `invoice.created` |
+| `onInvoicePaid` | `invoice.paid` |
+| `onRefundCreated` | `refund.created` |
+| `onRefundUpdated` | `refund.updated` |
+
+A handler for a specific event runs first (if configured), then `onPayload`
+(if configured) — every verified event reaches `onPayload`, including event
+types this package doesn't have a named option for yet.
+
+<Warning>
+**If a handler throws, the endpoint returns `500`.** This is intentional:
+Kelviq [retries](/guides/webhooks#how-it-works) non-`2xx` deliveries up to 3
+times, 60 seconds apart, so a handler that throws on a transient failure (a
+DB blip, a downstream API outage) gets a free retry. This means **handlers
+must be idempotent** — the same event can be delivered more than once. Use
+the event's `id` (which matches the `webhook-id` header) as a deduplication
+key; this package does not persist or deduplicate events itself.
+</Warning>
+
+### Verifying webhooks outside Better Auth
+
+If you need to verify a Kelviq webhook from a server that isn't running this
+plugin (or Better Auth at all), the signature verifier is exported
+standalone:
+
+```typescript
+import { verifyWebhookSignature } from '@kelviq/better-auth';
+
+const result = verifyWebhookSignature({
+  secret: process.env.KELVIQ_WEBHOOK_SECRET!,
+  id: request.headers.get('webhook-id')!,
+  timestamp: request.headers.get('webhook-timestamp')!,
+  signature: request.headers.get('webhook-signature')!,
+  rawBody: await request.text(), // must be the exact wire bytes, not re-serialized JSON
+});
+// result: { valid: boolean, reason?: 'signature' | 'timestamp' | 'format' }
+```
+
+The algorithm matches the [webhooks guide](/guides/webhooks#verifying-signatures):
+the signed string is `{webhook-id}.{webhook-timestamp}.{raw-request-body}`,
+HMAC-SHA256 keyed with your signing secret used verbatim, hex digest, `v1,`
+prefix stripped from the header before a constant-time comparison.
+
+## Test your integration
+
+### Sandbox checkout and webhooks
+
+Point your `Kelviq` client at the [sandbox environment](/guides/sandbox) with
+a sandbox Server API Key so signups, checkouts, and portal sessions created
+while testing never touch production data:
+
+```typescript
+const kelviqClient = new Kelviq({
+  accessToken: process.env.KELVIQ_SANDBOX_SERVER_API_KEY!,
+  environment: 'sandbox',
+});
+```
+
+Run a checkout through `authClient.kelviq.checkout(...)` and complete payment
+with the Stripe test card `4242 4242 4242 4242` (any future expiration date,
+any valid CVC). See the [sandbox guide](/guides/sandbox) for the full set of
+test card numbers and isolation details.
+
+### Local webhook testing
+
+The Kelviq dashboard needs a public HTTPS URL to deliver webhooks to, so
+local development requires either:
+
+- A tunnel (e.g. `ngrok http 3000`) pointed at your dev server, with the
+  tunnel's HTTPS URL plus `/api/auth/kelviq/webhooks` registered as the
+  endpoint in the dashboard, or
+- Self-signed test events posted directly to your endpoint, computing the
+  signature yourself with the same algorithm `verifyWebhookSignature` checks:
+
+```javascript
+const crypto = require('crypto');
+
+const secret = 'kq_whsec_test_secret';
+const id = 'wh_test_1';
+const timestamp = Math.floor(Date.now() / 1000).toString();
+const body = JSON.stringify({
+  id,
+  type: 'subscription.created',
+  created_at: new Date().toISOString(),
+  data: { object: { id: 'sub_test_1', status: 'active' } },
+});
+
+const signedPayload = `${id}.${timestamp}.${body}`;
+const signature = crypto.createHmac('sha256', secret).update(signedPayload, 'utf8').digest('hex');
+
+// POST `body` to your endpoint with headers:
+//   webhook-id: id
+//   webhook-timestamp: timestamp
+//   webhook-signature: `v1,${signature}`
+```
+
+<Warning>
+Never reuse a real signing secret in a test script or commit it to source
+control — use a placeholder secret for local self-signed testing, and only
+the dashboard-issued secret for actual Kelviq deliveries.
+</Warning>
