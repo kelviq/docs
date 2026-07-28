@@ -110,8 +110,13 @@ Plans in Kelviq can support multiple billing periods:
 |--------|----------|----------|
 | **Monthly** | 1 month | Recurring subscriptions |
 | **3 Months** | 3 months | Quarterly billing |
+| **6 Months** | 6 months | Biannual billing |
 | **Yearly** | 12 months | Annual billing, often with discounts |
 | **One Time** | One-off payment | Digital products, courses, lifetime access |
+
+<Tip>
+  We can also add custom billing periods such as weekly, daily, or 28 days upon request. Contact [hi@kelviq.com](mailto:hi@kelviq.com) to enable these options.
+</Tip>
 
 ### Setting Default Billing Period
 
@@ -157,7 +162,7 @@ Offer free trial periods before charging customers.
 
 1. **Open your plan** → Go to the plan's pricing section
 2. **Enable Free Trial** → Toggle the trial option
-3. **Set duration** → 1-365 days (default 30)
+3. **Set duration** → 1-365 days (default 7 days)
 4. **Save plan**
 
 ### Trial Behavior
@@ -210,7 +215,7 @@ For a static checkout link, add the URL-encoded `success_url` parameter when you
 &success_url=https%3A%2F%2Fyourdomain.com%2Fcheckout-success
 ```
 
-When creating a checkout session through the API, use the optional `successUrl` field. You can also provide `cancelUrl` to redirect the customer if they cancel payment.
+When creating a checkout session through the API, the `successUrl` field is required. You can also optionally provide a `cancelUrl` to redirect the customer if they cancel payment.
 
 ### Checkout Session Options
 
