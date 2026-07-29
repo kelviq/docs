@@ -5,7 +5,7 @@ mode: "wide"
 rss: true
 ---
 
-<Update label="v1.6.4" description="July 29, 2026">
+<Update label="v1.6.3" description="July 29, 2026">
 
 ### Fixes
 
@@ -15,33 +15,17 @@ Scheduling a subscription to cancel at the end of the current billing period (ra
 
 </Update>
 
-<Update label="v1.6.3" description="July 29, 2026">
-
-### Changes
-
-#### `GET /refunds/`'s `search` param no longer matches the payment-provider refund ID
-
-`search` now matches against refund ID, order ID, customer name, email, and customer ID only — it no longer matches the payment provider's refund ID (e.g. Stripe's `re_...` ID).
-
-</Update>
-
 <Update label="v1.6.2" description="July 29, 2026">
 
 ### New Features
 
 #### Checkout sessions and checkout session events
 
-Three endpoints are now documented:
+Three endpoints are now part of the public API:
 
 - `GET /checkout/sessions/` — paginated list of checkout sessions for the authenticated organization.
 - `GET /checkout/sessions/{session_id}/` — a single checkout session, including the order, subscription, and payment method it produced (if any).
 - `GET /checkout/sessions/{session_id}/events/` — the session's timeline events (session created, customer details updated, payment attempted, payment completed, etc.).
-
-### Fixes
-
-#### Checkout session endpoints now accept the Server API Key
-
-`GET /checkout/sessions/`, `GET /checkout/sessions/{session_id}/`, and `GET /checkout/sessions/{session_id}/events/` previously didn't accept the standard Server API Key `Authorization: Bearer` credential used across the rest of the API — only session-based auth worked. These endpoints now accept the Server API Key like every other endpoint.
 
 </Update>
 
@@ -51,7 +35,7 @@ Three endpoints are now documented:
 
 #### Orders, order events, and webhook delivery logs
 
-Four endpoints are now documented:
+Four endpoints are now part of the public API:
 
 - `GET /orders/` — paginated list of orders. `PENDING` orders (payment never attempted/completed) are never included. Accepts `status`, `billing_type` (`ONE_TIME`/`SUBSCRIPTION`), and `is_renewal` (`true`/`false`) filters.
 - `GET /orders/{id}/` — a single order.
@@ -67,18 +51,6 @@ GET /webhook/logs/?start_date=2026-07-20&end_date=2026-07-25
 ```
 GET /orders/?billing_type=SUBSCRIPTION&is_renewal=false
 ```
-
-### Fixes
-
-#### More endpoints now accept the Server API Key
-
-`GET /orders/`, `GET /orders/{id}/`, `GET /orders/{id}/events/`, and `GET /webhook/logs/` previously didn't accept the standard Server API Key `Authorization: Bearer` credential used across the rest of the API — only session-based auth worked. These endpoints now accept the Server API Key like every other endpoint.
-
-### Removed
-
-#### `GET /orders/subscription/`
-
-No longer documented — it does not accept the Server API Key and is not part of the supported public API.
 
 </Update>
 
@@ -102,10 +74,6 @@ This changes the shape of the response compared to the default (no `status`) cal
 Use `status` for point-in-time queries ("show me everything currently `active`"); omit it for the current, deduplicated view of each subscription.
 
 ### Fixes
-
-#### Orders and Transactions endpoints now accept the Server API Key
-
-`GET /orders/`, `GET /orders/{id}/`, and `GET /transaction/` previously didn't accept the standard Server API Key `Authorization: Bearer` credential used across the rest of the API — only session-based auth worked. These endpoints now accept the Server API Key like every other endpoint.
 
 #### HTTPS pagination links
 
