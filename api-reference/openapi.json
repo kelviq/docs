@@ -27,7 +27,13 @@
     { "name": "Partner", "description": "Partner integration APIs (organization provisioning, lookup)." },
     { "name": "Charges", "description": "One-time payments charged immediately against a customer's default payment method." },
     { "name": "Refunds", "description": "Full and partial refunds for paid orders." },
-    { "name": "Payment Methods", "description": "Saved customer payment methods (cards, etc.)." }
+    { "name": "Transactions", "description": "Charges, refunds, disputes, and other financial movements for the authenticated organization." },
+    { "name": "Payment Methods", "description": "Saved customer payment methods (cards, etc.)." },
+    { "name": "Orders", "description": "Completed and resolved orders for the authenticated organization." },
+    { "name": "Order Events", "description": "Timeline events for a specific order." },
+    { "name": "Webhooks", "description": "Delivery logs for webhook events sent to your configured endpoints." },
+    { "name": "Checkout Sessions", "description": "Merchant-side view of checkout sessions created by customers." },
+    { "name": "Checkout Session Events", "description": "Timeline events for a specific checkout session." }
   ],
   "components": {
     "securitySchemes": {
@@ -3514,6 +3520,349 @@
           }
         }
       },
+      "MorFeeBreakdownComponent": {
+        "type": "object",
+        "description": "One component of the total Merchant of Record fee.",
+        "properties": {
+          "name": {
+            "type": "string",
+            "enum": ["base_fee", "fixed_fee", "international_fee", "subscription_fee", "conversion_fee", "fee_adjustment"],
+            "example": "base_fee"
+          },
+          "percentage": {
+            "type": "string",
+            "nullable": true,
+            "description": "Percentage rate applied for this component. `null` for fixed fees and the `fee_adjustment` component.",
+            "example": "2.9"
+          },
+          "valueUnits": {
+            "type": "integer",
+            "format": "int64",
+            "description": "Component amount in the transaction currency's minor unit.",
+            "example": 290
+          },
+          "currency": {
+            "type": "string",
+            "description": "Three-letter ISO currency code.",
+            "example": "USD"
+          }
+        },
+        "required": ["name", "percentage", "valueUnits", "currency"]
+      },
+      "TransactionResponse": {
+        "type": "object",
+        "description": "A financial transaction for the authenticated organization.",
+        "properties": {
+          "id": { "type": "string", "format": "uuid", "example": "5b274952-0e54-48f6-aec6-e8a3f202b12e" },
+          "order": {
+            "type": "object",
+            "description": "The complete serialized order associated with the transaction.",
+            "additionalProperties": true
+          },
+          "createdOn": { "type": "string", "format": "date-time", "example": "2026-07-28T10:30:00Z" },
+          "currency": { "type": "string", "example": "USD" },
+          "currencySymbol": { "type": "string", "example": "$" },
+          "amountTotal": { "type": "number", "format": "decimal", "example": 100 },
+          "morFee": { "type": "number", "format": "decimal", "example": 4 },
+          "morFeeBreakdown": {
+            "type": "array",
+            "description": "Components used to calculate the total Merchant of Record fee. Empty when no Merchant of Record fee applies. A `fee_adjustment` component is included when the calculated fee is raised to match a processor-fee floor.",
+            "items": { "$ref": "#/components/schemas/MorFeeBreakdownComponent" },
+            "example": [
+              { "name": "fixed_fee", "percentage": null, "valueUnits": 40, "currency": "USD" },
+              { "name": "base_fee", "percentage": "2.9", "valueUnits": 290, "currency": "USD" },
+              { "name": "subscription_fee", "percentage": "0.7", "valueUnits": 70, "currency": "USD" }
+            ]
+          },
+          "collectedTax": { "type": "number", "format": "decimal", "example": 0 },
+          "netPayout": { "type": "number", "format": "decimal", "example": 96 },
+          "status": { "type": "string", "enum": ["success", "failure", "pending"], "example": "success" },
+          "transactionType": {
+            "type": "string",
+            "enum": ["CHARGE", "REFUND", "CHARGEBACK", "CHARGEBACK_REVERSAL", "CREDIT", "PAYOUT", "ADJUSTMENT"],
+            "example": "CHARGE"
+          },
+          "paymentMethodType": { "type": "string", "example": "card" },
+          "availableOn": { "type": "string", "format": "date", "nullable": true, "example": "2026-08-04" },
+          "isSettled": { "type": "boolean", "example": false },
+          "paymentMethodName": { "type": "string", "nullable": true, "example": "visa" },
+          "last4": { "type": "string", "nullable": true, "example": "4242" }
+        }
+      },
+      "TransactionListResponse": {
+        "type": "object",
+        "properties": {
+          "count": { "type": "integer", "example": 1 },
+          "next": { "type": "string", "format": "uri", "nullable": true, "example": null },
+          "previous": { "type": "string", "format": "uri", "nullable": true, "example": null },
+          "results": {
+            "type": "array",
+            "items": { "$ref": "#/components/schemas/TransactionResponse" }
+          }
+        }
+      },
+      "OrderEventResponse": {
+        "type": "object",
+        "description": "A single entry in an order's timeline.",
+        "properties": {
+          "id": { "type": "integer", "example": 4821 },
+          "order": { "type": "string", "description": "The order ID this event belongs to.", "example": "ORD-20260729103000-AB3K9" },
+          "title": { "type": "string", "example": "Order completed" },
+          "code": { "type": "string", "description": "Machine-readable event code.", "example": "order.completed" },
+          "status": { "type": "string", "enum": ["pending", "success", "failed"], "example": "success" },
+          "timestamp": { "type": "string", "format": "date-time", "example": "2026-07-29T10:31:12Z" },
+          "metadata": {
+            "type": "object",
+            "description": "Event-specific extra data (e.g. amounts, card details, failure reasons). Shape varies by `code`.",
+            "additionalProperties": true,
+            "example": { "primary": "+112.50", "secondary": "card ending 4242" }
+          }
+        },
+        "required": ["id", "order", "title", "code", "status", "timestamp", "metadata"]
+      },
+      "OrderEventListResponse": {
+        "type": "object",
+        "properties": {
+          "count": { "type": "integer", "example": 1 },
+          "next": { "type": "string", "format": "uri", "nullable": true, "example": null },
+          "previous": { "type": "string", "format": "uri", "nullable": true, "example": null },
+          "results": {
+            "type": "array",
+            "items": { "$ref": "#/components/schemas/OrderEventResponse" }
+          }
+        }
+      },
+      "OrderCustomer": {
+        "type": "object",
+        "properties": {
+          "customerId": { "type": "string", "example": "testuser" },
+          "name": { "type": "string", "nullable": true, "example": "Jane Smith" },
+          "email": { "type": "string", "format": "email", "nullable": true, "example": "jane@example.com" }
+        }
+      },
+      "OrderSubscriptionSummary": {
+        "type": "object",
+        "description": "Summary of the subscription linked to this order. An empty object (`{}`) when the order has no linked subscription.",
+        "properties": {
+          "id": { "type": "string", "format": "uuid", "example": "09d706ca-58f3-4fb2-818f-5b8623d67e6e" },
+          "status": { "type": "string", "example": "active" },
+          "amount": { "type": "string", "description": "Decimal amount, serialized as a string (e.g. `\"261.00\"`), not a JSON number.", "nullable": true, "example": "261.00" },
+          "currency": { "type": "string", "nullable": true, "example": "usd" },
+          "interval": { "type": "string", "description": "Billing interval, e.g. `month` or `year`.", "example": "month" },
+          "currencySymbol": { "type": "string", "example": "$" },
+          "nextInvoiceDate": { "type": "string", "format": "date-time", "nullable": true, "example": "2026-08-28T10:46:34Z" }
+        }
+      },
+      "OrderPaymentMethod": {
+        "type": "object",
+        "nullable": true,
+        "description": "The payment method used for the order's first successful transaction. `null` if no successful transaction exists yet.",
+        "properties": {
+          "paymentMethodType": { "type": "string", "example": "card" },
+          "paymentMethodName": { "type": "string", "nullable": true, "example": "visa" },
+          "last4": { "type": "string", "nullable": true, "example": "4242" }
+        }
+      },
+      "OrderResponse": {
+        "type": "object",
+        "description": "A completed, failed, or otherwise resolved order. Orders in `PENDING` status (payment not yet attempted) are never returned by the list/retrieve endpoints.",
+        "properties": {
+          "id": { "type": "string", "description": "Order ID.", "example": "ORD-20260729103000-AB3K9" },
+          "customer": { "$ref": "#/components/schemas/OrderCustomer" },
+          "product": { "$ref": "#/components/schemas/Product" },
+          "status": {
+            "type": "string",
+            "enum": ["PENDING", "COMPLETE", "FAILED", "REFUNDED", "PARTIAL_REFUND", "CANCELLED", "FRAUDULENT"],
+            "example": "COMPLETE"
+          },
+          "paidAt": { "type": "string", "format": "date-time", "nullable": true, "example": "2026-07-29T10:31:12Z" },
+          "amountSubtotal": { "type": "string", "description": "Decimal amount, serialized as a string (e.g. `\"261.00\"`), not a JSON number.", "nullable": true, "example": "261.00" },
+          "amountDiscount": { "type": "string", "description": "Decimal amount, serialized as a string, not a JSON number.", "example": "0.00" },
+          "amountTax": { "type": "string", "description": "Decimal amount, serialized as a string, not a JSON number.", "nullable": true, "example": "0.00" },
+          "amountTotal": { "type": "string", "description": "Decimal amount, serialized as a string, not a JSON number.", "nullable": true, "example": "261.00" },
+          "saleCurrency": { "type": "string", "example": "USD" },
+          "amountSubtotalUnits": { "type": "integer", "format": "int64", "nullable": true, "example": 26100 },
+          "amountDiscountUnits": { "type": "integer", "format": "int64", "example": 0 },
+          "amountTaxUnits": { "type": "integer", "format": "int64", "nullable": true, "example": 0 },
+          "amountTotalUnits": { "type": "integer", "format": "int64", "nullable": true, "example": 26100 },
+          "saleCurrencySymbol": { "type": "string", "example": "$" },
+          "billingAddress": { "$ref": "#/components/schemas/BillingAddress" },
+          "plan": { "$ref": "#/components/schemas/CatalogPlan" },
+          "billingType": { "type": "string", "enum": ["ONE_TIME", "SUBSCRIPTION"], "nullable": true, "example": "SUBSCRIPTION" },
+          "license": {
+            "type": "array",
+            "description": "Licenses issued for the order's subscription, if the plan includes licensing.",
+            "items": { "$ref": "#/components/schemas/SubscriptionLicense" }
+          },
+          "isTrial": { "type": "boolean", "example": false },
+          "subscription": { "$ref": "#/components/schemas/OrderSubscriptionSummary" },
+          "invoiceId": { "type": "string", "nullable": true, "example": "INV-20260729103000-XZ7Q1" },
+          "customFieldsData": { "type": "object", "additionalProperties": true, "example": {} },
+          "paymentMethod": { "$ref": "#/components/schemas/OrderPaymentMethod" }
+        }
+      },
+      "OrderListResponse": {
+        "type": "object",
+        "properties": {
+          "count": { "type": "integer", "example": 1 },
+          "next": { "type": "string", "format": "uri", "nullable": true, "example": null },
+          "previous": { "type": "string", "format": "uri", "nullable": true, "example": null },
+          "results": {
+            "type": "array",
+            "items": { "$ref": "#/components/schemas/OrderResponse" }
+          }
+        }
+      },
+      "WebhookEventLogResponse": {
+        "type": "object",
+        "description": "One row per webhook delivery attempt (including retries).",
+        "properties": {
+          "id": { "type": "string", "format": "uuid", "description": "ID of this delivery attempt.", "example": "9c3e9f2a-1b7a-4a3e-8b6e-8e6f9a2c1d4a" },
+          "eventId": { "type": "string", "format": "uuid", "description": "ID of the parent webhook event (shared across all retry attempts).", "example": "5b274952-0e54-48f6-aec6-e8a3f202b12e" },
+          "endpoint": { "type": "string", "format": "uuid", "description": "ID of the destination webhook endpoint.", "example": "2f6b9e2a-7c1a-4a3e-8b6e-8e6f9a2c1d4a" },
+          "eventType": { "type": "string", "example": "charge.completed" },
+          "statusCode": { "type": "integer", "nullable": true, "description": "HTTP status code returned by the destination for this attempt.", "example": 200 },
+          "isSuccess": { "type": "boolean", "example": true },
+          "retryCount": { "type": "integer", "description": "Number of retries prior to this attempt (0 for the first attempt).", "example": 0 },
+          "lastAttempt": { "type": "string", "format": "date-time", "description": "When this specific delivery attempt was made. This is the timestamp `start_date`/`end_date` filter against.", "example": "2026-07-29T10:31:15Z" },
+          "createdOn": { "type": "string", "format": "date-time", "description": "When the underlying webhook event was originally created — not this delivery attempt.", "example": "2026-07-29T10:31:12Z" },
+          "payload": { "type": "object", "description": "The raw event envelope sent to the destination.", "additionalProperties": true }
+        },
+        "required": ["id", "eventId", "endpoint", "eventType", "statusCode", "isSuccess", "retryCount", "lastAttempt", "createdOn", "payload"]
+      },
+      "WebhookEventLogListResponse": {
+        "type": "object",
+        "properties": {
+          "count": { "type": "integer", "example": 1 },
+          "next": { "type": "string", "format": "uri", "nullable": true, "example": null },
+          "previous": { "type": "string", "format": "uri", "nullable": true, "example": null },
+          "results": {
+            "type": "array",
+            "items": { "$ref": "#/components/schemas/WebhookEventLogResponse" }
+          }
+        }
+      },
+      "CheckoutSessionOrder": {
+        "type": "object",
+        "description": "The first order created from this checkout session.",
+        "properties": {
+          "id": { "type": "string", "example": "ORD-20260729103000-AB3K9" },
+          "status": {
+            "type": "string",
+            "enum": ["PENDING", "COMPLETE", "FAILED", "REFUNDED", "PARTIAL_REFUND", "CANCELLED", "FRAUDULENT"],
+            "example": "COMPLETE"
+          },
+          "paidAt": { "type": "string", "format": "date-time", "nullable": true, "example": "2026-07-29T10:31:12Z" },
+          "createdOn": { "type": "string", "format": "date-time", "example": "2026-07-29T10:30:55Z" },
+          "billingType": { "type": "string", "enum": ["ONE_TIME", "SUBSCRIPTION"], "nullable": true, "example": "SUBSCRIPTION" },
+          "isTrial": { "type": "boolean", "example": false },
+          "amountSubtotal": { "type": "string", "description": "Decimal amount, serialized as a string (e.g. `\"261.00\"`), not a JSON number.", "nullable": true, "example": "261.00" },
+          "amountDiscount": { "type": "string", "description": "Decimal amount, serialized as a string, not a JSON number.", "example": "0.00" },
+          "amountTax": { "type": "string", "description": "Decimal amount, serialized as a string, not a JSON number.", "nullable": true, "example": "0.00" },
+          "amountTotal": { "type": "string", "description": "Decimal amount, serialized as a string, not a JSON number.", "nullable": true, "example": "261.00" },
+          "saleCurrency": { "type": "string", "example": "USD" },
+          "saleCurrencySymbol": { "type": "string", "example": "$" },
+          "invoiceId": { "type": "string", "nullable": true, "example": "INV-20260729103000-XZ7Q1" }
+        }
+      },
+      "CheckoutSessionSubscription": {
+        "type": "object",
+        "description": "The subscription created from this checkout session's order, if any.",
+        "properties": {
+          "id": { "type": "string", "format": "uuid", "example": "09d706ca-58f3-4fb2-818f-5b8623d67e6e" },
+          "recurrence": { "type": "string", "nullable": true, "example": "month" },
+          "billingPeriodStartTime": { "type": "string", "format": "date-time", "nullable": true, "example": "2026-07-29T10:31:12Z" },
+          "billingPeriodEndTime": { "type": "string", "format": "date-time", "nullable": true, "example": "2026-08-29T10:31:12Z" },
+          "startDate": { "type": "string", "format": "date", "example": "2026-07-29" },
+          "endDate": { "type": "string", "format": "date", "nullable": true, "example": null },
+          "status": { "type": "string", "example": "active" },
+          "amount": { "type": "string", "description": "Decimal amount, serialized as a string (e.g. `\"261.00\"`), not a JSON number.", "nullable": true, "example": "261.00" },
+          "currency": { "type": "string", "nullable": true, "example": "usd" },
+          "trialDaysRemaining": { "type": "integer", "example": 0 },
+          "billingType": { "type": "string", "enum": ["ONE_TIME", "SUBSCRIPTION"], "example": "SUBSCRIPTION" },
+          "recurrenceUnit": { "type": "integer", "nullable": true, "example": 1 },
+          "recurrenceType": { "type": "string", "nullable": true, "example": "MONTH" }
+        }
+      },
+      "CheckoutSessionResponse": {
+        "type": "object",
+        "description": "A checkout session. Returned by the list endpoint.",
+        "properties": {
+          "id": { "type": "string", "description": "Checkout session ID.", "example": "cs_a1B2c3D4e5F6g7H8i9J0k1L2m3N4o5P6q7R8s9T0u1V2" },
+          "customer": { "$ref": "#/components/schemas/OrderCustomer" },
+          "product": { "$ref": "#/components/schemas/Product" },
+          "billingAddress": { "$ref": "#/components/schemas/BillingAddress" },
+          "discountCode": { "type": "string", "nullable": true, "example": null },
+          "taxId": { "type": "string", "nullable": true, "example": null },
+          "currency": { "type": "string", "nullable": true, "example": "usd" },
+          "currencySymbol": { "type": "string", "example": "$" },
+          "status": { "type": "string", "description": "Typical values: `open`, `processing`, `success`, `expired`.", "example": "open" },
+          "createdOn": { "type": "string", "format": "date-time", "example": "2026-07-29T10:30:00Z" },
+          "selectedData": { "type": "object", "description": "Selected plan/addons for this session.", "additionalProperties": true },
+          "offeringData": { "type": "object", "description": "Snapshot of the product/plan offering shown at checkout.", "additionalProperties": true },
+          "data": { "type": "object", "additionalProperties": true },
+          "customFieldsData": { "type": "object", "description": "Customer-submitted responses to custom checkout fields.", "additionalProperties": true },
+          "metadata": { "type": "object", "description": "Customer-supplied metadata passed at checkout session creation.", "additionalProperties": true },
+          "customization": { "type": "object", "description": "Customer-supplied checkout UI customization passed at session creation.", "additionalProperties": true },
+          "trialPeriod": { "type": "integer", "description": "Trial period length in days.", "example": 0 }
+        }
+      },
+      "CheckoutSessionDetailResponse": {
+        "type": "object",
+        "description": "A single checkout session, with the order/subscription/payment method it produced.",
+        "allOf": [
+          { "$ref": "#/components/schemas/CheckoutSessionResponse" },
+          {
+            "type": "object",
+            "properties": {
+              "order": { "$ref": "#/components/schemas/CheckoutSessionOrder", "nullable": true, "description": "`null` until an order has been created from this session." },
+              "subscription": { "$ref": "#/components/schemas/CheckoutSessionSubscription", "nullable": true, "description": "`null` if the order has no linked subscription." },
+              "paymentMethod": { "$ref": "#/components/schemas/OrderPaymentMethod" }
+            }
+          }
+        ]
+      },
+      "CheckoutSessionListResponse": {
+        "type": "object",
+        "properties": {
+          "count": { "type": "integer", "example": 1 },
+          "next": { "type": "string", "format": "uri", "nullable": true, "example": null },
+          "previous": { "type": "string", "format": "uri", "nullable": true, "example": null },
+          "results": {
+            "type": "array",
+            "items": { "$ref": "#/components/schemas/CheckoutSessionResponse" }
+          }
+        }
+      },
+      "CheckoutSessionEventResponse": {
+        "type": "object",
+        "description": "A single entry in a checkout session's timeline.",
+        "properties": {
+          "id": { "type": "integer", "example": 913 },
+          "title": { "type": "string", "example": "Checkout session created" },
+          "code": { "type": "string", "description": "Machine-readable event code.", "example": "checkout_session.created" },
+          "status": { "type": "string", "enum": ["pending", "success", "failed"], "example": "success" },
+          "timestamp": { "type": "string", "format": "date-time", "example": "2026-07-29T10:30:00Z" },
+          "metadata": {
+            "type": "object",
+            "description": "Event-specific extra data. Shape varies by `code`.",
+            "additionalProperties": true
+          }
+        },
+        "required": ["id", "title", "code", "status", "timestamp", "metadata"]
+      },
+      "CheckoutSessionEventListResponse": {
+        "type": "object",
+        "properties": {
+          "count": { "type": "integer", "example": 1 },
+          "next": { "type": "string", "format": "uri", "nullable": true, "example": null },
+          "previous": { "type": "string", "format": "uri", "nullable": true, "example": null },
+          "results": {
+            "type": "array",
+            "items": { "$ref": "#/components/schemas/CheckoutSessionEventResponse" }
+          }
+        }
+      },
       "PartnerOrganizationList": {
         "type": "object",
         "description": "List response for partner organizations.",
@@ -3857,6 +4206,152 @@
               }
             }
           }
+        }
+      }
+    },
+    "/checkout/sessions/": {
+      "get": {
+        "tags": ["Checkout Sessions"],
+        "summary": "List checkout sessions",
+        "description": "Returns a paginated list of checkout sessions for the authenticated organization, newest first.",
+        "operationId": "listCheckoutSessions",
+        "x-mint": {
+          "content": "<Info>Click the base URL in the API playground and select the **Sandbox** host for test data or the **Production** host for live data. Use credentials from the same environment.</Info>"
+        },
+        "parameters": [
+          {
+            "name": "search",
+            "in": "query",
+            "required": false,
+            "description": "Search by session ID, customer name, email, customer ID, or product name.",
+            "schema": { "type": "string" }
+          },
+          {
+            "name": "status",
+            "in": "query",
+            "required": false,
+            "description": "Filter by session status.",
+            "schema": { "type": "string", "example": "open" }
+          },
+          {
+            "name": "start_date",
+            "in": "query",
+            "required": false,
+            "description": "Include sessions created on or after this date.",
+            "schema": { "type": "string", "format": "date" }
+          },
+          {
+            "name": "end_date",
+            "in": "query",
+            "required": false,
+            "description": "Include sessions created on or before this date.",
+            "schema": { "type": "string", "format": "date" }
+          },
+          {
+            "name": "page_size",
+            "in": "query",
+            "required": false,
+            "description": "Number of results per page. Defaults to 10, maximum 100.",
+            "schema": { "type": "integer", "minimum": 1, "maximum": 100 }
+          },
+          {
+            "name": "page",
+            "in": "query",
+            "required": false,
+            "description": "Page number to return.",
+            "schema": { "type": "integer", "minimum": 1 }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "A paginated list of checkout sessions.",
+            "content": {
+              "application/json": {
+                "schema": { "$ref": "#/components/schemas/CheckoutSessionListResponse" }
+              }
+            }
+          },
+          "401": { "description": "Unauthorized — missing or invalid API key." }
+        }
+      }
+    },
+    "/checkout/sessions/{session_id}/": {
+      "get": {
+        "tags": ["Checkout Sessions"],
+        "summary": "Retrieve a checkout session",
+        "description": "Returns a single checkout session by ID, including the order, subscription, and payment method it produced (if any).",
+        "operationId": "retrieveCheckoutSession",
+        "x-mint": {
+          "content": "<Info>Click the base URL in the API playground and select the **Sandbox** host for test data or the **Production** host for live data. Use credentials from the same environment.</Info>"
+        },
+        "parameters": [
+          {
+            "name": "session_id",
+            "in": "path",
+            "required": true,
+            "description": "The checkout session ID.",
+            "schema": { "type": "string" },
+            "example": "cs_a1B2c3D4e5F6g7H8i9J0k1L2m3N4o5P6q7R8s9T0u1V2"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "The checkout session.",
+            "content": {
+              "application/json": {
+                "schema": { "$ref": "#/components/schemas/CheckoutSessionDetailResponse" }
+              }
+            }
+          },
+          "401": { "description": "Unauthorized — missing or invalid API key." },
+          "404": { "description": "No checkout session with that ID for the authenticated organization." }
+        }
+      }
+    },
+    "/checkout/sessions/{session_id}/events/": {
+      "get": {
+        "tags": ["Checkout Session Events"],
+        "summary": "List checkout session events",
+        "description": "Returns a paginated list of timeline events for a checkout session (e.g. session created, customer details updated, payment attempted, payment completed), newest first.",
+        "operationId": "listCheckoutSessionEvents",
+        "x-mint": {
+          "content": "<Info>Click the base URL in the API playground and select the **Sandbox** host for test data or the **Production** host for live data. Use credentials from the same environment.</Info>"
+        },
+        "parameters": [
+          {
+            "name": "session_id",
+            "in": "path",
+            "required": true,
+            "description": "The checkout session ID.",
+            "schema": { "type": "string" },
+            "example": "cs_a1B2c3D4e5F6g7H8i9J0k1L2m3N4o5P6q7R8s9T0u1V2"
+          },
+          {
+            "name": "page_size",
+            "in": "query",
+            "required": false,
+            "description": "Number of results per page. Defaults to 10, maximum 100.",
+            "schema": { "type": "integer", "minimum": 1, "maximum": 100 }
+          },
+          {
+            "name": "page",
+            "in": "query",
+            "required": false,
+            "description": "Page number to return.",
+            "schema": { "type": "integer", "minimum": 1 }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "A paginated list of checkout session timeline events.",
+            "content": {
+              "application/json": {
+                "schema": { "$ref": "#/components/schemas/CheckoutSessionEventListResponse" }
+              }
+            }
+          },
+          "401": { "description": "Unauthorized — missing or invalid API key." },
+          "404": { "description": "No checkout session with that ID for the authenticated organization." }
         }
       }
     },
@@ -4337,6 +4832,287 @@
         }
       }
     },
+    "/transaction/": {
+      "get": {
+        "tags": ["Transactions"],
+        "summary": "List transactions",
+        "description": "Returns a paginated list of financial transactions for the authenticated organization, ordered newest first. Each transaction includes an itemized Merchant of Record fee breakdown when applicable.",
+        "operationId": "listTransactions",
+        "x-mint": {
+          "content": "<Info>Click the base URL in the API playground and select the **Sandbox** host for test data or the **Production** host for live data. Use credentials from the same environment.</Info>"
+        },
+        "parameters": [
+          {
+            "name": "search",
+            "in": "query",
+            "required": false,
+            "description": "Search by payment-provider IDs, customer name, email or ID, product name, or payment method type.",
+            "schema": { "type": "string" }
+          },
+          {
+            "name": "status",
+            "in": "query",
+            "required": false,
+            "description": "Filter by transaction status.",
+            "schema": { "type": "string", "enum": ["success", "failure", "pending"] }
+          },
+          {
+            "name": "start_date",
+            "in": "query",
+            "required": false,
+            "description": "Include transactions created on or after this date.",
+            "schema": { "type": "string", "format": "date" }
+          },
+          {
+            "name": "end_date",
+            "in": "query",
+            "required": false,
+            "description": "Include transactions created on or before this date.",
+            "schema": { "type": "string", "format": "date" }
+          },
+          {
+            "name": "page_size",
+            "in": "query",
+            "required": false,
+            "description": "Number of results per page. Defaults to 10, maximum 100.",
+            "schema": { "type": "integer", "minimum": 1, "maximum": 100 }
+          },
+          {
+            "name": "page",
+            "in": "query",
+            "required": false,
+            "description": "Page number to return.",
+            "schema": { "type": "integer", "minimum": 1 }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "A paginated list of transactions.",
+            "content": {
+              "application/json": {
+                "schema": { "$ref": "#/components/schemas/TransactionListResponse" }
+              }
+            }
+          },
+          "401": { "description": "Unauthorized — missing or invalid API key." }
+        }
+      }
+    },
+    "/orders/": {
+      "get": {
+        "tags": ["Orders"],
+        "summary": "List orders",
+        "description": "Returns a paginated list of orders for the authenticated organization, newest paid first. Orders in `PENDING` status (payment never attempted/completed) and orders with no attached customer are never included.",
+        "operationId": "listOrders",
+        "x-mint": {
+          "content": "<Info>Click the base URL in the API playground and select the **Sandbox** host for test data or the **Production** host for live data. Use credentials from the same environment.</Info>"
+        },
+        "parameters": [
+          {
+            "name": "search",
+            "in": "query",
+            "required": false,
+            "description": "Search by order ID, customer name, email, or customer ID.",
+            "schema": { "type": "string" }
+          },
+          {
+            "name": "status",
+            "in": "query",
+            "required": false,
+            "description": "Filter by order status.",
+            "schema": {
+              "type": "string",
+              "enum": ["PENDING", "COMPLETE", "FAILED", "REFUNDED", "PARTIAL_REFUND", "CANCELLED", "FRAUDULENT"]
+            }
+          },
+          {
+            "name": "billing_type",
+            "in": "query",
+            "required": false,
+            "description": "Filter by billing type.",
+            "schema": { "type": "string", "enum": ["ONE_TIME", "SUBSCRIPTION"] }
+          },
+          {
+            "name": "is_renewal",
+            "in": "query",
+            "required": false,
+            "description": "Filter by whether the order is a recurring renewal charge (`true`) versus an initial sign-up/one-time purchase (`false`).",
+            "schema": { "type": "boolean" }
+          },
+          {
+            "name": "start_date",
+            "in": "query",
+            "required": false,
+            "description": "Include orders paid on or after this date.",
+            "schema": { "type": "string", "format": "date" }
+          },
+          {
+            "name": "end_date",
+            "in": "query",
+            "required": false,
+            "description": "Include orders paid on or before this date.",
+            "schema": { "type": "string", "format": "date" }
+          },
+          {
+            "name": "page_size",
+            "in": "query",
+            "required": false,
+            "description": "Number of results per page. Defaults to 10, maximum 100.",
+            "schema": { "type": "integer", "minimum": 1, "maximum": 100 }
+          },
+          {
+            "name": "page",
+            "in": "query",
+            "required": false,
+            "description": "Page number to return.",
+            "schema": { "type": "integer", "minimum": 1 }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "A paginated list of orders.",
+            "content": {
+              "application/json": {
+                "schema": { "$ref": "#/components/schemas/OrderListResponse" }
+              }
+            }
+          },
+          "401": { "description": "Unauthorized — missing or invalid API key." }
+        }
+      }
+    },
+    "/orders/{id}/": {
+      "get": {
+        "tags": ["Orders"],
+        "summary": "Retrieve an order",
+        "description": "Returns a single order by ID.",
+        "operationId": "retrieveOrder",
+        "x-mint": {
+          "content": "<Info>Click the base URL in the API playground and select the **Sandbox** host for test data or the **Production** host for live data. Use credentials from the same environment.</Info>"
+        },
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "description": "The order ID.",
+            "schema": { "type": "string" },
+            "example": "ORD-20260729103000-AB3K9"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "The order.",
+            "content": {
+              "application/json": {
+                "schema": { "$ref": "#/components/schemas/OrderResponse" }
+              }
+            }
+          },
+          "401": { "description": "Unauthorized — missing or invalid API key." },
+          "404": { "description": "No order with that ID for the authenticated organization (this also applies to `PENDING` orders and orders with no attached customer, which are never returned)." }
+        }
+      }
+    },
+    "/orders/{id}/events/": {
+      "get": {
+        "tags": ["Order Events"],
+        "summary": "List order events",
+        "description": "Returns a paginated list of timeline events for an order (e.g. order created, order completed, order receipt sent, invoice paid), newest first. This includes every order tied to the same underlying subscription as the given order, not just that single order record.",
+        "operationId": "listOrderEvents",
+        "x-mint": {
+          "content": "<Info>Click the base URL in the API playground and select the **Sandbox** host for test data or the **Production** host for live data. Use credentials from the same environment.</Info>"
+        },
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "description": "The order ID.",
+            "schema": { "type": "string" },
+            "example": "ORD-20260729103000-AB3K9"
+          },
+          {
+            "name": "page_size",
+            "in": "query",
+            "required": false,
+            "description": "Number of results per page. Defaults to 10, maximum 100.",
+            "schema": { "type": "integer", "minimum": 1, "maximum": 100 }
+          },
+          {
+            "name": "page",
+            "in": "query",
+            "required": false,
+            "description": "Page number to return.",
+            "schema": { "type": "integer", "minimum": 1 }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "A paginated list of order timeline events.",
+            "content": {
+              "application/json": {
+                "schema": { "$ref": "#/components/schemas/OrderEventListResponse" }
+              }
+            }
+          },
+          "401": { "description": "Unauthorized — missing or invalid API key." },
+          "404": { "description": "No order with that ID for the authenticated organization." }
+        }
+      }
+    },
+    "/webhook/logs/": {
+      "get": {
+        "tags": ["Webhooks"],
+        "summary": "List webhook logs",
+        "description": "Returns a paginated list of webhook delivery attempts (including retries) for the authenticated organization, newest first. Results are always limited to the trailing 30 days — `start_date`/`end_date` can narrow that window further but can't widen it beyond 30 days back. Note that `start_date`/`end_date` filter against `lastAttempt` (when that specific delivery attempt happened), not `createdOn` (when the underlying event was first created) — the two can differ for retried deliveries.",
+        "operationId": "listWebhookEventLogs",
+        "x-mint": {
+          "content": "<Info>Click the base URL in the API playground and select the **Sandbox** host for test data or the **Production** host for live data. Use credentials from the same environment.</Info>"
+        },
+        "parameters": [
+          {
+            "name": "start_date",
+            "in": "query",
+            "required": false,
+            "description": "Include delivery attempts made on or after this date. Clamped to at most 30 days back regardless of the value passed.",
+            "schema": { "type": "string", "format": "date" }
+          },
+          {
+            "name": "end_date",
+            "in": "query",
+            "required": false,
+            "description": "Include delivery attempts made on or before this date.",
+            "schema": { "type": "string", "format": "date" }
+          },
+          {
+            "name": "page_size",
+            "in": "query",
+            "required": false,
+            "description": "Number of results per page. Defaults to 10, maximum 100.",
+            "schema": { "type": "integer", "minimum": 1, "maximum": 100 }
+          },
+          {
+            "name": "page",
+            "in": "query",
+            "required": false,
+            "description": "Page number to return.",
+            "schema": { "type": "integer", "minimum": 1 }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "A paginated list of webhook delivery logs.",
+            "content": {
+              "application/json": {
+                "schema": { "$ref": "#/components/schemas/WebhookEventLogListResponse" }
+              }
+            }
+          },
+          "401": { "description": "Unauthorized — missing or invalid API key." }
+        }
+      }
+    },
     "/refunds/": {
       "get": {
         "tags": [
@@ -4353,7 +5129,7 @@
             "name": "search",
             "in": "query",
             "required": false,
-            "description": "Search by refund ID, order ID, payment-provider refund ID, or customer name, email, or ID.",
+            "description": "Search by refund ID, order ID, customer name, email, or ID.",
             "schema": { "type": "string" }
           },
           {
@@ -4602,7 +5378,7 @@
           "Subscriptions"
         ],
         "summary": "List Subscriptions",
-        "description": "Retrieves a paginated list of subscriptions. Optionally filter the results by customer.",
+        "description": "Retrieves a paginated list of subscriptions. Optionally filter the results by customer or status.\n\nBy default (no `status` filter), the response contains exactly one row per subscription: its most recent state, excluding records that have expired (`end_date` in the past) or been superseded by a later update. When `status` is supplied, that deduplication and exclusion is skipped and matching subscription records are returned directly — so a subscription that has passed through the requested status more than once, or whose only matching record has since expired or been superseded, can appear more than once or in a state you didn't expect. Use `status` for point-in-time queries (e.g. \"show me everything currently `active`\"); omit it when you want the current, deduplicated view of each subscription.",
         "operationId": "listSubscriptions",
         "x-mint": {
           "content": "<Info>Click the base URL in the API playground and select the **Sandbox** host for test data or the **Production** host for live data. Use credentials from the same environment.</Info>"
@@ -4615,6 +5391,16 @@
             "description": "Optional. The client-defined unique identifier of the customer whose subscriptions will be returned.",
             "schema": {
               "type": "string"
+            }
+          },
+          {
+            "name": "status",
+            "in": "query",
+            "required": false,
+            "description": "Optional. Filter by subscription status. Accepts a comma-separated list to match any of several statuses, e.g. `active,trialing`. Common values: `incomplete`, `incomplete_expired`, `trialing`, `active`, `past_due`, `canceled`. See the endpoint description above for how this changes the deduplication behavior of the response.",
+            "schema": {
+              "type": "string",
+              "example": "active,trialing"
             }
           },
           {

@@ -5,6 +5,154 @@ mode: "wide"
 rss: true
 ---
 
+<Update label="v1.6.4" description="July 29, 2026">
+
+### Fixes
+
+#### `subscription.updated` now fires when a cancellation is scheduled for period-end
+
+Scheduling a subscription to cancel at the end of the current billing period (rather than immediately) previously sent no webhook at all — status stays `active` until the period actually ends, so nothing was detected as changed. This now correctly sends `subscription.updated` (with the new `end_date` and a `previous_attributes.end_date` of `null`) at the moment the cancellation is scheduled. `subscription.cancelled` still only fires once the subscription actually reaches cancelled status — for a period-end cancellation, that's later, when the period ends.
+
+</Update>
+
+<Update label="v1.6.3" description="July 29, 2026">
+
+### Changes
+
+#### `GET /refunds/`'s `search` param no longer matches the payment-provider refund ID
+
+`search` now matches against refund ID, order ID, customer name, email, and customer ID only — it no longer matches the payment provider's refund ID (e.g. Stripe's `re_...` ID).
+
+</Update>
+
+<Update label="v1.6.2" description="July 29, 2026">
+
+### New Features
+
+#### Checkout sessions and checkout session events
+
+Three endpoints are now documented:
+
+- `GET /checkout/sessions/` — paginated list of checkout sessions for the authenticated organization.
+- `GET /checkout/sessions/{session_id}/` — a single checkout session, including the order, subscription, and payment method it produced (if any).
+- `GET /checkout/sessions/{session_id}/events/` — the session's timeline events (session created, customer details updated, payment attempted, payment completed, etc.).
+
+### Fixes
+
+#### Checkout session endpoints now accept the Server API Key
+
+`GET /checkout/sessions/`, `GET /checkout/sessions/{session_id}/`, and `GET /checkout/sessions/{session_id}/events/` previously didn't accept the standard Server API Key `Authorization: Bearer` credential used across the rest of the API — only session-based auth worked. These endpoints now accept the Server API Key like every other endpoint.
+
+</Update>
+
+<Update label="v1.6.1" description="July 29, 2026">
+
+### New Features
+
+#### Orders, order events, and webhook delivery logs
+
+Four endpoints are now documented:
+
+- `GET /orders/` — paginated list of orders. `PENDING` orders (payment never attempted/completed) are never included. Accepts `status`, `billing_type` (`ONE_TIME`/`SUBSCRIPTION`), and `is_renewal` (`true`/`false`) filters.
+- `GET /orders/{id}/` — a single order.
+- `GET /orders/{id}/events/` — the order's timeline events (order created, order completed, order receipt sent, invoice paid, etc.). This returns events for every order tied to the same underlying subscription as `{id}`, not just that single order record.
+- `GET /webhook/logs/` — one row per webhook delivery attempt, including retries.
+
+`GET /webhook/logs/` also accepts `start_date`/`end_date` query params. Results are always limited to the trailing 30 days — these params can narrow that window but can't widen it beyond 30 days back. They filter against `lastAttempt` (when that specific delivery attempt happened), not `createdOn` (when the underlying event was first created) — the two can differ for retried deliveries.
+
+```
+GET /webhook/logs/?start_date=2026-07-20&end_date=2026-07-25
+```
+
+```
+GET /orders/?billing_type=SUBSCRIPTION&is_renewal=false
+```
+
+### Fixes
+
+#### More endpoints now accept the Server API Key
+
+`GET /orders/`, `GET /orders/{id}/`, `GET /orders/{id}/events/`, and `GET /webhook/logs/` previously didn't accept the standard Server API Key `Authorization: Bearer` credential used across the rest of the API — only session-based auth worked. These endpoints now accept the Server API Key like every other endpoint.
+
+### Removed
+
+#### `GET /orders/subscription/`
+
+No longer documented — it does not accept the Server API Key and is not part of the supported public API.
+
+</Update>
+
+<Update label="v1.6.0" description="July 29, 2026">
+
+### New Features
+
+#### Filter subscriptions by status
+
+`GET /subscriptions/` now accepts a `status` query parameter. Pass a comma-separated list to match any of several statuses, e.g. `?status=active,trialing`.
+
+```
+GET /subscriptions/?status=active,trialing
+```
+
+This changes the shape of the response compared to the default (no `status`) call:
+
+- **Without `status`**: exactly one row per subscription — its most recent state, with expired (`end_date` in the past) and superseded records excluded.
+- **With `status`**: that deduplication and exclusion is skipped, and matching records are returned directly. A subscription that has passed through the requested status more than once, or whose only matching record has since expired or been superseded, can appear more than once or in a state you didn't expect.
+
+Use `status` for point-in-time queries ("show me everything currently `active`"); omit it for the current, deduplicated view of each subscription.
+
+### Fixes
+
+#### Orders and Transactions endpoints now accept the Server API Key
+
+`GET /orders/`, `GET /orders/{id}/`, and `GET /transaction/` previously didn't accept the standard Server API Key `Authorization: Bearer` credential used across the rest of the API — only session-based auth worked. These endpoints now accept the Server API Key like every other endpoint.
+
+#### HTTPS pagination links
+
+Paginated list responses' `next` and `previous` links now correctly use `https://` when the request was made over HTTPS. Previously they were always rendered as `http://`, regardless of the request's actual scheme.
+
+</Update>
+
+<Update label="v1.5.0" description="July 28, 2026">
+
+### Changes
+
+#### Itemized Merchant of Record fees
+
+Transaction responses from `GET /transaction/` now include `morFeeBreakdown`, an array that itemizes the Merchant of Record fee charged for the transaction.
+
+Each component includes its `name`, percentage rate, amount in minor units (`valueUnits`), and currency. Fixed fees return `null` for `percentage`. Transactions without an applicable Merchant of Record fee return an empty array.
+
+```json
+{
+  "morFee": 4,
+  "morFeeBreakdown": [
+    {
+      "name": "fixed_fee",
+      "percentage": null,
+      "valueUnits": 40,
+      "currency": "USD"
+    },
+    {
+      "name": "base_fee",
+      "percentage": "2.9",
+      "valueUnits": 290,
+      "currency": "USD"
+    },
+    {
+      "name": "subscription_fee",
+      "percentage": "0.7",
+      "valueUnits": 70,
+      "currency": "USD"
+    }
+  ]
+}
+```
+
+Possible components are `base_fee`, `fixed_fee`, `international_fee`, `subscription_fee`, and `conversion_fee`. A `fee_adjustment` component (also `null` percentage) is included when the calculated fee is raised to match a processor-fee floor.
+
+</Update>
+
 <Update label="v1.4.0" description="July 17, 2026">
 
 ### New Features
@@ -56,7 +204,7 @@ The event payload has not changed. Continue to use `data.object.status`, `data.o
 
 </Update>
 
-<Update label="Customer email rules" description="July 17, 2026">
+<Update label="v1.3.1" description="July 17, 2026">
 
 ### Changes
 

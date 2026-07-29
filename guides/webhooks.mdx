@@ -60,8 +60,8 @@ Kelviq also retries failed deliveries automatically. A manual resend is useful w
 | `order.updated` | An existing order was updated. |
 | `order.refunded` | A full or partial refund was issued against an order. |
 | `subscription.created` | A new subscription was activated for a customer. |
-| `subscription.updated` | A subscription's details were modified. |
-| `subscription.cancelled` | A subscription was cancelled (immediately or at period end). |
+| `subscription.updated` | A subscription's details were modified — including when a cancellation is scheduled for the end of the current period (status stays active; `end_date` is set). |
+| `subscription.cancelled` | A subscription actually reached cancelled status. For a period-end cancellation, this fires later, when the period ends — not at the moment it was scheduled. |
 | `subscription.plan_changed` | A subscription was moved to a different plan. |
 | `feature.usage_alert` | A customer's feature usage crossed a configured threshold. |
 | `invoice.created` | A new invoice was generated. |
