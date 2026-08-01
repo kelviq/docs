@@ -66,6 +66,7 @@ Kelviq also retries failed deliveries automatically. A manual resend is useful w
 | `feature.usage_alert` | A customer's feature usage crossed a configured threshold. |
 | `invoice.created` | A new invoice was generated. |
 | `invoice.paid` | An invoice was paid and funds were collected. |
+| `invoice.payment_failed` | A subscription invoice payment failed or requires customer action. |
 | `refund.created` | A refund was initiated. |
 | `refund.updated` | A refund's status changed (e.g., from pending to completed). |
 | `payment_method.created` | A new payment method was added for a customer. |
@@ -87,6 +88,12 @@ Use your customer identifier or checkout `metadata` to correlate the two events.
 Kelviq sends `invoice.paid` whenever an invoice is paid, including invoices that are created directly with a `PAID` status. Use this event for payment-driven work such as recording revenue, starting an asynchronous provisioning job, or notifying an internal system.
 
 For request-time access checks, query the customer's current entitlements instead of relying on a local webhook-derived subscription state.
+
+### Failed invoice payments
+
+Kelviq sends `invoice.payment_failed` when a subscription invoice payment fails or requires customer action. Use `data.object.subscription_id` and the embedded `customer` to identify the affected account. The invoice `status` is `PAYMENT_FAILED` for a failed attempt and can remain `OPEN` when the payment requires customer action.
+
+This event can be followed by `invoice.paid` if the customer completes authentication or a later retry succeeds. Handle both events idempotently and treat the latest invoice and subscription state as authoritative.
 
 ### Subscription end dates
 
@@ -844,6 +851,52 @@ The request body is a JSON object with the following top-level fields:
 ```
 </Accordion>
 
+<Accordion title="Example: invoice.payment_failed payload">
+```json
+{
+  "id": "1b8b128e-31c8-48b2-9d0b-f477ce543d58",
+  "type": "invoice.payment_failed",
+  "created_at": "2026-08-01T10:14:22Z",
+  "data": {
+    "object": {
+      "id": "INV-20260801101420-Q7M2P",
+      "object": "invoice",
+      "organization": "9b759915-5387-4e61-90e9-2162318e8d17",
+      "status": "PAYMENT_FAILED",
+      "customer_id": "c479275c-6987-4e0b-9aca-46e6e83226aa",
+      "customer": {
+        "id": "c479275c-6987-4e0b-9aca-46e6e83226aa",
+        "name": "Geo Jacob",
+        "email": "geojacob@example.com",
+        "customer_id": "geo-jacob",
+        "billing_address": {
+          "line1": null,
+          "line2": null,
+          "city": null,
+          "state": null,
+          "postal_code": "680121",
+          "country": "IN"
+        }
+      },
+      "product": {
+        "id": "df398021-477b-4e67-972d-c763a2f2ba7b",
+        "name": "ParityDeals"
+      },
+      "subscription_id": "a2951973-aca5-408d-bd9c-1d86827ed463",
+      "order_id": null,
+      "amount_total": "40",
+      "amount_total_units": 4000,
+      "currency": "USD",
+      "paid_at": null,
+      "due_date": null,
+      "created_on": "2026-08-01T10:14:20Z",
+      "modified_on": "2026-08-01T10:14:22Z"
+    }
+  }
+}
+```
+</Accordion>
+
 <Accordion title="Example: refund.created payload">
 ```json
 {
@@ -860,6 +913,21 @@ The request body is a JSON object with the following top-level fields:
       "currency": "USD",
       "reason": "REQUESTED_BY_CUSTOMER",
       "order_id": "ORD-20260402042513-8M80C",
+      "customer": {
+        "id": "c479275c-6987-4e0b-9aca-46e6e83226aa",
+        "name": "Geo Jacob",
+        "email": "geojacob@example.com",
+        "customer_id": "geo-jacob",
+        "billing_address": {
+          "line1": null,
+          "line2": null,
+          "city": null,
+          "state": null,
+          "postal_code": "680121",
+          "country": "IN"
+        }
+      },
+      "subscription_id": "a2951973-aca5-408d-bd9c-1d86827ed463",
       "organization": "9b759915-5387-4e61-90e9-2162318e8d17",
       "created_on": "2026-04-02T05:41:21Z",
       "modified_on": "2026-04-02T05:41:21Z"
@@ -885,12 +953,24 @@ The request body is a JSON object with the following top-level fields:
       "currency": "USD",
       "reason": "REQUESTED_BY_CUSTOMER",
       "order_id": "ORD-20260402042513-8M80C",
+      "customer": {
+        "id": "c479275c-6987-4e0b-9aca-46e6e83226aa",
+        "name": "Geo Jacob",
+        "email": "geojacob@example.com",
+        "customer_id": "geo-jacob",
+        "billing_address": {
+          "line1": null,
+          "line2": null,
+          "city": null,
+          "state": null,
+          "postal_code": "680121",
+          "country": "IN"
+        }
+      },
+      "subscription_id": "a2951973-aca5-408d-bd9c-1d86827ed463",
       "organization": "9b759915-5387-4e61-90e9-2162318e8d17",
       "created_on": "2026-04-02T05:41:21Z",
       "modified_on": "2026-04-02T05:41:30Z"
-    },
-    "previous_attributes": {
-      "status": "PROCESSING"
     }
   }
 }

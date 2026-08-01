@@ -1510,6 +1510,19 @@
             "nullable": true,
             "description": "Required if cancellationType is 'SPECIFIC_DATE'. Format: yyyy-MM-dd.",
             "example": "2025-12-31"
+          },
+          "cancellationFeedback": {
+            "type": "string",
+            "nullable": true,
+            "enum": ["TOO_EXPENSIVE", "MISSING_FEATURES", "SWITCHED_SERVICE", "UNUSED", "CUSTOMER_SERVICE", "LOW_QUALITY", "TOO_COMPLEX", "OTHER"],
+            "description": "Optional structured feedback explaining why the subscription is being cancelled.",
+            "example": "TOO_EXPENSIVE"
+          },
+          "cancellationComment": {
+            "type": "string",
+            "nullable": true,
+            "description": "Optional free-form cancellation comment.",
+            "example": "The plan no longer fits our budget."
           }
         }
       },
@@ -2030,6 +2043,29 @@
             "items": {
               "$ref": "#/components/schemas/SubscriptionLicense"
             }
+          },
+          "canceledAt": {
+            "type": "string",
+            "format": "date-time",
+            "nullable": true,
+            "description": "When cancellation was recorded for the subscription. This can be set before `endDate` when cancellation is scheduled for a future date."
+          },
+          "cancellationReason": {
+            "type": "string",
+            "nullable": true,
+            "enum": ["CANCELLED_BY_CUSTOMER", "CANCELLED_BY_MERCHANT", "CANCELLED_BY_PROVIDER"],
+            "description": "Who initiated the cancellation."
+          },
+          "cancellationFeedback": {
+            "type": "string",
+            "nullable": true,
+            "enum": ["TOO_EXPENSIVE", "MISSING_FEATURES", "SWITCHED_SERVICE", "UNUSED", "CUSTOMER_SERVICE", "LOW_QUALITY", "TOO_COMPLEX", "OTHER"],
+            "description": "Structured feedback supplied when the subscription was cancelled."
+          },
+          "cancellationComment": {
+            "type": "string",
+            "nullable": true,
+            "description": "Optional free-form cancellation comment."
           }
         }
       },
@@ -3685,6 +3721,7 @@
           "amountDiscountUnits": { "type": "integer", "format": "int64", "example": 0 },
           "amountTaxUnits": { "type": "integer", "format": "int64", "nullable": true, "example": 0 },
           "amountTotalUnits": { "type": "integer", "format": "int64", "nullable": true, "example": 26100 },
+          "refundedTotalUnits": { "type": "integer", "format": "int64", "description": "Total amount refunded against this order in the currency's minor units.", "example": 0 },
           "saleCurrencySymbol": { "type": "string", "example": "$" },
           "billingAddress": { "$ref": "#/components/schemas/BillingAddress" },
           "plan": { "$ref": "#/components/schemas/CatalogPlan" },
@@ -5508,7 +5545,11 @@
                           "activationLimit": 2,
                           "enabled": true
                         }
-                      ]
+                      ],
+                      "canceledAt": null,
+                      "cancellationReason": null,
+                      "cancellationFeedback": null,
+                      "cancellationComment": null
                     }
                   ]
                 }
@@ -5699,7 +5740,11 @@
                       "activationLimit": 2,
                       "enabled": true
                     }
-                  ]
+                  ],
+                  "canceledAt": "2025-08-01T10:15:00Z",
+                  "cancellationReason": "CANCELLED_BY_MERCHANT",
+                  "cancellationFeedback": "TOO_EXPENSIVE",
+                  "cancellationComment": "The plan no longer fits our budget."
                 }
               }
             }
@@ -5801,6 +5846,11 @@
             "application/json": {
               "schema": {
                 "$ref": "#/components/schemas/CancelSubscriptionRequest"
+              },
+              "example": {
+                "cancellationType": "CURRENT_PERIOD_ENDS",
+                "cancellationFeedback": "TOO_EXPENSIVE",
+                "cancellationComment": "The plan no longer fits our budget."
               }
             }
           }

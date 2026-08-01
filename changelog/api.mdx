@@ -5,6 +5,38 @@ mode: "wide"
 rss: true
 ---
 
+<Update label="v1.7.0" description="August 1, 2026">
+
+### New Features
+
+#### Subscription cancellation details
+
+`GET /subscriptions/` and `GET /subscriptions/{subscriptionId}/` now return cancellation metadata:
+
+- `canceledAt` — when the cancellation was recorded.
+- `cancellationReason` — whether it was initiated by the customer, merchant, or provider.
+- `cancellationFeedback` — structured feedback such as `TOO_EXPENSIVE`, `MISSING_FEATURES`, or `UNUSED`.
+- `cancellationComment` — an optional free-form comment.
+
+`POST /subscriptions/{subscriptionId}/cancel/` now accepts the optional `cancellationFeedback` and `cancellationComment` fields. The cancellation endpoint records the merchant as the initiator; cancellations submitted through the customer portal record the customer as the initiator.
+
+#### Failed invoice webhook
+
+You can now subscribe to `invoice.payment_failed`. Kelviq sends this event when a subscription invoice payment fails or requires customer action. Its `data.object` uses the same invoice payload shape as `invoice.created` and `invoice.paid`.
+
+#### Refund webhook context
+
+The `refund.created` and `refund.updated` webhook objects now include:
+
+- `customer` — the associated customer's ID, name, email, customer identifier, and billing address.
+- `subscription_id` — the associated subscription ID, or `null` for an order without a subscription.
+
+#### Refunded order total
+
+Order responses from `GET /orders/` and `GET /orders/{id}/` now include `refundedTotalUnits`, the total amount refunded against the order in the sale currency's minor units.
+
+</Update>
+
 <Update label="v1.6.3" description="July 29, 2026">
 
 ### Fixes
