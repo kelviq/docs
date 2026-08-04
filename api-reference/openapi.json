@@ -1461,7 +1461,7 @@
         "properties": {
           "customerId": {
             "type": "string",
-            "description": "The unique identifier of the customer for whom the portal session is being created.",
+            "description": "The unique identifier of the customer for whom the portal session is being created. The customer must exist in the authenticated organization and have an email address.",
             "example": "cust_789"
           }
         }
@@ -3763,7 +3763,7 @@
           "retryCount": { "type": "integer", "description": "Number of retries prior to this attempt (0 for the first attempt).", "example": 0 },
           "lastAttempt": { "type": "string", "format": "date-time", "description": "When this specific delivery attempt was made. This is the timestamp `start_date`/`end_date` filter against.", "example": "2026-07-29T10:31:15Z" },
           "createdOn": { "type": "string", "format": "date-time", "description": "When the underlying webhook event was originally created — not this delivery attempt.", "example": "2026-07-29T10:31:12Z" },
-          "payload": { "type": "object", "description": "The raw event envelope sent to the destination.", "additionalProperties": true }
+          "payload": { "type": "object", "description": "The raw event envelope sent to the destination. For `invoice.created`, `invoice.paid`, and `invoice.payment_failed`, `data.object.payment_link` contains a signed customer payment URL for the invoice.", "additionalProperties": true }
         },
         "required": ["id", "eventId", "endpoint", "eventType", "statusCode", "isSuccess", "retryCount", "lastAttempt", "createdOn", "payload"]
       },
@@ -6295,7 +6295,7 @@
           "Portal"
         ],
         "summary": "Create a portal session",
-        "description": "Creates a new customer portal session, returning a token and URL to redirect the customer to their billing portal.",
+        "description": "Creates a new customer portal session, returning a token and URL to redirect the customer to their billing portal. The selected customer must have an email address because the signed session token is tied to that email.",
         "operationId": "createPortalSession",
         "x-mint": {
           "content": "<Info>Click the base URL in the API playground and select the **Sandbox** host for test data or the **Production** host for live data. Use credentials from the same environment.</Info>"
@@ -6327,6 +6327,42 @@
                   "token": "cpt-4f7c5dc4-da9f-447b-d447-6266dc35ed6d:23fca530-adeb-4685-b3d5-9928c6d38275",
                   "email": "geo@example.com",
                   "customerPortalUrl": "https://www.kelviq.com/portal/aphelo/"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Invalid customer identifier or the customer does not have an email address.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "customerId": {
+                      "type": "array",
+                      "items": {
+                        "type": "string"
+                      }
+                    }
+                  }
+                },
+                "examples": {
+                  "invalidCustomer": {
+                    "summary": "Customer not found",
+                    "value": {
+                      "customerId": [
+                        "Invalid customer id"
+                      ]
+                    }
+                  },
+                  "missingEmail": {
+                    "summary": "Customer has no email",
+                    "value": {
+                      "customerId": [
+                        "Customer does not have an email"
+                      ]
+                    }
+                  }
                 }
               }
             }

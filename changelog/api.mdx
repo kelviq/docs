@@ -5,6 +5,24 @@ mode: "wide"
 rss: true
 ---
 
+<Update label="v1.7.1" description="August 5, 2026">
+
+### New Features
+
+#### Payment links in invoice webhooks
+
+The invoice object sent by `invoice.created`, `invoice.paid`, and `invoice.payment_failed` now includes `payment_link`. This signed URL takes the customer directly to the invoice payment page, so integrations can surface payment recovery without constructing a customer portal token themselves.
+
+`payment_link` is present when the invoice is open or payment has failed. If the invoice is already paid when it is created, `payment_link` is `null` because no payment action is required.
+
+### Changes
+
+#### Portal sessions require a customer email
+
+`POST /portal/session/` now returns `400 Bad Request` when the selected customer does not have an email address. Portal session tokens are tied to the customer's email, so add an email to the customer before creating a session.
+
+</Update>
+
 <Update label="v1.7.0" description="August 1, 2026">
 
 ### New Features
