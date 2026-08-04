@@ -7551,21 +7551,21 @@
       "get": {
         "tags": ["Payment Methods"],
         "summary": "List payment methods",
-        "description": "Returns a paginated list of saved payment methods for the authenticated organization, ordered by creation date (newest first). Only payment methods with status `succeeded` are included. Narrow results with `customerId` and/or `customerEmail`.",
+        "description": "Returns a paginated list of saved payment methods for the authenticated organization, ordered by creation date (newest first). Only payment methods with status `succeeded` are included. Narrow results with `customer_id` and/or `customer_email`.",
         "operationId": "listPaymentMethods",
         "x-mint": {
           "content": "<Info>Click the base URL in the API playground and select the **Sandbox** host for test data or the **Production** host for live data. Use credentials from the same environment.</Info>"
         },
         "parameters": [
           {
-            "name": "customerId",
+            "name": "customer_id",
             "in": "query",
             "required": false,
-            "description": "Filter to payment methods belonging to the customer with this client-provided `customerId`.",
+            "description": "Filter to payment methods belonging to the customer with this client-provided `customer_id`.",
             "schema": { "type": "string" }
           },
           {
-            "name": "customerEmail",
+            "name": "customer_email",
             "in": "query",
             "required": false,
             "description": "Filter to payment methods belonging to the customer with this email address.",
