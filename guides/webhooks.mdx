@@ -63,6 +63,7 @@ Kelviq also retries failed deliveries automatically. A manual resend is useful w
 | `subscription.updated` | A subscription's details were modified — including when a cancellation is scheduled for the end of the current period (status stays active; `end_date` is set). |
 | `subscription.cancelled` | A subscription actually reached cancelled status. For a period-end cancellation, this fires later, when the period ends — not at the moment it was scheduled. |
 | `subscription.plan_changed` | A subscription was moved to a different plan. |
+| `subscription.trial_will_end` | A subscription's trial period is ending soon. |
 | `feature.usage_alert` | A customer's feature usage crossed a configured threshold. |
 | `invoice.created` | A new invoice was generated. |
 | `invoice.paid` | An invoice was paid and funds were collected. |
@@ -709,6 +710,62 @@ The request body is a JSON object with the following top-level fields:
 ```
 </Accordion>
 
+<Accordion title="Example: subscription.trial_will_end payload">
+```json
+{
+  "id": "7c6d5e4f-3b2a-4190-8e7d-6c5b4a3f2e1d",
+  "type": "subscription.trial_will_end",
+  "created_at": "2026-08-08T05:25:34Z",
+  "data": {
+    "object": {
+      "id": "a22f1b2a-b922-4a28-9b0e-75e826988b4b",
+      "object": "subscription",
+      "status": "trialing",
+      "plan": {
+        "name": "default pd",
+        "version": 1,
+        "identifier": "default-pd"
+      },
+      "product": {
+        "id": "b4ea7e75-5dbe-4b3b-96e0-9a31dfe5a600",
+        "name": "Migrate PD"
+      },
+      "amount": "21.24",
+      "amount_units": 2100,
+      "currency": "USD",
+      "recurrence": "1 month",
+      "start_date": "2026-08-01",
+      "end_date": null,
+      "billing_period_start_time": "2026-08-01T05:25:33Z",
+      "billing_period_end_time": "2026-08-31T05:25:33Z",
+      "trial_start": "2026-08-01T05:25:33Z",
+      "trial_end": "2026-08-11T05:25:33Z",
+      "customer": {
+        "id": "1bb69d0f-39f8-4db8-aace-e003d6e5f3ed",
+        "name": "Geo Jacob",
+        "email": "geo@example.com",
+        "customer_id": "1",
+        "billing_address": {
+          "city": "Bangalore",
+          "line1": null,
+          "line2": null,
+          "state": "Karnataka",
+          "country": "IN",
+          "postal_code": "560001"
+        }
+      },
+      "features": null,
+      "organization": "2a3664c0-cbd2-4f1c-a98f-1b4f65e3256c",
+      "created_on": "2026-08-01T05:25:34Z",
+      "modified_on": "2026-08-01T05:25:34Z"
+    }
+  }
+}
+```
+
+`data.object` uses the same subscription payload shape as `subscription.created`/`subscription.updated`; the trial's remaining time is in `trial_end`. Kelviq sends this once, a few days before `trial_end`, mirroring Stripe's own `customer.subscription.trial_will_end` timing — it's skipped if the subscription has already converted to `active` or has no trial days left by the time Stripe's notice arrives.
+</Accordion>
+
 <Accordion title="Example: feature.usage_alert payload">
 ```json
 {
@@ -771,6 +828,10 @@ The request body is a JSON object with the following top-level fields:
       "amount_total_units": 4000,
       "currency": "USD",
       "due_date": null,
+      "attempt_count": 0,
+      "next_payment_attempt": null,
+      "failure_details": null,
+      "payment_link": "https://portal.kelviq.com/acme-inc/pay/aW5fMVJwb1pvU0JzdEN6eW9jUzdpUG1pdGgz",
       "order_id": null,
       "customer_id": "c479275c-6987-4e0b-9aca-46e6e83226aa",
       "customer": {
@@ -817,6 +878,10 @@ The request body is a JSON object with the following top-level fields:
       "amount_total_units": 4000,
       "currency": "USD",
       "due_date": null,
+      "attempt_count": 1,
+      "next_payment_attempt": null,
+      "failure_details": null,
+      "payment_link": null,
       "order_id": null,
       "customer_id": "c479275c-6987-4e0b-9aca-46e6e83226aa",
       "customer": {
@@ -884,17 +949,27 @@ The request body is a JSON object with the following top-level fields:
       },
       "subscription_id": "a2951973-aca5-408d-bd9c-1d86827ed463",
       "order_id": null,
+      "payment_link": "https://portal.kelviq.com/acme-inc/pay/aW5fMVJwb1pvU0JzdEN6eW9jUzdpUG1pdGgz",
       "amount_total": "40",
       "amount_total_units": 4000,
       "currency": "USD",
       "paid_at": null,
-      "due_date": null,
+      "due_date": "2026-08-01T10:14:22Z",
+      "attempt_count": 1,
+      "next_payment_attempt": "2026-08-04T10:14:22Z",
+      "failure_details": {
+        "code": "card_declined",
+        "message": "Your card was declined.",
+        "payment_method_type": "card"
+      },
       "created_on": "2026-08-01T10:14:20Z",
       "modified_on": "2026-08-01T10:14:22Z"
     }
   }
 }
 ```
+
+`attempt_count`, `next_payment_attempt`, and `payment_link` are also included on `invoice.created` and `invoice.paid` payloads. `failure_details` (with `code`, `message`, and `payment_method_type`) describes the most recent failed attempt and is `null` once the invoice moves past that attempt (e.g. a later `invoice.paid` for the same invoice). `payment_link` is `null` whenever the invoice isn't currently payable (e.g. already paid).
 </Accordion>
 
 <Accordion title="Example: refund.created payload">

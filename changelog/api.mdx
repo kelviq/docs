@@ -5,15 +5,64 @@ mode: "wide"
 rss: true
 ---
 
+<Update label="v1.7.3" description="August 10, 2026">
+
+### New Features
+
+#### Trial ending webhook
+
+You can now subscribe to `subscription.trial_will_end`. Kelviq sends this a few days before a subscription's trial ends, mirroring Stripe's own `customer.subscription.trial_will_end` timing. It's skipped if the subscription has already converted to `active` or has no trial days left by the time the notice would go out. `data.object` uses the same subscription payload shape as `subscription.created` and `subscription.updated`.
+
+</Update>
+
+<Update label="v1.7.2" description="August 10, 2026">
+
+### New Features
+
+#### Invoices API
+
+You can now list and retrieve invoices directly, rather than only receiving them through webhooks:
+
+- `GET /invoices/` — a paginated list of invoices for your organization, filterable by `subscription_id` and `customer_id`.
+- `GET /invoices/{invoiceId}/` — a single invoice by its Kelviq invoice ID.
+
+The invoice object also has three new fields, matching what's already sent in invoice webhooks:
+
+- `attemptCount` — number of payment attempts made against the invoice.
+- `nextPaymentAttempt` — when Stripe will next retry collection, if a retry is scheduled.
+- `failureDetails` — `code`, `message`, and `paymentMethodType` for the most recent failed payment attempt. `null` once the invoice is paid.
+
+#### Filter subscriptions by modification date
+
+`GET /subscriptions/` now accepts `modified_on_after` / `modified_on_before` query parameters, for filtering by when the subscription was last modified.
+
+```
+GET /subscriptions/?modified_on_after=2026-08-01T00:00:00Z
+```
+
+#### Subscription timestamps
+
+`GET /subscriptions/` and `GET /subscriptions/{subscriptionId}/` now return `createdOn` and `modifiedOn` on the subscription object.
+
+</Update>
+
 <Update label="v1.7.1" description="August 5, 2026">
 
 ### New Features
 
 #### Payment links in invoice webhooks
 
-The invoice object sent by `invoice.created`, `invoice.paid`, and `invoice.payment_failed` now includes `payment_link`. This signed URL takes the customer directly to the invoice payment page, so integrations can surface payment recovery without constructing a customer portal token themselves.
+The invoice object sent by `invoice.created`, `invoice.paid`, and `invoice.payment_failed` now includes `payment_link`. This URL takes the customer directly to the invoice payment page, so integrations can surface payment recovery without constructing the link themselves.
 
 `payment_link` is present when the invoice is open or payment has failed. If the invoice is already paid when it is created, `payment_link` is `null` because no payment action is required.
+
+Example:
+
+```json
+{
+  "paymentLink": "https://portal.kelviq.com/acme-inc/pay/aW5fMVJwb1pvU0JzdEN6eW9jUzdpUG1pdGgz"
+}
+```
 
 ### Changes
 
