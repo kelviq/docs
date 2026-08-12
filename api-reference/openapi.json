@@ -1155,8 +1155,27 @@
           "currencyCode": {
             "type": "string",
             "nullable": true,
-            "description": "Optional ISO 4217 currency code to charge in. Must match the customer's currency if they already have one set.",
+            "description": "Optional ISO 4217 currency code to charge in. Required when `customAmount` is provided. Must match the customer's currency if they already have one set.",
             "example": "USD"
+          },
+          "customAmount": {
+            "type": "number",
+            "minimum": 0,
+            "exclusiveMinimum": true,
+            "nullable": true,
+            "description": "Optional custom amount to charge, expressed in the currency's major unit (for example, `49.99` USD). Overrides the plan's configured one-time price. `currencyCode` is required when this field is provided, and Stripe's minimum charge for that currency applies.",
+            "example": 49.99
+          },
+          "taxBehavior": {
+            "type": "string",
+            "enum": [
+              "INCLUSIVE",
+              "EXCLUSIVE"
+            ],
+            "nullable": true,
+            "default": "EXCLUSIVE",
+            "description": "Controls whether tax is included in `customAmount` or added on top. Only applies with `customAmount`; defaults to `EXCLUSIVE` when omitted.",
+            "example": "INCLUSIVE"
           },
           "ipAddress": {
             "type": "string",
@@ -1514,6 +1533,94 @@
           "subscriptionId": {
             "type": "string",
             "example": "dffaf07e-4517-47db-ba3a-59a05aa2d465"
+          }
+        }
+      },
+      "SubscriptionUpdatePreviewLineItem": {
+        "type": "object",
+        "properties": {
+          "description": {
+            "type": "string",
+            "nullable": true,
+            "description": "Description of the invoice line item.",
+            "example": "Unused time on Pro after 12 Aug 2026"
+          },
+          "amount": {
+            "type": "number",
+            "description": "Line-item amount in the currency's major unit. Proration credits are negative.",
+            "example": -10.5
+          },
+          "amountUnits": {
+            "type": "integer",
+            "description": "Line-item amount in the currency's minor unit. Proration credits are negative.",
+            "example": -1050
+          }
+        }
+      },
+      "SubscriptionUpdatePreviewInvoice": {
+        "type": "object",
+        "properties": {
+          "amountDue": {
+            "type": "number",
+            "description": "Total amount due on the previewed invoice in the currency's major unit.",
+            "example": 39.5
+          },
+          "amountDueUnits": {
+            "type": "integer",
+            "description": "Total amount due on the previewed invoice in the currency's minor unit.",
+            "example": 3950
+          },
+          "nextPaymentAttempt": {
+            "type": "string",
+            "format": "date-time",
+            "nullable": true,
+            "description": "When payment for the previewed invoice would next be attempted, when available.",
+            "example": "2026-09-01T00:00:00Z"
+          },
+          "lineItems": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/SubscriptionUpdatePreviewLineItem"
+            }
+          }
+        }
+      },
+      "SubscriptionUpdatePreviewResponse": {
+        "type": "object",
+        "properties": {
+          "currency": {
+            "type": "string",
+            "description": "ISO 4217 currency code for all amounts in the response.",
+            "example": "USD"
+          },
+          "recurringAmount": {
+            "type": "number",
+            "description": "The subscription's new recurring amount in the currency's major unit.",
+            "example": 50
+          },
+          "recurringAmountUnits": {
+            "type": "integer",
+            "description": "The subscription's new recurring amount in the currency's minor unit.",
+            "example": 5000
+          },
+          "amountChargedImmediately": {
+            "type": "number",
+            "description": "Amount that would be charged immediately in the currency's major unit. This is non-zero only when the update uses immediate invoicing.",
+            "example": 39.5
+          },
+          "amountChargedImmediatelyUnits": {
+            "type": "integer",
+            "description": "Amount that would be charged immediately in the currency's minor unit.",
+            "example": 3950
+          },
+          "nextInvoice": {
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/SubscriptionUpdatePreviewInvoice"
+              }
+            ],
+            "nullable": true,
+            "description": "Preview of the next provider invoice. `null` for billing methods that do not provide invoice previews."
           }
         }
       },
@@ -7388,6 +7495,27 @@
             "application/json": {
               "schema": {
                 "$ref": "#/components/schemas/CreateChargeRequest"
+              },
+              "examples": {
+                "configuredPrice": {
+                  "summary": "Use the plan's configured price",
+                  "value": {
+                    "planIdentifier": "lifetime-access",
+                    "chargePeriod": "ONE_TIME",
+                    "customerId": "cust_789"
+                  }
+                },
+                "customAmount": {
+                  "summary": "Charge a custom amount",
+                  "value": {
+                    "planIdentifier": "lifetime-access",
+                    "chargePeriod": "ONE_TIME",
+                    "customerId": "cust_789",
+                    "currencyCode": "USD",
+                    "customAmount": 49.99,
+                    "taxBehavior": "INCLUSIVE"
+                  }
+                }
               }
             }
           }
@@ -7430,7 +7558,7 @@
             }
           },
           "400": {
-            "description": "Bad Request - Validation or business logic error (e.g. no default payment method, declined charge, blocked organization, or a non-`ONE_TIME` charge period).",
+            "description": "Bad Request - Validation or business logic error (e.g. no default payment method, declined charge, blocked organization, a non-`ONE_TIME` charge period, missing currency for a custom amount, an invalid tax behavior, or an amount below the provider's currency minimum).",
             "content": {
               "application/json": {
                 "schema": {
@@ -7871,6 +7999,101 @@
                 },
                 "example": {
                   "subscriptionId": "dffaf07e-4517-47db-ba3a-59a05aa2d465"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/subscriptions/{subscriptionId}/update/preview/": {
+      "post": {
+        "tags": [
+          "Subscriptions"
+        ],
+        "summary": "Preview a subscription update",
+        "description": "Calculates the recurring price, next invoice line items and total, and any amount that would be charged immediately for a proposed subscription update. The request uses the same plan, charge-period, and feature fields as [Update a subscription](/api-reference/subscriptions/update-a-subscription). This endpoint does not change the subscription, create an invoice, charge the customer, or write the proposed update to Kelviq.\n\nFor manual billing methods, `nextInvoice` is `null`. Amount fields without the `Units` suffix use the currency's major unit; fields ending in `Units` use its minor unit.",
+        "operationId": "previewSubscriptionUpdate",
+        "x-mint": {
+          "content": "<Info>Click the base URL in the API playground and select the **Sandbox** host for test data or the **Production** host for live data. Use credentials from the same environment.</Info>"
+        },
+        "parameters": [
+          {
+            "name": "subscriptionId",
+            "in": "path",
+            "required": true,
+            "description": "The unique identifier of the subscription whose update will be previewed.",
+            "example": "78058918-9746-4280-9b9b-1bd5115eec6e",
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/UpdateSubscriptionRequest"
+              },
+              "example": {
+                "planIdentifier": "new_plan_enterprise",
+                "chargePeriod": "YEARLY",
+                "features": [
+                  {
+                    "identifier": "seats",
+                    "quantity": 10
+                  }
+                ]
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "The proposed update was priced successfully; no changes were applied.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/SubscriptionUpdatePreviewResponse"
+                },
+                "example": {
+                  "currency": "USD",
+                  "recurringAmount": 50,
+                  "recurringAmountUnits": 5000,
+                  "amountChargedImmediately": 39.5,
+                  "amountChargedImmediatelyUnits": 3950,
+                  "nextInvoice": {
+                    "amountDue": 39.5,
+                    "amountDueUnits": 3950,
+                    "nextPaymentAttempt": "2026-09-01T00:00:00Z",
+                    "lineItems": [
+                      {
+                        "description": "Unused time on Pro after 12 Aug 2026",
+                        "amount": -10.5,
+                        "amountUnits": -1050
+                      },
+                      {
+                        "description": "Remaining time on Enterprise after 12 Aug 2026",
+                        "amount": 50,
+                        "amountUnits": 5000
+                      }
+                    ]
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad Request - Invalid subscription update, pricing configuration, or payment-provider preview error.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/DetailErrorResponse"
+                },
+                "example": {
+                  "detail": "Subscription does not exists"
                 }
               }
             }

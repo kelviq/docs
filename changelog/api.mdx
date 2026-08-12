@@ -5,6 +5,55 @@ mode: "wide"
 rss: true
 ---
 
+<Update label="v1.7.4" description="August 12, 2026">
+
+### New Features
+
+#### Preview subscription updates
+
+Use `POST /subscriptions/{subscriptionId}/update/preview/` to see the financial effect of a plan, billing-period, or feature change before applying it. Send the same `planIdentifier`, `chargePeriod`, and `features` payload used to update a subscription.
+
+The response includes the new recurring amount, any amount that would be charged immediately, and the previewed next invoice with its line items. Amounts are returned in both major currency units and integer minor units. The preview does not update the subscription, create an invoice, or charge the customer.
+
+```json
+{
+  "currency": "USD",
+  "recurringAmount": 50,
+  "recurringAmountUnits": 5000,
+  "amountChargedImmediately": 39.5,
+  "amountChargedImmediatelyUnits": 3950,
+  "nextInvoice": {
+    "amountDue": 39.5,
+    "amountDueUnits": 3950,
+    "nextPaymentAttempt": "2026-09-01T00:00:00Z",
+    "lineItems": [
+      {
+        "description": "Remaining time on Enterprise after 12 Aug 2026",
+        "amount": 39.5,
+        "amountUnits": 3950
+      }
+    ]
+  }
+}
+```
+
+#### Custom amounts for one-time charges
+
+`POST /charges/` now accepts `customAmount` to override a plan's configured one-time price. Pass the amount in the currency's major unit and include `currencyCode`. You can also set `taxBehavior` to `INCLUSIVE` or `EXCLUSIVE`; it defaults to `EXCLUSIVE`.
+
+```json
+{
+  "planIdentifier": "lifetime-access",
+  "chargePeriod": "ONE_TIME",
+  "customerId": "cust_789",
+  "currencyCode": "USD",
+  "customAmount": 49.99,
+  "taxBehavior": "INCLUSIVE"
+}
+```
+
+</Update>
+
 <Update label="v1.7.3" description="August 10, 2026">
 
 ### New Features
