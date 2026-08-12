@@ -8067,7 +8067,7 @@
           "Subscriptions"
         ],
         "summary": "Preview a subscription update",
-        "description": "Calculates the recurring price, next invoice line items and total, and any amount that would be charged immediately for a proposed subscription update. The request uses the same plan, charge-period, and feature fields as [Update a subscription](/api-reference/subscriptions/update-a-subscription). This endpoint does not change the subscription, create an invoice, charge the customer, or write the proposed update to Kelviq.\n\nFor manual billing methods, `nextInvoice` is `null`. Amount fields without the `Units` suffix use the currency's major unit; fields ending in `Units` use its minor unit.",
+        "description": "Calculates the recurring price, next invoice line items and total, and any amount that would be charged immediately for a proposed subscription update. The request uses the same plan, charge-period, and feature fields as [Update a subscription](/api-reference/subscriptions/update-a-subscription). This endpoint does not change the subscription, create an invoice, charge the customer, or write the proposed update to Kelviq.\n\nAmount fields without the `Units` suffix use the currency's major unit; fields ending in `Units` use its minor unit.",
         "operationId": "previewSubscriptionUpdate",
         "x-mint": {
           "content": "<Info>Click the base URL in the API playground and select the **Sandbox** host for test data or the **Production** host for live data. Use credentials from the same environment.</Info>"
