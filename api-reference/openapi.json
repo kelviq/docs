@@ -1536,6 +1536,61 @@
           }
         }
       },
+      "PreviewSubscriptionUpdateRequest": {
+        "type": "object",
+        "required": [
+          "planIdentifier",
+          "chargePeriod"
+        ],
+        "properties": {
+          "planIdentifier": {
+            "type": "string",
+            "description": "The identifier of the proposed new plan.",
+            "example": "new_plan_enterprise"
+          },
+          "chargePeriod": {
+            "type": "string",
+            "enum": [
+              "ONE_TIME",
+              "MONTHLY",
+              "YEARLY",
+              "WEEKLY",
+              "DAILY",
+              "TWENTY_EIGHT_DAYS",
+              "THREE_MONTHS",
+              "SIX_MONTHS"
+            ],
+            "description": "The proposed charging period for the subscription.",
+            "example": "YEARLY"
+          },
+          "features": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/FeatureInput"
+            },
+            "nullable": true,
+            "description": "List of proposed features and quantities for the subscription.",
+            "example": [
+              {
+                "identifier": "seats",
+                "quantity": 10
+              }
+            ]
+          },
+          "ipAddress": {
+            "type": "string",
+            "nullable": true,
+            "description": "The IP Address of the customer, for location-based pricing.",
+            "example": "103.154.35.20"
+          },
+          "trialEnd": {
+            "type": "string",
+            "nullable": true,
+            "description": "The proposed trial end. Accepts `\"now\"` or a future ISO 8601 datetime.",
+            "example": "2027-12-31 23:59:59"
+          }
+        }
+      },
       "SubscriptionUpdatePreviewLineItem": {
         "type": "object",
         "properties": {
@@ -8035,7 +8090,7 @@
           "content": {
             "application/json": {
               "schema": {
-                "$ref": "#/components/schemas/UpdateSubscriptionRequest"
+                "$ref": "#/components/schemas/PreviewSubscriptionUpdateRequest"
               },
               "example": {
                 "planIdentifier": "new_plan_enterprise",
