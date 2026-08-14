@@ -5,6 +5,46 @@ mode: "wide"
 rss: true
 ---
 
+<Update label="v1.7.5" description="August 14, 2026">
+
+### New Features
+
+#### Control how subscription updates are billed
+
+`POST /subscriptions/{subscriptionId}/update/` and its `/preview/` counterpart now accept `prorationBehavior`, which controls when the customer is billed for a mid-period change:
+
+| Value | Effect |
+| --- | --- |
+| `IMMEDIATE_CHARGE` | Prorates and invoices the difference right now. |
+| `PRORATE_NEXT_INVOICE` | Prorates now, but bills it on the next invoice. |
+| `NO_PRORATION` | Changes the plan immediately without crediting or charging for the partial period; the next invoice bills the full new price. |
+
+If omitted, your organization's existing default is used, so existing integrations are unaffected.
+
+```json
+{
+  "planIdentifier": "premium-plan",
+  "chargePeriod": "MONTHLY",
+  "prorationBehavior": "PRORATE_NEXT_INVOICE"
+}
+```
+
+Invalid values are now rejected with a clear `400` naming the accepted values, instead of a generic error.
+
+<Warning>
+Changing `chargePeriod` to a different billing interval (for example `MONTHLY` to `YEARLY`) resets the billing cycle and invoices the new period immediately, whichever `prorationBehavior` you pass. With `NO_PRORATION` the customer is charged for a full new period with no credit for unused time on the old plan. Call the preview endpoint first to see the exact amount.
+</Warning>
+
+### Improvements
+
+`amountChargedImmediately` on the update preview endpoint is now correct for billing-interval changes. It previously reported `0` for a `MONTHLY` to `YEARLY` change unless `prorationBehavior` was `IMMEDIATE_CHARGE`, even though the customer was charged right away.
+
+### Deprecations
+
+The undocumented `probation_behaviour` request field is deprecated in favour of `prorationBehavior` (`probation` was a typo for `proration`). It is still accepted and continues to work unchanged.
+
+</Update>
+
 <Update label="v1.7.4" description="August 12, 2026">
 
 ### New Features

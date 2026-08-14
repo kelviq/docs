@@ -1490,6 +1490,17 @@
             "description": "The new charging period for the subscription.",
             "example": "YEARLY"
           },
+          "prorationBehavior": {
+            "type": "string",
+            "enum": [
+              "IMMEDIATE_CHARGE",
+              "PRORATE_NEXT_INVOICE",
+              "NO_PRORATION"
+            ],
+            "nullable": true,
+            "description": "Controls when the customer is billed for this change.\n- `IMMEDIATE_CHARGE` \u2014 prorate and invoice the difference right now.\n- `PRORATE_NEXT_INVOICE` \u2014 prorate now, but bill it on the next invoice.\n- `NO_PRORATION` \u2014 the plan changes immediately, but the partial period is neither credited nor charged; the next invoice bills the full new price.\n\nIf omitted, the organization's default is used.\n\n**Note:** changing `chargePeriod` to a different billing interval (for example `MONTHLY` to `YEARLY`) resets the billing cycle and invoices the new period immediately, whichever value you pass. With `NO_PRORATION` that means the customer is charged for a full new period with no credit for unused time on the old one \u2014 call the preview endpoint first to see the exact amount.",
+            "example": "PRORATE_NEXT_INVOICE"
+          },
           "features": {
             "type": "array",
             "items": {
@@ -1562,6 +1573,17 @@
             ],
             "description": "The proposed charging period for the subscription.",
             "example": "YEARLY"
+          },
+          "prorationBehavior": {
+            "type": "string",
+            "enum": [
+              "IMMEDIATE_CHARGE",
+              "PRORATE_NEXT_INVOICE",
+              "NO_PRORATION"
+            ],
+            "nullable": true,
+            "description": "The proposed proration behaviour \u2014 `amountChargedImmediately` in the response reflects it.\n\nControls when the customer is billed for this change.\n- `IMMEDIATE_CHARGE` \u2014 prorate and invoice the difference right now.\n- `PRORATE_NEXT_INVOICE` \u2014 prorate now, but bill it on the next invoice.\n- `NO_PRORATION` \u2014 the plan changes immediately, but the partial period is neither credited nor charged; the next invoice bills the full new price.\n\nIf omitted, the organization's default is used.\n\n**Note:** changing `chargePeriod` to a different billing interval (for example `MONTHLY` to `YEARLY`) resets the billing cycle and invoices the new period immediately, whichever value you pass. With `NO_PRORATION` that means the customer is charged for a full new period with no credit for unused time on the old one \u2014 call the preview endpoint first to see the exact amount.",
+            "example": "PRORATE_NEXT_INVOICE"
           },
           "features": {
             "type": "array",
