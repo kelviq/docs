@@ -2296,6 +2296,10 @@
           "customerId": {
             "type": "string"
           },
+          "isCustomPricing": {
+            "type": "boolean",
+            "description": "Whether this subscription uses a custom price instead of the plan's configured price."
+          },
           "billingType": {
             "type": "string",
             "enum": [
@@ -7779,6 +7783,7 @@
                       ],
                       "trialDaysRemaining": 0,
                       "customerId": "testuser",
+                      "isCustomPricing": false,
                       "billingType": "SUBSCRIPTION",
                       "recurrenceUnit": 1,
                       "recurrenceType": "MONTH",
@@ -7976,6 +7981,7 @@
                   "features": [],
                   "trialDaysRemaining": 0,
                   "customerId": "testuser",
+                  "isCustomPricing": false,
                   "billingType": "SUBSCRIPTION",
                   "recurrenceUnit": 1,
                   "recurrenceType": "MONTH",

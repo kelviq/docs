@@ -5,6 +5,62 @@ mode: "wide"
 rss: true
 ---
 
+<Update label="v1.7.6" description="August 20, 2026">
+
+### New Features
+
+#### Organization-level proration defaults
+
+`GET /organizations/settings/` and `PATCH /organizations/settings/` now expose two settings for controlling how subscription changes are prorated:
+
+| Setting | Default | Used when |
+| --- | --- | --- |
+| `updateSubscriptionProrationBehavior` | `IMMEDIATE_CHARGE` | A subscription is upgraded or downgraded without a `prorationBehavior` in the update request. |
+| `migrateSubscriptionProrationBehavior` | `PRORATE_NEXT_INVOICE` | A subscription is migrated to the latest version of its plan. |
+
+Both settings accept `IMMEDIATE_CHARGE`, `PRORATE_NEXT_INVOICE`, or `NO_PRORATION`.
+
+```json
+{
+  "updateSubscriptionProrationBehavior": "IMMEDIATE_CHARGE",
+  "migrateSubscriptionProrationBehavior": "PRORATE_NEXT_INVOICE"
+}
+```
+
+#### Organization checkout customization
+
+Checkout branding and appearance can now be stored as organization defaults. Use `GET /organizations/checkout-settings/` to retrieve the settings and `PATCH /organizations/checkout-settings/` to update the brand name, light and dark logos, favicon, background image, and checkout customization object.
+
+The hosted checkout session response now includes these settings so the organization's branding can be applied consistently across checkout sessions.
+
+#### Migrate individual subscriptions
+
+`POST /subscriptions/{subscriptionId}/migrate/` migrates an existing subscription to the latest version of its current plan. Set at least one of `updateFeatures` or `updatePricing` to `true`:
+
+```json
+{
+  "updateFeatures": true,
+  "updatePricing": true
+}
+```
+
+The migration action is now available from both the Kelviq dashboard and the customer portal. Customer-portal migrations are restricted to the signed-in customer's own subscription. Custom-priced subscriptions cannot be migrated.
+
+### Changes
+
+#### Identify custom-priced subscriptions
+
+`GET /subscriptions/` and `GET /subscriptions/{subscriptionId}/` now include `isCustomPricing`. It is `true` when the subscription uses a custom price instead of the plan's configured price, and `false` otherwise.
+
+```json
+{
+  "id": "09d706ca-58f3-4fb2-818f-5b8623d67e6e",
+  "isCustomPricing": true
+}
+```
+
+</Update>
+
 <Update label="v1.7.5" description="August 14, 2026">
 
 ### New Features
