@@ -74,7 +74,8 @@
             "pages": [
               "sales/orders",
               "sales/create-a-one-time-charge",
-              "sales/checkout-sessions"
+              "sales/checkout-sessions",
+              "sales/abandoned-cart-recovery"
             ]
           },
           {
