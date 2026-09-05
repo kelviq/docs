@@ -49,6 +49,24 @@ For a paid change, you can wait until payment succeeds before activating the new
 
 Omit `paymentBehavior` to keep the default immediate-update behavior.
 
+### Control how a change is billed
+
+Pass `prorationBehavior` when you update a subscription to choose when the customer pays for a mid-period change:
+
+| Value | Effect |
+| --- | --- |
+| `IMMEDIATE_CHARGE` | Applies the change now, prorates the difference, and invoices it immediately. |
+| `PRORATE_NEXT_INVOICE` | Applies the change now and adds the prorated credit or charge to the next renewal invoice. Nothing is collected immediately. |
+| `NO_PRORATION` | Applies the change now without crediting or charging for the partial period. The next renewal invoice bills the full new price. |
+
+If you omit the field, Kelviq uses your organization's default. Set the defaults with `PATCH /organizations/settings/`: `updateSubscriptionProrationBehavior` covers upgrades and downgrades and defaults to `IMMEDIATE_CHARGE`, while `migrateSubscriptionProrationBehavior` covers plan migrations and defaults to `PRORATE_NEXT_INVOICE`.
+
+<Warning>
+  Changing the billing interval, such as monthly to yearly, starts and invoices the new billing period immediately, whichever option you pass. With `NO_PRORATION`, unused time on the old interval is not credited. The update time becomes the start of the new billing period and sets the new renewal date.
+</Warning>
+
+To see the exact amounts before committing to a change, call `POST /subscriptions/{subscriptionId}/update/preview/` with the same payload. If credits exceed the new charge, no payment is collected and the remainder is kept as customer credit.
+
 ### Wait for payment before changing access
 
 `activate_on_payment` keeps the customer's current subscription active while payment for the change is pending. This prevents an unpaid plan change from replacing working access.
@@ -68,11 +86,11 @@ Card payments that do not require authentication are usually completed during th
 
 ### Upgrades
 
-Kelviq prorates the price change against the time left in the current billing period. It credits the unused portion of the old plan, charges for the remaining portion of the new plan, and collects the net difference.
+Under the default `IMMEDIATE_CHARGE` proration behavior, Kelviq prorates the price change against the time left in the current billing period. It credits the unused portion of the old plan, charges for the remaining portion of the new plan, and collects the net difference. See [Control how a change is billed](#control-how-a-change-is-billed) for the other options.
 
 With `activate_on_payment`, Kelviq waits for that payment to succeed before activating the upgraded plan.
 
-For example, if a customer moves from a $100 monthly plan to a $200 monthly plan halfway through the period, the approximate calculation is:
+For example, if a customer moves from a \$100 monthly plan to a $200 monthly plan halfway through the period, the approximate calculation is:
 
 | Item | Amount |
 | --- | ---: |

@@ -4,6 +4,92 @@ description: "Changelog for the Kelviq Dashboard"
 mode: "wide"
 rss: true
 ---
+<Update label="v1.17" description="August 21, 2026">
+
+## Find transactions faster
+
+Search on the **Payouts → Transactions** page now works properly, and filtering is more precise:
+
+* A status filter narrows the list to successful, failed, or pending transactions.
+* The search field matches payment method types. Search for `upi`, `card`, `link`, `amazon_pay`, or `sepa_debit` to see payments made through that method.
+
+## Migrate subscriptions to the latest plan version
+
+When you republish a plan with new pricing or entitlements, existing subscribers stay on the version they bought. You can now move them forward. The migrate action on a subscription updates it to the latest version of its plan, and it is available in two places: the dashboard, and the customer portal, where customers can migrate their own subscription.
+
+Custom-priced subscriptions cannot be migrated. Developers can run the same migration with `POST /subscriptions/{subscriptionId}/migrate/` and control how the change is billed with the organization's proration defaults. The [API changelog](/changelog/api) has the details.
+
+</Update>
+
+<Update label="v1.16" description="August 7, 2026">
+
+## Clearer subscription cancellation dates
+
+Two fixes for cancelled subscriptions:
+
+* The customer details page now shows when a subscription was cancelled, alongside its status.
+* Cancelling a subscription from the dashboard now selects the correct cancellation date.
+
+On the API side, subscription responses now include cancellation metadata: when the subscription was cancelled, whether the customer or the merchant initiated it, and any feedback the customer gave. See the [API changelog](/changelog/api) entry for v1.7.0.
+
+</Update>
+
+<Update label="v1.15" description="July 31, 2026">
+
+## Kelviq now covers your payout fees
+
+Payout fees are on us. When your cleared Kelviq balance is sent to your bank account or eligible debit card, Kelviq bears the provider's payout costs. You keep the full amount of your balance, and transaction fees are unchanged.
+
+See [Fees](/getstarted/fees) for what a transaction costs and [Payouts](/payouts/overview) for how balances reach your bank.
+
+## More billing periods
+
+Plans now support a six-month billing period alongside monthly, quarterly, and yearly.
+
+Plans can also bill on a fixed four-week cycle. Renewals happen on the same weekday every 28 days, and metered features can reset usage on the same 28-day schedule instead of following calendar months.
+
+<Note>
+  The 28-day period, and other custom periods such as weekly or daily, must be enabled for your organization first. Contact [hi@kelviq.com](mailto:hi@kelviq.com) to turn them on.
+</Note>
+
+## Trials now default to 7 days
+
+New free trials default to 7 days instead of 30. You can still set any duration from 1 to 365 days.
+
+</Update>
+
+<Update label="v1.14" description="July 24, 2026">
+
+## Meet the Kelviq CLI (beta)
+
+You can now manage your pricing catalog as code. The Kelviq CLI (`@kelviq/cli`) turns your products, features, plans, entitlements, and prices into one typed TypeScript file, `kelviq.config.ts`, that lives in your repository like the rest of your code.
+
+The loop works in both directions:
+
+* `kelviq pull` writes your live catalog to a config file, so a catalog you built in the dashboard is one command away from version control.
+* `kelviq push` deploys the file back. It shows a diff, asks for confirmation, and writes drafts first. Nothing a customer sees changes until you pass `--publish`, which asks again.
+* `kelviq promote` moves your whole sandbox catalog to production with the same preview and gates.
+
+Your pricing model decides what customers are billed and which features they can reach, but dashboard edits leave no trail in your engineering workflow. With the catalog in git, every pricing change is a commit with an author, a diff, and a pull-request review. Drift between sandbox and production stops being invisible too: pull both environments and `diff` the two files.
+
+Because the config is plain TypeScript, your editor autocompletes it and the compiler catches mistakes. A misspelled field or an invalid enum fails with a "did you mean" suggestion before Kelviq ever sees it. It also gives AI coding assistants something they are good at working with: ask one to "add a Team plan between Pro and Enterprise with 25 seats" and the types keep it honest.
+
+Install it with `npm install -g @kelviq/cli`, run `kelviq login`, then `kelviq pull`. The CLI is in beta. It is safe by design, with previews and confirmations before every write, but commands and flags may still change between releases, so pin an exact version in CI. Start with the [CLI overview](/cli/overview).
+
+## A bigger, safer MCP server
+
+Two releases of `@kelviq/mcp-server` shipped this week for teams driving Kelviq from Claude, Cursor, or any other MCP client.
+
+**v0.3.0** adds sandbox support. Set `KELVIQ_ENV=sandbox` and the server targets your sandbox API hosts automatically; an invalid value fails fast at startup instead of silently hitting production. `portal_session_create` now returns a ready-to-share `signedPortalUrl` with the session token already appended, since the bare portal URL does not authenticate on its own.
+
+**v0.4.0** completes the checkout surface. `checkout_create_session` now accepts every field the API supports, including `customAmount` for custom-priced sessions, `discountCode`, and `metadata`. Fields the server did not recognize were previously dropped before the request was sent; a spec-conformance suite now guards every request schema against the OpenAPI spec so that cannot happen again.
+
+All 45 tools now declare MCP safety annotations, so clients can auto-approve read-only calls while asking for confirmation on destructive ones like `subscription_cancel`. Three guided prompts encode common workflows end to end: `setup_product`, `launch_plan`, and `diagnose_customer`. In Claude Code they appear as slash commands, such as `/kelviq:setup_product`.
+
+Six write tools were removed in v0.3.0, including bulk price editing, which now belongs to the CLI's reviewed `kelviq push` flow. The full list of changes is in the [MCP server changelog](/changelog/mcp-server), and the [MCP server guide](/guides/mcp-server) covers setup.
+
+</Update>
+
 <Update label="v1.13" description="July 17, 2026">
 
 ## Safer discount creation
