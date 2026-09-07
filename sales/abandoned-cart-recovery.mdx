@@ -1,0 +1,65 @@
+---
+title: 'Abandoned cart recovery'
+description: 'Automatically remind customers who start checkout but do not pay'
+---
+
+Abandoned cart recovery emails customers who start a checkout but do not complete payment. Kelviq detects the abandoned checkout, sends up to three reminder emails over three days, and expires the checkout after four. You do not need to build anything: detection, scheduling, and deduplication are handled for you.
+
+The feature is on by default for every organization. You can turn it off in **Settings**.
+
+## How a checkout becomes abandoned
+
+Kelviq marks a checkout as abandoned when all of the following are true:
+
+* The checkout was created at least one hour ago.
+* Its status is `open` or `processing`.
+* The customer has not touched it in the last 30 minutes.
+
+Recent customer activity delays the marking, so a customer who is still filling in payment details is not emailed.
+
+A reminder also needs somewhere to go: the customer must have an email address, taken from the linked customer record or the email entered during checkout.
+
+## Reminder schedule
+
+All timings are measured from when the checkout session was created.
+
+| Event | When |
+| --- | --- |
+| Checkout marked as abandoned | After 1 hour |
+| First reminder email | After 24 hours |
+| Second reminder email | After 48 hours |
+| Final reminder email | After 72 hours |
+| Checkout expires | After 4 days |
+
+The background jobs that send these run hourly, so an email can arrive up to an hour after its nominal time.
+
+The reminders are sequential. The second email is only sent after the first, and the third only after the second. Each email includes a **Return to checkout** link that takes the customer back to their session, and each send is recorded so a customer is never emailed twice for the same step.
+
+The subject lines are:
+
+1. `You left {productName} in checkout`
+2. `Still interested in {productName}?`
+3. `Last reminder about your {productName} checkout`
+
+## What happens at expiration
+
+Four days after creation, an unpaid checkout expires:
+
+* The checkout status becomes `expired` and its payment status becomes `canceled`.
+* The recovery link in earlier emails stops working.
+* No further reminders are sent.
+
+Completed, closed, or expired checkouts never receive reminders.
+
+## Turning it off and on
+
+Use the **Abandoned cart recovery** toggle in **Settings &rarr; Notifications** to control the feature for your whole organization.
+
+* Turning it off stops future reminder emails. Emails that were already sent cannot be recalled.
+* Turning it back on resumes eligible reminders for checkouts that have not yet expired.
+
+<Note>
+  The reminder timing and email content are fixed. There is currently no option to change the schedule, resend a reminder manually, or exclude individual checkouts.
+</Note>
+
+To watch recovery in action, open [Checkout sessions](/sales/checkout-sessions). An abandoned checkout stays in its `open` or `processing` state until the customer returns and pays or the session expires.
