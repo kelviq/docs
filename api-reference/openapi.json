@@ -378,6 +378,13 @@
             ],
             "example": "MONTHLY"
           },
+          "trialPeriod": {
+            "type": "integer",
+            "minimum": 1,
+            "nullable": true,
+            "description": "The number of trial days to apply to the subscription created by this checkout session. When provided, this overrides the trial period configured on the selected plan.",
+            "example": 14
+          },
           "customerId": {
             "type": "string",
             "nullable": true,
@@ -3140,12 +3147,6 @@
             "type": "string",
             "example": "custom-pricinig.png"
           },
-          "file": {
-            "type": "string",
-            "format": "uri",
-            "readOnly": true,
-            "example": "https://cdn.kelviq.com/media/organizations/8/plan/1ad723d2-40eb-4bf0-b924-557e6697e788/53c28d460fed421a81f6c6e90114ff4f/custom-pricinig.png"
-          },
           "ordering": {
             "type": "integer",
             "example": 0
@@ -3158,8 +3159,8 @@
             "type": "string",
             "format": "uri",
             "readOnly": true,
-            "description": "URL clients can hit to download the file. Will redirect to a forced-download URL.",
-            "example": "https://api.kelviq.com/api/v1/catalog/plans/10-july/file/bf9f0fe0-c9c0-436d-8811-e412d0365470/download/"
+            "description": "URL clients can hit to download the file. Carries a signed token and expires 24 hours after it was generated; requesting a fresh copy of the plan/subscription issues a new link.",
+            "example": "https://api.kelviq.com/api/v1/catalog/plans/10-july/file/bf9f0fe0-c9c0-436d-8811-e412d0365470/download/?token=Yjk5ZjBmZTAtYzljMC00MzZkLTg4MTEtZTQxMmQwMzY1NDcw%3A1v2Abc%3Ahash"
           }
         }
       },
@@ -7791,10 +7792,9 @@
                         {
                           "id": "bf9f0fe0-c9c0-436d-8811-e412d0365470",
                           "name": "custom-pricinig.png",
-                          "file": "https://cdn.kelviq.com/media/organizations/8/plan/1ad723d2-40eb-4bf0-b924-557e6697e788/53c28d460fed421a81f6c6e90114ff4f/custom-pricinig.png",
                           "ordering": 0,
                           "enabled": true,
-                          "downloadUrl": "https://api.kelviq.com/api/v1/catalog/plans/10-july/file/bf9f0fe0-c9c0-436d-8811-e412d0365470/download/"
+                          "downloadUrl": "https://api.kelviq.com/api/v1/catalog/plans/10-july/file/bf9f0fe0-c9c0-436d-8811-e412d0365470/download/?token=Yjk5ZjBmZTAtYzljMC00MzZkLTg4MTEtZTQxMmQwMzY1NDcw%3A1v2Abc%3Ahash"
                         }
                       ],
                       "links": [
@@ -7887,10 +7887,9 @@
                     {
                       "id": "bf9f0fe0-c9c0-436d-8811-e412d0365470",
                       "name": "custom-pricinig.png",
-                      "file": "https://cdn.kelviq.com/media/organizations/8/plan/1ad723d2-40eb-4bf0-b924-557e6697e788/53c28d460fed421a81f6c6e90114ff4f/custom-pricinig.png",
                       "ordering": 0,
                       "enabled": true,
-                      "downloadUrl": "https://api.kelviq.com/api/v1/catalog/plans/10-july/file/bf9f0fe0-c9c0-436d-8811-e412d0365470/download/"
+                      "downloadUrl": "https://api.kelviq.com/api/v1/catalog/plans/10-july/file/bf9f0fe0-c9c0-436d-8811-e412d0365470/download/?token=Yjk5ZjBmZTAtYzljMC00MzZkLTg4MTEtZTQxMmQwMzY1NDcw%3A1v2Abc%3Ahash"
                     }
                   ],
                   "links": [
@@ -7989,10 +7988,9 @@
                     {
                       "id": "bf9f0fe0-c9c0-436d-8811-e412d0365470",
                       "name": "custom-pricinig.png",
-                      "file": "https://cdn.kelviq.com/media/organizations/8/plan/1ad723d2-40eb-4bf0-b924-557e6697e788/53c28d460fed421a81f6c6e90114ff4f/custom-pricinig.png",
                       "ordering": 0,
                       "enabled": true,
-                      "downloadUrl": "https://api.kelviq.com/api/v1/catalog/plans/10-july/file/bf9f0fe0-c9c0-436d-8811-e412d0365470/download/"
+                      "downloadUrl": "https://api.kelviq.com/api/v1/catalog/plans/10-july/file/bf9f0fe0-c9c0-436d-8811-e412d0365470/download/?token=Yjk5ZjBmZTAtYzljMC00MzZkLTg4MTEtZTQxMmQwMzY1NDcw%3A1v2Abc%3Ahash"
                     }
                   ],
                   "links": [

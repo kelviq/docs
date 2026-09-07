@@ -5,6 +5,31 @@ mode: "wide"
 rss: true
 ---
 
+<Update label="v1.7.7" description="September 7, 2026">
+
+### New Features
+
+#### Set a custom trial period at checkout
+
+`POST /checkout/` now accepts `trialPeriod`, allowing you to set the number of trial days for the subscription created by a checkout session. When provided, it overrides the trial period configured on the selected plan.
+
+```json
+{
+  "planIdentifier": "premium-plan",
+  "chargePeriod": "MONTHLY",
+  "trialPeriod": 14,
+  "successUrl": "https://example.com/checkout/success"
+}
+```
+
+### Changes
+
+#### Success URL is required
+
+`successUrl` is mandatory when calling `POST /checkout/`. Requests that omit it are rejected with a `400` response.
+
+</Update>
+
 <Update label="v1.7.6" description="August 20, 2026">
 
 ### New Features
