@@ -5,6 +5,87 @@ mode: "wide"
 rss: true
 ---
 
+<Update label="v2.7.4" description="September 8, 2026">
+
+### New Features
+
+#### Control How Subscription Updates Are Billed
+
+The synchronous and asynchronous `client.subscriptions.update()` methods now support `prorationBehavior`, with a `ProrationBehavior` enum exported from the package. It controls when the customer is billed for a mid-period change: `IMMEDIATE_CHARGE` invoices the difference right now, `PRORATE_NEXT_INVOICE` bills it on the next invoice, and `NO_PRORATION` changes the plan without crediting or charging for the partial period.
+
+```python
+from kelviq_sdk import ProrationBehavior
+
+subscription = client.subscriptions.update(
+    subscriptionId="78058918-9746-4280-9b9b-1bd5115eec6e",
+    planIdentifier="premium-plan",
+    chargePeriod="MONTHLY",
+    prorationBehavior=ProrationBehavior.PRORATE_NEXT_INVOICE,
+)
+```
+
+The SDK validates the value and serializes it as `proration_behavior`. Omit it to use your organization's default.
+
+<Warning>
+Changing `chargePeriod` to a different billing interval resets the billing cycle and invoices the new period immediately, whichever value you pass — with `NO_PRORATION`, without any credit for unused time on the old plan.
+</Warning>
+
+#### Preview Subscription Updates
+
+The synchronous and asynchronous subscription clients now provide `preview_update()`. It calculates the financial effect of a proposed update without changing the subscription, creating an invoice, or charging the customer.
+
+```python
+preview = client.subscriptions.preview_update(
+    subscriptionId="78058918-9746-4280-9b9b-1bd5115eec6e",
+    planIdentifier="premium-plan",
+    chargePeriod="YEARLY",
+    prorationBehavior=ProrationBehavior.PRORATE_NEXT_INVOICE,
+    features=[{"identifier": "seats", "quantity": 10}],
+)
+
+print(preview.recurringAmount, preview.amountChargedImmediately)
+```
+
+The returned Pydantic models include major- and minor-unit amounts, the next payment attempt, and preview invoice line items.
+
+#### Set a Custom Trial Period at Checkout
+
+The synchronous and asynchronous `checkout.create_session()` methods now accept `trialPeriod`. Pass an integer greater than or equal to `1` to override the selected plan's configured trial period.
+
+```python
+session = client.checkout.create_session(
+    planIdentifier="premium-plan",
+    chargePeriod="MONTHLY",
+    successUrl="https://example.com/checkout/success",
+    trialPeriod=14,
+)
+```
+
+#### Use a Custom Amount for One-Time Charges
+
+The synchronous and asynchronous `charges.create()` methods now accept `customAmount` and `taxBehavior`. `customAmount` must be greater than zero and requires `currencyCode`; `taxBehavior` accepts `INCLUSIVE` or `EXCLUSIVE`.
+
+```python
+charge = client.charges.create(
+    planIdentifier="lifetime-access",
+    chargePeriod="ONE_TIME",
+    customerId="cust_789",
+    currencyCode="USD",
+    customAmount=49.99,
+    taxBehavior="INCLUSIVE",
+)
+```
+
+### Changes
+
+`successUrl` is now required when calling the synchronous or asynchronous `checkout.create_session()` method, matching the API contract.
+
+### Deprecations
+
+`probationBehaviour` is deprecated in favour of `prorationBehavior` (`probation` was a typo for `proration`). It is still accepted and continues to serialize as `probation_behaviour`.
+
+</Update>
+
 <Update label="v2.7.3" description="July 21, 2026">
 
 ### New Features

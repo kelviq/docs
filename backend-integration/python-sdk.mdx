@@ -145,9 +145,11 @@ The SDK currently supports the following operations:
 
     5. [Subscriptions](/backend-integration/python-sdk#subscriptions)
 
-    6. [License](/backend-integration/python-sdk#license)
+    6. [Charges](/backend-integration/python-sdk#charges)
 
-    7. [Portal](/backend-integration/python-sdk#portal)
+    7. [License](/backend-integration/python-sdk#license)
+
+    8. [Portal](/backend-integration/python-sdk#portal)
 
 ---
 
@@ -312,7 +314,8 @@ response = client.checkout.create_session(
     planIdentifier="plan-pro-monthly",
     chargePeriod="MONTHLY",
     customerId="cust_789",  # Recommended, otherwise it will create a new customer
-    successUrl="https://kelviq.com/checkout/success"
+    successUrl="https://kelviq.com/checkout/success",
+    trialPeriod=14,
 )
 print(f"Checkout Session URL: {response.checkoutUrl}")
 ```
@@ -389,6 +392,8 @@ print(f"Checkout Session URL: {response.checkoutUrl}")
             * Example: `[{"identifier": "seats", "quantity": 10}, {"identifier": "api-calls-tier1", "quantity": 5000}]`
 
     * `ipAddress` (str): The IP Address of the customer, used for location based pricing.
+
+    * `trialPeriod` (int): Number of trial days to apply. Must be greater than or equal to `1` and overrides the selected plan's configured trial period.
 
     * `currencyCode` (str): The currency code for the checkout session (e.g. `"USD"`). Required when `customAmount` is provided.
 
@@ -844,7 +849,7 @@ An instance of ReportUsageResponse (Pydantic model), which includes:
 
 ## Subscriptions
 
-The subscriptions module allows you to list, retrieve, create, update, and cancel customer subscriptions. You can access these operations via the `subscriptions` attribute on an initialized Kelviq client instance.
+The subscriptions module allows you to list, retrieve, create, preview updates, update, and cancel customer subscriptions. You can access these operations via the `subscriptions` attribute on an initialized Kelviq client instance.
 
 ### List subscriptions
 
@@ -909,6 +914,8 @@ for subscription in page.results:
 
 * `page` (int): Page number to retrieve.
 * `page_size` (int): Number of subscriptions to return per page.
+* `modifiedOnAfter` (str): Only return subscriptions modified on or after this ISO 8601 timestamp.
+* `modifiedOnBefore` (str): Only return subscriptions modified on or before this ISO 8601 timestamp.
 
 **Returns:**
 
@@ -1037,12 +1044,14 @@ A `CreateSubscriptionResponse` model containing the created subscription, includ
 **Synchronous**:
 
 ```python
-# Assuming 'client' is your synchronous Kelviq client
+from kelviq_sdk import ProrationBehavior
+
 try:
     response = client.subscriptions.update(
         subscriptionId="78058918-9746-4280-9b9b-1bd5115eec6e",
         planIdentifier="premium-plan",
         chargePeriod="MONTHLY",
+        prorationBehavior=ProrationBehavior.PRORATE_NEXT_INVOICE,
     )
     print(response.subscriptionId)
 except Exception as e:
@@ -1059,6 +1068,7 @@ try:
         subscriptionId="78058918-9746-4280-9b9b-1bd5115eec6e",
         planIdentifier="new_plan_enterprise",
         chargePeriod="YEARLY",
+        prorationBehavior=ProrationBehavior.PRORATE_NEXT_INVOICE,
         offeringId="offer_abc",
         pricingTableId="pw_def",
         ruleId="rule_ghi",
@@ -1110,12 +1120,50 @@ except Exception as e:
     * An ISO 8601 datetime string (e.g. `"2027-12-31 23:59:59"`) to set a new trial end date. The datetime must be in the future. Naive datetimes are interpreted as UTC.
     * If omitted, the existing trial behavior on the subscription is preserved.
 * `paymentBehavior` (`Literal["activate_on_payment"]`): Optional. Set to `"activate_on_payment"` to keep the current subscription active while payment is pending. The new plan and features are applied only after payment succeeds. If the pending update expires, the current subscription remains unchanged. Omit this field to use the default immediate-update behavior.
+* `prorationBehavior` (`ProrationBehavior`): Controls how a mid-period change is billed. Use `ProrationBehavior.IMMEDIATE_CHARGE`, `ProrationBehavior.PRORATE_NEXT_INVOICE`, or `ProrationBehavior.NO_PRORATION`. When omitted, the organization's default is used.
 
 **Returns**:
 
 An instance of `UpdateSubscriptionResponse`, which includes:
 
 * `subscriptionId` (str): UUID of the updated subscription.
+
+
+### Preview a subscription update
+
+Calculates the financial effect of an update without changing the subscription, creating an invoice, or charging the customer.
+
+**Synchronous:**
+
+```python
+from kelviq_sdk import ProrationBehavior
+
+preview = client.subscriptions.preview_update(
+    subscriptionId="78058918-9746-4280-9b9b-1bd5115eec6e",
+    planIdentifier="premium-plan",
+    chargePeriod="YEARLY",
+    prorationBehavior=ProrationBehavior.PRORATE_NEXT_INVOICE,
+    features=[{"identifier": "seats", "quantity": 10}],
+)
+
+print(preview.recurringAmount, preview.amountChargedImmediately)
+print(preview.nextInvoice.lineItems if preview.nextInvoice else [])
+```
+
+**Asynchronous:**
+
+```python
+preview = await async_client.subscriptions.preview_update(
+    subscriptionId="78058918-9746-4280-9b9b-1bd5115eec6e",
+    planIdentifier="premium-plan",
+    chargePeriod="YEARLY",
+    prorationBehavior=ProrationBehavior.NO_PRORATION,
+)
+```
+
+Required parameters are `subscriptionId`, `planIdentifier`, and `chargePeriod`. Optional parameters are `prorationBehavior`, `features`, `ipAddress`, and `trialEnd`.
+
+**Returns:** A `SubscriptionUpdatePreviewResponse` Pydantic model with recurring and immediate amounts in major and minor units, plus an optional next invoice and its line items.
 
 
 ### Cancel an active subscription for a customer.
@@ -1179,6 +1227,45 @@ An instance of `CancelSubscriptionResponse`, which includes:
 * `message` (str): A confirmation message indicating the result of the cancellation request.
 
 
+
+---
+
+## Charges
+
+The synchronous and asynchronous `charges` clients immediately charge a customer's saved payment method for a one-time plan. Use sandbox mode when testing this operation.
+
+**Synchronous:**
+
+```python
+charge = client.charges.create(
+    planIdentifier="lifetime-access",
+    chargePeriod="ONE_TIME",
+    customerId="cust_789",
+    currencyCode="USD",
+    customAmount=49.99,
+    taxBehavior="INCLUSIVE",
+    features=[{"identifier": "seats", "quantity": 5}],
+)
+
+print(charge.id, charge.status, charge.amount)
+```
+
+**Asynchronous:**
+
+```python
+charge = await async_client.charges.create(
+    planIdentifier="lifetime-access",
+    chargePeriod="ONE_TIME",
+    customerId="cust_789",
+    currencyCode="USD",
+    customAmount=49.99,
+    taxBehavior="EXCLUSIVE",
+)
+```
+
+`planIdentifier`, `chargePeriod="ONE_TIME"`, and `customerId` are required. `customAmount` must be positive and requires `currencyCode`. `taxBehavior` accepts `INCLUSIVE` or `EXCLUSIVE` and defaults to `EXCLUSIVE` on the API. Optional fields also include `features` and `ipAddress`.
+
+**Returns:** A `CreateChargeResponse` Pydantic model containing the charge record, amount, currency, status, product, plan, features, and customer details.
 
 ---
 

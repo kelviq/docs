@@ -5,6 +5,85 @@ mode: "wide"
 rss: true
 ---
 
+<Update label="v2.7.4" description="September 8, 2026">
+
+### New Features
+
+#### Control How Subscription Updates Are Billed
+
+`client.subscriptions.update()` now supports `prorationBehavior`, using the exported `PRORATION_BEHAVIORS` constant. It controls when the customer is billed for a mid-period change: `IMMEDIATE_CHARGE` invoices the difference right now, `PRORATE_NEXT_INVOICE` bills it on the next invoice, and `NO_PRORATION` changes the plan without crediting or charging for the partial period.
+
+```typescript
+import { CHARGE_PERIOD_CHOICES, PRORATION_BEHAVIORS } from "@kelviq/node-sdk";
+
+const subscription = await client.subscriptions.update({
+  subscriptionId: "78058918-9746-4280-9b9b-1bd5115eec6e",
+  planIdentifier: "premium-plan",
+  chargePeriod: CHARGE_PERIOD_CHOICES.MONTHLY,
+  prorationBehavior: PRORATION_BEHAVIORS.PRORATE_NEXT_INVOICE,
+});
+```
+
+The SDK serializes the option as `proration_behavior`. Omit it to use your organization's default.
+
+<Warning>
+Changing `chargePeriod` to a different billing interval resets the billing cycle and invoices the new period immediately, whichever value you pass — with `NO_PRORATION`, without any credit for unused time on the old plan.
+</Warning>
+
+#### Preview Subscription Updates
+
+`client.subscriptions.previewUpdate()` calculates the financial effect of a proposed subscription update without changing the subscription, creating an invoice, or charging the customer. It accepts the same plan, charge period, proration behavior, features, IP address, and trial-end options used by an update.
+
+```typescript
+const preview = await client.subscriptions.previewUpdate({
+  subscriptionId: "78058918-9746-4280-9b9b-1bd5115eec6e",
+  planIdentifier: "premium-plan",
+  chargePeriod: CHARGE_PERIOD_CHOICES.YEARLY,
+  prorationBehavior: PRORATION_BEHAVIORS.PRORATE_NEXT_INVOICE,
+  features: [{ identifier: "seats", quantity: 10 }],
+});
+
+console.log(preview.recurringAmount, preview.amountChargedImmediately);
+```
+
+The response includes typed major- and minor-unit amounts, the next payment attempt, and preview invoice line items.
+
+#### Set a Custom Trial Period at Checkout
+
+`client.checkout.createSession()` now accepts `trialPeriod`. Pass an integer greater than or equal to `1` to override the selected plan's configured trial period. Invalid values are rejected by the SDK before a request is sent.
+
+```typescript
+const session = await client.checkout.createSession({
+  planIdentifier: "premium-plan",
+  chargePeriod: CHARGE_PERIOD_CHOICES.MONTHLY,
+  successUrl: "https://example.com/checkout/success",
+  trialPeriod: 14,
+});
+```
+
+#### Use a Custom Amount for One-Time Charges
+
+`client.charges.create()` now accepts `customAmount` and `taxBehavior`. `customAmount` must be greater than zero and requires `currencyCode`; `taxBehavior` accepts `INCLUSIVE` or `EXCLUSIVE`.
+
+```typescript
+const charge = await client.charges.create({
+  planIdentifier: "lifetime-access",
+  chargePeriod: "ONE_TIME",
+  customerId: "cust_789",
+  currencyCode: "USD",
+  customAmount: 49.99,
+  taxBehavior: "INCLUSIVE",
+});
+```
+
+### Deprecations
+
+`probationBehaviour` and `PROBATION_BEHAVIOURS` are deprecated in favour of `prorationBehavior` and `PRORATION_BEHAVIORS` (`probation` was a typo for `proration`). The old field still works.
+
+`PROBATION_BEHAVIOURS.NEXT_BILLING_CYCLE` and `PROBATION_BEHAVIOURS.PRO_RATA` were never supported by the API and are rejected by it. Use `PRORATION_BEHAVIORS.NO_PRORATION` and `PRORATION_BEHAVIORS.PRORATE_NEXT_INVOICE` instead. `IMMEDIATE_CHARGE` is unchanged and now works.
+
+</Update>
+
 <Update label="v2.7.3" description="July 21, 2026">
 
 ### New Features
