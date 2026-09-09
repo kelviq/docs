@@ -5,6 +5,62 @@ mode: "wide"
 rss: true
 ---
 
+<Update label="v2.8.0" description="September 9, 2026">
+
+### New Features
+
+#### Refunds
+
+The synchronous and asynchronous clients now provide a `refunds` module for listing, creating, and retrieving refunds.
+
+```python
+refund = client.refunds.create(
+    orderId="ORD-20260715123000-A1B2C",
+    amountUnits=2500,
+    reason="REQUESTED_BY_CUSTOMER",
+    internalNote="Customer requested a partial refund.",
+)
+
+page = client.refunds.list(status="SUCCEEDED", page=1, page_size=10)
+
+retrieved = client.refunds.retrieve(refund.id)
+```
+
+**Async variant:**
+
+```python
+refund = await async_client.refunds.create(
+    orderId="ORD-20260715123000-A1B2C",
+    amountUnits=2500,
+)
+```
+
+`client.refunds.create()` accepts either `amountUnits` (minor currency unit) or `amount` (major currency unit) for a partial refund; omit both to refund the order's entire remaining refundable balance. `client.refunds.list()` supports `search`, `status`, `start_date`, `end_date`, `page`, and `page_size` filters. Pydantic models validate parameters and provide typed refund records.
+
+#### Payment Methods
+
+The synchronous and asynchronous clients now provide a `payment_methods` module that lists saved payment methods, optionally filtered by `customer_id` or `customer_email`.
+
+```python
+methods = client.payment_methods.list(customer_id="cust_789")
+print(methods.results[0].methodData["brand"], methods.results[0].methodData["last4"])
+```
+
+Only payment methods with status `succeeded` are returned.
+
+#### Transactions
+
+The synchronous and asynchronous clients now provide a `transactions` module that lists financial transactions, including the itemized Merchant of Record fee breakdown when applicable.
+
+```python
+transactions = client.transactions.list(status="success", start_date="2026-07-01")
+print(transactions.results[0].amountTotal, transactions.results[0].morFeeBreakdown)
+```
+
+`client.transactions.list()` supports `search`, `status`, `start_date`, `end_date`, `page`, and `page_size` filters.
+
+</Update>
+
 <Update label="v2.7.4" description="September 8, 2026">
 
 ### New Features

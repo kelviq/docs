@@ -151,6 +151,12 @@ The SDK currently supports the following operations:
 
     8. [Portal](/backend-integration/python-sdk#portal)
 
+    9. [Refunds](/backend-integration/python-sdk#refunds)
+
+    10. [Payment Methods](/backend-integration/python-sdk#payment-methods)
+
+    11. [Transactions](/backend-integration/python-sdk#transactions)
+
 ---
 
 ## Customers
@@ -1266,6 +1272,274 @@ charge = await async_client.charges.create(
 `planIdentifier`, `chargePeriod="ONE_TIME"`, and `customerId` are required. `customAmount` must be positive and requires `currencyCode`. `taxBehavior` accepts `INCLUSIVE` or `EXCLUSIVE` and defaults to `EXCLUSIVE` on the API. Optional fields also include `features` and `ipAddress`.
 
 **Returns:** A `CreateChargeResponse` Pydantic model containing the charge record, amount, currency, status, product, plan, features, and customer details.
+
+---
+
+## Refunds
+
+The synchronous and asynchronous `refunds` clients let you list, create, and retrieve refunds for orders owned by your organization.
+
+### List refunds
+
+**Synchronous:**
+
+```python
+page = client.refunds.list(
+    status="SUCCEEDED",
+    start_date="2026-07-01",
+    page=1,
+    page_size=10,
+)
+```
+
+**Asynchronous:**
+
+```python
+page = await async_client.refunds.list(status="SUCCEEDED", page=1, page_size=10)
+```
+
+<Accordion title="Response">
+```json
+{
+  "count": 1,
+  "next": null,
+  "previous": null,
+  "results": [
+    {
+      "id": "7c2f3a91-2d4e-4a8b-9b1c-6f0a2e5d9c11",
+      "reason": "REQUESTED_BY_CUSTOMER",
+      "amountUnits": 2500,
+      "amount": 25,
+      "internalNote": "Customer requested a partial refund.",
+      "failureReason": null,
+      "status": "SUCCEEDED",
+      "order": { "id": "ORD-20260715123000-A1B2C" }
+    }
+  ]
+}
+```
+</Accordion>
+
+**Optional Parameters:**
+
+* `search` : Search by refund ID, order ID, customer name, email, or ID.
+* `status` : Filter by refund status. One of `"PENDING"`, `"PROCESSING"`, `"SUCCEEDED"`, `"FAILED"`, `"CANCELED"`.
+* `start_date` : Include refunds created on or after this date (`YYYY-MM-DD`).
+* `end_date` : Include refunds created on or before this date (`YYYY-MM-DD`).
+* `page` : Page number to return.
+* `page_size` : Number of results per page. Defaults to 10, maximum 100.
+
+**Returns:** A `RefundListResponse` Pydantic model with `count`, `next`, `previous`, and `results: List[RefundResponse]`.
+
+### Create a refund
+
+**Synchronous:**
+
+```python
+refund = client.refunds.create(
+    orderId="ORD-20260715123000-A1B2C",
+    amountUnits=2500,
+    reason="REQUESTED_BY_CUSTOMER",
+    internalNote="Customer requested a partial refund.",
+)
+```
+
+**Asynchronous:**
+
+```python
+refund = await async_client.refunds.create(
+    orderId="ORD-20260715123000-A1B2C",
+    amountUnits=2500,
+)
+```
+
+<Accordion title="Response">
+```json
+{
+  "id": "7c2f3a91-2d4e-4a8b-9b1c-6f0a2e5d9c11",
+  "reason": "REQUESTED_BY_CUSTOMER",
+  "amountUnits": 2500,
+  "amount": 25,
+  "internalNote": "Customer requested a partial refund.",
+  "failureReason": null,
+  "status": "SUCCEEDED",
+  "order": { "id": "ORD-20260715123000-A1B2C" }
+}
+```
+</Accordion>
+
+**Required Parameters:**
+
+* `orderId` : The ID of an order owned by your organization.
+
+**Optional Parameters:**
+
+* `amountUnits` : Amount to refund in the currency's minor unit (e.g. cents for USD). Takes precedence over `amount` when both are provided.
+* `amount` : Amount to refund in the currency's major unit (e.g. dollars for USD). Used only when `amountUnits` is omitted.
+* `reason` : One of `"DUPLICATE"`, `"FRAUDULENT"`, `"REQUESTED_BY_CUSTOMER"`, `"OTHER"`. Defaults to `"REQUESTED_BY_CUSTOMER"`.
+* `internalNote` : An internal note associated with the refund.
+
+Omit both `amountUnits` and `amount` to refund the order's entire remaining refundable balance. The amount must be positive and cannot exceed the order's remaining refundable balance — the SDK raises `InvalidRequestError` if `orderId` is missing, and the API rejects invalid amounts.
+
+**Returns:** A `RefundResponse` Pydantic model with `id`, `reason`, `amountUnits`, `amount`, `internalNote`, `failureReason`, `status`, and the complete serialized `order`.
+
+### Retrieve a refund
+
+**Synchronous:**
+
+```python
+refund = client.refunds.retrieve("7c2f3a91-2d4e-4a8b-9b1c-6f0a2e5d9c11")
+```
+
+**Asynchronous:**
+
+```python
+refund = await async_client.refunds.retrieve("7c2f3a91-2d4e-4a8b-9b1c-6f0a2e5d9c11")
+```
+
+**Required Parameters:**
+
+* `refundId` : The UUID of the refund.
+
+**Returns:** A `RefundResponse` Pydantic model, as above.
+
+---
+
+## Payment Methods
+
+The synchronous and asynchronous `payment_methods` clients list saved payment methods for your organization.
+
+### List payment methods
+
+**Synchronous:**
+
+```python
+page = client.payment_methods.list(customer_id="geo-jacob", page_size=10)
+```
+
+**Asynchronous:**
+
+```python
+page = await async_client.payment_methods.list(customer_email="geojacob@example.com")
+```
+
+<Accordion title="Response">
+```json
+{
+  "count": 1,
+  "next": null,
+  "previous": null,
+  "results": [
+    {
+      "id": 482,
+      "customer": {
+        "customerId": "geo-jacob",
+        "name": "Geo Jacob",
+        "email": "geojacob@example.com",
+        "billingAddress": { "country": "US" }
+      },
+      "methodType": "card",
+      "methodData": {
+        "brand": "visa",
+        "last4": "4242",
+        "expMonth": 12,
+        "expYear": 2029,
+        "funding": "credit",
+        "country": "US"
+      },
+      "isDefault": true,
+      "status": "succeeded",
+      "createdOn": "2026-04-02T06:12:04.123456Z",
+      "modifiedOn": "2026-04-02T06:12:04.123456Z"
+    }
+  ]
+}
+```
+</Accordion>
+
+**Optional Parameters:**
+
+* `customer_id` : Filter to payment methods belonging to the customer with this client-provided `customerId`.
+* `customer_email` : Filter to payment methods belonging to the customer with this email address.
+* `page` : Page number to return.
+* `page_size` : Number of results per page. Defaults to 10, maximum 100.
+
+Only payment methods with status `"succeeded"` are included in results.
+
+**Returns:** A `PaymentMethodListResponse` Pydantic model with `count`, `next`, `previous`, and `results: List[PaymentMethodResponse]`. Each `methodData` dict is payment-provider-specific; for `card` it includes `brand`, `last4`, `expMonth`, `expYear`, `funding`, and `country`.
+
+---
+
+## Transactions
+
+The synchronous and asynchronous `transactions` clients list financial transactions for your organization, ordered newest first.
+
+### List transactions
+
+**Synchronous:**
+
+```python
+page = client.transactions.list(
+    status="success",
+    start_date="2026-07-01",
+    page=1,
+    page_size=25,
+)
+
+print(page.results[0].amountTotal, page.results[0].morFeeBreakdown)
+```
+
+**Asynchronous:**
+
+```python
+page = await async_client.transactions.list(status="success")
+```
+
+<Accordion title="Response">
+```json
+{
+  "count": 1,
+  "next": null,
+  "previous": null,
+  "results": [
+    {
+      "id": "5b274952-0e54-48f6-aec6-e8a3f202b12e",
+      "order": { "id": "ORD-20260715123000-A1B2C" },
+      "createdOn": "2026-07-28T10:30:00Z",
+      "currency": "USD",
+      "currencySymbol": "$",
+      "amountTotal": 100,
+      "morFee": 4,
+      "morFeeBreakdown": [
+        { "name": "fixed_fee", "percentage": null, "valueUnits": 40, "currency": "USD" },
+        { "name": "base_fee", "percentage": "2.9", "valueUnits": 290, "currency": "USD" },
+        { "name": "subscription_fee", "percentage": "0.7", "valueUnits": 70, "currency": "USD" }
+      ],
+      "collectedTax": 0,
+      "netPayout": 96,
+      "status": "success",
+      "transactionType": "CHARGE",
+      "paymentMethodType": "card",
+      "availableOn": "2026-08-04",
+      "isSettled": false,
+      "paymentMethodName": "visa",
+      "last4": "4242"
+    }
+  ]
+}
+```
+</Accordion>
+
+**Optional Parameters:**
+
+* `search` : Search by payment-provider IDs, customer name, email or ID, product name, or payment method type.
+* `status` : Filter by transaction status. One of `"success"`, `"failure"`, `"pending"`.
+* `start_date` : Include transactions created on or after this date (`YYYY-MM-DD`).
+* `end_date` : Include transactions created on or before this date (`YYYY-MM-DD`).
+* `page` : Page number to return.
+* `page_size` : Number of results per page. Defaults to 10, maximum 100.
+
+**Returns:** A `TransactionListResponse` Pydantic model with `count`, `next`, `previous`, and `results: List[TransactionResponse]`. Each transaction includes an itemized `morFeeBreakdown` (Merchant of Record fee components) when applicable — empty when no such fee applies.
 
 ---
 

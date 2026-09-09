@@ -5,6 +5,53 @@ mode: "wide"
 rss: true
 ---
 
+<Update label="v2.8.0" description="September 9, 2026">
+
+### New Features
+
+#### Refunds
+
+A new `client.refunds` module lets you list, create, and retrieve refunds.
+
+```typescript
+const refund = await client.refunds.create({
+  orderId: "ORD-20260715123000-A1B2C",
+  amountUnits: 2500,
+  reason: "REQUESTED_BY_CUSTOMER",
+  internalNote: "Customer requested a partial refund.",
+});
+
+const page = await client.refunds.list({ status: "SUCCEEDED", page: 1, pageSize: 10 });
+
+const retrieved = await client.refunds.retrieve({ refundId: refund.id });
+```
+
+`client.refunds.create()` accepts either `amountUnits` (minor currency unit) or `amount` (major currency unit) for a partial refund; omit both to refund the order's entire remaining refundable balance. `client.refunds.list()` supports `search`, `status`, `startDate`, `endDate`, `page`, and `pageSize` filters.
+
+#### Payment Methods
+
+A new `client.paymentMethods` module lists saved payment methods, optionally filtered by `customerId` or `customerEmail`.
+
+```typescript
+const methods = await client.paymentMethods.list({ customerId: "cust_789" });
+console.log(methods.results[0].methodData.brand, methods.results[0].methodData.last4);
+```
+
+Only payment methods with status `succeeded` are returned.
+
+#### Transactions
+
+A new `client.transactions` module lists financial transactions, including the itemized Merchant of Record fee breakdown when applicable.
+
+```typescript
+const transactions = await client.transactions.list({ status: "success", startDate: "2026-07-01" });
+console.log(transactions.results[0].amountTotal, transactions.results[0].morFeeBreakdown);
+```
+
+`client.transactions.list()` supports `search`, `status`, `startDate`, `endDate`, `page`, and `pageSize` filters.
+
+</Update>
+
 <Update label="v2.7.4" description="September 8, 2026">
 
 ### New Features
