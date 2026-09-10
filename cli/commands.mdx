@@ -121,7 +121,7 @@ kelviq pull --force            # overwrite an existing file
 
 What it fetches: all products, all features, the **latest version** of each plan, and each plan's prices and entitlements. Every cross-reference in the generated file uses `identifier` slugs, never UUIDs — the file is stable across environments that share identifiers.
 
-On success, `pull` prints the path it wrote and a **warnings list** for anything it couldn't represent in the config format (for example, plan fields like `license`, `links`, `countries`, and `files` are dropped, with one warning each). Warnings are informational — the file it wrote is still valid.
+On success, `pull` prints the path it wrote and a **warnings list** for anything it couldn't represent in the config format (for example, plan fields like `links`, `countries`, and `files` are dropped, with one warning each; a plan's `license` settings are pulled into the file). Warnings are informational — the file it wrote is still valid.
 
 On failure — missing key, network error, unexpected API response — `pull` writes `pull failed: <reason>` to stderr and exits non-zero without touching the output file.
 
