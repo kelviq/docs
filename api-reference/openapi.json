@@ -81,6 +81,14 @@
       "description": "Invoices generated for orders and subscription billing cycles."
     },
     {
+      "name": "Discounts",
+      "description": "Discount codes (coupons) that can be applied to products and plans at checkout."
+    },
+    {
+      "name": "Webhook Endpoints",
+      "description": "Configure the destination URLs and event subscriptions that receive webhook deliveries."
+    },
+    {
       "name": "Webhooks",
       "description": "Delivery logs for webhook events sent to your configured endpoints."
     },
@@ -424,6 +432,12 @@
             "description": "A comma-separated list of plan identifiers to display on the checkout page.",
             "example": "plan-pro-monthly,plan-pro-yearly"
           },
+          "billingPeriodsEnabled": {
+            "type": "string",
+            "nullable": true,
+            "description": "A comma-separated list of billing periods to display and allow on the checkout page. Values are case-insensitive and are normalized to uppercase.",
+            "example": "MONTHLY,YEARLY"
+          },
           "currencyCode": {
             "type": "string",
             "nullable": true,
@@ -457,6 +471,13 @@
             "nullable": true,
             "description": "A discount/coupon code to pre-apply to the checkout session. The code is applied only if it is active, unexpired, and valid for the selected plan; otherwise the request fails with an error.",
             "example": "WELCOME20"
+          },
+          "email": {
+            "type": "string",
+            "format": "email",
+            "nullable": true,
+            "description": "The email address to pre-fill on the checkout page. Set lockEmail to true to prevent the customer from changing it.",
+            "example": "customer@example.com"
           },
           "lockEmail": {
             "type": "boolean",
@@ -1170,7 +1191,7 @@
             "minimum": 0,
             "exclusiveMinimum": true,
             "nullable": true,
-            "description": "Optional custom amount to charge, expressed in the currency's major unit (for example, `49.99` USD). Overrides the plan's configured one-time price. `currencyCode` is required when this field is provided, and Stripe's minimum charge for that currency applies.",
+            "description": "Optional custom amount to charge, expressed in the currency's major unit (for example, `49.99` USD). Overrides the plan's configured one-time price. `currencyCode` is required when this field is provided, and minimum charge for that currency applies.",
             "example": 49.99
           },
           "taxBehavior": {
@@ -3324,7 +3345,7 @@
             "type": "object",
             "readOnly": true,
             "additionalProperties": true,
-            "description": "Provider-side identifiers (e.g. `stripeProductId`).",
+            "description": "Provider-side identifiers.",
             "example": {
               "stripeProductId": "prod_ABC123"
             }
@@ -5658,7 +5679,7 @@
             "type": "string",
             "format": "date-time",
             "nullable": true,
-            "description": "When Stripe will next retry collection, if a retry is scheduled.",
+            "description": "Date time when next retry is scheduled.",
             "example": null
           },
           "failureDetails": {
@@ -5764,6 +5785,416 @@
             "type": "array",
             "items": {
               "$ref": "#/components/schemas/InvoiceResponse"
+            }
+          }
+        }
+      },
+      "DiscountAppliesToProduct": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "name": {
+            "type": "string"
+          }
+        }
+      },
+      "DiscountAppliesToPlan": {
+        "type": "object",
+        "properties": {
+          "identifier": {
+            "type": "string"
+          },
+          "name": {
+            "type": "string"
+          }
+        }
+      },
+      "DiscountAppliesTo": {
+        "type": "object",
+        "description": "One product (and optionally specific plans of that product) this discount is restricted to.",
+        "properties": {
+          "product": {
+            "$ref": "#/components/schemas/DiscountAppliesToProduct"
+          },
+          "plans": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/DiscountAppliesToPlan"
+            }
+          }
+        }
+      },
+      "Discount": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "format": "uuid",
+            "example": "b3f1a2c4-5d6e-4f7a-8b9c-0d1e2f3a4b5c"
+          },
+          "discountType": {
+            "type": "string",
+            "enum": [
+              "PERCENTAGE",
+              "FIXED_AMOUNT"
+            ],
+            "description": "PERCENTAGE discounts a percentage off the price. FIXED_AMOUNT discounts a flat amount off the total."
+          },
+          "amountOff": {
+            "type": "string",
+            "nullable": true,
+            "description": "Amount to discount, in currency units (e.g. \"10.00\"). Set when `discountType` is FIXED_AMOUNT.",
+            "example": "10.00"
+          },
+          "percentageOff": {
+            "type": "integer",
+            "nullable": true,
+            "description": "Percentage to discount. Set when `discountType` is PERCENTAGE.",
+            "example": 20
+          },
+          "currency": {
+            "type": "string",
+            "nullable": true,
+            "description": "3-letter ISO currency code. Required when `discountType` is FIXED_AMOUNT.",
+            "example": "usd"
+          },
+          "currencySymbol": {
+            "type": "string",
+            "example": "$"
+          },
+          "name": {
+            "type": "string",
+            "description": "Displayed on the customer's invoice.",
+            "example": "Summer Sale"
+          },
+          "code": {
+            "type": "string",
+            "description": "Checkout discount code. Uppercase letters and numbers only.",
+            "example": "SUMMER20"
+          },
+          "duration": {
+            "type": "string",
+            "enum": [
+              "ONCE",
+              "REPEATING",
+              "FOREVER"
+            ],
+            "description": "How many billing cycles the discount applies for."
+          },
+          "durationInMonths": {
+            "type": "integer",
+            "nullable": true,
+            "description": "Number of billing periods the discount applies for. Despite the field name, this counts billing cycles, not calendar months — e.g. 3 on a yearly plan means 3 years. Set when `duration` is REPEATING."
+          },
+          "redeemBy": {
+            "type": "string",
+            "format": "date-time",
+            "nullable": true,
+            "description": "UTC time after which this discount can no longer be redeemed."
+          },
+          "maxRedemptions": {
+            "type": "integer",
+            "nullable": true,
+            "description": "Total number of times this code can be redeemed across all customers."
+          },
+          "timesRedeemed": {
+            "type": "integer",
+            "description": "Number of times this code has been redeemed so far."
+          },
+          "appliesTo": {
+            "type": "array",
+            "description": "Products/plans this discount is restricted to. Empty means the discount applies to all products.",
+            "items": {
+              "$ref": "#/components/schemas/DiscountAppliesTo"
+            }
+          },
+          "isActive": {
+            "type": "boolean"
+          }
+        }
+      },
+      "DiscountAppliesToRequestItem": {
+        "type": "object",
+        "properties": {
+          "product": {
+            "type": "string",
+            "format": "uuid",
+            "description": "Product ID this discount applies to."
+          },
+          "plans": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            },
+            "description": "Plan identifiers within the product to restrict the discount to. Omit or leave empty to apply to all plans of the product."
+          }
+        },
+        "required": [
+          "product"
+        ]
+      },
+      "DiscountCreateRequest": {
+        "type": "object",
+        "properties": {
+          "discountType": {
+            "type": "string",
+            "enum": [
+              "PERCENTAGE",
+              "FIXED_AMOUNT"
+            ]
+          },
+          "amountOff": {
+            "type": "string",
+            "description": "Required (and only used) when `discountType` is FIXED_AMOUNT."
+          },
+          "percentageOff": {
+            "type": "integer",
+            "description": "Required (and only used) when `discountType` is PERCENTAGE."
+          },
+          "currency": {
+            "type": "string",
+            "description": "3-letter ISO currency code. Required when `discountType` is FIXED_AMOUNT."
+          },
+          "name": {
+            "type": "string",
+            "description": "Displayed on the customer's invoice."
+          },
+          "code": {
+            "type": "string",
+            "description": "Checkout discount code. Uppercase letters and numbers only, and must be unique among active discounts for the organization."
+          },
+          "duration": {
+            "type": "string",
+            "enum": [
+              "ONCE",
+              "REPEATING",
+              "FOREVER"
+            ],
+            "default": "ONCE"
+          },
+          "durationInMonths": {
+            "type": "integer",
+            "description": "Number of billing periods the discount applies for. Despite the field name, this counts billing cycles, not calendar months — e.g. 3 on a yearly plan means 3 years. Required when `duration` is REPEATING."
+          },
+          "redeemBy": {
+            "type": "string",
+            "format": "date-time",
+            "description": "UTC time after which this discount can no longer be redeemed. Must be in the future."
+          },
+          "maxRedemptions": {
+            "type": "integer",
+            "description": "Total number of times this code can be redeemed across all customers."
+          },
+          "appliesTo": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/DiscountAppliesToRequestItem"
+            },
+            "description": "Restrict the discount to specific products/plans. Omit to apply to all products."
+          }
+        },
+        "required": [
+          "discountType",
+          "name",
+          "code"
+        ]
+      },
+      "DiscountUpdateRequest": {
+        "type": "object",
+        "description": "Discounts only support toggling `isActive` after creation; every other field is immutable.",
+        "properties": {
+          "isActive": {
+            "type": "boolean"
+          }
+        }
+      },
+      "DiscountListResponse": {
+        "type": "object",
+        "properties": {
+          "count": {
+            "type": "integer"
+          },
+          "next": {
+            "type": "string",
+            "format": "uri",
+            "nullable": true
+          },
+          "previous": {
+            "type": "string",
+            "format": "uri",
+            "nullable": true
+          },
+          "results": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/Discount"
+            }
+          }
+        }
+      },
+      "WebhookEndpoint": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "format": "uuid",
+            "example": "2f6b9e2a-7c1a-4a3e-8b6e-8e6f9a2c1d4a"
+          },
+          "url": {
+            "type": "string",
+            "format": "uri",
+            "description": "Destination URL that webhook events are POSTed to.",
+            "example": "https://example.com/webhooks/kelviq"
+          },
+          "enabled": {
+            "type": "boolean",
+            "description": "Disabled endpoints don't receive deliveries."
+          },
+          "events": {
+            "type": "array",
+            "description": "Event types this endpoint is subscribed to.",
+            "items": {
+              "type": "string",
+              "enum": [
+                "checkout.completed",
+                "customer.created",
+                "customer.updated",
+                "order.created",
+                "order.updated",
+                "order.refunded",
+                "subscription.created",
+                "subscription.updated",
+                "subscription.cancelled",
+                "subscription.plan_changed",
+                "subscription.trial_will_end",
+                "invoice.created",
+                "invoice.paid",
+                "invoice.payment_failed",
+                "refund.created",
+                "refund.updated",
+                "feature.usage_alert",
+                "payment_method.created",
+                "payment_method.updated",
+                "payment_method.deleted"
+              ]
+            }
+          },
+          "secret": {
+            "type": "string",
+            "description": "Signing secret used to verify the `Kelviq-Signature` header on deliveries to this endpoint.",
+            "readOnly": true
+          }
+        }
+      },
+      "WebhookEndpointCreateRequest": {
+        "type": "object",
+        "properties": {
+          "url": {
+            "type": "string",
+            "format": "uri",
+            "description": "Must be a public HTTPS/HTTP URL \u2014 URLs resolving to a private, loopback, link-local, or otherwise internal address are rejected."
+          },
+          "events": {
+            "type": "array",
+            "items": {
+              "type": "string",
+              "enum": [
+                "checkout.completed",
+                "customer.created",
+                "customer.updated",
+                "order.created",
+                "order.updated",
+                "order.refunded",
+                "subscription.created",
+                "subscription.updated",
+                "subscription.cancelled",
+                "subscription.plan_changed",
+                "subscription.trial_will_end",
+                "invoice.created",
+                "invoice.paid",
+                "invoice.payment_failed",
+                "refund.created",
+                "refund.updated",
+                "feature.usage_alert",
+                "payment_method.created",
+                "payment_method.updated",
+                "payment_method.deleted"
+              ]
+            }
+          },
+          "enabled": {
+            "type": "boolean",
+            "default": true
+          }
+        },
+        "required": [
+          "url",
+          "events"
+        ]
+      },
+      "WebhookEndpointUpdateRequest": {
+        "type": "object",
+        "properties": {
+          "url": {
+            "type": "string",
+            "format": "uri"
+          },
+          "events": {
+            "type": "array",
+            "items": {
+              "type": "string",
+              "enum": [
+                "checkout.completed",
+                "customer.created",
+                "customer.updated",
+                "order.created",
+                "order.updated",
+                "order.refunded",
+                "subscription.created",
+                "subscription.updated",
+                "subscription.cancelled",
+                "subscription.plan_changed",
+                "subscription.trial_will_end",
+                "invoice.created",
+                "invoice.paid",
+                "invoice.payment_failed",
+                "refund.created",
+                "refund.updated",
+                "feature.usage_alert",
+                "payment_method.created",
+                "payment_method.updated",
+                "payment_method.deleted"
+              ]
+            }
+          },
+          "enabled": {
+            "type": "boolean"
+          }
+        }
+      },
+      "WebhookEndpointListResponse": {
+        "type": "object",
+        "properties": {
+          "count": {
+            "type": "integer"
+          },
+          "next": {
+            "type": "string",
+            "format": "uri",
+            "nullable": true
+          },
+          "previous": {
+            "type": "string",
+            "format": "uri",
+            "nullable": true
+          },
+          "results": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/WebhookEndpoint"
             }
           }
         }
@@ -8280,6 +8711,16 @@
             "example": "pro,enterprise"
           },
           {
+            "name": "billing_periods_enabled",
+            "in": "query",
+            "required": false,
+            "description": "Optional. Comma-separated list of billing periods to include in the response. Values are case-insensitive and are normalized to uppercase. When omitted, all available billing periods are returned.",
+            "schema": {
+              "type": "string"
+            },
+            "example": "MONTHLY,YEARLY"
+          },
+          {
             "name": "ip_address",
             "in": "query",
             "required": false,
@@ -9649,7 +10090,7 @@
           "Plans"
         ],
         "summary": "Publish a plan",
-        "description": "Promotes the most recent draft version of the plan to `isLatest=true`, demotes the previous published version, and syncs the plan to Stripe / internal billing. Optionally migrates existing customers' features or pricing. Fails with 400 if no price exists or required currencies are missing.",
+        "description": "Promotes the most recent draft version of the plan to `isLatest=true`, demotes the previous published version. Optionally migrates existing customers' features or pricing. Fails with 400 if no price exists or required currencies are missing.",
         "operationId": "publishCatalogPlan",
         "x-mint": {
           "content": "<Info>Click the base URL in the API playground and select the **Sandbox** host for test data or the **Production** host for live data. Use credentials from the same environment.</Info>"
@@ -10540,6 +10981,415 @@
           },
           "401": {
             "description": "Unauthorized \u2014 missing or invalid API key."
+          }
+        }
+      }
+    },
+    "/discount/": {
+      "get": {
+        "tags": [
+          "Discounts"
+        ],
+        "summary": "List discounts",
+        "description": "Returns a paginated list of active, non-archived discounts for the authenticated organization, newest first.",
+        "operationId": "listDiscounts",
+        "x-mint": {
+          "content": "<Info>Click the base URL in the API playground and select the **Sandbox** host for test data or the **Production** host for live data. Use credentials from the same environment.</Info>"
+        },
+        "parameters": [
+          {
+            "name": "search",
+            "in": "query",
+            "required": false,
+            "description": "Free-text search across the discount's `name` and `code`.",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "page_size",
+            "in": "query",
+            "required": false,
+            "description": "Number of results per page. Defaults to 10, maximum 100.",
+            "schema": {
+              "type": "integer",
+              "minimum": 1,
+              "maximum": 100
+            }
+          },
+          {
+            "name": "page",
+            "in": "query",
+            "required": false,
+            "description": "Page number to return.",
+            "schema": {
+              "type": "integer",
+              "minimum": 1
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "A paginated list of discounts.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/DiscountListResponse"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized \u2014 missing or invalid API key."
+          }
+        }
+      },
+      "post": {
+        "tags": [
+          "Discounts"
+        ],
+        "summary": "Create a discount",
+        "description": "Creates a new discount code.",
+        "operationId": "createDiscount",
+        "x-mint": {
+          "content": "<Info>Click the base URL in the API playground and select the **Sandbox** host for test data or the **Production** host for live data. Use credentials from the same environment.</Info>"
+        },
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/DiscountCreateRequest"
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "Discount created.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Discount"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Validation error, or the organization is not enrolled as Merchant of Record."
+          },
+          "401": {
+            "description": "Unauthorized \u2014 missing or invalid API key."
+          }
+        }
+      }
+    },
+    "/discount/{pk}/": {
+      "parameters": [
+        {
+          "name": "pk",
+          "in": "path",
+          "required": true,
+          "description": "Discount UUID.",
+          "example": "b3f1a2c4-5d6e-4f7a-8b9c-0d1e2f3a4b5c",
+          "schema": {
+            "type": "string",
+            "format": "uuid"
+          }
+        }
+      ],
+      "get": {
+        "tags": [
+          "Discounts"
+        ],
+        "summary": "Retrieve a discount",
+        "description": "Fetches a single discount by ID.",
+        "operationId": "retrieveDiscount",
+        "x-mint": {
+          "content": "<Info>Click the base URL in the API playground and select the **Sandbox** host for test data or the **Production** host for live data. Use credentials from the same environment.</Info>"
+        },
+        "responses": {
+          "200": {
+            "description": "Discount details.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Discount"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Discount not found."
+          },
+          "401": {
+            "description": "Unauthorized \u2014 missing or invalid API key."
+          }
+        }
+      },
+      "patch": {
+        "tags": [
+          "Discounts"
+        ],
+        "summary": "Update a discount",
+        "description": "Toggles a discount on or off. Every other field is immutable after creation.",
+        "operationId": "updateDiscount",
+        "x-mint": {
+          "content": "<Info>Click the base URL in the API playground and select the **Sandbox** host for test data or the **Production** host for live data. Use credentials from the same environment.</Info>"
+        },
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/DiscountUpdateRequest"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Updated discount.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Discount"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Validation error."
+          },
+          "401": {
+            "description": "Unauthorized \u2014 missing or invalid API key."
+          }
+        }
+      },
+      "delete": {
+        "tags": [
+          "Discounts"
+        ],
+        "summary": "Delete a discount",
+        "description": "Soft-deletes (archives) the discount. Already-archived discounts return 400.",
+        "operationId": "deleteDiscount",
+        "x-mint": {
+          "content": "<Info>Click the base URL in the API playground and select the **Sandbox** host for test data or the **Production** host for live data. Use credentials from the same environment.</Info>"
+        },
+        "responses": {
+          "204": {
+            "description": "Discount deleted.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/MessageResponse"
+                },
+                "example": {
+                  "message": "Object deleted successfully."
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "This discount is already deleted."
+          },
+          "401": {
+            "description": "Unauthorized \u2014 missing or invalid API key."
+          }
+        }
+      }
+    },
+    "/webhook/endpoints/": {
+      "get": {
+        "tags": [
+          "Webhook Endpoints"
+        ],
+        "summary": "List webhook endpoints",
+        "description": "Returns a paginated list of webhook endpoints configured for the authenticated organization.",
+        "operationId": "listWebhookEndpoints",
+        "x-mint": {
+          "content": "<Info>Click the base URL in the API playground and select the **Sandbox** host for test data or the **Production** host for live data. Use credentials from the same environment.</Info>"
+        },
+        "parameters": [
+          {
+            "name": "page_size",
+            "in": "query",
+            "required": false,
+            "description": "Number of results per page. Defaults to 10, maximum 100.",
+            "schema": {
+              "type": "integer",
+              "minimum": 1,
+              "maximum": 100
+            }
+          },
+          {
+            "name": "page",
+            "in": "query",
+            "required": false,
+            "description": "Page number to return.",
+            "schema": {
+              "type": "integer",
+              "minimum": 1
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "A paginated list of webhook endpoints.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/WebhookEndpointListResponse"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized \u2014 missing or invalid API key."
+          }
+        }
+      },
+      "post": {
+        "tags": [
+          "Webhook Endpoints"
+        ],
+        "summary": "Create a webhook endpoint",
+        "description": "Registers a new destination URL and its event subscriptions. A signing secret is generated automatically and returned once in the response.",
+        "operationId": "createWebhookEndpoint",
+        "x-mint": {
+          "content": "<Info>Click the base URL in the API playground and select the **Sandbox** host for test data or the **Production** host for live data. Use credentials from the same environment.</Info>"
+        },
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/WebhookEndpointCreateRequest"
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "Webhook endpoint created.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/WebhookEndpoint"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Validation error \u2014 e.g. an invalid event type, or a URL that resolves to a private/internal address."
+          },
+          "401": {
+            "description": "Unauthorized \u2014 missing or invalid API key."
+          }
+        }
+      }
+    },
+    "/webhook/endpoints/{pk}/": {
+      "parameters": [
+        {
+          "name": "pk",
+          "in": "path",
+          "required": true,
+          "description": "Webhook endpoint UUID.",
+          "example": "2f6b9e2a-7c1a-4a3e-8b6e-8e6f9a2c1d4a",
+          "schema": {
+            "type": "string",
+            "format": "uuid"
+          }
+        }
+      ],
+      "get": {
+        "tags": [
+          "Webhook Endpoints"
+        ],
+        "summary": "Retrieve a webhook endpoint",
+        "description": "Fetches a single webhook endpoint by ID.",
+        "operationId": "retrieveWebhookEndpoint",
+        "x-mint": {
+          "content": "<Info>Click the base URL in the API playground and select the **Sandbox** host for test data or the **Production** host for live data. Use credentials from the same environment.</Info>"
+        },
+        "responses": {
+          "200": {
+            "description": "Webhook endpoint details.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/WebhookEndpoint"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Webhook endpoint not found."
+          },
+          "401": {
+            "description": "Unauthorized \u2014 missing or invalid API key."
+          }
+        }
+      },
+      "patch": {
+        "tags": [
+          "Webhook Endpoints"
+        ],
+        "summary": "Update a webhook endpoint",
+        "description": "Partially updates a webhook endpoint's URL, event subscriptions, or enabled state.",
+        "operationId": "updateWebhookEndpoint",
+        "x-mint": {
+          "content": "<Info>Click the base URL in the API playground and select the **Sandbox** host for test data or the **Production** host for live data. Use credentials from the same environment.</Info>"
+        },
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/WebhookEndpointUpdateRequest"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Updated webhook endpoint.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/WebhookEndpoint"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Validation error."
+          },
+          "401": {
+            "description": "Unauthorized \u2014 missing or invalid API key."
+          }
+        }
+      },
+      "delete": {
+        "tags": [
+          "Webhook Endpoints"
+        ],
+        "summary": "Delete a webhook endpoint",
+        "description": "Permanently removes the webhook endpoint. It will stop receiving deliveries immediately.",
+        "operationId": "deleteWebhookEndpoint",
+        "x-mint": {
+          "content": "<Info>Click the base URL in the API playground and select the **Sandbox** host for test data or the **Production** host for live data. Use credentials from the same environment.</Info>"
+        },
+        "responses": {
+          "204": {
+            "description": "Webhook endpoint deleted."
+          },
+          "401": {
+            "description": "Unauthorized \u2014 missing or invalid API key."
+          },
+          "404": {
+            "description": "Webhook endpoint not found."
           }
         }
       }

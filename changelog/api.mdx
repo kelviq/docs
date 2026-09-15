@@ -5,6 +5,91 @@ mode: "wide"
 rss: true
 ---
 
+<Update label="v1.7.9" description="September 15, 2026">
+
+### New Features
+
+#### Discounts API
+
+Discount codes can now be managed directly through the API, authenticated with your server API key:
+
+- `GET /discount/` — list discounts
+- `POST /discount/` — create a discount (Merchant of Record organizations only)
+- `GET /discount/{id}/` — retrieve a discount
+- `PATCH /discount/{id}/` — enable or disable a discount
+- `DELETE /discount/{id}/` — archive a discount
+
+```json
+{
+  "discountType": "PERCENTAGE",
+  "percentageOff": 20,
+  "name": "Summer Sale",
+  "code": "SUMMER20",
+  "duration": "ONCE"
+}
+```
+
+See the [Discounts API reference](/api-reference/introduction) for the full request/response shape, including restricting a discount to specific products or plans with `appliesTo`.
+
+#### Manage webhook endpoints via API
+
+`WebhookEndpoint` resources — previously dashboard-only — are now fully manageable through the API:
+
+- `GET /webhook/endpoints/` — list webhook endpoints
+- `POST /webhook/endpoints/` — create a webhook endpoint
+- `GET /webhook/endpoints/{id}/` — retrieve a webhook endpoint
+- `PATCH /webhook/endpoints/{id}/` — update the URL, subscribed events, or enabled state
+- `DELETE /webhook/endpoints/{id}/` — delete a webhook endpoint
+
+```json
+{
+  "url": "https://example.com/webhooks/kelviq",
+  "events": ["invoice.paid", "subscription.cancelled"],
+  "enabled": true
+}
+```
+
+The signing secret used to verify the `Kelviq-Signature` header is generated automatically and returned in the create response.
+
+</Update>
+
+<Update label="v1.7.8" description="September 10, 2026">
+
+### New Features
+
+#### Limit checkout to selected billing periods
+
+`POST /checkout/` now accepts `billingPeriodsEnabled`, a comma-separated list of billing periods to display and allow during checkout. Values are case-insensitive and normalized to uppercase. A checkout attempt using a billing period outside this list is rejected.
+
+```json
+{
+  "planIdentifier": "premium-plan",
+  "chargePeriod": "MONTHLY",
+  "billingPeriodsEnabled": "MONTHLY,YEARLY",
+  "successUrl": "https://example.com/checkout/success"
+}
+```
+
+`GET /monetization/product-offering/{product_id}/` also accepts `billing_periods_enabled` to return only the requested billing periods. Static checkout links support the same snake-case parameter.
+
+#### Prefill the checkout email address
+
+`POST /checkout/` now accepts `email` to prefill the checkout page. Combine it with `lockEmail: true` when the customer must not edit the address.
+
+```json
+{
+  "planIdentifier": "premium-plan",
+  "chargePeriod": "MONTHLY",
+  "email": "customer@example.com",
+  "lockEmail": true,
+  "successUrl": "https://example.com/checkout/success"
+}
+```
+
+Static checkout links can prefill the same value with the `email` query parameter.
+
+</Update>
+
 <Update label="v1.7.7" description="September 7, 2026">
 
 ### New Features
