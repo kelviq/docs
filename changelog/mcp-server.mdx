@@ -5,6 +5,29 @@ mode: "wide"
 rss: true
 ---
 
+<Update label="v1.0.0" description="September 14, 2026">
+
+### Breaking Changes
+
+#### Sandbox is now the default environment
+
+When `KELVIQ_ENV` isn't set, the server now uses your **sandbox** environment instead of production, so an AI client can't change live data unless you choose production explicitly.
+
+If you use the MCP server with a production key, add `KELVIQ_ENV=production` to its environment. Without it, requests go to the sandbox host and return 403 errors — nothing is written.
+
+### Improvements
+
+- The startup log shows which environment the server is using, and warns when `KELVIQ_ENV` isn't set.
+- The server tells the connected AI client which environment its tools act on.
+- 401 and 403 errors now include a hint: when `KELVIQ_ENV` isn't set, they explain the sandbox default and how to use a production key; otherwise they name the active environment and link its API keys page.
+- Setup examples now run `npx -y @kelviq/mcp-server@latest`, so clients pick up new releases instead of a cached copy.
+
+### Fixes
+
+- If your MCP client passes an unexpanded placeholder such as `${KELVIQ_ENV}` instead of a value, the server now treats that variable as unset and warns at startup. Previously the server failed to start, or sent the placeholder text as your API key.
+
+</Update>
+
 <Update label="v0.4.0" description="July 24, 2026">
 
 ### New Features

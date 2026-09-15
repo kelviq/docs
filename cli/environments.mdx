@@ -55,29 +55,36 @@ Server API Keys have full API access. Never expose them in client-side code, com
 
 ## Environment variables
 
-Environment variables **override** the stored config file — useful for CI, containers, and one-off overrides without touching your stored keys:
+Environment variables **override** the stored config file — useful for CI, containers, and one-off overrides without touching your stored keys. `KELVIQ_SERVER_API_KEY` and `KELVIQ_ENV` work the same way as in the [MCP server](/guides/mcp-server); the environment-named keys are CLI-only.
 
 | Variable | Purpose |
 |---|---|
-| `KELVIQ_SANDBOX_SERVER_API_KEY` | Server key for the sandbox environment (the default target). |
-| `KELVIQ_SERVER_API_KEY` | Server key for the production environment (`--prod`). |
-| `KELVIQ_SANDBOX_BASE_URL` | Override the sandbox API base URL. You almost never need this. |
-| `KELVIQ_BASE_URL` | Override the production API base URL. You almost never need this. |
-| `KELVIQ_EDGE_URL` | Override the edge API URL. You almost never need this. |
+| `KELVIQ_SERVER_API_KEY` | Server key for the environment named by `KELVIQ_ENV`. |
+| `KELVIQ_ENV` | `sandbox` (the default when unset, as in the MCP server) or `production`. |
+| `KELVIQ_SANDBOX_SERVER_API_KEY` | Server key that always applies to sandbox. |
+| `KELVIQ_PRODUCTION_SERVER_API_KEY` | Server key that always applies to production. |
+| `KELVIQ_BASE_URL`, `KELVIQ_EDGE_URL` | Override the API or edge URL for the `KELVIQ_ENV` environment. You almost never need these. |
+
+- A variable named for an environment wins over `KELVIQ_SERVER_API_KEY`. Use `KELVIQ_SANDBOX_SERVER_API_KEY` and `KELVIQ_PRODUCTION_SERVER_API_KEY` when one shell needs both keys, for example for `kelviq promote`.
+- `KELVIQ_ENV` only decides which environment `KELVIQ_SERVER_API_KEY` belongs to. It never makes a command target production — only `--prod` does.
+- Any value other than `sandbox` or `production` makes commands fail rather than guess.
 
 A typical CI setup skips `kelviq login` entirely:
 
 ```yaml
 # e.g. GitHub Actions
 env:
-  KELVIQ_SANDBOX_SERVER_API_KEY: ${{ secrets.KELVIQ_SANDBOX_SERVER_API_KEY }}
+  KELVIQ_SERVER_API_KEY: ${{ secrets.KELVIQ_SANDBOX_SERVER_API_KEY }}
+  KELVIQ_ENV: sandbox
 ```
 
 ```shell
-kelviq pull --force   # authenticates from the environment variable
+kelviq pull --force   # authenticates from the environment variables
 ```
 
-If a command needs a key and finds none — neither in the environment nor stored — it fails with a message naming the exact variable to set and where to get a key.
+For `kelviq promote` in CI, set both `KELVIQ_SANDBOX_SERVER_API_KEY` and `KELVIQ_PRODUCTION_SERVER_API_KEY` instead.
+
+If a command needs a key and finds none — neither in the environment nor stored — it fails with a message naming the variables to set and where to get a key. If `KELVIQ_SERVER_API_KEY` is set for the other environment, the message says so.
 
 ---
 
@@ -87,6 +94,7 @@ If a command needs a key and finds none — neither in the environment nor store
 
 ```text
 Environment : sandbox (default — use --prod to target production)
+KELVIQ_ENV  : unset (sandbox) — unprefixed KELVIQ_* vars apply to sandbox
 Sandbox URL : https://sandboxapi.kelviq.com/api/v1
 Prod URL    : https://api.kelviq.com/api/v1
 Sandbox key : set

@@ -107,7 +107,8 @@
               "guides/subscription-integration",
               "guides/subscription-integration-for-nextjs",
               "guides/webhooks",
-              "guides/mcp-server"
+              "guides/mcp-server",
+              "guides/agent-toolkit"
             ]
           },
           {
@@ -190,6 +191,7 @@
               "changelog/python-sdk",
               "changelog/js-promotions-ui",
               "changelog/mcp-server",
+              "changelog/cli",
               "changelog/api"
             ]
           }

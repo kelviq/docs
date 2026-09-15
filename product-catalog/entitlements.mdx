@@ -287,8 +287,9 @@ yarn add @kelviq/node-sdk
 ```javascript
 import { Kelviq } from '@kelviq/node-sdk';
 
-const client = new Kelviq({ 
-  accessToken: process.env.KELVIQ_ACCESS_TOKEN 
+const client = new Kelviq({
+  accessToken: process.env.KELVIQ_SERVER_API_KEY,
+  environment: process.env.KELVIQ_ENV, // 'sandbox' or 'production'
 });
 ```
 

@@ -1,0 +1,34 @@
+---
+title: "CLI"
+description: "Changelog for @kelviq/cli"
+mode: "wide"
+rss: true
+---
+
+<Update label="v0.3.0" description="September 15, 2026">
+
+### Breaking Changes
+
+#### `KELVIQ_SERVER_API_KEY` follows `KELVIQ_ENV`
+
+`KELVIQ_SERVER_API_KEY` now belongs to the environment named by `KELVIQ_ENV`, and `KELVIQ_ENV` defaults to `sandbox` — the same rules as the [MCP server](/guides/mcp-server). It previously always meant your production key.
+
+If you keep a production key in `KELVIQ_SERVER_API_KEY`, add `KELVIQ_ENV=production` or rename the variable to `KELVIQ_PRODUCTION_SERVER_API_KEY`. Keys saved with `kelviq login` are unaffected, and commands still target production only when you pass `--prod`.
+
+### New Features
+
+#### Environment-named keys
+
+`KELVIQ_SANDBOX_SERVER_API_KEY` and `KELVIQ_PRODUCTION_SERVER_API_KEY` always apply to their own environment and take priority over `KELVIQ_SERVER_API_KEY`, so one shell or CI job can hold both keys for `kelviq promote`.
+
+### Improvements
+
+- `kelviq env` shows which environment `KELVIQ_ENV` points your unprefixed variables at.
+- When a key is missing, the error names every way to provide it, and tells you if `KELVIQ_SERVER_API_KEY` is set for the other environment.
+- An invalid `KELVIQ_ENV` value stops the command instead of guessing.
+
+### Fixes
+
+- `kelviq push` now works with a globally installed CLI in projects that don't install `@kelviq/cli` locally. Previously it failed with `Cannot find package '@kelviq/cli'`.
+
+</Update>

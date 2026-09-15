@@ -29,22 +29,33 @@ Add these to your `.env.local` file:
 
 ```env
 # Backend (server-side only)
-KELVIQ_API_KEY=server-xxxxxxxx
-
-# API URLs
-KELVIQ_API_BASE_URL=https://api.kelviq.com/api/v1
+KELVIQ_SERVER_API_KEY=server-xxxxxxxx
+KELVIQ_ENV=sandbox
 
 # Frontend (can be exposed to client)
-NEXT_PUBLIC_KELVIQ_CLIENT_KEY=client-xxxxxxxx
-NEXT_PUBLIC_KELVIQ_EDGE_URL=https://edge.api.kelviq.com/api/v1/
+NEXT_PUBLIC_KELVIQ_CLIENT_API_KEY=client-xxxxxxxx
+NEXT_PUBLIC_KELVIQ_ENV=sandbox
 
 # Your app URL (for redirects)
 NEXT_PUBLIC_APP_URL=https://yourdomain.com
 ```
 
+Build with sandbox keys — keys only work against their own environment. When you go live, switch both keys to production keys and set both `KELVIQ_ENV` values to `production`.
+
 <Warning>
 Never expose your server API key to the frontend or commit it to version control.
 </Warning>
+
+### Point API Routes at the Right Environment
+
+Create `lib/kelviq.ts` so every API route calls the host that matches `KELVIQ_ENV`:
+
+```typescript
+export const KELVIQ_API_URL =
+  process.env.KELVIQ_ENV === "production"
+    ? "https://api.kelviq.com/api/v1"
+    : "https://sandboxapi.kelviq.com/api/v1";
+```
 
 ---
 
@@ -102,17 +113,18 @@ Create a customer record when a user signs up. This gives you more control and l
 
 ```typescript
 import { NextRequest, NextResponse } from "next/server";
+import { KELVIQ_API_URL } from "@/lib/kelviq";
 
 export async function POST(request: NextRequest) {
   const { customerId, name, email } = await request.json();
 
   const response = await fetch(
-    `${process.env.KELVIQ_API_BASE_URL}/customers/`,
+    `${KELVIQ_API_URL}/customers/`,
     {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
-        Authorization: `Bearer ${process.env.KELVIQ_API_KEY}`,
+        Authorization: `Bearer ${process.env.KELVIQ_SERVER_API_KEY}`,
       },
       body: JSON.stringify({ customerId, name, email }),
     }
@@ -155,17 +167,18 @@ Create `app/api/checkout/route.ts`:
 
 ```typescript
 import { NextRequest, NextResponse } from "next/server";
+import { KELVIQ_API_URL } from "@/lib/kelviq";
 
 export async function POST(request: NextRequest) {
   const { planIdentifier, customerId, chargePeriod } = await request.json();
 
   const response = await fetch(
-    `${process.env.KELVIQ_API_BASE_URL}/checkout/`,
+    `${KELVIQ_API_URL}/checkout/`,
     {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
-        Authorization: `Bearer ${process.env.KELVIQ_API_KEY}`,
+        Authorization: `Bearer ${process.env.KELVIQ_SERVER_API_KEY}`,
       },
       body: JSON.stringify({
         planIdentifier,
@@ -253,15 +266,16 @@ Create `app/api/subscriptions/route.ts`:
 
 ```typescript
 import { NextRequest, NextResponse } from "next/server";
+import { KELVIQ_API_URL } from "@/lib/kelviq";
 
 export async function GET(request: NextRequest) {
   const customerId = request.nextUrl.searchParams.get("customerId");
 
   const response = await fetch(
-    `${process.env.KELVIQ_API_BASE_URL}/subscriptions/?customer_id=${customerId}`,
+    `${KELVIQ_API_URL}/subscriptions/?customer_id=${customerId}`,
     {
       headers: {
-        Authorization: `Bearer ${process.env.KELVIQ_API_KEY}`,
+        Authorization: `Bearer ${process.env.KELVIQ_SERVER_API_KEY}`,
       },
     }
   );
@@ -277,6 +291,7 @@ Create `app/api/subscriptions/update/route.ts`:
 
 ```typescript
 import { NextRequest, NextResponse } from "next/server";
+import { KELVIQ_API_URL } from "@/lib/kelviq";
 
 export async function POST(request: NextRequest) {
   const {
@@ -287,12 +302,12 @@ export async function POST(request: NextRequest) {
   } = await request.json();
 
   const response = await fetch(
-    `${process.env.KELVIQ_API_BASE_URL}/subscriptions/${subscriptionId}/update/`,
+    `${KELVIQ_API_URL}/subscriptions/${subscriptionId}/update/`,
     {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
-        Authorization: `Bearer ${process.env.KELVIQ_API_KEY}`,
+        Authorization: `Bearer ${process.env.KELVIQ_SERVER_API_KEY}`,
       },
       body: JSON.stringify({
         planIdentifier,
@@ -361,8 +376,8 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
       <body>
         <KelviqProvider
           customerId={getCurrentUserId()}
-          accessToken={process.env.NEXT_PUBLIC_KELVIQ_CLIENT_KEY!}
-          apiUrl={process.env.NEXT_PUBLIC_KELVIQ_EDGE_URL!}
+          accessToken={process.env.NEXT_PUBLIC_KELVIQ_CLIENT_API_KEY!}
+          environment={process.env.NEXT_PUBLIC_KELVIQ_ENV === "production" ? "production" : "sandbox"}
         >
           {children}
         </KelviqProvider>
