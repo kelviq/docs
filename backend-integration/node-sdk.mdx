@@ -1615,6 +1615,34 @@ An instance of `CreatePortalSessionResponse` (TypeScript Interface), which inclu
 * `email` : The email address of the customer.
 * `customerPortalUrl` : The customer's billing portal base URL. **This URL alone does not authenticate the session** — append the `token` as a query parameter (`${customerPortalUrl}?token=${token}`) to produce the signed link you share with the customer. The token expires, so create a fresh session per visit.
 
+### Deep-linking to add a payment method
+
+You can send a customer directly to the **add payment method** form and have them redirected back to your application when they're done. Append these query parameters to the signed portal link, targeting the `billing` page:
+
+| Parameter | Required | Description |
+|---|---|---|
+| `intent` | Yes | Set to `add_payment_method` to auto-open the add payment method form. |
+| `returnUrl` | No | URL-encoded `https` URL of your application. After the payment method is saved, the customer is redirected here with `?kelviq_setup=success` appended. `http` is only allowed for `localhost` during development. |
+| `customerId` | No | Opens the form for this specific customer account. If omitted, the customer's first account is used. |
+
+```typescript
+const session = await client.portal.createSession({
+    customerId: "cust_789",
+});
+
+const returnUrl = encodeURIComponent("https://your-app.com/billing/done");
+const addPaymentMethodLink =
+    `${session.customerPortalUrl}billing` +
+    `?token=${session.token}` +
+    `&intent=add_payment_method` +
+    `&customerId=cust_789` +
+    `&returnUrl=${returnUrl}`;
+
+res.redirect(addPaymentMethodLink);
+```
+
+After the customer saves their payment method, the portal redirects them to `https://your-app.com/billing/done?kelviq_setup=success`.
+
 ---
 ## Webhooks
 
