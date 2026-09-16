@@ -9,6 +9,26 @@ import { ChangelogFilter } from "/snippets/changelog-filter.jsx";
 
 <ChangelogFilter products={["App","JS SDK","React SDK","Node SDK","Python SDK","JS Promotions UI","MCP Server","CLI","API"]} />
 
+<Update label="v1.1.0" description="September 16, 2026" tags={["MCP Server"]}>
+
+### New Features
+
+#### Discount and webhook tools
+
+11 new tools bring the server to 56:
+
+- Discounts: `discount_list`, `discount_create`, `discount_retrieve`, `discount_update` to enable or disable a code, and `discount_archive`
+- Webhooks: `webhook_endpoint_list`, `webhook_endpoint_create`, `webhook_endpoint_retrieve`, `webhook_endpoint_update`, `webhook_endpoint_delete`, and `webhook_log_list` for delivery attempts from the last 30 days
+
+Webhook signing secrets are hidden in tool results so they don't end up in your AI conversation. Pass `revealSecret: true` when you need the value.
+
+### Improvements
+
+- `checkout_create_session` accepts `trialPeriod`, `billingPeriodsEnabled` and `email`.
+- `subscription_update` accepts `prorationBehavior`, and `subscription_cancel` accepts `cancellationFeedback` and `cancellationComment`.
+
+</Update>
+
 <Update label="v0.3.0" description="September 15, 2026" tags={["CLI"]}>
 
 ### Breaking Changes
@@ -81,7 +101,7 @@ See the [Discounts API reference](/api-reference/introduction) for the full requ
 }
 ```
 
-The signing secret used to verify the `Kelviq-Signature` header is generated automatically and returned in the create response.
+The signing secret used to verify the `webhook-signature` header is generated automatically and returned in the create response.
 
 </Update>
 
