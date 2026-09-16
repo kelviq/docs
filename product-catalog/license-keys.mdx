@@ -160,6 +160,17 @@ For each active instance, you can click **Revoke** to:
 
 Your customers (or their software) can interact with licenses using these API endpoints. Use these to integrate license checking into your application.
 
+### 3.0 Reading a customer's key from your server
+
+A customer's keys come back with their purchase records, authenticated with your server API key. Orders, subscriptions and invoices all carry a `license` array, and each entry holds `licenseKey` alongside `activationUsage`, `activationLimit` and `expiresOn`.
+
+Which record to read depends on how the plan is sold:
+
+- **One-time purchases** produce an order, not a subscription. Read `GET /orders/`, where each order's `billingType` is `ONE_TIME`. Orders have no customer filter — pass the customer's id or email as `search` to narrow the list to them.
+- **Recurring plans** produce a subscription. Read `GET /subscriptions/?customer_id=<id>`.
+
+This matters for how much you ask of the customer. A signed-in web app already knows who the customer is, so it can read the key server-side and activate on their behalf — there is no need to make them find an email and paste a key back into a session you control. Ask for the key only where the software has no way to look it up itself: a desktop app, CLI, plugin, or anything running off your server, which cannot hold a server API key.
+
 ### 3.1 Activate a License
 
 Activates a license key on a specific device/instance.
@@ -252,6 +263,8 @@ Removes an activation from a specific device/instance.
 5. Application calls Activate API
 6. License is now active on customer's device
 ```
+
+For software the customer signs in to, skip steps 3 and 4: read the key from their subscription as in [3.0](#3-0-reading-a-customer-s-key-from-your-server) and call Activate for them.
 
 ### Workflow B: Customer Switches Devices
 

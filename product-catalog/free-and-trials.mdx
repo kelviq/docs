@@ -23,6 +23,19 @@ Use a free plan to offer a permanent zero cost tier. This is perfect for open so
 
 Users who select this plan bypass the payment step entirely. They still get access to the customer portal and any deliverables or entitlements attached to the plan.
 
+### Putting new signups on a free plan
+
+Entitlement checks return `false` for a customer Kelviq has never seen, so a free plan only takes effect once the customer has a subscription to it. To enrol someone at signup rather than sending them through checkout:
+
+1. Create the customer **with an email address** — `customers.create` in the SDK, or `POST /customers/`.
+2. Create the subscription — `POST /subscriptions/create/` with the plan's identifier and `chargePeriod: "ONE_TIME"`.
+
+Keep that order. Creating a subscription for a customer Kelviq has not seen fails with `Subscription requires a customer with a valid email address` — and the failed attempt still registers the customer, without an email. From then on `POST /customers/` answers `Customer already exists`, and the portal refuses that customer too. Recover by patching the email onto the existing record with `PATCH /customers/{customerId}/`, after which the subscription call succeeds. Treat `Customer already exists` as a signal to patch rather than an error to surface.
+
+Enrolling this way also records a $0 order for the plan, which stays `PENDING` because no payment takes place. That is expected for a free plan — nothing is waiting to be collected.
+
+Check for an existing subscription first, with `customer_id` on `GET /subscriptions/`. Creating a second subscription for the same customer is allowed: the new one becomes `active` and the previous one becomes `superseded`. Nothing breaks, but enrolling on every visit churns through subscription records for no reason.
+
 ## Free trials
 
 Free trials let customers test a paid plan for a specific number of days before their card is charged. 

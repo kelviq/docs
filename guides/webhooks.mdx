@@ -1208,7 +1208,7 @@ Optionally, also check that `webhook-timestamp` is within a few minutes of your 
 ## Code Examples
 
 <Note>
-Use `express.raw()` (not `express.json()`) in Node.js so that `req.body` contains the unmodified request bytes. Parsing the body before verification will break the signature check.
+Use `express.raw()` (not `express.json()`) in Node.js so that `req.body` contains the unmodified request bytes. Parsing the body before verification will break the signature check. On a framework built on the Fetch API (Next.js route handlers, Hono, Remix, Cloudflare Workers), read the body with `await request.text()` and take each header with `request.headers.get(...)`, since `request.headers` is a `Headers` object rather than a plain object.
 </Note>
 
 <CodeGroup>
