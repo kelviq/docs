@@ -180,25 +180,32 @@
       },
       {
         "tab": "Changelog",
-        "groups": [
-          {
-            "group": "Changelog",
-            "pages": [
-              "changelog/app",
-              "changelog/js-sdk",
-              "changelog/react-sdk",
-              "changelog/node-sdk",
-              "changelog/python-sdk",
-              "changelog/js-promotions-ui",
-              "changelog/mcp-server",
-              "changelog/cli",
-              "changelog/api"
-            ]
-          }
+        "anchors": [
+          { "anchor": "All", "pages": ["changelog"] },
+          { "anchor": "App", "href": "https://docs.kelviq.com/changelog#app" },
+          { "anchor": "JS SDK", "href": "https://docs.kelviq.com/changelog#js-sdk" },
+          { "anchor": "React SDK", "href": "https://docs.kelviq.com/changelog#react-sdk" },
+          { "anchor": "Node SDK", "href": "https://docs.kelviq.com/changelog#node-sdk" },
+          { "anchor": "Python SDK", "href": "https://docs.kelviq.com/changelog#python-sdk" },
+          { "anchor": "JS Promotions UI", "href": "https://docs.kelviq.com/changelog#js-promotions-ui" },
+          { "anchor": "MCP Server", "href": "https://docs.kelviq.com/changelog#mcp-server" },
+          { "anchor": "CLI", "href": "https://docs.kelviq.com/changelog#cli" },
+          { "anchor": "API", "href": "https://docs.kelviq.com/changelog#api" }
         ]
       }
     ]
   },
+  "redirects": [
+    { "source": "/changelog/app", "destination": "/changelog#app" },
+    { "source": "/changelog/js-sdk", "destination": "/changelog#js-sdk" },
+    { "source": "/changelog/react-sdk", "destination": "/changelog#react-sdk" },
+    { "source": "/changelog/node-sdk", "destination": "/changelog#node-sdk" },
+    { "source": "/changelog/python-sdk", "destination": "/changelog#python-sdk" },
+    { "source": "/changelog/js-promotions-ui", "destination": "/changelog#js-promotions-ui" },
+    { "source": "/changelog/mcp-server", "destination": "/changelog#mcp-server" },
+    { "source": "/changelog/cli", "destination": "/changelog#cli" },
+    { "source": "/changelog/api", "destination": "/changelog#api" }
+  ],
   "logo": {
     "light": "/logo/light.svg",
     "dark": "/logo/dark.svg"

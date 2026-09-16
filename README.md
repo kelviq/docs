@@ -120,6 +120,22 @@ To contribute to Kelviq docs:
 - Link to related documentation
 - Keep sections concise and focused
 
+### Changelog
+
+All release notes live in one page, `changelog.mdx`, newest first. Add each release as an `<Update>` at the top of the page, tagged with the product exactly as it appears in the filter. The product filter above the entries matches on that tag, and so does the sidebar:
+
+```mdx
+<Update label="v2.9.0" description="October 1, 2026" tags={["Node SDK"]}>
+...
+</Update>
+```
+
+Keep the label a plain string; an expression label loses its anchor link. Products are `App`, `JS SDK`, `React SDK`, `Node SDK`, `Python SDK`, `JS Promotions UI`, `MCP Server`, `CLI`, and `API`.
+
+The sidebar lists the same products, as anchors under the Changelog tab in `docs.json`. They must be written as absolute URLs (`https://docs.kelviq.com/changelog#node-sdk`): Mintlify rewrites a relative href containing a hash to `/`. Absolute URLs would open in a new tab, so `ChangelogFilter` rewrites them back to same-page links once the page loads. To add a product, add it in three places: the `products` list passed to `<ChangelogFilter>`, the anchors in `docs.json`, and the redirect if the product had its own page before.
+
+Those anchors would otherwise carry an icon and no group title, so `custom.css` hides the icon, heads the list with "Changelog", and highlights whichever product is selected. Those rules only apply while `ChangelogFilter` is on screen, which it marks with `data-changelog-page` on the body.
+
 ## Need Help?
 
 - **Can't find something?** - Use the search feature (top of page)
