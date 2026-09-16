@@ -23,9 +23,9 @@ export const app = product({
   taxCode: 'saas',
 });
 
-export const seats = feature({
-  identifier: 'seats',
-  name: 'Seats',
+export const historyRetention = feature({
+  identifier: 'history-retention',
+  name: 'History retention (days)',
   type: 'CUSTOMIZABLE',
 });
 
@@ -33,7 +33,7 @@ export const pro = plan({
   identifier: 'pro',
   name: 'Pro',
   product: 'my-app',
-  entitlements: [{ feature: 'seats', value: 5 }],
+  entitlements: [{ feature: 'history-retention', value: 30 }],
 });
 ```
 

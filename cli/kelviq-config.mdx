@@ -23,11 +23,15 @@ export const apiCalls = feature({
   identifier: 'api-calls',
   name: 'API calls',
   type: 'METER',
+  featureDetails: {
+    featureSubType: 'PRE_AGGREGATED_USAGE',
+    units: { singular: 'call', plural: 'calls' },
+  },
 });
 
-export const seats = feature({
-  identifier: 'seats',
-  name: 'Seats',
+export const historyRetention = feature({
+  identifier: 'history-retention',
+  name: 'History retention (days)',
   type: 'CUSTOMIZABLE',
 });
 
@@ -36,13 +40,29 @@ export const pro = plan({
   name: 'Pro',
   product: 'my-app',
   entitlements: [
-    { feature: 'seats', value: 5 },
+    { feature: 'history-retention', value: 30 },
     { feature: 'api-calls', value: 10000, reset: 'EVERY_MONTH', hardLimit: false },
   ],
   prices: [
     {
       priceType: 'PAID',
       currency: 'USD',
+      freeTrial: false,
+      trialPeriod: 0,
+      enabled: true,
+      taxBehavior: 'EXCLUSIVE',
+      chargeCatalogPrice: [
+        {
+          feature: null,
+          priceModel: 'FLAT',
+          paymentType: 'ADVANCE_COMMITMENT',
+          reset: 'NEVER',
+          charges: [
+            { chargePeriod: 'MONTHLY', priceData: { amount: 29 } },
+            { chargePeriod: 'YEARLY', priceData: { amount: 290 } },
+          ],
+        },
+      ],
     },
   ],
 });
@@ -81,9 +101,9 @@ The plan lifecycle (draft → published) is also deliberately absent: the config
 |---|---|---|---|
 | `identifier` | slug | yes | Stable identifier, referenced from plan entitlements. |
 | `name` | string | yes | Display name. |
-| `type` | enum | yes | `BOOLEAN` (on/off), `CUSTOMIZABLE` (a configurable limit), or `METER` (usage-tracked). |
+| `type` | enum | yes | `BOOLEAN` (on/off), `CUSTOMIZABLE` (a setting the plan configures, such as days of history retention), or `METER` (a counted quantity — usage that resets, or seats a customer buys). Seats are a `METER`, not `CUSTOMIZABLE`: only a meter can carry a per-unit price and take a quantity at checkout — see [seat-based pricing](/product-catalog/seat-based-pricing). |
 | `description` | string | no | Free-text description. |
-| `featureDetails` | object | no | Type-specific detail payload, passed through to the API. |
+| `featureDetails` | object | for `METER` | Type-specific detail payload, passed through to the API. A `METER` feature needs `featureSubType` (`PRE_AGGREGATED_USAGE`) and `units` (`{ singular, plural }`); the API rejects the feature without them. See [Create a feature](/product-catalog/create-a-feature). |
 | `meter` | object | no | Meter configuration for `METER` features, passed through to the API. |
 | `metadata` | object | no | Arbitrary key-value metadata. |
 
