@@ -1949,23 +1949,7 @@ Always pass the **raw** request body (e.g. `request.data` in Flask) to `validate
 
 ### Webhook event types
 
-| Event | Description |
-|---|---|
-| `checkout.completed` | A checkout session was completed |
-| `customer.created` | A new customer was created |
-| `customer.updated` | A customer's details were updated |
-| `order.created` | A new order was placed |
-| `order.updated` | An order was updated |
-| `order.refunded` | An order was refunded |
-| `subscription.created` | A new subscription was created |
-| `subscription.updated` | A subscription was updated |
-| `subscription.cancelled` | A subscription was cancelled |
-| `subscription.plan_changed` | A subscription plan was changed |
-| `feature.usage_alert` | A feature's usage crossed a threshold configured when the entitlement was added to the plan |
-| `invoice.created` | A new invoice was created |
-| `invoice.paid` | An invoice was paid |
-| `refund.created` | A refund was initiated |
-| `refund.updated` | A refund status changed |
+See [Webhook event types](/guides/webhooks#event-types) for the complete list of supported events and their descriptions.
 
 ### Best practices
 
