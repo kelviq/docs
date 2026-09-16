@@ -166,10 +166,11 @@ The price envelope is validated; the charge structures inside it are deliberatel
 | `freeTrial` | boolean | no | Whether the price includes a free trial. |
 | `trialPeriod` | number | no | Trial length in days. |
 | `taxBehavior` | enum | no | `INCLUSIVE`, `EXCLUSIVE`, or `UNSPECIFIED`. |
+| `enabled` | boolean | no | Whether the price is available for purchase. |
 | `chargeCatalogPrice` | array of objects | no | The full charge structure (price models, tiers, billing periods). Passed through verbatim — see the plan-prices endpoints in the [API Reference](/api-reference/introduction) for the shape. |
 
 <Info>
-A pulled config reproduces your remote prices in full, including nested charge structures. You rarely need to author `chargeCatalogPrice` by hand — pull an existing plan and adapt it. If you do author prices by hand, set `freeTrial`, `trialPeriod`, `enabled`, and `taxBehavior` explicitly — omitting them makes `kelviq push` see a difference against the server's stored defaults on every run (see the [push reference](/cli/commands#kelviq-push)).
+A pulled config reproduces your remote prices in full, including nested charge structures. You rarely need to author `chargeCatalogPrice` by hand — pull an existing plan and adapt it. If you do author prices by hand, set `freeTrial`, `trialPeriod`, `enabled`, and `taxBehavior` explicitly, and set `paymentType` and `reset` on each entry in `chargeCatalogPrice` — omitting any of them makes `kelviq push` see a difference against the server's stored defaults on every run (see the [push reference](/cli/commands#kelviq-push)).
 </Info>
 
 ---
