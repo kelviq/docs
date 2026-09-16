@@ -9,6 +9,30 @@ import { ChangelogFilter } from "/snippets/changelog-filter.jsx";
 
 <ChangelogFilter products={["App","JS SDK","React SDK","Node SDK","Python SDK","JS Promotions UI","MCP Server","CLI","API"]} />
 
+<Update label="v0.3.1" description="September 16, 2026" tags={["CLI"]}>
+
+### Improvements
+
+#### Cleaner `kelviq pull` output
+
+A pulled `kelviq.config.ts` now writes charge prices the way you'd author them. A charge's `feature` is the feature's identifier:
+
+```typescript
+chargeCatalogPrice: [
+  {
+    feature: 'seats',
+    priceModel: 'FLAT',
+    ...
+  },
+]
+```
+
+Previously that field held the whole feature object the API returns — its UUID, timestamps and Stripe ids — and each charge carried its own server-generated ids. Those fields are now left out, so a pulled catalog is around 20% smaller, holds no UUIDs or Stripe ids, and reads as something you can edit by hand and review in a pull request.
+
+Existing pulled files keep working: `kelviq push` accepts the identifier, the UUID and the embedded object alike.
+
+</Update>
+
 <Update label="v1.1.0" description="September 16, 2026" tags={["MCP Server"]}>
 
 ### New Features
