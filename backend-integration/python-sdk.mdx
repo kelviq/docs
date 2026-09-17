@@ -1975,6 +1975,22 @@ client = Kelviq.create_sync_client(
     environment="sandbox"
 )
 ```
+### Reading the environment from `KELVIQ_ENV`
+
+`environment_from_env()` turns the `KELVIQ_ENV` convention shared with the Kelviq CLI and MCP server into the `environment` argument: `"sandbox"` when the variable is unset or empty, `"production"` or `"sandbox"` when it is set to one of those, and a `ValueError` naming any other value.
+
+```python
+import os
+from kelviq_sdk import Kelviq, environment_from_env
+
+client = Kelviq.create_sync_client(
+    access_token=os.environ["KELVIQ_SERVER_API_KEY"],
+    environment=environment_from_env(),  # reads KELVIQ_ENV: sandbox when unset
+)
+```
+
+`environment="production"` and `environment="prod"` mean the same thing.
+
 <Info>
 The sandbox environment is completely separate from production. You will need to use a different set of API keys, and any data created (customers, subscriptions, etc.) will only exist in the sandbox.
 </Info>

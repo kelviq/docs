@@ -6,6 +6,13 @@ icon: 'square-terminal'
 
 All commands support `--help`. The CLI targets your **sandbox** environment unless you pass `--prod` — see [Environments & authentication](/cli/environments).
 
+Every command reads `KELVIQ_*` variables from `.env.local` and then `.env` in the working directory before it runs, so a project's env file works without exporting anything. A variable already set in your shell always wins. Two global flags control this:
+
+| Flag | Description |
+|---|---|
+| `--env-file <path>` | Read this dotenv file instead of `.env.local`/`.env`. Repeat it for several files; a missing file is an error. |
+| `--no-env-file` | Don't read any env file. |
+
 Output is colorized on interactive terminals (green creates, yellow updates, red archives) and automatically plain when piped. Disable colors explicitly with the global `--no-color` flag or the `NO_COLOR` environment variable.
 
 ---
@@ -15,17 +22,24 @@ Output is colorized on interactive terminals (green creates, yellow updates, red
 Writes a starter `kelviq.config.ts` to the current directory.
 
 ```shell
-kelviq init
+kelviq init                     # the saas template
+kelviq init --template usage    # metered usage with an overage price
+kelviq init --template license  # a plan that issues license keys
 kelviq init -o pricing/kelviq.config.ts
 kelviq init --force
 ```
 
 | Flag | Description |
 |---|---|
+| `--template <name>` | Which starter catalog to write: `saas` (default), `usage`, or `license`. |
 | `-o, --output <path>` | Where to write the file. Defaults to `kelviq.config.ts` in the current directory. |
 | `--force` | Overwrite the file if it already exists. Without it, `init` refuses rather than clobbering your edits. |
 
-The starter file defines one product, one feature, and one plan using the typed builders from `@kelviq/cli/config` — see the [format reference](/cli/kelviq-config).
+Each template is a complete catalog that `kelviq push` accepts as written, using the typed builders from `@kelviq/cli/config` — see the [format reference](/cli/kelviq-config):
+
+- **`saas`** — a product with a free plan and a Pro plan billed monthly or yearly, gating a boolean feature and a configurable limit.
+- **`usage`** — a `METER` feature with the details the API requires, a free plan with a hard monthly allowance, and a Pro plan with an included quantity plus a tiered pay-as-you-go overage price.
+- **`license`** — a Pro plan whose orders issue license keys valid on up to three devices.
 
 ---
 
@@ -83,22 +97,37 @@ Removing a key locally does not revoke it. To revoke a key, delete it from the [
 
 ## kelviq env
 
-Shows which environment and keys the CLI is configured with. Read-only — it never calls the API.
+Shows which environment and keys the CLI is configured with, and which env files it read.
 
 ```shell
 kelviq env
+kelviq env --check
 ```
 
 ```text
 Environment : sandbox (default — use --prod to target production)
+KELVIQ_ENV  : unset (sandbox) — unprefixed KELVIQ_* vars apply to sandbox
 Sandbox URL : https://sandboxapi.kelviq.com/api/v1
 Prod URL    : https://api.kelviq.com/api/v1
 Sandbox key : set
 Prod key    : missing
 Org         : unknown — Kelviq has no key-introspection endpoint yet
+Env files   : /path/to/app/.env.local (KELVIQ_SERVER_API_KEY, KELVIQ_ENV)
 ```
 
-Key rows show `set` or `missing` only — `env` reports what's configured locally and does not validate keys against the API. `kelviq env --json` emits the same report as JSON (never any part of a key's value).
+| Flag | Description |
+|---|---|
+| `--check` | Make one authenticated read per configured key and report whether the API accepted it. |
+| `--json` | Machine-readable output. Never includes any part of a key's value. |
+
+Without `--check`, key rows show `set` or `missing` only and nothing is sent to the API. With `--check`, each configured key gets one `GET /catalog/products/` call against its own environment's host and a result line:
+
+```text
+Sandbox check : ok
+Prod   check : skipped (no key configured)
+```
+
+`ok` means the key was accepted. `rejected` (HTTP 401 or 403) almost always means the key belongs to the other environment. The command exits non-zero when any configured key fails, or when no key is configured, so a script or agent can gate on it. `--check --json` adds `sandboxCheck` and `prodCheck` objects (`{ ok, status, httpStatus?, message? }`) to the JSON document.
 
 ---
 
@@ -177,9 +206,11 @@ Push stamps a `managed-by: kelviq-cli` entry into the `metadata` of every featur
 
 A plan **with** a `prices` array in config always pushes that complete array, replacing the plan's entire remote price set. A plan **without** a `prices` key never touches remote prices at all. Omitting `prices` means "leave pricing alone," not "this plan is free."
 
-<Warning>
-If you hand-author prices, set `freeTrial`, `trialPeriod`, `enabled`, and `taxBehavior` explicitly. Omitting them makes your price compare unequal to the server's stored defaults forever, so every push re-replaces that plan's prices (harmless but noisy — each one drafts the plan again). Configs generated by `kelviq pull` don't have this problem.
-</Warning>
+Prices are compared on the fields your config sets. A field you omit — `freeTrial`, `taxBehavior`, a charge's `paymentType` or `reset` — is left to the server's default and never counts as a difference, so a hand-authored price diffs clean after its first push.
+
+### METER features are checked before anything is written
+
+The API rejects a `METER` feature created without `featureDetails` (`featureSubType` and `units`). Push checks for this while building the plan and stops before any write, naming the feature and the shape to add — see [feature()](/cli/kelviq-config#feature).
 
 ### Features can't be updated — by design
 
@@ -229,3 +260,105 @@ kelviq promote             # then do it
 ```
 
 Promotion is one-way — sandbox to production. There is no reverse mode.
+
+---
+
+## kelviq status
+
+Shows the live catalog of an environment without writing a config file: products, features, and the latest version of every plan with its price and entitlement counts. Read-only — the check to run after a push to confirm what landed.
+
+```shell
+kelviq status
+kelviq status --prod
+kelviq status --json
+```
+
+```text
+Environment : sandbox
+
+Products (1)
+  my-app  My App
+
+Features (2)
+  api-calls          METER         API calls
+  history-retention  CUSTOMIZABLE  History retention (days)
+
+Plans (2)
+  free  Free  product my-app  ·  v1  ·  1 price  ·  1 entitlement  ·  visible
+  pro   Pro   product my-app  ·  v2  ·  1 price  ·  2 entitlements  ·  visible  ·  license keys
+```
+
+| Flag | Description |
+|---|---|
+| `--prod` | Read production instead of sandbox. |
+| `--json` | Emit `{ environment, products, features, plans }`, each plan as `{ identifier, name, product, version, isLatest, isVisible, prices, entitlements, licenseKeys }`. |
+
+A plan with no prices is flagged, since it can't be bought. The API reports a plan's version number rather than a draft/published state, so that's what `status` shows.
+
+---
+
+## kelviq webhook
+
+Registers the app's webhook endpoint and gets the signing secret into the app's env file without it ever appearing on screen.
+
+```shell
+kelviq webhook list
+kelviq webhook add https://app.example.com/api/kelviq/webhooks \
+  --events checkout.completed,subscription.created,subscription.updated,subscription.cancelled,invoice.payment_failed \
+  --write-secret .env.local
+```
+
+### kelviq webhook add
+
+| Flag | Description |
+|---|---|
+| `<url>` | The public https URL that receives events. Localhost and private addresses are rejected by the API. |
+| `--events <list>` | Comma-separated event types — see the [event list](/guides/webhooks#event-types). Required. |
+| `--write-secret <file>` | Write the signing secret into this dotenv file, replacing or appending a `KELVIQ_WEBHOOK_SECRET=` line. The value is never printed. |
+| `--variable <name>` | Variable name to write instead of `KELVIQ_WEBHOOK_SECRET`. |
+| `--print-secret` | Print the secret to stdout instead. Off by default. |
+| `--prod` | Target production instead of sandbox. |
+| `--yes` | Skip the confirmation prompt (required in non-interactive sessions). |
+| `--json` | Machine-readable output. The endpoint's `secret` is always `[hidden]` unless `--print-secret` is passed. |
+
+`add` is idempotent on the URL: an endpoint that already exists for the same URL is reused instead of registered twice, and its events are extended when the ones you pass aren't all covered. With neither `--write-secret` nor `--print-secret`, the secret stays hidden and the output tells you how to get it.
+
+### kelviq webhook list
+
+Lists endpoints with their URL, state, id and events. Secrets are never shown. `--prod` and `--json` as above.
+
+---
+
+## kelviq discount
+
+Creates and lists discount codes. Only enabling or disabling a code can change after creation, so `create` restates everything and asks before writing.
+
+```shell
+kelviq discount list
+kelviq discount create --name "Launch offer" --code LAUNCH20 --percent 20 \
+  --duration repeating --months 3 --product my-app --plans pro-monthly
+kelviq discount create --name "Ten off" --code TENOFF --amount 10 --currency USD
+```
+
+### kelviq discount create
+
+| Flag | Description |
+|---|---|
+| `--name <text>` | Shown on the customer's invoice. Required. |
+| `--code <CODE>` | What customers enter at checkout: uppercase letters and digits. Required. |
+| `--percent <n>` | Percentage off, 1–100. Exactly one of `--percent` or `--amount`. |
+| `--amount <x>` | Fixed amount off in normal currency units; needs `--currency`. |
+| `--currency <code>` | ISO currency code for `--amount`. |
+| `--duration <once\|repeating\|forever>` | How long the discount applies. Default `once`. |
+| `--months <n>` | With `--duration repeating`: how many **billing periods** it applies for. Not calendar months — `3` on a yearly plan is three years, so scope a "first 3 months" code to monthly plans. |
+| `--product <identifier>` | Limit the code to one product, by identifier or UUID. The CLI resolves the identifier to the UUID the API wants. |
+| `--plans <list>` | With `--product`: comma-separated plan identifiers. Omit to cover every plan of the product. |
+| `--max-redemptions <n>` | Total number of uses across all customers. |
+| `--redeem-by <datetime>` | ISO 8601 date/time after which the code stops working. |
+| `--prod` / `--yes` / `--json` | As for `webhook add`. |
+
+Discount codes need a Merchant of Record organization.
+
+### kelviq discount list
+
+Lists codes with amount, duration and state. `--search <text>` filters by name or code; `--prod` and `--json` as above.

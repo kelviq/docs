@@ -55,7 +55,7 @@ Server API Keys have full API access. Never expose them in client-side code, com
 
 ## Environment variables
 
-Environment variables **override** the stored config file — useful for CI, containers, and one-off overrides without touching your stored keys. `KELVIQ_SERVER_API_KEY` and `KELVIQ_ENV` work the same way as in the [MCP server](/guides/mcp-server); the environment-named keys are CLI-only.
+Environment variables **override** the stored config file — useful for CI, containers, and one-off overrides without touching your stored keys. They can come from the shell or from the project's env file: before every command, the CLI reads `KELVIQ_*` variables from `.env.local` and then `.env` in the working directory, never overriding a variable the shell already sets. Pass `--env-file <path>` to read a specific file instead, or `--no-env-file` to read none. `kelviq env` lists the files it read. `KELVIQ_SERVER_API_KEY` and `KELVIQ_ENV` work the same way as in the [MCP server](/guides/mcp-server); the environment-named keys are CLI-only.
 
 | Variable | Purpose |
 |---|---|
@@ -90,7 +90,7 @@ If a command needs a key and finds none — neither in the environment nor store
 
 ## Checking your setup
 
-`kelviq env` prints the full picture without calling the API:
+`kelviq env` prints the full picture without calling the API, and `kelviq env --check` adds one authenticated read per configured key:
 
 ```text
 Environment : sandbox (default — use --prod to target production)
@@ -103,5 +103,5 @@ Org         : unknown — Kelviq has no key-introspection endpoint yet
 ```
 
 <Info>
-`set` means a key is configured (stored or via environment variable) — not that it's valid. Kelviq has no key-introspection endpoint yet, so the CLI can't verify a key or display your organization name; an invalid key surfaces on the first real API call, such as `kelviq pull`.
+`set` means a key is configured (stored, from an env file, or from the shell) — not that it's valid. `kelviq env --check` verifies each key with one read against its own environment and exits non-zero if any configured key is rejected. Kelviq has no key-introspection endpoint yet, so the CLI can't display your organization name.
 </Info>

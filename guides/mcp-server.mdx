@@ -12,7 +12,7 @@ Instead of asking your assistant to "write me a curl command," you describe the 
 </Tip>
 
 <Info>
-**56 tools** spanning customers, checkout, subscriptions, discounts, webhooks, entitlements, licenses, usage, offerings, promotions, the customer portal, and full catalog management (products, plans, features) — plus a resource for every docs page and the full OpenAPI spec, and **3 guided prompts** for the most common workflows. Every tool carries [MCP safety annotations](https://modelcontextprotocol.io/docs/concepts/tools#tool-annotations), so clients can auto-approve read-only calls while confirming destructive ones.
+**57 tools** spanning connection checks, customers, checkout, subscriptions, discounts, webhooks, entitlements, licenses, usage, offerings, promotions, the customer portal, and full catalog management (products, plans, features) — plus a resource for every docs page and the full OpenAPI spec, and **3 guided prompts** for the most common workflows. Every tool carries [MCP safety annotations](https://modelcontextprotocol.io/docs/concepts/tools#tool-annotations), so clients can auto-approve read-only calls while confirming destructive ones.
 </Info>
 
 
@@ -69,7 +69,7 @@ claude mcp add kelviq \
 The `--` separator is required so that `claude` doesn't intercept `-y` as one of its own flags. Put all `--env` arguments **before** the `--`.
 </Note>
 
-Verify the connection with `/mcp` inside a Claude Code session — you should see `kelviq ✓ Connected, 56 tools`.
+Verify the connection with `/mcp` inside a Claude Code session — you should see `kelviq ✓ Connected, 57 tools`.
 </Tab>
 
 <Tab title="Claude Desktop">
@@ -247,6 +247,14 @@ Docs tools (`docs_search`, `docs_read`) work with no API keys at all. Even witho
 
 Tools are grouped by domain. Each tool name uses `domain_action` form (`customer_create`, `plan_publish`). The LLM picks the right tool from the description automatically — you rarely need to name a tool explicitly.
 
+Wherever a tool takes a product or feature reference (`plan_create`, `plan_entitlements_add`, `discount_create`'s `appliesTo`, `offering_get_product`), it accepts the identifier or the UUID; the server resolves an identifier before calling the API.
+
+### Connection
+
+| Tool | Description |
+|------|-------------|
+| `connection_check` | One authenticated read with the server key. Returns the environment, both API hosts and whether the key is `ok`, `missing`, `rejected` or errored, never the key itself. The first thing to call when something returns 401/403. |
+
 ### Customers
 
 | Tool | Description |
@@ -292,7 +300,7 @@ Tools are grouped by domain. Each tool name uses `domain_action` form (`customer
 | Tool | Description |
 |------|-------------|
 | `discount_list` | List discount codes. Optional `search` across name and code, paginated. |
-| `discount_create` | Create a percentage or fixed-amount code, optionally limited to products or plans with `appliesTo`. Merchant of Record organizations only. |
+| `discount_create` | Create a percentage or fixed-amount code, optionally limited to a product (identifier or UUID) and its plans with `appliesTo`. Merchant of Record organizations only. |
 | `discount_retrieve` | Fetch one discount, including how often it's been redeemed and whether it's active. |
 | `discount_update` | Enable or disable a code with `isActive`. Nothing else can change after creation. |
 | `discount_archive` | Archive a code so it can no longer be used. |
@@ -340,7 +348,7 @@ Plans are versioned. Updates create a draft; `plan_publish` releases it.
 | Tool | Description |
 |------|-------------|
 | `plan_list` | List all plans in the account. |
-| `plan_create` | Create a plan under a product. Plan starts in `DRAFT`. |
+| `plan_create` | Create a plan under a product (by identifier or UUID). Plan starts in `DRAFT`. |
 | `plan_retrieve` | Fetch one plan. |
 | `plan_update` | Patch a plan. Updates to a published plan automatically create a new draft. |
 | `plan_archive` | Archive a plan. Existing subscriptions keep working. |
@@ -348,7 +356,7 @@ Plans are versioned. Updates create a draft; `plan_publish` releases it.
 | `plan_discard_draft` | Drop the current draft, keep the published version. |
 | `plan_prices_list` | List all prices configured on a plan. |
 | `plan_entitlements_list` | List feature entitlements on a plan. |
-| `plan_entitlements_add` | Attach feature entitlements. |
+| `plan_entitlements_add` | Attach feature entitlements, each feature by identifier or UUID. |
 | `plan_entitlement_update` | Patch a single entitlement's `details`. |
 | `plan_entitlement_delete` | Remove an entitlement. |
 | `plan_file_update` | Edit display fields of a plan-attached file. |
@@ -475,7 +483,7 @@ A required env var is missing. The error message names which one — set it in y
 
 ### Tool returns HTTP 401 or 403
 
-Almost always, the key belongs to the other environment: a sandbox key only works against sandbox, and a production key only against production.
+Ask your assistant to call `connection_check`: it reports the environment the server is using and whether the key was accepted, without showing the key. Almost always, the key belongs to the other environment: a sandbox key only works against sandbox, and a production key only against production.
 
 - The server uses sandbox unless `KELVIQ_ENV=production`. If your key is a production key, add `KELVIQ_ENV=production` to the server's environment and reconnect.
 - The error message includes a hint naming the environment the server is using, and the startup log shows it too (`kelviq-mcp ready (env=…`). Make sure it matches your key.

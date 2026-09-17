@@ -9,6 +9,90 @@ import { ChangelogFilter } from "/snippets/changelog-filter.jsx";
 
 <ChangelogFilter products={["App","JS SDK","React SDK","Node SDK","Python SDK","JS Promotions UI","MCP Server","CLI","API"]} />
 
+<Update label="v0.4.0" description="September 16, 2026" tags={["CLI"]}>
+
+### New Features
+
+#### Env files, a live key check, and the live catalog
+
+- Every command reads `KELVIQ_*` variables from `.env.local` and then `.env` in the working directory, so an app's env file is enough. A variable set in the shell always wins; `--env-file <path>` reads a specific file and `--no-env-file` reads none.
+- `kelviq env --check` makes one authenticated read per configured key and reports `ok`, `rejected` or `error`, exiting non-zero when a key fails. Nothing from the key is printed.
+- `kelviq status` shows the live catalog: products, features, and each plan's latest version with its price and entitlement counts, visibility and license-key state. `--json` for scripts.
+
+#### Webhooks and discounts from the terminal
+
+- `kelviq webhook add <url> --events … --write-secret .env.local` registers the app's endpoint, reusing one that already has the same URL, and writes the signing secret into the env file as `KELVIQ_WEBHOOK_SECRET` without printing it. `kelviq webhook list` shows endpoints with secrets hidden.
+- `kelviq discount create` creates a code after restating it for confirmation, with `--product` taking the product's identifier. `kelviq discount list` lists codes.
+
+#### Starter templates
+
+`kelviq init --template saas|usage|license` writes a complete catalog that pushes as written: a SaaS product with free and Pro plans, a metered product with an included quantity and tiered overage, or a plan that issues license keys.
+
+### Improvements
+
+- `kelviq push` compares prices only on the fields your config sets. Leaving out `freeTrial`, `taxBehavior`, or a charge's `paymentType` and `reset` no longer shows a difference on every run.
+- `kelviq push` and `kelviq promote` stop before writing when a `METER` feature would be created without `featureDetails`, naming the feature and the fields to add.
+
+</Update>
+
+<Update label="v1.2.0" description="September 16, 2026" tags={["MCP Server"]}>
+
+### New Features
+
+#### `connection_check`
+
+A read-only tool that makes one authenticated read with the server key and reports the environment, both API hosts and whether the key is `ok`, `missing` or `rejected`, without ever including the key. Ask for it first when a tool returns 401 or 403.
+
+### Improvements
+
+- `plan_create`, `plan_entitlements_add`, `discount_create`'s `appliesTo` and `offering_get_product` accept a product or feature **identifier** as well as a UUID. The server resolves the identifier before calling the API, so the assistant no longer has to look up UUIDs first.
+- The bundled documentation is refreshed with every release, so `docs_search` and `docs_read` match the current docs.
+
+</Update>
+
+<Update label="v2.9.0" description="September 17, 2026" tags={["Python SDK"]}>
+
+### New Features
+
+#### `environment_from_env()`
+
+Resolves the client's `environment` argument from `KELVIQ_ENV`, the variable the CLI and MCP server share: `"sandbox"` when unset, `"production"` or `"sandbox"` when set to one of those, and a `ValueError` naming any other value.
+
+```python
+from kelviq_sdk import Kelviq, environment_from_env
+
+client = Kelviq.create_sync_client(
+    access_token=os.environ["KELVIQ_SERVER_API_KEY"],
+    environment=environment_from_env(),
+)
+```
+
+### Improvements
+
+- `environment="production"` is accepted alongside `"prod"`, so a value read straight from `KELVIQ_ENV` works.
+- An environment name the SDK doesn't know now logs a warning. It still falls back to the production hosts.
+
+</Update>
+
+<Update label="v2.9.0" description="September 16, 2026" tags={["Node SDK"]}>
+
+### New Features
+
+#### `environmentFromEnv()`
+
+Turns the `KELVIQ_ENV` convention shared with the CLI and MCP server into a typed `environment` option: `sandbox` when unset, `production` or `sandbox` when set to one of those, and an error naming any other value.
+
+```typescript
+import { Kelviq, environmentFromEnv } from '@kelviq/node-sdk';
+
+const client = new Kelviq({
+  accessToken: process.env.KELVIQ_SERVER_API_KEY!,
+  environment: environmentFromEnv(),
+});
+```
+
+</Update>
+
 <Update label="v0.3.1" description="September 16, 2026" tags={["CLI"]}>
 
 ### Improvements

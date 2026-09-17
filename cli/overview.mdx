@@ -122,7 +122,7 @@ A typed, self-contained TypeScript file is something coding assistants are genui
 kelviq init
 ```
 
-Writes a starter `kelviq.config.ts` to edit by hand — useful when you're designing pricing for a new product and want to sketch the model in code (with autocomplete and validation) before anything exists in Kelviq.
+Writes a complete starter `kelviq.config.ts` to edit by hand — useful when you're designing pricing for a new product and want to sketch the model in code (with autocomplete and validation) before anything exists in Kelviq. `--template usage` and `--template license` start from a metered or a license-key catalog instead of the default SaaS one.
 
 ---
 
@@ -166,7 +166,7 @@ kelviq --version
 kelviq login
 ```
 
-`login` opens the dashboard's [API keys page](https://app.kelviq.com/settings/api-keys) in your browser and prompts you to paste a **Server API Key**. Input is masked and the key is stored locally with owner-only file permissions.
+`login` opens the dashboard's [API keys page](https://app.kelviq.com/settings/api-keys) in your browser and prompts you to paste a **Server API Key**. Input is masked and the key is stored locally with owner-only file permissions. If the key is already in your project's `.env.local` or `.env` as `KELVIQ_SERVER_API_KEY`, skip this step: the CLI reads it from there.
 
 The CLI targets your **sandbox** environment by default. To store a production key too, run `kelviq login --prod`. See [Environments & authentication](/cli/environments) for how keys are stored and how to use environment variables instead (for example, in CI).
 
@@ -189,10 +189,10 @@ kelviq init
 ### Step 4: Check where you're pointed
 
 ```shell
-kelviq env
+kelviq env --check
 ```
 
-Prints which environment the CLI targets and which keys are configured — useful before any command that touches your account.
+Prints which environment the CLI targets, which keys are configured and which env files were read, and with `--check` confirms each key is accepted by the API — useful before any command that touches your account. Keys can also live in the project's `.env.local` or `.env`: every command reads `KELVIQ_*` variables from there, so an app's existing env file is enough.
 
 ### Step 5: Make a change and deploy it
 
@@ -218,6 +218,9 @@ When you're happy, `kelviq push --publish` makes the changed plans live, and `ke
 | [`kelviq pull`](/cli/commands#kelviq-pull) | Write your remote catalog to `kelviq.config.ts`. |
 | [`kelviq push`](/cli/commands#kelviq-push) | Deploy a `kelviq.config.ts`: diff, confirm, draft-first writes, optional publish and prune. |
 | [`kelviq promote`](/cli/commands#kelviq-promote) | Move the sandbox catalog to production with the same preview and gates. |
+| [`kelviq status`](/cli/commands#kelviq-status) | Show the live catalog: products, features, each plan's latest version with price and entitlement counts. |
+| [`kelviq webhook`](/cli/commands#kelviq-webhook) | Register the app's webhook endpoint and write its signing secret into an env file without printing it. |
+| [`kelviq discount`](/cli/commands#kelviq-discount) | Create and list discount codes, with the product given by identifier. |
 
 See the full [command reference](/cli/commands) for every flag, and the [`kelviq.config.ts` reference](/cli/kelviq-config) for the file format.
 
@@ -225,5 +228,4 @@ See the full [command reference](/cli/commands) for every flag, and the [`kelviq
 
 ## What's coming
 
-- **Catalog browse commands** — list and inspect products, features, and plans without a full pull.
 - **Browser-based login** — a pairing flow that mints a scoped key from your dashboard session, replacing paste-a-key.

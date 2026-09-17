@@ -103,7 +103,7 @@ The plan lifecycle (draft → published) is also deliberately absent: the config
 | `name` | string | yes | Display name. |
 | `type` | enum | yes | `BOOLEAN` (on/off), `CUSTOMIZABLE` (a setting the plan configures, such as days of history retention), or `METER` (a counted quantity — usage that resets, or seats a customer buys). Seats are a `METER`, not `CUSTOMIZABLE`: only a meter can carry a per-unit price and take a quantity at checkout — see [seat-based pricing](/product-catalog/seat-based-pricing). |
 | `description` | string | no | Free-text description. |
-| `featureDetails` | object | for `METER` | Type-specific detail payload, passed through to the API. A `METER` feature needs `featureSubType` (`PRE_AGGREGATED_USAGE`) and `units` (`{ singular, plural }`); the API rejects the feature without them. See [Create a feature](/product-catalog/create-a-feature). |
+| `featureDetails` | object | for `METER` | Type-specific detail payload, passed through to the API. A `METER` feature needs `featureSubType` (`PRE_AGGREGATED_USAGE`) and `units` (`{ singular, plural }`): `kelviq push` refuses to create one without them, before writing anything, because the API rejects it. See [Create a feature](/product-catalog/create-a-feature). |
 | `meter` | object | no | Meter configuration for `METER` features, passed through to the API. |
 | `metadata` | object | no | Arbitrary key-value metadata. |
 
@@ -190,7 +190,7 @@ The price envelope is validated; the charge structures inside it are deliberatel
 | `chargeCatalogPrice` | array of objects | no | The full charge structure (price models, tiers, billing periods). Passed through verbatim — see the plan-prices endpoints in the [API Reference](/api-reference/introduction) for the shape. |
 
 <Info>
-A pulled config reproduces your remote prices in full, including nested charge structures. You rarely need to author `chargeCatalogPrice` by hand — pull an existing plan and adapt it. If you do author prices by hand, set `freeTrial`, `trialPeriod`, `enabled`, and `taxBehavior` explicitly, and set `paymentType` and `reset` on each entry in `chargeCatalogPrice` — omitting any of them makes `kelviq push` see a difference against the server's stored defaults on every run (see the [push reference](/cli/commands#kelviq-push)).
+A pulled config reproduces your remote prices in full, including nested charge structures. To author one by hand, start from `kelviq init --template saas|usage|license` or pull an existing plan and adapt it. Fields you leave out — `freeTrial`, `taxBehavior`, a charge's `paymentType` or `reset` — take the server's defaults, and `kelviq push` compares prices only on the fields you set, so leaving them out never shows up as a change.
 </Info>
 
 ---
