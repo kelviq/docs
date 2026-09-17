@@ -227,6 +227,14 @@ For example, suppose a plan includes 10,000 credits each month. The customer has
   The rollover limit and the usage hard limit do different jobs. The rollover limit caps the credits carried into a new period. The hard limit stops additional usage when the customer's balance reaches zero.
 </Note>
 
+#### Rollover when two subscriptions share a feature
+
+A customer can hold two active subscriptions whose plans include the same metered feature. The customer sees one combined balance: if Plan A includes 100 credits and Plan B includes 200, they have 300 credits to spend. Features that exist in only one of the plans stay exclusive to that plan.
+
+Consumption follows the defined order. If Plan A's credits are set to be used first, Kelviq draws from Plan B only after Plan A's balance is fully used.
+
+The combined balance is a display convenience. Kelviq tracks each plan's credits separately, and at the end of each billing cycle it calculates rollover per plan, using that plan's own unused credits and that plan's rollover percentage and limit. A credit that came from Plan A never rolls over under Plan B's rules.
+
 #### Usage alerts
 
 Usage alerts watch a metered feature for percentage or absolute-unit thresholds. When a customer crosses a threshold, Kelviq sends `feature.usage_alert` to your subscribed webhook endpoint. Your application can then send an email, show an in-app warning, or start an upgrade flow.
