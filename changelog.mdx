@@ -9,6 +9,23 @@ import { ChangelogFilter } from "/snippets/changelog-filter.jsx";
 
 <ChangelogFilter products={["App","JS SDK","React SDK","Node SDK","Python SDK","JS Promotions UI","MCP Server","CLI","API"]} />
 
+<Update label="v0.4.1" description="September 18, 2026" tags={["CLI"]}>
+
+### Fixes
+
+- `kelviq discount create --product <identifier>` now finds the product. It looks the identifier up through the product list, since the product endpoint itself takes only a UUID.
+
+</Update>
+
+<Update label="v1.2.1" description="September 18, 2026" tags={["MCP Server"]}>
+
+### Fixes
+
+- Product and feature identifiers now resolve correctly in every tool that accepts them. 1.2.0 looked them up through the retrieve endpoints, which take only a UUID, so any identifier failed with a 404.
+- `product_retrieve`, `product_update`, `product_archive`, the product settings and image tools, `feature_retrieve` and `feature_archive` accept an identifier as well as a UUID.
+
+</Update>
+
 <Update label="v0.4.0" description="September 16, 2026" tags={["CLI"]}>
 
 ### New Features

@@ -30,7 +30,7 @@ Entitlement checks return `false` for a customer Kelviq has never seen, so a fre
 1. Create the customer **with an email address** — `customers.create` in the SDK, or `POST /customers/`.
 2. Create the subscription — `POST /subscriptions/create/` with the plan's identifier and `chargePeriod: "ONE_TIME"`.
 
-Keep that order. Creating a subscription for a customer Kelviq has not seen fails with `Subscription requires a customer with a valid email address` — and the failed attempt still registers the customer, without an email. From then on `POST /customers/` answers `Customer already exists`, and the portal refuses that customer too. Recover by patching the email onto the existing record with `PATCH /customers/{customerId}/`, after which the subscription call succeeds. Treat `Customer already exists` as a signal to patch rather than an error to surface.
+Keep that order, and enrol at signup, before the customer reaches checkout. Creating a subscription for a customer Kelviq has not seen fails with `Subscription requires a customer with a valid email address` — and the failed attempt still registers the customer, without an email. Creating a checkout session with a `customerId` registers the customer the same way. From then on `POST /customers/` answers `Customer already exists`, and the portal refuses that customer too. Recover by patching the email onto the existing record with `PATCH /customers/{customerId}/`, after which the subscription call succeeds. Treat `Customer already exists` as a signal to patch rather than an error to surface.
 
 Enrolling this way also records a $0 order for the plan.
 
