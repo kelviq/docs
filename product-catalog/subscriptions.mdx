@@ -67,6 +67,34 @@ If you omit the field, Kelviq uses your organization's default. Set the defaults
 
 To see the exact amounts before committing to a change, call `POST /subscriptions/{subscriptionId}/update/preview/` with the same payload. If credits exceed the new charge, no payment is collected and the remainder is kept as customer credit.
 
+#### Proration examples
+
+The examples below assume the change happens halfway through the billing period, with taxes and discounts excluded for simplicity.
+
+**Monthly to monthly.** The customer moves from a \$100/month plan to a \$200/month plan. The unused old-plan credit is \$50 and the remaining new-plan charge is \$100, so the prorated difference is \$50. The renewal date does not change.
+
+| Option | Result |
+| --- | --- |
+| `IMMEDIATE_CHARGE` | An invoice is created immediately: \$100 charge minus \$50 credit, so \$50 due now. |
+| `PRORATE_NEXT_INVOICE` | No immediate invoice. The next renewal invoice is \$200 renewal plus \$50 proration, so \$250 due. |
+| `NO_PRORATION` | No credit or partial charge. The next renewal invoice is \$200. |
+
+**Monthly to yearly.** The customer moves from a \$100/month plan to a \$1,200/year plan with \$50 of unused monthly credit. Because the billing interval changes, every option invoices immediately, and the change date starts the new yearly period.
+
+| Option | Result |
+| --- | --- |
+| `IMMEDIATE_CHARGE` | Immediate invoice: \$1,200 yearly charge minus \$50 credit, so \$1,150 due now. |
+| `PRORATE_NEXT_INVOICE` | Also invoices immediately because the interval changed: \$1,150 due now. |
+| `NO_PRORATION` | Immediate invoice for the full yearly price with no credit: \$1,200 due now. |
+
+**Yearly to monthly.** The customer moves from a \$1,200/year plan to a \$200/month plan with \$600 of unused yearly credit. The change date becomes the new monthly renewal date.
+
+| Option | Result |
+| --- | --- |
+| `IMMEDIATE_CHARGE` | The \$200 monthly charge is deducted from the \$600 credit, leaving \$400 as customer credit. |
+| `PRORATE_NEXT_INVOICE` | Also processed immediately because the interval changed, leaving \$400 customer credit. |
+| `NO_PRORATION` | The unused yearly credit is not applied. Immediate invoice: \$200 due now. |
+
 ### Wait for payment before changing access
 
 `activate_on_payment` keeps the customer's current subscription active while payment for the change is pending. This prevents an unpaid plan change from replacing working access.

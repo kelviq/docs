@@ -578,6 +578,18 @@ charge = client.charges.create(
 
 </Update>
 
+<Update label="v1.18" description="September 4, 2026" tags={["App"]}>
+
+## Abandoned cart recovery
+
+Kelviq now follows up with customers who start a checkout but do not pay. When a checkout sits untouched for an hour, Kelviq marks it as abandoned and sends up to three reminder emails, one each day for three days. Each email carries a **Return to checkout** link that takes the customer back to their session. The checkout expires four days after it was created.
+
+You do not need to set anything up. Recovery emails are on by default for every organization, and you can turn them off with the **Abandoned cart recovery** toggle in **Settings → Notifications**. Reminders are only sent when there is a customer email to send them to, and a customer is never emailed twice for the same step.
+
+Read [Abandoned cart recovery](/sales/abandoned-cart-recovery) for the full schedule, the abandonment rules, and what happens at expiration.
+
+</Update>
+
 <Update label="v1.17" description="August 21, 2026" tags={["App"]}>
 
 ## Find transactions faster
