@@ -9,6 +9,14 @@ import { ChangelogFilter } from "/snippets/changelog-filter.jsx";
 
 <ChangelogFilter products={["App","JS SDK","React SDK","Node SDK","Python SDK","JS Promotions UI","MCP Server","CLI","API"]} />
 
+<Update label="v0.4.2" description="September 23, 2026" tags={["CLI"]}>
+
+### Fixes
+
+- `kelviq pull` no longer fails on a plan that grants unlimited usage of a feature. The dashboard stores an empty `value` for those entitlements, which the config format rejected. Pull now writes them as `hasUnlimitedUsage: true` with no `value`.
+
+</Update>
+
 <Update label="v0.4.1" description="September 18, 2026" tags={["CLI"]}>
 
 ### Fixes

@@ -131,7 +131,7 @@ Each entry grants a feature to the plan:
 |---|---|---|---|
 | `feature` | slug | yes | Identifier of the granted feature. |
 | `value` | boolean or number | no | The grant: `true`/`false` for `BOOLEAN` features, a number for limits. |
-| `hasUnlimitedUsage` | boolean | no | Grant unlimited usage instead of a numeric value. |
+| `hasUnlimitedUsage` | boolean | no | Grant unlimited usage instead of a numeric value. Omit `value` when this is `true`; `kelviq pull` writes unlimited entitlements this way. |
 | `reset` | enum | no | Usage reset cadence: `NEVER`, `EVERY_DAY`, `EVERY_28_DAYS`, `EVERY_MONTH`, `EVERY_QUARTER`, `EVERY_YEAR`. |
 | `hardLimit` | boolean | no | Whether usage is blocked at the limit. |
 | `usageAlerts` | object | no | Alert configuration, passed through to the API. |
