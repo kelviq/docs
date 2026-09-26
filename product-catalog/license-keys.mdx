@@ -160,6 +160,27 @@ For each active instance, you can click **Revoke** to:
 
 Your customers (or their software) can interact with licenses using these API endpoints. Use these to integrate license checking into your application.
 
+### Authentication
+
+The Activate, Validate, and Deactivate License APIs accept either a **Client API Key** or a **Server API Key** as a Bearer token:
+
+```bash
+Authorization: Bearer YOUR_API_KEY
+```
+
+Choose the key based on where the request originates:
+
+| Request origin | API key | Guidance |
+| --- | --- | --- |
+| Browser, desktop app, mobile app, CLI, or plugin | Client API Key | Safe to include in distributed client software. The customer still supplies the license key. |
+| Your backend or another trusted server | Server API Key | Keep it secret and load it from your server environment. |
+
+Both key types can call `POST /license/activate/`, `POST /license/validate/`, and `POST /license/deactivate/`. Use a key from the same environment as the license: a sandbox key with a sandbox license, or a production key with a production license.
+
+<Warning>
+  Never expose a Server API Key in frontend code or software distributed to customers. Use a Client API Key for those integrations.
+</Warning>
+
 ### 3.0 Reading a customer's key from your server
 
 A customer's keys come back with their purchase records, authenticated with your server API key. Orders, subscriptions and invoices all carry a `license` array, and each entry holds `licenseKey` alongside `activationUsage`, `activationLimit` and `expiresOn`.
@@ -175,7 +196,9 @@ This matters for how much you ask of the customer. A signed-in web app already k
 
 Activates a license key on a specific device/instance.
 
-**Endpoint**: `POST /license/activate`
+**Endpoint**: `POST /license/activate/`
+
+**Authentication**: Client API Key or Server API Key
 
 **When to use**: 
 - When the user enters their license key for the first time
@@ -201,7 +224,9 @@ Activates a license key on a specific device/instance.
 
 Checks if a license is valid and currently active.
 
-**Endpoint**: `POST /license/validate`
+**Endpoint**: `POST /license/validate/`
+
+**Authentication**: Client API Key or Server API Key
 
 **When to use**:
 - On application startup to verify the license
@@ -229,7 +254,9 @@ Checks if a license is valid and currently active.
 
 Removes an activation from a specific device/instance.
 
-**Endpoint**: `POST /license/deactivate`
+**Endpoint**: `POST /license/deactivate/`
+
+**Authentication**: Client API Key or Server API Key
 
 **When to use**:
 - When the user uninstalls your application

@@ -34,14 +34,20 @@ You can get your API key from the Kelviq application dashboard.
 
 1.  Navigate to **Settings**.
 2.  Go to the [**API keys**](https://app.kelviq.com/settings/api-keys) section.
-3.  Copy your **Server API Key** to use in your application.
+3.  Copy the key appropriate for your integration:
+    - **Client API Key** for supported calls made from browsers or distributed applications.
+    - **Server API Key** for calls made from your trusted backend.
 
 ---
 
 ## Authorization
 
-To authenticate your requests, pass your **Server API Key** as a Bearer token in the `Authorization` header.
+To authenticate your requests, pass the appropriate API key as a Bearer token in the `Authorization` header.
 
 ```bash
 Authorization: Bearer YOUR_API_KEY
 ```
+
+Most management APIs require a Server API Key. The License Activate, Validate, and Deactivate APIs accept either a Client API Key or a Server API Key, allowing license lifecycle calls from both customer-facing software and trusted backends. Check each endpoint's authentication note before using a Client API Key.
+
+[Learn about license API authentication →](/product-catalog/license-keys#authentication)

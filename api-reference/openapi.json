@@ -108,6 +108,11 @@
         "scheme": "bearer",
         "description": "The Server API Key obtained from the kelviq application. Pass as a Bearer token in the Authorization header. Example: 'Authorization: Bearer __YOUR_API_KEY__'"
       },
+      "licenseBearerAuth": {
+        "type": "http",
+        "scheme": "bearer",
+        "description": "A Client API Key or Server API Key from the Kelviq application. Pass it as a Bearer token in the Authorization header. Use Client API Keys in customer-facing software and keep Server API Keys on trusted backends."
+      },
       "partnerKeyAuth": {
         "type": "apiKey",
         "in": "header",
@@ -6755,13 +6760,18 @@
       "post": {
         "operationId": "licenseActivate",
         "x-mint": {
-          "content": "<Info>Click the base URL in the API playground and select the **Sandbox** host for test data or the **Production** host for live data. Use credentials from the same environment.</Info>"
+          "content": "<Info>This endpoint accepts either a **Client API Key** or a **Server API Key** as a Bearer token. Use a Client API Key in browser or distributed client software, and keep Server API Keys on trusted backends. Select the matching Sandbox or Production host and key.</Info>"
         },
         "tags": [
           "License"
         ],
         "summary": "Activate License",
-        "description": "Activates a license key for a specific instance.",
+        "description": "Activates a license key for a specific instance. Accepts either a Client API Key or a Server API Key as a Bearer token.",
+        "security": [
+          {
+            "licenseBearerAuth": []
+          }
+        ],
         "requestBody": {
           "required": true,
           "content": {
@@ -6894,12 +6904,18 @@
       "post": {
         "operationId": "licenseDeactivate",
         "x-mint": {
-          "content": "<Info>Click the base URL in the API playground and select the **Sandbox** host for test data or the **Production** host for live data. Use credentials from the same environment.</Info>"
+          "content": "<Info>This endpoint accepts either a **Client API Key** or a **Server API Key** as a Bearer token. Use a Client API Key in browser or distributed client software, and keep Server API Keys on trusted backends. Select the matching Sandbox or Production host and key.</Info>"
         },
         "tags": [
           "License"
         ],
         "summary": "Deactivate License",
+        "description": "Deactivates a specific license instance. Accepts either a Client API Key or a Server API Key as a Bearer token.",
+        "security": [
+          {
+            "licenseBearerAuth": []
+          }
+        ],
         "requestBody": {
           "required": true,
           "content": {
@@ -6961,12 +6977,18 @@
       "post": {
         "operationId": "licenseValidate",
         "x-mint": {
-          "content": "<Info>Click the base URL in the API playground and select the **Sandbox** host for test data or the **Production** host for live data. Use credentials from the same environment.</Info>"
+          "content": "<Info>This endpoint accepts either a **Client API Key** or a **Server API Key** as a Bearer token. Use a Client API Key in browser or distributed client software, and keep Server API Keys on trusted backends. Select the matching Sandbox or Production host and key.</Info>"
         },
         "tags": [
           "License"
         ],
         "summary": "Validate License",
+        "description": "Validates a license key and, when provided, a specific instance. Accepts either a Client API Key or a Server API Key as a Bearer token.",
+        "security": [
+          {
+            "licenseBearerAuth": []
+          }
+        ],
         "requestBody": {
           "required": true,
           "content": {
