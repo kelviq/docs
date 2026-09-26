@@ -5,7 +5,7 @@ description: "Install Kelviq into Claude Code with one plugin — or add the Kel
 
 The [Kelviq Agent Toolkit](https://github.com/kelviq/agent-toolkit) packages everything an AI coding agent needs to work with Kelviq — the full [MCP server](/guides/mcp-server) plus five **Agent Skills** that teach the agent Kelviq's workflows — behind a single install.
 
-Skills are the missing half of tool access. The MCP server gives your agent 56 typed tools, but tools alone don't tell it that a new plan sits in DRAFT until published, that checkout is the default way to charge a customer, or that a retried usage report can double-count. The skills carry exactly that working knowledge, and they load automatically whenever a task looks Kelviq-shaped.
+Skills are the missing half of tool access. The MCP server gives your agent 57 typed tools, but tools alone don't tell it that a new plan sits in DRAFT until published, that checkout is the default way to charge a customer, or that a retried usage report can double-count. The skills carry exactly that working knowledge, and they load automatically whenever a task looks Kelviq-shaped.
 
 <Note>
 **The Agent Toolkit is new.** The skills and their names are stable, but content will keep improving alongside the platform. The bundled MCP server is always the latest published `@kelviq/mcp-server` — no toolkit update needed when the server improves.
@@ -33,7 +33,7 @@ export KELVIQ_CLIENT_API_KEY="<your-sandbox-client-key>"   # only needed for pro
 
 Get keys at [app.kelviq.com/settings/api-keys](https://app.kelviq.com/settings/api-keys).
 
-**Verify**: run `/mcp` — you should see `kelviq ✓ Connected, 56 tools`. Then ask something Kelviq-shaped ("set up a Pro plan for my product") and watch the relevant skill activate.
+**Verify**: run `/mcp` — you should see `kelviq ✓ Connected, 57 tools`. Then ask something Kelviq-shaped ("set up a Pro plan for my product") and watch the relevant skill activate.
 
 <Tip>
 No keys yet? Install anyway. The docs tools (`docs_search`, `docs_read`) work without any credentials, so your agent can answer Kelviq questions from the documentation immediately. API tools return a clear `Configuration error` until a key is set.
@@ -103,7 +103,7 @@ Wraps the [Kelviq CLI](/cli/overview) loop for agents: `kelviq pull` → edit `k
 
 The toolkit layers three things, each doing what it's best at:
 
-1. **Tools** (from the MCP server) do the work — 56 typed API calls, each carrying [safety annotations](https://modelcontextprotocol.io/docs/concepts/tools#tool-annotations) so clients can auto-approve reads and confirm destructive writes.
+1. **Tools** (from the MCP server) do the work — 57 typed API calls, each carrying [safety annotations](https://modelcontextprotocol.io/docs/concepts/tools#tool-annotations) so clients can auto-approve reads and confirm destructive writes.
 2. **Skills** (from this toolkit) supply the judgment — which tool, in what order, with which confirmations. They activate automatically based on what you ask.
 3. **Prompts** (from the MCP server) are guided, step-by-step flows you invoke explicitly — `setup_product`, `launch_plan`, and `diagnose_customer`. The skills route to them rather than duplicating them.
 

@@ -1748,6 +1748,17 @@ const client = new Kelviq({
 
 ```
 
+To pick the environment from the `KELVIQ_ENV` variable that the Kelviq CLI and MCP server also read, use `environmentFromEnv()`: it returns `'sandbox'` when `KELVIQ_ENV` is unset or empty, `'production'` or `'sandbox'` when it is set to one of those, and throws on any other value.
+
+```typescript
+import { Kelviq, environmentFromEnv } from '@kelviq/node-sdk';
+
+const client = new Kelviq({
+  accessToken: process.env.KELVIQ_SERVER_API_KEY!,
+  environment: environmentFromEnv(), // reads KELVIQ_ENV: sandbox when unset
+});
+```
+
 <Info>
 The sandbox environment is completely separate from production. You will need to use a different set of API keys, and any data created (customers, subscriptions, etc.) will only exist in the sandbox.
 </Info>
