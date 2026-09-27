@@ -9,6 +9,28 @@ import { ChangelogFilter } from "/snippets/changelog-filter.jsx";
 
 <ChangelogFilter products={["App","JS SDK","React SDK","Node SDK","Python SDK","JS Promotions UI","MCP Server","CLI","API"]} />
 
+<Update label="v1.8.0" description="September 27, 2026" tags={["API"]}>
+
+### New Features
+
+#### Per-organization rate limits
+
+Requests to endpoints authenticated with a Server or Client API Key are now rate limited per organization: `500 requests` / minute in production, `100 requests` / minute in sandbox. A Server and Client API Key belonging to the same organization share one quota.
+
+Exceeding the limit returns a `429 Too Many Requests` response with a `Retry-After` header naming how many seconds to wait before retrying:
+
+```json
+{
+  "detail": "Request was throttled. Expected available in 42 seconds."
+}
+```
+
+The limit only applies to requests authenticated with your own API keys.
+
+See [Rate limits](/api-reference/introduction#rate-limits) for details.
+
+</Update>
+
 <Update label="v0.4.2" description="September 23, 2026" tags={["CLI"]}>
 
 ### Fixes
@@ -136,7 +158,7 @@ chargeCatalogPrice: [
 ]
 ```
 
-Previously that field held the whole feature object the API returns — its UUID, timestamps and Stripe ids — and each charge carried its own server-generated ids. Those fields are now left out, so a pulled catalog is around 20% smaller, holds no UUIDs or Stripe ids, and reads as something you can edit by hand and review in a pull request.
+Previously that field held the whole feature object the API returns — its UUID, timestamps and other ids — and each charge carried its own server-generated ids. Those fields are now left out, so a pulled catalog is around 20% smaller, holds no UUIDs or other ids, and reads as something you can edit by hand and review in a pull request.
 
 Existing pulled files keep working: `kelviq push` accepts the identifier, the UUID and the embedded object alike.
 
@@ -754,7 +776,7 @@ The response includes the new recurring amount, any amount that would be charged
 
 #### Trial ending webhook
 
-You can now subscribe to `subscription.trial_will_end`. Kelviq sends this a few days before a subscription's trial ends, mirroring Stripe's own `customer.subscription.trial_will_end` timing. It's skipped if the subscription has already converted to `active` or has no trial days left by the time the notice would go out. `data.object` uses the same subscription payload shape as `subscription.created` and `subscription.updated`.
+You can now subscribe to `subscription.trial_will_end`. Kelviq sends this a few days before a subscription's trial ends. It's skipped if the subscription has already converted to `active` or has no trial days left by the time the notice would go out. `data.object` uses the same subscription payload shape as `subscription.created` and `subscription.updated`.
 
 </Update>
 
@@ -772,7 +794,7 @@ You can now list and retrieve invoices directly, rather than only receiving them
 The invoice object also has three new fields, matching what's already sent in invoice webhooks:
 
 - `attemptCount` — number of payment attempts made against the invoice.
-- `nextPaymentAttempt` — when Stripe will next retry collection, if a retry is scheduled.
+- `nextPaymentAttempt` — when will next retry collection, if a retry is scheduled.
 - `failureDetails` — `code`, `message`, and `paymentMethodType` for the most recent failed payment attempt. `null` once the invoice is paid.
 
 #### Filter subscriptions by modification date
