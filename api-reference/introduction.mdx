@@ -128,6 +128,29 @@ curl "https://sandboxapi.kelviq.com/api/v1/subscriptions/?customer_id=customer_1
 
 Consult the endpoint reference before adding a query parameter; unsupported parameters may be ignored or rejected.
 
+## Rate limits
+
+To keep the API responsive for everyone, requests are rate limited per organization. The limit applies to all endpoints authenticated with a Server or Client API Key, and differs by environment:
+
+| Environment | Limit |
+| --- | --- |
+| Production | `500 requests` / minute |
+| Sandbox | `100 requests` / minute |
+
+The limit applies to your whole organization, not to an individual API key — Server and Client API Key requests share the same quota. Sandbox and production are isolated environments, so each maintains its own limit.
+
+If you exceed the limit, the API returns a `429 Too Many Requests` response with a `Retry-After` header indicating how many seconds to wait before retrying:
+
+```json
+{
+  "detail": "Request was throttled. Expected available in 42 seconds."
+}
+```
+
+<Tip>
+Honor the `Retry-After` header and back off before retrying. If your integration regularly approaches the limit, batch or cache requests where possible rather than polling.
+</Tip>
+
 ## Error handling
 
 The API uses standard HTTP status codes and returns detailed error information in the response body.
@@ -142,7 +165,7 @@ The API uses standard HTTP status codes and returns detailed error information i
 | `409` | Conflict | The request conflicts with an existing resource, such as a duplicate account. |
 | `422` | Unprocessable Entity | The request is well-formed but contains invalid or unsupported values. |
 | `428` | Precondition Required | A required account configuration, such as billing-provider authentication, is incomplete. |
-| `429` | Too Many Requests | The request rate limit has been exceeded. |
+| `429` | Too Many Requests | The [rate limit](#rate-limits) has been exceeded. |
 | `500` | Internal Server Error | Kelviq could not complete the request because of an unexpected server error. |
 | `502` | Bad Gateway | Kelviq received an invalid response from an upstream service. |
 | `503` | Service Unavailable | The service is temporarily unavailable. |
