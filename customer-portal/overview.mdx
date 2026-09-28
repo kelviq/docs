@@ -96,3 +96,25 @@ This is where they manage the legal side of the account.
 <Frame>
   <img height="200" src="/images/billing-settings.png" />
 </Frame>
+## Retention offers
+
+When a customer starts cancelling, the portal can offer them a reason to stay instead of ending the subscription straight away. Configure this under **Settings → Retention** in the dashboard.
+
+The customer picks why they are leaving, and sees the offer you assigned to that reason:
+
+* **Discount**
+  A percentage off for a number of billing cycles. Applied to the existing subscription, so there is nothing for the customer to redeem.
+* **Pause**
+  Billing and access both stop for a length the customer chooses from the ones you offer, then resume on their own. A pause shorter than one billing period is never offered, because it would skip no renewal.
+* **Support**
+  Sends the customer to a booking page, live chat, or support site, for the cases where the problem is worth a conversation rather than a discount.
+
+Reasons you map to **No offer** go straight to cancellation, which is the right choice where no offer would help, such as a customer whose project has ended.
+
+You can also ask one open question before the customer confirms, for the reasons a dropdown cannot capture. Answering is optional, and the response is stored with the cancellation.
+
+<Note>
+Each offer can be taken once per subscription by default, so a customer cannot reopen the cancel flow every month and stack another discount. Change this under the same settings if you would rather allow repeats, or allow them once the previous offer has run out.
+</Note>
+
+Offers are not shown where they cannot be honoured. A discount and a pause both need a paid, recurring subscription that Kelviq bills, so neither appears on a free plan, a manually billed one, or a subscription already scheduled to cancel.
