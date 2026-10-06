@@ -11,7 +11,7 @@ Kelviq can push event notifications to your server whenever something meaningful
 
 When an event occurs, Kelviq creates a `WebhookEvent` and fans it out to all enabled endpoints you have registered for that event type. Each delivery is a single `POST` request with a JSON body and signed headers.
 
-Kelviq retries failed deliveries up to **3 times** with a 60-second delay between attempts. A delivery is considered successful when your endpoint returns a `2xx` status code.
+A delivery is considered successful when your endpoint returns a `2xx` status code. Kelviq retries a delivery up to **3 times**, with a 60-second delay between attempts, when the request fails to connect, times out after 10 seconds, or your endpoint returns a `5xx` status code or `429 Too Many Requests`. Other `4xx` and `3xx` responses are not retried; Kelviq does not follow redirects.
 
 ---
 

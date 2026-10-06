@@ -9,6 +9,20 @@ import { ChangelogFilter } from "/snippets/changelog-filter.jsx";
 
 <ChangelogFilter products={["App","JS SDK","React SDK","Node SDK","Python SDK","JS Promotions UI","MCP Server","CLI","API"]} />
 
+<Update label="v1.8.1" description="October 5, 2026" tags={["API"]}>
+
+### Improvements
+
+#### Webhook retries on server errors and rate limits
+
+Kelviq now retries a webhook delivery when your endpoint returns a `5xx` status code or `429 Too Many Requests`. Previously, only network failures and timeouts were retried, so an endpoint that was briefly unavailable or rate limiting lost the delivery after one attempt.
+
+Retries follow the existing schedule: up to `3` retries, `60` seconds apart. Each attempt appears in the delivery logs with its status code. Other `4xx` and `3xx` responses are still treated as final and are not retried.
+
+See [Webhooks](/guides/webhooks#how-it-works) for details.
+
+</Update>
+
 <Update label="v1.8.0" description="September 27, 2026" tags={["API"]}>
 
 ### New Features
