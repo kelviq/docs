@@ -41,7 +41,7 @@ To retry a delivery:
 3. Click **Resend**.
 4. Review the new delivery attempt and its response.
 
-Kelviq also retries failed deliveries automatically. A manual resend is useful when the endpoint is working again and you want to retry immediately.
+Kelviq automatically retries timeouts, connection failures, and `5xx` or `429` responses, but not other `4xx` or `3xx` responses. Use a manual resend to redeliver those after you fix the endpoint, or to retry immediately instead of waiting for the next automatic attempt.
 
 <Warning>
   Automatic retries and manual resends can deliver the same event more than once. Process webhooks idempotently using the event `id` or the `webhook-id` header.

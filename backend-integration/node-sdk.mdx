@@ -1785,7 +1785,7 @@ See [Webhook event types](/guides/webhooks#event-types) for the complete list of
 
 ### Best practices
 
-* **Return quickly** — respond with a `2xx` status before doing any heavy processing. Kelviq retries up to 3 times at 60-second intervals if it does not receive a `2xx`.
+* **Return quickly** — respond with a `2xx` status before doing any heavy processing. Kelviq waits 10 seconds for a response. It retries up to 3 times at 60-second intervals on a timeout, connection failure, `5xx` or `429`; other non-`2xx` responses are not retried.
 * **Use idempotency** — use the `webhook-id` header (or the event `id` field) to detect and skip duplicate deliveries.
 * **Validate every request** — always verify the signature before trusting the payload.
 
