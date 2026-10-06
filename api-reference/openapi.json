@@ -2414,6 +2414,18 @@
             "type": "string",
             "format": "date-time",
             "example": "2026-08-01T10:15:00Z"
+          },
+          "pausedAt": {
+            "type": "string",
+            "format": "date-time",
+            "nullable": true,
+            "description": "Set while billing collection is paused."
+          },
+          "pauseResumesAt": {
+            "type": "string",
+            "format": "date-time",
+            "nullable": true,
+            "description": "When the subscription resumes on its own."
           }
         }
       },
@@ -5892,7 +5904,7 @@
           "durationInMonths": {
             "type": "integer",
             "nullable": true,
-            "description": "Number of billing periods the discount applies for. Despite the field name, this counts billing cycles, not calendar months — e.g. 3 on a yearly plan means 3 years. Set when `duration` is REPEATING."
+            "description": "Number of billing periods the discount applies for. Despite the field name, this counts billing cycles, not calendar months \u2014 e.g. 3 on a yearly plan means 3 years. Set when `duration` is REPEATING."
           },
           "redeemBy": {
             "type": "string",
@@ -5982,7 +5994,7 @@
           },
           "durationInMonths": {
             "type": "integer",
-            "description": "Number of billing periods the discount applies for. Despite the field name, this counts billing cycles, not calendar months — e.g. 3 on a yearly plan means 3 years. Required when `duration` is REPEATING."
+            "description": "Number of billing periods the discount applies for. Despite the field name, this counts billing cycles, not calendar months \u2014 e.g. 3 on a yearly plan means 3 years. Required when `duration` is REPEATING."
           },
           "redeemBy": {
             "type": "string",
@@ -6201,6 +6213,91 @@
             "items": {
               "$ref": "#/components/schemas/WebhookEndpoint"
             }
+          }
+        }
+      },
+      "PauseSubscriptionRequest": {
+        "type": "object",
+        "properties": {
+          "pauseMonths": {
+            "type": "integer",
+            "minimum": 1,
+            "maximum": 12,
+            "nullable": true,
+            "description": "How long to pause for, in months. Must be at least as long as one billing period, otherwise the pause skips no renewal and is rejected. Mutually exclusive with resumesAt.",
+            "example": 3
+          },
+          "resumesAt": {
+            "type": "string",
+            "format": "date",
+            "nullable": true,
+            "description": "An explicit resume date. Mutually exclusive with pauseMonths.",
+            "example": "2026-12-31"
+          }
+        }
+      },
+      "PauseSubscriptionResponse": {
+        "type": "object",
+        "properties": {
+          "message": {
+            "type": "string",
+            "example": "Subscription paused successfully"
+          },
+          "subscriptionId": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "status": {
+            "type": "string",
+            "example": "paused"
+          },
+          "pausedAt": {
+            "type": "string",
+            "format": "date-time",
+            "nullable": true
+          },
+          "resumesAt": {
+            "type": "string",
+            "format": "date-time",
+            "nullable": true,
+            "description": "When the subscription resumes on its own. Null for an indefinite pause, which only a resume call ends."
+          }
+        }
+      },
+      "ResumeSubscriptionRequest": {
+        "type": "object",
+        "properties": {
+          "billingBehavior": {
+            "type": "string",
+            "nullable": true,
+            "enum": [
+              "RESET_BILLING_CYCLE",
+              "KEEP_BILLING_DAY"
+            ],
+            "description": "Overrides the organization's retention setting for this call.",
+            "example": "RESET_BILLING_CYCLE"
+          }
+        }
+      },
+      "ResumeSubscriptionResponse": {
+        "type": "object",
+        "properties": {
+          "message": {
+            "type": "string",
+            "example": "Subscription resumed successfully"
+          },
+          "subscriptionId": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "status": {
+            "type": "string",
+            "example": "active"
+          },
+          "billingPeriodEndTime": {
+            "type": "string",
+            "format": "date-time",
+            "nullable": true
           }
         }
       }
@@ -11412,6 +11509,121 @@
           },
           "404": {
             "description": "Webhook endpoint not found."
+          }
+        }
+      }
+    },
+    "/subscriptions/{subscriptionId}/pause/": {
+      "post": {
+        "tags": [
+          "Subscriptions"
+        ],
+        "summary": "Pause a subscription",
+        "description": "Pauses billing and access on a subscription. Invoices generated during the pause are voided, and the subscription's feature entitlements are switched off for its duration, then recreated with usage reset when it resumes.\n\nPass `pauseMonths` for a length, which is converted to a resume date aligned to the end of a billing period so the renewal after the pause bills normally, or `resumesAt` for an explicit date. Pass neither to pause until a resume call.\n\nNot available on manually billed subscriptions, which Kelviq does not invoice.",
+        "operationId": "pauseSubscription",
+        "x-mint": {
+          "content": "<Info>Click the base URL in the API playground and select the **Sandbox** host for test data or the **Production** host for live data. Use credentials from the same environment.</Info>"
+        },
+        "parameters": [
+          {
+            "name": "subscriptionId",
+            "in": "path",
+            "required": true,
+            "description": "The unique identifier of the subscription to pause.",
+            "example": "78058918-9746-4280-9b9b-1bd5115eec6e",
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": false,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/PauseSubscriptionRequest"
+              },
+              "example": {
+                "pauseMonths": 3
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Subscription paused.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PauseSubscriptionResponse"
+                },
+                "example": {
+                  "message": "Subscription paused successfully",
+                  "subscriptionId": "78058918-9746-4280-9b9b-1bd5115eec6e",
+                  "status": "paused",
+                  "pausedAt": "2026-09-28T10:00:00Z",
+                  "resumesAt": "2026-12-31T23:00:00Z"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/subscriptions/{subscriptionId}/resume/": {
+      "post": {
+        "tags": [
+          "Subscriptions"
+        ],
+        "summary": "Resume a paused subscription",
+        "description": "Resumes a paused subscription, restoring billing and access.\n\n`billingBehavior` controls when billing restarts. `RESET_BILLING_CYCLE` invoices a full period on the resume date and moves the billing day; `KEEP_BILLING_DAY` waits for the original renewal day. Omit it to use the organization's retention setting.\n\nA customer resuming inside a period they already paid for is never re-invoiced, whichever value is sent.",
+        "operationId": "resumeSubscription",
+        "x-mint": {
+          "content": "<Info>Click the base URL in the API playground and select the **Sandbox** host for test data or the **Production** host for live data. Use credentials from the same environment.</Info>"
+        },
+        "parameters": [
+          {
+            "name": "subscriptionId",
+            "in": "path",
+            "required": true,
+            "description": "The unique identifier of the paused subscription.",
+            "example": "78058918-9746-4280-9b9b-1bd5115eec6e",
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": false,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ResumeSubscriptionRequest"
+              },
+              "example": {
+                "billingBehavior": "RESET_BILLING_CYCLE"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Subscription resumed.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ResumeSubscriptionResponse"
+                },
+                "example": {
+                  "message": "Subscription resumed successfully",
+                  "subscriptionId": "78058918-9746-4280-9b9b-1bd5115eec6e",
+                  "status": "active",
+                  "billingPeriodEndTime": "2026-10-28T00:00:00Z"
+                }
+              }
+            }
           }
         }
       }

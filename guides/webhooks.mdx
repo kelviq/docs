@@ -11,7 +11,7 @@ Kelviq can push event notifications to your server whenever something meaningful
 
 When an event occurs, Kelviq creates a `WebhookEvent` and fans it out to all enabled endpoints you have registered for that event type. Each delivery is a single `POST` request with a JSON body and signed headers.
 
-Kelviq retries failed deliveries up to **3 times** with a 60-second delay between attempts. A delivery is considered successful when your endpoint returns a `2xx` status code.
+A delivery is considered successful when your endpoint returns a `2xx` status code. Kelviq retries a delivery up to **3 times**, with a 60-second delay between attempts, when the request fails to connect, times out after 10 seconds, or your endpoint returns a `5xx` status code or `429 Too Many Requests`. Other `4xx` and `3xx` responses are not retried; Kelviq does not follow redirects.
 
 ---
 
@@ -41,7 +41,7 @@ To retry a delivery:
 3. Click **Resend**.
 4. Review the new delivery attempt and its response.
 
-Kelviq also retries failed deliveries automatically. A manual resend is useful when the endpoint is working again and you want to retry immediately.
+Kelviq automatically retries timeouts, connection failures, and `5xx` or `429` responses, but not other `4xx` or `3xx` responses. Use a manual resend to redeliver those after you fix the endpoint, or to retry immediately instead of waiting for the next automatic attempt.
 
 <Warning>
   Automatic retries and manual resends can deliver the same event more than once. Process webhooks idempotently using the event `id` or the `webhook-id` header.
@@ -63,6 +63,8 @@ Kelviq also retries failed deliveries automatically. A manual resend is useful w
 | `subscription.updated` | A subscription's details were modified — including when a cancellation is scheduled for the end of the current period (status stays active; `end_date` is set). |
 | `subscription.cancelled` | A subscription actually reached cancelled status. For a period-end cancellation, this fires later, when the period ends — not at the moment it was scheduled. |
 | `subscription.plan_changed` | A subscription was moved to a different plan. |
+| `subscription.paused` | Billing collection and feature access were both suspended. `pauseResumesAt` carries the date it resumes on its own, or is null for an indefinite pause. |
+| `subscription.resumed` | A paused subscription is active again, with its entitlements recreated and usage reset. |
 | `subscription.trial_will_end` | A subscription's trial period is ending soon. |
 | `feature.usage_alert` | A customer's feature usage crossed a configured threshold. |
 | `invoice.created` | A new invoice was generated. |
@@ -113,6 +115,35 @@ Kelviq does not currently send a separate `payment.failed` event. For a failed c
 5. If all recovery attempts fail, Kelviq cancels the subscription and sends `subscription.cancelled`.
 
 Do not remove access when you receive the first `subscription.updated` with `past_due` unless that is your own policy. Use the final subscription status or a live entitlement check to decide when access should end.
+
+## Pauses
+
+A pause stops billing and access together. Invoices generated during the pause are voided, and the subscription's feature entitlements are switched off for its duration, then recreated with usage reset to zero when it resumes.
+
+A pause can start in three ways, and all three send `subscription.paused`: your call to the pause API, a customer accepting a pause offer in the customer portal, or a pause applied directly in the payment provider. A resume likewise sends `subscription.resumed` whether it came from the resume API, the portal, or the provider clearing the pause on its own at the scheduled date.
+
+<Warning>
+Entitlement responses are cached by the SDKs for up to the configured TTL, 60 seconds by default. Until it expires, an access check keeps returning the answer from before the pause — which means continuing to grant access the customer no longer has. Invalidate the cache for that customer when you handle these events.
+</Warning>
+
+```javascript
+// Node
+if (event.type === 'subscription.paused' || event.type === 'subscription.resumed') {
+  await client.entitlements.invalidateCache({
+    customerId: event.data.object.customer.customerId
+  });
+}
+```
+
+```python
+# Python
+if event.type in ('subscription.paused', 'subscription.resumed'):
+    client.entitlements.invalidate_cache(
+        customerId=event.data.object.customer.customerId
+    )
+```
+
+While a subscription is paused, the provider keeps generating and voiding renewals. Kelviq does not send `subscription.updated` for those, so a paused subscription is quiet until it resumes.
 
 <Note>
   The retry window applies only to card payments. Kelviq does not retry a failed non-card renewal; the subscription is cancelled after the failure.
