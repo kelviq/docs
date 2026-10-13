@@ -443,6 +443,18 @@
             "description": "A comma-separated list of billing periods to display and allow on the checkout page. Values are case-insensitive and are normalized to uppercase.",
             "example": "MONTHLY,YEARLY"
           },
+          "customFields": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            },
+            "nullable": true,
+            "description": "A list of custom field identifiers to collect from the customer during checkout. Active fields configured for your organization are displayed in their configured sort order, and the customer's responses are validated against each field's type and validation rules. Unknown or archived identifiers are ignored.",
+            "example": [
+              "company-name",
+              "purchase-order-number"
+            ]
+          },
           "currencyCode": {
             "type": "string",
             "nullable": true,
