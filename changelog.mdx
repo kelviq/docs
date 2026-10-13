@@ -9,6 +9,27 @@ import { ChangelogFilter } from "/snippets/changelog-filter.jsx";
 
 <ChangelogFilter products={["App","JS SDK","React SDK","Node SDK","Python SDK","JS Promotions UI","MCP Server","CLI","API"]} />
 
+<Update label="v1.8.2" description="October 13, 2026" tags={["API"]}>
+
+### New Features
+
+#### Custom fields in checkout sessions
+
+The [Create a checkout session](/api-reference/checkout/create-a-checkout-session) endpoint now documents the `customFields` request property. Pass an array of custom field identifiers to display those fields during checkout and collect validated responses from the customer:
+
+```json
+{
+  "planIdentifier": "pro-plan",
+  "chargePeriod": "MONTHLY",
+  "successUrl": "https://example.com/success",
+  "customFields": ["company-name", "purchase-order-number"]
+}
+```
+
+Only active custom fields configured for the authenticated organization are included, and they appear in their configured sort order.
+
+</Update>
+
 <Update label="v1.8.1" description="October 5, 2026" tags={["API"]}>
 
 ### Improvements
