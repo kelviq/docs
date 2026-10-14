@@ -65,6 +65,7 @@
             "pages": [
               "checkout/checkout-configuration",
               "checkout/static-checkout-url",
+              "checkout/checkout-examples",
               "checkout/apply-a-discount-code",
               "checkout/checkout-metadata"
             ]
@@ -107,6 +108,7 @@
               "guides/subscription-integration",
               "guides/subscription-integration-for-nextjs",
               "guides/webhooks",
+              "guides/set-up-with-ai",
               "guides/mcp-server",
               "guides/agent-toolkit"
             ]

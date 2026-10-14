@@ -1,0 +1,239 @@
+---
+title: "Checkout examples"
+description: "See how checkout looks for subscriptions, free plans, trials, one-time payments, usage-based plans, and discounts"
+---
+
+Every example is a live sandbox checkout. To try one, pay with the test card `4242 4242 4242 4242`, any future expiry date, and any CVC.
+
+The examples use the default look. You can change the theme, colors, button text, and which sections appear, and turn discount codes on or off, in **Settings → Checkout design**.
+
+| Example | What changes at checkout | Button |
+| --- | --- | --- |
+| [Plan picker](#plan-picker) | Customer chooses from several plans | **Subscribe** |
+| [Single plan](#single-plan) | Price shown at the top, no plan list | **Subscribe** |
+| [Free plan](#free-plan) | Name and email only, no payment fields | **Get it for Free** |
+| [Free trial](#free-trial) | Shows the first charge date, nothing due today | **Start 7-day Trial** |
+| [More billing periods](#more-billing-periods) | Extra tabs for 3 and 6 months | **Subscribe** |
+| [One-time payment](#one-time-payment) | No billing period, one charge | **Pay Now** |
+| [Included usage with overage](#included-usage-with-overage) | Base fee today, overage billed later | **Subscribe** |
+| [Pay as you go](#pay-as-you-go) | \$0 today, usage billed monthly | **Subscribe** |
+| [Prepaid credit pack](#prepaid-credit-pack) | One-time top-up of usage | **Pay Now** |
+| [Discount applied](#discount-applied) | Code filled in and deducted | **Subscribe** |
+| [Discount field hidden](#discount-field-hidden) | No promotion code entry | **Subscribe** |
+| [Per-seat plan](#per-seat-plan) | Seat count and total for the team | **Start 14-day Trial** |
+| [Prefilled customer](#prefilled-customer) | Name and email already filled in | **Subscribe** |
+| [Business purchase](#business-purchase) | Company name, address, and tax ID fields | **Subscribe** |
+
+## Light and dark mode
+
+Checkout follows the light or dark setting on the customer's device. The switcher in the bottom-left corner lets the customer change it to **System**, **Light**, or **Dark**. The other screenshots on this page match the theme you're reading in.
+
+<Tabs>
+  <Tab title="Light">
+    <Frame>
+      <img src="/images/checkout-examples/pricing-table-light.webp" alt="VoiceForge AI checkout in light mode" />
+    </Frame>
+  </Tab>
+  <Tab title="Dark">
+    <Frame>
+      <img src="/images/checkout-examples/pricing-table-dark.webp" alt="VoiceForge AI checkout in dark mode" />
+    </Frame>
+  </Tab>
+</Tabs>
+
+## Plan picker
+
+List several plans in the link and checkout shows them as a list the customer can choose from. You also pick which plan is selected when the page opens. This is the usual link behind a **Buy** button on a pricing page.
+
+<Frame>
+  <img className="block dark:hidden" src="/images/checkout-examples/pricing-table-light.webp" alt="Checkout with five VoiceForge AI plans, Creator selected, Monthly and Yearly tabs" />
+  <img className="hidden dark:block" src="/images/checkout-examples/pricing-table-dark.webp" alt="Checkout with five VoiceForge AI plans, Creator selected, Monthly and Yearly tabs" />
+</Frame>
+
+[See example →](https://www.kelviq.com/sandbox/buy/f60cea73-579b-4932-8d85-02b79710e9dc/?enabled=voice-starter,voice-creator,voice-pro,voice-scale,voice-business&plan_identifier=voice-creator&charge_period=MONTHLY) · [Yearly →](https://www.kelviq.com/sandbox/buy/f60cea73-579b-4932-8d85-02b79710e9dc/?enabled=voice-starter,voice-creator,voice-pro,voice-scale,voice-business&plan_identifier=voice-pro&charge_period=YEARLY)
+
+## Single plan
+
+Put only one plan in the link and checkout skips the plan list. The price moves to the top of the page. Use this when the customer has already picked a plan on your site.
+
+<Frame>
+  <img className="block dark:hidden" src="/images/checkout-examples/single-plan-light.webp" alt="Checkout for the VoiceForge AI Starter plan at $6 per month" />
+  <img className="hidden dark:block" src="/images/checkout-examples/single-plan-dark.webp" alt="Checkout for the VoiceForge AI Starter plan at $6 per month" />
+</Frame>
+
+[See example →](https://www.kelviq.com/sandbox/buy/f60cea73-579b-4932-8d85-02b79710e9dc/?enabled=voice-starter&plan_identifier=voice-starter&charge_period=MONTHLY)
+
+## Free plan
+
+A [free plan](/product-catalog/free-and-trials#free-plans) asks for a name and email only. There are no card or address fields, and the button reads **Get it for Free**. The customer still gets a subscription and the plan's entitlements.
+
+<Frame>
+  <img className="block dark:hidden" src="/images/checkout-examples/free-plan-light.webp" alt="Free forever checkout for Context API with name and email fields" />
+  <img className="hidden dark:block" src="/images/checkout-examples/free-plan-dark.webp" alt="Free forever checkout for Context API with name and email fields" />
+</Frame>
+
+[See example →](https://www.kelviq.com/sandbox/buy/574a07ca-b9ef-4700-9907-deb64bd7f7e3/?enabled=ctx-free&plan_identifier=ctx-free&charge_period=MONTHLY)
+
+## Free trial
+
+When the plan has a [trial period](/product-catalog/free-and-trials), checkout collects the card but charges nothing today. The summary shows **Total after trial** and **Total due today**, and the text under the button gives the date of the first charge.
+
+<Frame>
+  <img className="block dark:hidden" src="/images/checkout-examples/free-trial-light.webp" alt="StudyPal Premium checkout with a Start 7-day Trial button and the first charge date" />
+  <img className="hidden dark:block" src="/images/checkout-examples/free-trial-dark.webp" alt="StudyPal Premium checkout with a Start 7-day Trial button and the first charge date" />
+</Frame>
+
+[See example →](https://www.kelviq.com/sandbox/buy/dfb9c6d9-d195-4176-8bf3-036e42345c3d/?enabled=sp-premium&plan_identifier=sp-premium&charge_period=MONTHLY)
+
+The trial comes from the plan settings, not from the link.
+
+The price is in rupees because this plan uses [location-based pricing](/product-catalog/location-based-pricing) and the screenshot was taken from India.
+
+## More billing periods
+
+A plan can be sold monthly, every 3 months, every 6 months, and yearly. Checkout shows a tab for each period the plan has a price for, and the link decides which tab opens first.
+
+<Frame>
+  <img className="block dark:hidden" src="/images/checkout-examples/billing-intervals-light.webp" alt="StudyPal checkout with Monthly, Yearly, 3 Months, and 6 Months tabs, 3 Months selected" />
+  <img className="hidden dark:block" src="/images/checkout-examples/billing-intervals-dark.webp" alt="StudyPal checkout with Monthly, Yearly, 3 Months, and 6 Months tabs, 3 Months selected" />
+</Frame>
+
+[3 months →](https://www.kelviq.com/sandbox/buy/dfb9c6d9-d195-4176-8bf3-036e42345c3d/?enabled=sp-premium&plan_identifier=sp-premium&charge_period=THREE_MONTHS) · [6 months →](https://www.kelviq.com/sandbox/buy/dfb9c6d9-d195-4176-8bf3-036e42345c3d/?enabled=sp-premium&plan_identifier=sp-premium&charge_period=SIX_MONTHS) · [Yearly →](https://www.kelviq.com/sandbox/buy/dfb9c6d9-d195-4176-8bf3-036e42345c3d/?enabled=sp-premium&plan_identifier=sp-premium&charge_period=YEARLY)
+
+## One-time payment
+
+For a [one-time](/product-catalog/one-time-payments) plan there's no billing-period toggle, the summary says **One-time payment**, and the button reads **Pay Now**.
+
+<Frame>
+  <img className="block dark:hidden" src="/images/checkout-examples/one-time-light.webp" alt="One-time checkout for the PixelGallery JS Hobby license at $48" />
+  <img className="hidden dark:block" src="/images/checkout-examples/one-time-dark.webp" alt="One-time checkout for the PixelGallery JS Hobby license at $48" />
+</Frame>
+
+[See example →](https://www.kelviq.com/sandbox/buy/83cd7be6-8459-4099-bee7-47bbf74c6813/?enabled=pg-hobby&plan_identifier=pg-hobby&charge_period=ONE_TIME)
+
+The PixelGallery plans issue a [license key](/product-catalog/license-keys) with each order. For an ebook or course, attach [digital downloads](/product-catalog/digital-downloads) to the plan instead.
+
+You can offer several one-time plans on one page, the same way as subscriptions. This example offers an ebook or a bundle, with the bundle selected:
+
+<Frame>
+  <img className="block dark:hidden" src="/images/checkout-examples/one-time-choice-light.webp" alt="Indie SaaS Playbook checkout with Complete bundle and Ebook options" />
+  <img className="hidden dark:block" src="/images/checkout-examples/one-time-choice-dark.webp" alt="Indie SaaS Playbook checkout with Complete bundle and Ebook options" />
+</Frame>
+
+[See example →](https://www.kelviq.com/sandbox/buy/9b6bc03c-8899-4bfc-b435-fbf7ca855741/?enabled=ip-ebook,ip-complete&plan_identifier=ip-complete&charge_period=ONE_TIME)
+
+## Included usage with overage
+
+The Context API Developer plan costs \$19 a month, includes 7,500 credits, and charges \$2.20 per 1,000 credits after that. Checkout charges the \$19 base fee. Overage is [billed at the end of each monthly period](/product-catalog/usage-based-billing) from the usage your backend reports.
+
+<Frame>
+  <img className="block dark:hidden" src="/images/checkout-examples/usage-overage-light.webp" alt="Context API Developer checkout at $19 per month with included features" />
+  <img className="hidden dark:block" src="/images/checkout-examples/usage-overage-dark.webp" alt="Context API Developer checkout at $19 per month with included features" />
+</Frame>
+
+[See example →](https://www.kelviq.com/sandbox/buy/574a07ca-b9ef-4700-9907-deb64bd7f7e3/?enabled=ctx-developer&plan_identifier=ctx-developer&charge_period=MONTHLY)
+
+<Note>
+  A single-plan checkout doesn't show the overage rate. Put it in the plan description and link to the [plan picker](#plan-picker) instead, which shows each plan's description, or state the rate on your pricing page.
+</Note>
+
+## Pay as you go
+
+A [pay-as-you-go](/product-catalog/pay-as-you-go) plan with no base price opens at \$0 a month. Nothing is charged at checkout. Kelviq bills the recorded usage at the end of each month.
+
+<Frame>
+  <img className="block dark:hidden" src="/images/checkout-examples/pay-as-you-go-light.webp" alt="TokenFlow pay as you go checkout at $0 per month" />
+  <img className="hidden dark:block" src="/images/checkout-examples/pay-as-you-go-dark.webp" alt="TokenFlow pay as you go checkout at $0 per month" />
+</Frame>
+
+[See example →](https://www.kelviq.com/sandbox/buy/47236d49-8477-4483-9b8e-a1b35f1886e2/?enabled=tf-payg&plan_identifier=tf-payg&charge_period=MONTHLY)
+
+## Prepaid credit pack
+
+Sell usage upfront with a one-time plan that grants a fixed amount of a metered feature. This pack adds 5M tokens for \$10.
+
+<Frame>
+  <img className="block dark:hidden" src="/images/checkout-examples/token-pack-light.webp" alt="TokenFlow one-time checkout for a 5M token pack at $10" />
+  <img className="hidden dark:block" src="/images/checkout-examples/token-pack-dark.webp" alt="TokenFlow one-time checkout for a 5M token pack at $10" />
+</Frame>
+
+[See example →](https://www.kelviq.com/sandbox/buy/47236d49-8477-4483-9b8e-a1b35f1886e2/?enabled=tf-pack-10&plan_identifier=tf-pack-10&charge_period=ONE_TIME)
+
+## Discount applied
+
+A link can carry a discount code, so the customer doesn't have to type it. Checkout fills in the code and shows the discount and the reduced total. Here the link adds `discount_code=VOICE50`, which takes 50% off the first month of Creator. Use it in campaign emails and partner links.
+
+<Frame>
+  <img className="block dark:hidden" src="/images/checkout-examples/discount-applied-light.webp" alt="VoiceForge AI Creator checkout with VOICE50 applied, $11 discount, $11 total" />
+  <img className="hidden dark:block" src="/images/checkout-examples/discount-applied-dark.webp" alt="VoiceForge AI Creator checkout with VOICE50 applied, $11 discount, $11 total" />
+</Frame>
+
+[See example →](https://www.kelviq.com/sandbox/buy/f60cea73-579b-4932-8d85-02b79710e9dc/?enabled=voice-creator&plan_identifier=voice-creator&charge_period=MONTHLY&discounts_enabled=true&discount_code=VOICE50)
+
+The code must be active and valid for the plan and currency. [How checkout discounts work →](/checkout/apply-a-discount-code)
+
+## Discount field hidden
+
+You can also remove the **Add promotion code** field, so customers aren't tempted to leave and search for a code. This link adds `discounts_enabled=false`.
+
+<Frame>
+  <img className="block dark:hidden" src="/images/checkout-examples/discount-hidden-light.webp" alt="VoiceForge AI Creator checkout without a promotion code field" />
+  <img className="hidden dark:block" src="/images/checkout-examples/discount-hidden-dark.webp" alt="VoiceForge AI Creator checkout without a promotion code field" />
+</Frame>
+
+[See example →](https://www.kelviq.com/sandbox/buy/f60cea73-579b-4932-8d85-02b79710e9dc/?enabled=voice-creator&plan_identifier=voice-creator&charge_period=MONTHLY&discounts_enabled=false)
+
+## Per-seat plan
+
+A per-seat plan charges for each seat the customer buys. The seat count comes from your app, so this checkout is created with the [Checkout API](/api-reference/checkout/create-a-checkout-session) rather than a static link. This example is TeamBoard Business at \$16 a seat with 5 seats and a 14-day trial.
+
+<Frame>
+  <img className="block dark:hidden" src="/images/checkout-examples/per-seat-light.webp" alt="TeamBoard Business checkout with 5 seats at $80 a month and a 14-day trial" />
+  <img className="hidden dark:block" src="/images/checkout-examples/per-seat-dark.webp" alt="TeamBoard Business checkout with 5 seats at $80 a month and a 14-day trial" />
+</Frame>
+
+```json
+{
+  "planIdentifier": "tb-business",
+  "chargePeriod": "MONTHLY",
+  "features": [{ "identifier": "tb-seats", "quantity": 5 }],
+  "successUrl": "https://example.com/welcome"
+}
+```
+
+The response has a `checkoutUrl` to send the customer to. See [Seat-based pricing](/product-catalog/seat-based-pricing) for how to set up the plan.
+
+## Prefilled customer
+
+Add `customer_id` to the link for a customer your app already knows, and checkout fills in their name and email. The purchase is attached to that customer record.
+
+<Frame>
+  <img className="block dark:hidden" src="/images/checkout-examples/prefilled-customer-light.webp" alt="VoiceForge AI Pro checkout with the email and name already filled in" />
+  <img className="hidden dark:block" src="/images/checkout-examples/prefilled-customer-dark.webp" alt="VoiceForge AI Pro checkout with the email and name already filled in" />
+</Frame>
+
+[See example →](https://www.kelviq.com/sandbox/buy/f60cea73-579b-4932-8d85-02b79710e9dc/?enabled=voice-pro&plan_identifier=voice-pro&charge_period=MONTHLY&customer_id=cust_demo_jane)
+
+## Business purchase
+
+Every checkout has an **I'm purchasing as a business** box. Ticking it adds fields for the company name, address, and tax ID, which then appear on the invoice.
+
+<Frame>
+  <img className="block dark:hidden" src="/images/checkout-examples/business-purchase-light.webp" alt="VoiceForge AI Pro checkout with the business purchase fields open" />
+  <img className="hidden dark:block" src="/images/checkout-examples/business-purchase-dark.webp" alt="VoiceForge AI Pro checkout with the business purchase fields open" />
+</Frame>
+
+[See example →](https://www.kelviq.com/sandbox/buy/f60cea73-579b-4932-8d85-02b79710e9dc/?enabled=voice-pro&plan_identifier=voice-pro&charge_period=MONTHLY)
+
+## Redirect after payment
+
+To send the customer back to your app after they pay, add `success_url` with the address of your page. Checkout itself looks the same. This example sends the customer to `https://example.com/welcome`.
+
+[See example →](https://www.kelviq.com/sandbox/buy/f60cea73-579b-4932-8d85-02b79710e9dc/?enabled=voice-pro&plan_identifier=voice-pro&charge_period=MONTHLY&success_url=https%3A%2F%2Fexample.com%2Fwelcome)
+
+## Related documentation
+
+- [Customize a static checkout URL](/checkout/static-checkout-url)
+- [Checkout configuration](/checkout/checkout-configuration)
+- [Free plans and trials](/product-catalog/free-and-trials)
+- [Create a checkout session with the API](/api-reference/checkout/create-a-checkout-session)

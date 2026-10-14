@@ -59,7 +59,11 @@ Pass `prorationBehavior` when you update a subscription to choose when the custo
 | `PRORATE_NEXT_INVOICE` | Applies the change now and adds the prorated credit or charge to the next renewal invoice. Nothing is collected immediately. |
 | `NO_PRORATION` | Applies the change now without crediting or charging for the partial period. The next renewal invoice bills the full new price. |
 
-If you omit the field, Kelviq uses your organization's default. Set the defaults with `PATCH /organizations/settings/`: `updateSubscriptionProrationBehavior` covers upgrades and downgrades and defaults to `IMMEDIATE_CHARGE`, while `migrateSubscriptionProrationBehavior` covers plan migrations and defaults to `PRORATE_NEXT_INVOICE`.
+If you omit the field, Kelviq uses your organization's default. Set the defaults in **Settings → Subscription proration**: one for plan upgrades and downgrades (defaults to immediate charge) and one for plan version migrations (defaults to prorate on next invoice). The same settings are available through the API as `updateSubscriptionProrationBehavior` and `migrateSubscriptionProrationBehavior` on `PATCH /organizations/settings/`.
+
+<Frame>
+  <img src="/images/subscription-proration-settings.webp" alt="The Subscription proration settings page" />
+</Frame>
 
 <Warning>
   Changing the billing interval, such as monthly to yearly, starts and invoices the new billing period immediately, whichever option you pass. With `NO_PRORATION`, unused time on the old interval is not credited. The update time becomes the start of the new billing period and sets the new renewal date.

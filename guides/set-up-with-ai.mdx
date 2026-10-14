@@ -1,0 +1,46 @@
+---
+title: "Set up with AI"
+description: "Hand billing to your AI coding agent with a prompt generated from your Kelviq account"
+---
+
+**Settings → Set up with AI** writes a prompt for your coding agent. Paste it into Claude Code, Cursor, Codex, Lovable, Replit, Bolt, or any agent that can edit files and run commands, and the agent integrates Kelviq into your app.
+
+It works in your sandbox, asks before changing anything in Kelviq, and never needs your keys in the chat.
+
+<Frame>
+  <img src="/images/set-up-with-ai-integrate.webp" alt="The Set up with AI page" />
+</Frame>
+
+## Two ways to start
+
+**Integrate with my app** is for a catalog you have already built. The agent connects the plans you have published: it adds a checkout route, a billing portal route, feature checks, and a webhook route that verifies signatures. If your app has a public URL, it registers the webhook too.
+
+**Set up everything** is for a new product. The agent reads your app and your requirements, proposes plans, prices, limits, license keys and discount codes, and shows you what it will create. Nothing is created in Kelviq until you approve. It then builds the integration the same way.
+
+<Frame>
+  <img src="/images/set-up-with-ai-everything.webp" alt="The Set up everything path, with approval steps before anything is created" />
+</Frame>
+
+## Steps
+
+1. **Add your keys to the project.** Click **Copy for your .env file** and paste the block into your project's `.env.local` or `.env`, or into your app builder's secrets. The agent reads the keys from the file. Don't paste them into the chat.
+2. **Describe what you want.** Plain language is fine: "one plan at $9/month with license keys, up to 3 devices per key, no free plan". Or add a common request, such as a monthly and yearly toggle or a 7-day free trial. The agent follows these on top of its defaults and asks if something conflicts.
+3. **Give the prompt to your agent.** Click **Copy prompt**, open your agent in your app's project, and paste it as the first message.
+
+The agent checks your sandbox keys with the Kelviq CLI without printing them, builds the app, and ends with a test purchase you can try with a [sandbox test card](/guides/sandbox).
+
+## What stays with you
+
+The agent only works in your sandbox. Before you go live, you still:
+
+* complete [business verification](/getstarted/review-process) and set up [payouts](/payouts/overview);
+* add production keys to your hosting settings; and
+* register a production [webhook](/guides/webhooks) endpoint.
+
+On Claude Code, install the [Kelviq plugin](/guides/agent-toolkit) for extra tools. The prompt picks them up automatically.
+
+## Related documentation
+
+- [Agent Toolkit](/guides/agent-toolkit)
+- [MCP server](/guides/mcp-server)
+- [CLI overview](/cli/overview)

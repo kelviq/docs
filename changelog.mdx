@@ -9,6 +9,64 @@ import { ChangelogFilter } from "/snippets/changelog-filter.jsx";
 
 <ChangelogFilter products={["App","JS SDK","React SDK","Node SDK","Python SDK","JS Promotions UI","MCP Server","CLI","API"]} />
 
+<Update label="v1.20" description="October 16, 2026" tags={["App"]}>
+
+## Set up with AI
+
+Billing is now something you can hand to your coding agent. The new **Settings → Set up with AI** page writes a prompt for Claude Code, Cursor, Codex, Lovable, Replit, Bolt, or any agent that can edit files and run commands, and you paste it in as your first message.
+
+<Frame>
+  <img src="/images/set-up-with-ai-integrate.webp" alt="The Set up with AI page with its three steps and the prompt it generates" />
+</Frame>
+
+Pick one of two paths. **Integrate with my app** connects the plans you have already published: the agent adds checkout, the billing portal, feature checks, and a verified webhook route, and registers the webhook when your app has a public URL. **Set up everything** starts earlier. The agent reads your app, proposes plans, prices, limits, license keys and discount codes, and only creates them in your sandbox after you approve.
+
+Describe what you want in plain language, or add a common request such as a monthly and yearly toggle or a 7-day free trial, and the prompt includes it.
+
+Your keys never go in the chat. The page gives you a block to paste into your project's `.env.local`, and the agent reads them from the file. Everything happens in your sandbox. Going live, business verification and production keys stay with you.
+
+## Checkout examples in the docs
+
+The docs now have a [Checkout examples](/checkout/checkout-examples) page: a live sandbox checkout for every kind of plan, from a free trial to pay as you go, with a screenshot of what the customer sees.
+
+## Fixes
+
+* Amounts show two decimal places everywhere in the dashboard.
+* In promotion settings, the security options are now off for new promotions.
+
+</Update>
+
+<Update label="v1.19" description="October 3, 2026" tags={["App"]}>
+
+## Choose how plan changes are billed
+
+When a customer moves between plans mid-period, you decide what happens to the partial period. **Settings → Subscription proration** has two defaults:
+
+<Frame>
+  <img src="/images/subscription-proration-settings.webp" alt="The Subscription proration settings page with defaults for plan changes and plan version migrations" />
+</Frame>
+
+* **Plan upgrades and downgrades** defaults to **Immediate charge**: Kelviq prorates the difference and invoices it right away.
+* **Plan version migrations** defaults to **Prorate on next invoice**: the change applies now and the difference lands on the next renewal.
+
+Both accept a third option, **No proration**, which changes the plan without crediting or charging for the partial period. Switching between monthly and yearly billing always invoices immediately, whatever you choose here. API requests that pass `prorationBehavior` override these defaults.
+
+[Subscriptions](/product-catalog/subscriptions#control-how-a-change-is-billed) explains each option with an example.
+
+</Update>
+
+<Update label="v1.18" description="September 4, 2026" tags={["App"]}>
+
+## Abandoned cart recovery
+
+Kelviq now follows up with customers who start a checkout but do not pay. When a checkout sits untouched for an hour, Kelviq marks it as abandoned and sends up to three reminder emails, one each day for three days. Each email carries a **Return to checkout** link that takes the customer back to their session. The checkout expires four days after it was created.
+
+You do not need to set anything up. Recovery emails are on by default for every organization, and you can turn them off with the **Abandoned cart recovery** toggle in **Settings → Notifications**. Reminders are only sent when there is a customer email to send them to, and a customer is never emailed twice for the same step. A customer who starts several checkouts gets one set of reminders, not one per checkout.
+
+Read [Abandoned cart recovery](/sales/abandoned-cart-recovery) for the full schedule, the abandonment rules, and what happens at expiration.
+
+</Update>
+
 <Update label="v1.8.2" description="October 13, 2026" tags={["API"]}>
 
 ### New Features
