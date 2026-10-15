@@ -9,7 +9,7 @@ import { ChangelogFilter } from "/snippets/changelog-filter.jsx";
 
 <ChangelogFilter products={["App","JS SDK","React SDK","Node SDK","Python SDK","JS Promotions UI","MCP Server","CLI","API"]} />
 
-<Update label="v1.21" description="October 23, 2026" tags={["App"]}>
+<Update label="v1.22" description="October 23, 2026" tags={["App"]}>
 
 ## Retention offers
 
@@ -32,7 +32,7 @@ Read [Retention offers](/customer-portal/retention) to set it up.
 
 </Update>
 
-<Update label="v1.20" description="October 16, 2026" tags={["App"]}>
+<Update label="v1.21" description="October 16, 2026" tags={["App"]}>
 
 ## Set up with AI
 
@@ -50,7 +50,7 @@ Your keys never go in the chat. The page gives you a block to paste into your pr
 
 ## Checkout design
 
-Make checkout look like the rest of your product. **Settings → Checkout design** has your logo, colors, fonts, and corner radius in one place, with a live preview next to the controls.
+Make checkout look like the rest of your product. **Settings → Checkout design** has your logo, colors, and corner radius in one place, with a live preview next to the controls.
 
 <Frame>
   <img src="/images/checkout-design/checkout-design-settings.webp" alt="The Checkout design settings page with a live preview" />
@@ -65,7 +65,39 @@ Change any color for light and dark mode, set how rounded cards and buttons are,
 
 </Update>
 
-<Update label="v1.19" description="October 3, 2026" tags={["App"]}>
+<Update label="v1.20" description="October 9, 2026" tags={["App"]}>
+
+## New checkout
+
+Every checkout link and checkout session now opens in a redesigned page. Product on the left, payment on the right, and nothing the customer doesn't need.
+
+<Frame caption="Light mode">
+  <img src="/images/checkout-examples/pricing-table-light.webp" alt="The new checkout in light mode, with a plan picker, billing period tabs, and the payment form" />
+</Frame>
+
+<Frame caption="Dark mode">
+  <img src="/images/checkout-examples/pricing-table-dark.webp" alt="The same checkout in dark mode" />
+</Frame>
+
+**Light and dark mode.** Checkout follows the customer's device setting, and a switch in the corner of the page lets them change it. Every part of the page, including the card fields, has its own light and dark version, so nothing looks pasted in.
+
+**What's in the plan.** When a plan has features, checkout lists them under **Includes**, with the limit for each one ("100 monitors", "30K credits") and a cross for anything the plan doesn't include. A customer can compare plans without leaving the page.
+
+**Plans and billing periods.** When a link offers more than one plan, checkout shows them as cards with the price and a short description, and tabs for the billing periods you sell. Picking a different plan or period updates the summary and total on the spot. Per-seat plans show the seat count and the price per seat.
+
+**Clear totals.** The summary shows the line item with its billing period, the subtotal, the promotion code field, tax, and the total. Tax is calculated as soon as the customer enters their country and postal code. A free trial shows **Total due today** at zero, the total after the trial, and the date of the first charge.
+
+**Business purchases.** Ticking **I'm purchasing as a business** adds the organization name, address, and tax ID fields, so the invoice comes out right without a support ticket.
+
+**Local payment methods.** Checkout shows the methods available in the customer's country next to the card fields, such as UPI in India, and prices in the local currency.
+
+**Secure by default.** Card details are entered in embedded, PCI-compliant payment fields and never touch Kelviq's or your servers. Before paying, the customer sees who the merchant of record is and what they are authorizing, with links to the terms and privacy policy. Your app still confirms a purchase from the webhook, not from the redirect.
+
+Try every variation on the [Checkout examples](/checkout/checkout-examples) page, and change the look in [Checkout design](/checkout/checkout-design).
+
+</Update>
+
+<Update label="v1.19" description="October 2, 2026" tags={["App"]}>
 
 ## Choose how plan changes are billed
 
