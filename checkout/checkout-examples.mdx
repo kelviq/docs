@@ -5,7 +5,7 @@ description: "See how checkout looks for subscriptions, free plans, trials, one-
 
 Every example is a live sandbox checkout. To try one, pay with the test card `4242 4242 4242 4242`, any future expiry date, and any CVC.
 
-The examples use the default look. You can change the logo, theme, colors, fonts, and which sections appear in [Checkout design](/checkout/checkout-design).
+The examples use the default look. You can change the logo, colors, and which sections appear in [Checkout design](/checkout/checkout-design).
 
 | Example | What changes at checkout | Button |
 | --- | --- | --- |
@@ -54,11 +54,11 @@ List several plans in the link and checkout shows them as a list the customer ca
 
 ## Single plan
 
-Put only one plan in the link and checkout skips the plan list. The price moves to the top of the page. Use this when the customer has already picked a plan on your site.
+Put only one plan in the link and checkout shows just that plan, already selected. Use this when the customer has picked a plan on your site.
 
 <Frame>
-  <img className="block dark:hidden" src="/images/checkout-examples/single-plan-light.webp" alt="Checkout for the VoiceForge AI Starter plan at $6 per month" />
-  <img className="hidden dark:block" src="/images/checkout-examples/single-plan-dark.webp" alt="Checkout for the VoiceForge AI Starter plan at $6 per month" />
+  <img className="block dark:hidden" src="/images/checkout-examples/single-plan-light.webp" alt="Checkout showing only the VoiceForge AI Starter plan at $6 per month" />
+  <img className="hidden dark:block" src="/images/checkout-examples/single-plan-dark.webp" alt="Checkout showing only the VoiceForge AI Starter plan at $6 per month" />
 </Frame>
 
 [See example →](https://www.kelviq.com/sandbox/buy/f60cea73-579b-4932-8d85-02b79710e9dc/?enabled=voice-starter&plan_identifier=voice-starter&charge_period=MONTHLY)
@@ -185,16 +185,17 @@ You can also remove the **Add promotion code** field, so customers aren't tempte
 
 ## Per-seat plan
 
-A per-seat plan charges for each seat the customer buys. The seat count comes from your app, so this checkout is created with the [Checkout API](/api-reference/checkout/create-a-checkout-session) rather than a static link. This example is TeamBoard Business at \$16 a seat with 5 seats and a 14-day trial.
+A per-seat plan charges for each seat the customer buys. The seat count comes from your app, so this checkout is created with the [Checkout API](/api-reference/checkout/create-a-checkout-session) rather than a static link. This example offers TeamBoard Basic and Business for 5 seats, with Business selected: \$16 a seat, \$80 a month, after a 14-day trial.
 
 <Frame>
-  <img className="block dark:hidden" src="/images/checkout-examples/per-seat-light.webp" alt="TeamBoard Business checkout with 5 seats at $80 a month and a 14-day trial" />
-  <img className="hidden dark:block" src="/images/checkout-examples/per-seat-dark.webp" alt="TeamBoard Business checkout with 5 seats at $80 a month and a 14-day trial" />
+  <img className="block dark:hidden" src="/images/checkout-examples/per-seat-light.webp" alt="TeamBoard checkout with Basic and Business plans, Business selected with 5 seats at $80 a month" />
+  <img className="hidden dark:block" src="/images/checkout-examples/per-seat-dark.webp" alt="TeamBoard checkout with Basic and Business plans, Business selected with 5 seats at $80 a month" />
 </Frame>
 
 ```json
 {
   "planIdentifier": "tb-business",
+  "plansEnabled": "tb-basic,tb-business",
   "chargePeriod": "MONTHLY",
   "features": [{ "identifier": "tb-seats", "quantity": 5 }],
   "successUrl": "https://example.com/welcome"
