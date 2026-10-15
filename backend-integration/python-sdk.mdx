@@ -1232,6 +1232,72 @@ An instance of `CancelSubscriptionResponse`, which includes:
 
 * `message` (str): A confirmation message indicating the result of the cancellation request.
 
+### Pause a subscription.
+
+Pausing stops billing **and** access. Invoices generated during the pause are voided, and the subscription's feature entitlements are switched off for its duration, then recreated with usage reset to zero when it resumes.
+
+**Synchronous:**
+
+```python
+response = client.subscriptions.pause(
+    subscriptionId="78058918-9746-4280-9b9b-1bd5115eec6e",
+    pauseMonths=3
+)
+print(response.message, response.resumesAt)
+```
+
+**Asynchronous:**
+
+```python
+response = await async_client.subscriptions.pause(
+    subscriptionId="78058918-9746-4280-9b9b-1bd5115eec6e",
+    pauseMonths=3
+)
+```
+
+**Parameters**:
+
+* `subscriptionId` (str): The subscription to pause.
+
+* `pauseMonths` (int): How long to pause for, in months. This is converted to a resume date aligned to the end of a billing period, so the renewal after the pause bills normally. It must be at least as long as one billing period — a one-month pause on a yearly plan skips no renewal and is rejected. Mutually exclusive with `resumesAt`.
+
+* `resumesAt` (str): An explicit resume date in `YYYY-MM-DD` format, instead of a length. Mutually exclusive with `pauseMonths`.
+
+Passing neither pauses indefinitely, until a resume call.
+
+Pausing is not available on manually billed subscriptions, which Kelviq does not invoice, nor on a subscription that is free, already paused, or scheduled to cancel.
+
+**Returns**:
+
+An instance of `PauseSubscriptionResponse`, with `message`, `subscriptionId`, `status`, `pausedAt` and `resumesAt`.
+
+### Resume a paused subscription.
+
+**Synchronous:**
+
+```python
+from kelviq_sdk import ResumeBillingBehavior
+
+response = client.subscriptions.resume(
+    subscriptionId="78058918-9746-4280-9b9b-1bd5115eec6e",
+    billingBehavior=ResumeBillingBehavior.RESET_BILLING_CYCLE
+)
+```
+
+**Parameters**:
+
+* `subscriptionId` (str): The paused subscription to resume.
+
+* `billingBehavior` (str | ResumeBillingBehavior): When billing restarts. `RESET_BILLING_CYCLE` invoices a full period on the resume date and moves the billing day. `KEEP_BILLING_DAY` waits for the original renewal day, so nothing is charged until it comes round. Omit it to use the organization's retention setting.
+
+<Note>
+A customer resuming inside a period they already paid for is never re-invoiced for those days, whichever value you send.
+</Note>
+
+**Returns**:
+
+An instance of `ResumeSubscriptionResponse`, with `message`, `subscriptionId`, `status` and `billingPeriodEndTime`.
+
 
 
 ---
