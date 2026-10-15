@@ -84,6 +84,10 @@ Kelviq automatically retries timeouts, connection failures, and `5xx` or `429` r
 
 Use your customer identifier or checkout `metadata` to correlate the two events. See [Add metadata to checkout](/checkout/checkout-metadata) for request and webhook examples. Do not treat the checkout redirect as proof that a subscription has been created.
 
+### Custom field responses
+
+When a checkout session collects [custom fields](/api-reference/checkout/create-a-checkout-session), the customer's responses are included as `custom_fields_data` in `data.object` of `checkout.completed` and of the `order.created`, `order.updated`, and `order.refunded` events for the resulting order. The object is keyed by custom field identifier and is empty (`{}`) when the session collected no custom fields.
+
 ### Successful invoice payments
 
 Kelviq sends `invoice.paid` whenever an invoice is paid, including invoices that are created directly with a `PAID` status. Use this event for payment-driven work such as recording revenue, starting an asynchronous provisioning job, or notifying an internal system.
@@ -232,6 +236,10 @@ The request body is a JSON object with the following top-level fields:
         "order_ref": "ABC-123",
         "source": "pricing_page"
       },
+      "custom_fields_data": {
+        "company-name": "Acme Inc",
+        "purchase-order-number": "PO-4821"
+      },
       "data": {
         "name": "Geo",
         "email": "geojacob@example.com",
@@ -326,6 +334,10 @@ The request body is a JSON object with the following top-level fields:
       },
       "organization": "9b759915-5387-4e61-90e9-2162318e8d17",
       "is_renewal": false,
+      "custom_fields_data": {
+        "company-name": "Acme Inc",
+        "purchase-order-number": "PO-4821"
+      },
       "paid_at": "2026-04-01T17:36:41Z",
       "amount_total": "10.00",
       "amount_total_units": 1000,
@@ -378,6 +390,10 @@ The request body is a JSON object with the following top-level fields:
       },
       "organization": "9b759915-5387-4e61-90e9-2162318e8d17",
       "is_renewal": false,
+      "custom_fields_data": {
+        "company-name": "Acme Inc",
+        "purchase-order-number": "PO-4821"
+      },
       "paid_at": "2026-04-01T17:36:41Z",
       "amount_total": "10.00",
       "amount_total_units": 1000,
@@ -433,6 +449,10 @@ The request body is a JSON object with the following top-level fields:
       },
       "organization": "9b759915-5387-4e61-90e9-2162318e8d17",
       "is_renewal": false,
+      "custom_fields_data": {
+        "company-name": "Acme Inc",
+        "purchase-order-number": "PO-4821"
+      },
       "paid_at": "2026-04-01T17:36:41Z",
       "amount_total": "10.00",
       "amount_total_units": 1000,
