@@ -1,0 +1,105 @@
+---
+title: "Checkout design"
+description: "Match checkout to your brand with your logo, colors, fonts, and the sections you want customers to see"
+---
+
+**Settings → Checkout design** controls how every checkout for your business looks. Changes show in the preview as you make them, and apply to all checkout links and checkout sessions when you save.
+
+<Frame>
+  <img src="/images/checkout-design/checkout-design-settings.webp" alt="The Checkout design settings page with branding, mode and theme options next to a live checkout preview" />
+</Frame>
+
+## Branding
+
+| Setting | What it changes |
+| --- | --- |
+| Business name | The name shown at the top of checkout |
+| Logo | Shown at the top of checkout. Upload a separate **Dark mode logo** if your logo doesn't read well on a dark background |
+| Logo height | Size of the logo, in pixels |
+| Favicon | The icon in the browser tab |
+| Background image | An image behind the checkout page |
+
+## Light and dark mode
+
+Choose **Light**, **Dark**, or **System**. System follows the customer's device setting.
+
+<Frame>
+  <img src="/images/checkout-design/checkout-design-light-dark.webp" alt="The same checkout in light and dark mode" />
+</Frame>
+
+## Themes
+
+A theme sets every color at once. Start with **Minimal**, **Ocean**, **Warm**, or **Terminal**, then adjust any color you like. Each theme has a light and a dark palette.
+
+<Frame>
+  <img src="/images/checkout-design/checkout-design-themes.webp" alt="One checkout shown in the Minimal, Ocean, Warm, and Terminal themes" />
+</Frame>
+
+Changing a color adds a customized version of the theme, such as **Warm (customized)**, next to the original.
+
+### Colors
+
+Light and dark mode each have their own colors.
+
+| Group | Colors |
+| --- | --- |
+| Brand | Primary (buttons and selected plan), On primary (text on buttons), Secondary |
+| Surface | Background, Surface (cards), Input background |
+| Text and border | Text, Muted text, Border |
+| Status | Error, Success, Warning, Highlight |
+| Shadows | Card shadow, Button shadow |
+
+<Tip>
+  Check that **Primary** and **On primary** have enough contrast. The button text sits on the primary color.
+</Tip>
+
+## Typography
+
+Pick a **Primary font** for headings and a **Secondary font** for body text, or upload your own font file. You can also set the base text size, body and heading weight, and the letter spacing of labels.
+
+## Shape
+
+| Setting | What it changes |
+| --- | --- |
+| Corner radius | How rounded cards, buttons, and inputs are. While **Link card, button, and input radius** is ticked, one value applies to all three |
+| Border width | Thickness of borders around cards and inputs |
+| Spacing density | How much space sits between sections |
+
+## Choose what customers see
+
+Turn sections of checkout on or off. Everything is on by default.
+
+<Frame>
+  <img src="/images/checkout-design/checkout-design-visibility.webp" alt="A checkout with all sections on, next to the same checkout with the product image and description turned off" />
+</Frame>
+
+| Section | Shows |
+| --- | --- |
+| Logo | Your logo at the top |
+| Heading | The "Subscribe to…" title |
+| Product description | The text under the product image |
+| Product images | The images you added to the product |
+| Plan selector | The list of plans and the billing-period tabs |
+| Metered features | Usage limits included in the plan, such as credits |
+| Included features | The plan's features and limits |
+| Feature tooltips | Extra detail when a customer hovers over a feature |
+| Discount code field | The **Add promotion code** field |
+| Price breakdown | Subtotal, discount, and tax lines above the total |
+
+<Note>
+  Hiding the plan selector only hides the list. Checkout still uses the plan from the link. To hide the discount field for a single link instead of every checkout, add `discounts_enabled=false` to the [checkout URL](/checkout/static-checkout-url).
+</Note>
+
+## Custom CSS
+
+For changes the settings don't cover, use **Developer overrides**. **CSS variables** set design values, such as `--ck-radius: 12px;`. **Custom CSS** is applied last, after everything else.
+
+<Warning>
+  Custom CSS can break when checkout is updated. Use the settings above where you can, and keep custom CSS small.
+</Warning>
+
+## Related documentation
+
+- [Checkout examples](/checkout/checkout-examples)
+- [Customize a static checkout URL](/checkout/static-checkout-url)
+- [Products](/product-catalog/products)

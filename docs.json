@@ -64,6 +64,7 @@
             "group": "Checkout",
             "pages": [
               "checkout/checkout-configuration",
+              "checkout/checkout-design",
               "checkout/static-checkout-url",
               "checkout/checkout-examples",
               "checkout/apply-a-discount-code",
@@ -97,6 +98,7 @@
             "group": "Customer-portal",
             "pages": [
               "customer-portal/overview",
+              "customer-portal/retention",
               "customer-portal/managing-payment-methods"
             ]
           },

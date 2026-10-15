@@ -9,6 +9,29 @@ import { ChangelogFilter } from "/snippets/changelog-filter.jsx";
 
 <ChangelogFilter products={["App","JS SDK","React SDK","Node SDK","Python SDK","JS Promotions UI","MCP Server","CLI","API"]} />
 
+<Update label="v1.21" description="October 23, 2026" tags={["App"]}>
+
+## Retention offers
+
+Customers who cancel in the customer portal can now get an offer to stay. Kelviq asks why they're leaving, then shows the offer you picked for that reason.
+
+<Frame>
+  <img src="/images/retention/retention-pause-offer.webp" alt="A retention offer to pause the subscription for 1, 3, or 6 months" />
+</Frame>
+
+Set up four kinds of offer in **Settings → Retention**:
+
+* **Discount:** a percentage off the next 1 to 3 payments.
+* **Pause:** 1, 3, or 6 months without billing.
+* **Plan change:** a move to the next cheaper plan.
+* **Support:** a link to a booking page, live chat, or your help site.
+
+Then match each cancellation reason to an offer, such as a discount for "Too expensive" or a pause for "Not using it enough". You can also ask one optional question before the customer confirms, and choose whether an offer can be accepted more than once.
+
+Read [Retention offers](/customer-portal/retention) to set it up.
+
+</Update>
+
 <Update label="v1.20" description="October 16, 2026" tags={["App"]}>
 
 ## Set up with AI
@@ -24,6 +47,16 @@ Pick one of two paths. **Integrate with my app** connects the plans you have alr
 Describe what you want in plain language, or add a common request such as a monthly and yearly toggle or a 7-day free trial, and the prompt includes it.
 
 Your keys never go in the chat. The page gives you a block to paste into your project's `.env.local`, and the agent reads them from the file. Everything happens in your sandbox. Going live, business verification and production keys stay with you.
+
+## Checkout design
+
+Make checkout look like the rest of your product. **Settings → Checkout design** has your logo, colors, fonts, and corner radius in one place, with a live preview next to the controls.
+
+<Frame>
+  <img src="/images/checkout-design/checkout-design-themes.webp" alt="One checkout in the Minimal, Ocean, Warm, and Terminal themes" />
+</Frame>
+
+Start from one of four themes, then change any color for light and dark mode. You can also hide parts of checkout you don't need, such as product images or the discount code field. Read [Checkout design](/checkout/checkout-design) for every setting.
 
 ## Fixes
 
