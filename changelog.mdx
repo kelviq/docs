@@ -19,16 +19,52 @@ Customers who cancel in the customer portal can now get an offer to stay. Kelviq
   <img src="/images/retention/retention-pause-offer.webp" alt="A retention offer to pause the subscription for 1, 3, or 6 months" />
 </Frame>
 
-Set up four kinds of offer in **Settings → Retention**:
+Set up three kinds of offer in **Settings → Retention**:
 
-* **Discount:** a percentage off the next 1 to 3 payments.
+* **Discount:** a percentage off the next few payments.
 * **Pause:** 1, 3, or 6 months without billing.
-* **Plan change:** a move to the next cheaper plan.
 * **Support:** a link to a booking page, live chat, or your help site.
 
 Then match each cancellation reason to an offer, such as a discount for "Too expensive" or a pause for "Not using it enough". You can also ask one optional question before the customer confirms, and choose whether an offer can be accepted more than once.
 
 Read [Retention offers](/customer-portal/retention) to set it up.
+
+## Pause and resume subscriptions
+
+Subscriptions can now be paused, from the subscription page, from the customer portal through a retention offer, or through the API. A paused subscription isn't billed and its entitlements are off until it resumes. Choose in **Settings → Retention → Advanced settings** whether resuming charges a full period on the spot or waits for the original billing day.
+
+Read [Pause a subscription](/product-catalog/subscriptions#pause-a-subscription).
+
+</Update>
+
+<Update label="v1.9.0" description="October 23, 2026" tags={["API"]}>
+
+### New Features
+
+#### Pause and resume a subscription
+
+Two new endpoints:
+
+```http
+POST /api/v1/subscriptions/{subscriptionId}/pause/
+POST /api/v1/subscriptions/{subscriptionId}/resume/
+```
+
+Pause with `pauseMonths` (1 to 12), a `resumesAt` date, or neither for an open-ended pause. Resume takes an optional `billingBehavior` of `RESET_BILLING_CYCLE` or `KEEP_BILLING_DAY`. Subscription objects gain the `paused` status, `pausedAt`, and `pauseResumesAt`. Plan changes return `400` while a subscription is paused.
+
+#### Webhooks
+
+`subscription.paused` and `subscription.resumed`, sent whichever surface the change came from. Renewals skipped during a pause send no events.
+
+#### Retention settings
+
+`GET` and `PATCH /api/v1/organizations/retention-settings/` read and update the offers, the reason-to-offer map, written feedback, and the resume and repeat policies. The customer portal API gains `…/retention/` to load the offers for a subscription and `…/retention/accept/` to accept one. The cancel endpoint accepts an optional `offerType` to record an offer the customer declined.
+
+#### SDKs
+
+`entitlements.invalidateCache` (Node) and `entitlements.invalidate_cache` (Python) drop a customer's cached entitlements, for use in `subscription.paused` and `subscription.cancelled` handlers.
+
+See [Pause a subscription](/product-catalog/subscriptions#pause-a-subscription) and [Retention offers](/customer-portal/retention).
 
 </Update>
 

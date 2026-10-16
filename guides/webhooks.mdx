@@ -63,6 +63,8 @@ Kelviq automatically retries timeouts, connection failures, and `5xx` or `429` r
 | `subscription.updated` | A subscription's details were modified — including when a cancellation is scheduled for the end of the current period (status stays active; `end_date` is set). |
 | `subscription.cancelled` | A subscription actually reached cancelled status. For a period-end cancellation, this fires later, when the period ends — not at the moment it was scheduled. |
 | `subscription.plan_changed` | A subscription was moved to a different plan. |
+| `subscription.paused` | A subscription was paused, from the dashboard, the customer portal, the API, or directly in Stripe. The payload includes `pausedAt` and `pauseResumesAt`. No other subscription events are sent while it stays paused. |
+| `subscription.resumed` | A paused subscription started billing again, either at its scheduled date or by a resume call. Clear any cached entitlement checks for the customer on both events. |
 | `subscription.trial_will_end` | A subscription's trial period is ending soon. |
 | `feature.usage_alert` | A customer's feature usage crossed a configured threshold. |
 | `invoice.created` | A new invoice was generated. |

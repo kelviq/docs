@@ -81,6 +81,12 @@ client = Kelviq.create_sync_client(
 
 Set `enable_cache=False` to disable caching.
 
+To drop a customer's cached entitlements before the window expires, for example in a `subscription.paused` or `subscription.cancelled` webhook handler:
+
+```python
+client.entitlements.invalidate_cache(customerId=customer_id)
+```
+
 ### Share the cache across workers
 
 The in-memory cache and offline reporting queue belong to one process and disappear when it restarts. Use the optional Redis store when multiple workers, processes, or containers need one shared, durable cache and queue.

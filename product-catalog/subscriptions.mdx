@@ -116,6 +116,64 @@ Under the default payment behavior, downgrades also apply immediately. If the cu
 
 When cancelling, choose whether the subscription should end immediately or at the end of the current billing period. A plan downgrade and a subscription cancellation are separate actions: the downgrade follows the payment behavior you choose, while the cancellation follows the timing option you select.
 
+## Pause a subscription
+
+A paused subscription stops billing and stops access. The customer isn't charged, their entitlements return `isActive: false`, and plan changes are blocked until the subscription resumes. Cancelling stays available.
+
+Pause from the subscription page in the dashboard, from the [customer portal](/customer-portal/overview) when a [retention offer](/customer-portal/retention) includes a pause, or from the API.
+
+```http
+POST /api/v1/subscriptions/{subscriptionId}/pause/
+```
+
+```json
+{ "pauseMonths": 3 }
+```
+
+Send `pauseMonths` (1 to 12) to resume after a set number of months, or `resumesAt` (`YYYY-MM-DD`) to resume on a date. Send neither to pause until you resume it yourself. The response has the new status and the resume date:
+
+```json
+{
+  "message": "Subscription paused successfully",
+  "subscriptionId": "sub_…",
+  "status": "paused",
+  "pausedAt": "2026-09-30T10:00:00",
+  "resumesAt": "2026-12-31T23:00:00"
+}
+```
+
+A pause has to cover at least one full billing period, so a 1-month pause on a yearly plan is refused. Only an `active` subscription can be paused, not one on trial, past due, already paused, or scheduled to cancel. Free and manually billed subscriptions can't be paused.
+
+### Resume a subscription
+
+A subscription resumes on its own at the scheduled date, or when you call:
+
+```http
+POST /api/v1/subscriptions/{subscriptionId}/resume/
+```
+
+```json
+{ "billingBehavior": "RESET_BILLING_CYCLE" }
+```
+
+`billingBehavior` is optional. Leave it out to use the default from **Settings → Retention → Advanced settings**.
+
+| | `RESET_BILLING_CYCLE` (default) | `KEEP_BILLING_DAY` |
+| --- | --- | --- |
+| Charged on resume | A full period | Nothing |
+| Next charge | One period after the resume date | The original billing day |
+| Billing day afterwards | The resume date | Unchanged |
+
+For a monthly plan billed on the 1st, paused on 10 September and resumed on 20 October, reset charges a full month on 20 October and bills on the 20th from then on. Keep billing day charges nothing and bills on 1 November as before, which gives the customer free access from the 20th to the 1st. A customer who resumes inside a period they've already paid for is never charged again, whichever behavior you pick.
+
+On resume, entitlements come back with usage reset to zero and a fresh period.
+
+### What changes while paused
+
+The subscription has `status: "paused"`, `pausedAt`, and `pauseResumesAt` (`null` for an open-ended pause). Kelviq sends `subscription.paused` and `subscription.resumed` [webhooks](/guides/webhooks), whichever surface the change came from. Renewals that would fall inside the pause are skipped silently, so a paused subscription sends no other events until it resumes.
+
+If you cache entitlement checks, clear them when you receive `subscription.paused`, otherwise the customer keeps access until the cache expires. Both SDKs have a call for it: `client.entitlements.invalidateCache({ customerId })` in Node and `client.entitlements.invalidate_cache(customerId=...)` in Python.
+
 ## Refund a cancelled subscription
 
 Kelviq does not automatically refund unused time when a subscription is cancelled mid-period. You decide whether to issue a full refund, a partial refund, or no refund.

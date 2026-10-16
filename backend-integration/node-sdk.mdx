@@ -84,6 +84,12 @@ const client = new Kelviq({
 
 Set `enableCache: false` to disable caching.
 
+To drop a customer's cached entitlements before the window expires, for example in a `subscription.paused` or `subscription.cancelled` webhook handler:
+
+```typescript
+await client.entitlements.invalidateCache({ customerId });
+```
+
 ### Share the cache across instances
 
 The in-memory cache and offline reporting queue belong to one Node process and disappear when it restarts. Use the optional Redis store when multiple processes or containers need one shared, durable cache and queue.
