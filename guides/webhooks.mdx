@@ -134,7 +134,7 @@ Do not provision the new plan from the update API response alone. Read the lates
 
 ### Pauses and resumes
 
-A pause sends `subscription.paused` with `status: "paused"`, `paused_at`, and `pause_resumes_at`, which is `null` for an open-ended pause. Treat it like a cancellation for access: entitlement checks already return `false` for a paused customer, so clear any cached result when the event arrives (`client.entitlements.invalidateCache` in Node, `client.entitlements.invalidate_cache` in Python).
+A pause sends `subscription.paused` with `status: "paused"`, `pausedAt`, and `pauseResumesAt`, which is `null` for an open-ended pause. Treat it like a cancellation for access: entitlement checks already return `false` for a paused customer, so clear any cached result when the event arrives (`client.entitlements.invalidateCache` in Node, `client.entitlements.invalidate_cache` in Python).
 
 The subscription is quiet until it resumes. Renewals that fall inside the pause are skipped without `subscription.updated` or invoice events. `subscription.resumed` arrives when billing starts again, at the scheduled date or after a resume call, with `status: "active"` and a new billing period. Usage counters are reset at that point.
 
@@ -731,8 +731,8 @@ The request body is a JSON object with the following top-level fields:
       "id": "d1284180-beba-465a-b756-9a300324245e",
       "object": "subscription",
       "status": "paused",
-      "paused_at": "2026-09-30T10:00:00Z",
-      "pause_resumes_at": "2026-12-31T23:00:00Z",
+      "pausedAt": "2026-09-30T10:00:00Z",
+      "pauseResumesAt": "2026-12-31T23:00:00Z",
       "plan": {
         "name": "Pro",
         "version": 4,
@@ -777,8 +777,8 @@ The request body is a JSON object with the following top-level fields:
       "id": "d1284180-beba-465a-b756-9a300324245e",
       "object": "subscription",
       "status": "active",
-      "paused_at": null,
-      "pause_resumes_at": null,
+      "pausedAt": null,
+      "pauseResumesAt": null,
       "plan": {
         "name": "Pro",
         "version": 4,
