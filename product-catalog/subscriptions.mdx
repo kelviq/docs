@@ -170,7 +170,7 @@ On resume, entitlements come back with usage reset to zero and a fresh period.
 
 ### What changes while paused
 
-The subscription has `status: "paused"`, `pausedAt`, and `pauseResumesAt` (`null` for an open-ended pause). Kelviq sends `subscription.paused` and `subscription.resumed` [webhooks](/guides/webhooks), whichever surface the change came from. Renewals that would fall inside the pause are skipped silently, so a paused subscription sends no other events until it resumes.
+The subscription has `status: "paused"`, `pausedAt`, and `pauseResumesAt` (`null` for an open-ended pause). Kelviq sends `subscription.paused` and `subscription.resumed` [webhooks](/guides/webhooks), whichever surface the change came from. Webhook payloads use snake_case, so the same fields arrive there as `paused_at` and `pause_resumes_at`. Renewals that would fall inside the pause are skipped silently, so a paused subscription sends no other events until it resumes.
 
 If you cache entitlement checks, clear them when you receive `subscription.paused`, otherwise the customer keeps access until the cache expires. Both SDKs have a call for it: `client.entitlements.invalidateCache({ customerId })` in Node and `client.entitlements.invalidate_cache(customerId=...)` in Python.
 

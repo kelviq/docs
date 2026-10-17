@@ -63,7 +63,7 @@ Kelviq automatically retries timeouts, connection failures, and `5xx` or `429` r
 | `subscription.updated` | A subscription's details were modified — including when a cancellation is scheduled for the end of the current period (status stays active; `end_date` is set). |
 | `subscription.cancelled` | A subscription actually reached cancelled status. For a period-end cancellation, this fires later, when the period ends — not at the moment it was scheduled. |
 | `subscription.plan_changed` | A subscription was moved to a different plan. |
-| `subscription.paused` | A subscription was paused, from the dashboard, the customer portal, the API, or directly in Stripe. The payload includes `pausedAt` and `pauseResumesAt`. No other subscription events are sent while it stays paused. |
+| `subscription.paused` | A subscription was paused, from the dashboard, the customer portal, the API, or directly in Stripe. The payload includes `paused_at` and `pause_resumes_at`. No other subscription events are sent while it stays paused. |
 | `subscription.resumed` | A paused subscription started billing again, either at its scheduled date or by a resume call. Clear any cached entitlement checks for the customer on both events. |
 | `subscription.trial_will_end` | A subscription's trial period is ending soon. |
 | `feature.usage_alert` | A customer's feature usage crossed a configured threshold. |
@@ -134,7 +134,7 @@ Do not provision the new plan from the update API response alone. Read the lates
 
 ### Pauses and resumes
 
-A pause sends `subscription.paused` with `status: "paused"`, `pausedAt`, and `pauseResumesAt`, which is `null` for an open-ended pause. Treat it like a cancellation for access: entitlement checks already return `false` for a paused customer, so clear any cached result when the event arrives (`client.entitlements.invalidateCache` in Node, `client.entitlements.invalidate_cache` in Python).
+A pause sends `subscription.paused` with `status: "paused"`, `paused_at`, and `pause_resumes_at`, which is `null` for an open-ended pause. Treat it like a cancellation for access: entitlement checks already return `false` for a paused customer, so clear any cached result when the event arrives (`client.entitlements.invalidateCache` in Node, `client.entitlements.invalidate_cache` in Python).
 
 The subscription is quiet until it resumes. Renewals that fall inside the pause are skipped without `subscription.updated` or invoice events. `subscription.resumed` arrives when billing starts again, at the scheduled date or after a resume call, with `status: "active"` and a new billing period. Usage counters are reset at that point.
 
@@ -731,8 +731,8 @@ The request body is a JSON object with the following top-level fields:
       "id": "d1284180-beba-465a-b756-9a300324245e",
       "object": "subscription",
       "status": "paused",
-      "pausedAt": "2026-09-30T10:00:00Z",
-      "pauseResumesAt": "2026-12-31T23:00:00Z",
+      "paused_at": "2026-09-30T10:00:00Z",
+      "pause_resumes_at": "2026-12-31T23:00:00Z",
       "plan": {
         "name": "Pro",
         "version": 4,
@@ -777,8 +777,8 @@ The request body is a JSON object with the following top-level fields:
       "id": "d1284180-beba-465a-b756-9a300324245e",
       "object": "subscription",
       "status": "active",
-      "pausedAt": null,
-      "pauseResumesAt": null,
+      "paused_at": null,
+      "pause_resumes_at": null,
       "plan": {
         "name": "Pro",
         "version": 4,
