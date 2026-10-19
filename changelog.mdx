@@ -9,6 +9,24 @@ import { ChangelogFilter } from "/snippets/changelog-filter.jsx";
 
 <ChangelogFilter products={["App","JS SDK","React SDK","Node SDK","Python SDK","JS Promotions UI","MCP Server","CLI","API"]} />
 
+<Update label="v1.23" description="October 30, 2026" tags={["App"]}>
+
+## Custom fields
+
+Ask customers your own questions at checkout, such as a company name for the invoice, a purchase order number, or agreement to your terms.
+
+<Frame>
+  <img width="480" src="/images/settings/custom-field-create.webp" alt="Creating a required Company name custom field" />
+</Frame>
+
+Create a field in **Settings → Custom fields** and pick its type: text, number, yes/no, email, dropdown, URL, or date. Make it required, add help text and a placeholder, and set limits such as length, a pattern, or a date range. Customers see your error message if an answer doesn't pass.
+
+Add the field to a checkout link from **Get Link** on the product page, or pass it in `customFields` when you create a checkout session. Answers are saved with the order and subscription, and sent in your webhooks.
+
+Read [Custom fields](/checkout/custom-fields) to set one up.
+
+</Update>
+
 <Update label="v1.22" description="October 23, 2026" tags={["App"]}>
 
 ## Retention offers
@@ -34,6 +52,10 @@ Read [Retention offers](/customer-portal/retention) to set it up.
 Subscriptions can now be paused, from the subscription page, from the customer portal through a retention offer, or through the API. A paused subscription isn't billed and its entitlements are off until it resumes. Choose in **Settings → Retention → Advanced settings** whether resuming charges a full period on the spot or waits for the original billing day.
 
 Read [Pause a subscription](/product-catalog/subscriptions#pause-a-subscription).
+
+## A discount in the final abandoned cart reminder
+
+The last [abandoned cart](/sales/abandoned-cart-recovery) reminder can now offer a percentage off the checkout total. Turn it on in **Settings → Customer emails** and set the percentage. It isn't offered when another discount already applies to the product.
 
 ## Settings, regrouped
 
