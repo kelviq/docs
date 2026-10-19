@@ -3,7 +3,7 @@ title: Usage-based pricing
 description: Charge customers for the actual work your product performs
 ---
 
-AI products perform actual work. Flat rate subscriptions force you to guess at average compute costs which destroys your margins. Usage-based pricing lets you charge for exact consumption.
+Usage-based pricing charges customers for what they use: API calls, tokens, compute, or any other Meter feature.
 
 ## Set up a usage plan
 
@@ -108,7 +108,7 @@ Customers pay upfront for a baseline allotment of usage. This gives your users a
 Customers pay for their recorded usage at the end of the monthly subscription period. You can bill for API calls, tokens, storage, compute time, or another Meter feature, either on its own or alongside a monthly base price. See [Pay as you go](/product-catalog/pay-as-you-go) for setup, usage reporting, sandbox testing, and troubleshooting.
 
 <Note>
-  Monthly must be the plan's only billing period. Pay as you go does not support Stair-step pricing or credit rollover.
+  A Pay as you go plan can only be billed monthly. Remove other billing periods before you add it. Pay as you go does not support Stair-step pricing or credit rollover.
 </Note>
 
 ### 3. Configure the pricing model
@@ -189,7 +189,7 @@ A customer uses 3,500 tokens.
 | Tier 2 | 2,500 × \$0.05 = \$125 |
 | **Total** | \$100 + \$125 = **\$225** |
 
-Kelviq tracks each pricing bracket automatically, with sub-100ms real-time access checks.
+Kelviq tracks each pricing bracket automatically.
 
 <Frame>
   <img height="400" src="/images/tiered-pricing.png" />
@@ -231,7 +231,7 @@ Kelviq automatically applies the correct rate when customers cross a volume thre
 
 Customers pay a fixed fee based on the usage bracket they fall into, regardless of the exact number of units used within that bracket. There is no per-unit rate.
 
-**Why it's useful** Combines the simplicity of subscription plans with the flexibility of usage-based scaling. Perfect for API plans, infrastructure products, and other services with clear usage bands.
+**Why it's useful** Combines the simplicity of subscription plans with the flexibility of usage-based scaling.
 
 **Example** An email delivery platform charging based on monthly email volume.
 

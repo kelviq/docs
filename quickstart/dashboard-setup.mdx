@@ -3,7 +3,7 @@ title: 'Dashboard setup'
 ---
 
 Before you can integrate Kelviq into your app, you need to configure your **products, plans, and features** in the dashboard.  
-This setup defines how your pricing and entitlements will work.
+This defines your pricing and what each plan includes.
 
 <Tip>
   Using Claude Code, Cursor, or another coding agent? [Set up with AI](/guides/set-up-with-ai) gives you a prompt that creates your products, plans, and features for you. You approve each change.
@@ -13,7 +13,7 @@ This setup defines how your pricing and entitlements will work.
 
 ## Create a product
 
-1. In the sidebar, go to **Products → Create product**
+1. In the sidebar, go to **Product catalog → Products** and click **Create product**
 2. Enter a product name (e.g., "Design Course", "Pro Plan", "Premium Templates")
 3. Click **Save** — you'll be redirected to the product page  
 
@@ -33,19 +33,21 @@ From the product page:
 
 From the plan page, click the **Price** section to configure pricing:
 
-1. Select billing cycles: **28 Days** (when enabled), **Monthly**, **Yearly**, **3 Months**, or **One Time**
+1. Select billing cycles: **Monthly**, **3 Months**, **6 Months**, **Yearly**, **28 Days** (when enabled), or **One Time**
 2. Enter prices for each selected billing cycle
 3. (Optional) Enable **Free trial** and set the trial period in days
 4. Click **Save**
 
 ### Usage-based pricing
 
-To charger your users based on consumption like compute or agent runs you can add usage based pricing.
+To charge for consumption, such as compute or agent runs:
 
-1. In the Price section select the usage billing option
-2. Choose the specific feature you want to track like AI tokens or workflow executions
-3. Set your price per unit
-4. Combine this with a flat base fee if you want a hybrid pricing model
+1. In the Price section, add a usage charge
+2. Pick the Meter feature to bill, such as AI tokens or workflow executions
+3. Set the price per unit
+4. Keep a flat base price too if you want hybrid pricing
+
+See [Usage-based pricing](/product-catalog/usage-based-billing).
 
 ### Regional pricing
 
@@ -94,13 +96,13 @@ Click the **Features & limits** section to configure feature access and usage qu
 
 Features are created independently and can be attached to multiple plans with different values:
 
-- **Switch (Boolean)** — on or off
+- **Boolean** — on or off
   Examples: priority support, bonus content access, community access, custom branding
 
 - **Customizable** — a fixed numeric limit, no usage reporting
   Examples: number of downloads, max projects, storage limit (10 GB, 100 GB)
 
-- **Metered** — tracked consumption, usage events sent to Kelviq, resets each billing cycle
+- **Meter feature** — tracked consumption, usage events sent to Kelviq, resets each billing cycle
   Examples: API calls, AI generations, video renders, exports per month
 
 Once added, features appear in the plan's feature list. You can reorder or remove them as needed.  
@@ -109,7 +111,7 @@ Once added, features appear in the plan's feature list. You can reorder or remov
 
 ## Publish the plan
 
-The last step is to publish your plan, so customers can see it and purchase it.
+Click **Publish** on the plan page. Plans stay drafts until you publish them, and customers can only buy published plans.
 
 ---
 
@@ -118,9 +120,9 @@ The last step is to publish your plan, so customers can see it and purchase it.
 Your plan is now published and ready for customers.
 Next, you can integrate Kelviq into your app:
 
-- Use **checkout links** to let customers purchase your plans
+- Use [checkout links](/checkout/static-checkout-url) to let customers buy your plans
 - Create a customer in Kelviq when a user signs up in your app
-- Use the Kelviq **SDK** to check feature access and track usage
+- Use the Kelviq [SDKs](/quickstart/integrate-with-your-app) to check feature access and track usage
 
 ---
 
