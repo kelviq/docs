@@ -1,5 +1,6 @@
 ---
-title: 'Build with AI'
+title: 'Kelviq and AI'
+sidebarTitle: 'Overview'
 description: 'Set up Kelviq with your coding agent, or connect your agent to Kelviq and its docs'
 ---
 
@@ -20,7 +21,7 @@ Kelviq works with the AI tools you already use. Your coding agent can create you
   </Card>
 </CardGroup>
 
-## The quick version
+## Set up with your agent
 
 1. Open **Settings → Set up with AI** in the dashboard.
 2. Copy the keys block into your project's `.env.local`.
@@ -28,18 +29,8 @@ Kelviq works with the AI tools you already use. Your coding agent can create you
 
 Your agent can build and test everything with sandbox keys, then you go live when it's ready. You can also set it up directly in production. Either way, business verification and your keys stay with you.
 
-## Give your agent the docs
+## For your agent
 
-Point your agent at the Kelviq docs so it answers from them instead of guessing.
-
-| Resource | Use it for |
-| --- | --- |
-| [`llms.txt`](https://docs.kelviq.com/llms.txt) | An index of every docs page, in Markdown |
-| [`llms-full.txt`](https://docs.kelviq.com/llms-full.txt) | All the docs in one file |
-| `https://docs.kelviq.com/mcp` | Docs MCP server: search and read the docs from any MCP client |
-
-In Claude Code, add the docs MCP server with:
-
-```bash
-claude mcp add --transport http kelviq-docs https://docs.kelviq.com/mcp
-```
+* [MCP server](/guides/mcp-server): your agent manages customers, plans, and subscriptions in Kelviq.
+* [Agent Toolkit](/guides/agent-toolkit): the MCP server plus skills that teach Claude Code how Kelviq works.
+* [Docs for agents](/ai/docs-for-agents): `llms.txt` and a docs MCP server, so your agent answers from the Kelviq docs.
