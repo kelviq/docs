@@ -65,6 +65,8 @@
             "pages": [
               "checkout/checkout-configuration",
               "checkout/checkout-design",
+              "checkout/payment-methods",
+              "checkout/custom-fields",
               "checkout/static-checkout-url",
               "checkout/checkout-examples",
               "checkout/apply-a-discount-code",
@@ -100,6 +102,15 @@
               "customer-portal/overview",
               "customer-portal/retention",
               "customer-portal/managing-payment-methods"
+            ]
+          },
+          {
+            "group": "Settings",
+            "pages": [
+              "settings/profile",
+              "settings/members",
+              "settings/customer-emails",
+              "settings/zapier"
             ]
           },
           {

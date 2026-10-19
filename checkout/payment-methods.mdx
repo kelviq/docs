@@ -1,0 +1,120 @@
+---
+title: 'Payment methods'
+description: 'Cards, Apple Pay, Google Pay, UPI, PayPal, Klarna, iDEAL, SEPA Direct Debit, Pix, and the other ways customers can pay at Kelviq checkout'
+keywords: ['payment methods', 'UPI', 'UPI AutoPay', 'Apple Pay', 'Google Pay', 'PayPal', 'Klarna', 'iDEAL', 'SEPA Direct Debit', 'ACH', 'Pix', 'local payment methods']
+---
+
+Kelviq checkout accepts cards, wallets, bank payments, buy now pay later, and local payment methods from around the world. You don't need to turn anything on or sign up with each provider. Kelviq is the merchant of record, so we handle the payment provider agreements, currency conversion, and payouts to you.
+
+## Which methods a customer sees
+
+Checkout shows the methods that fit each purchase, based on:
+
+* **The customer's country.** A buyer in the Netherlands sees iDEAL, a buyer in India sees UPI, a buyer in Brazil sees Pix.
+* **The checkout currency.** Most local methods only work in their own currency. UPI needs INR, Pix needs BRL, iDEAL needs EUR. Set local prices with [location-based pricing](/product-catalog/location-based-pricing) so these methods can appear.
+* **One-time or recurring.** Some methods can be charged again automatically for subscription renewals. Others can only be used for one-time payments, so checkout hides them for subscriptions.
+
+Cards, Apple Pay, and Google Pay work almost everywhere and for both one-time payments and subscriptions.
+
+## Cards
+
+| Method | Where | Subscriptions |
+| --- | --- | --- |
+| Visa, Mastercard, American Express | Worldwide | Yes |
+| Discover, Diners Club, JCB, UnionPay | Worldwide | Yes |
+| Cartes Bancaires | France | Yes |
+| eftpos | Australia | Yes |
+| Korean local cards | South Korea | Yes |
+
+## Wallets
+
+| Method | Where | Subscriptions |
+| --- | --- | --- |
+| Apple Pay | Wherever Apple Pay is available | Yes |
+| Google Pay | Wherever Google Pay is available | Yes |
+| Link | Most countries | Yes |
+| PayPal | Worldwide | Yes |
+| Amazon Pay | Worldwide (USD) | Yes |
+| Revolut Pay | UK and EU | Yes |
+| Cash App Pay | United States | Yes |
+| Kakao Pay, Naver Pay | South Korea | Yes |
+| Alipay, WeChat Pay | Customers in China | One-time only |
+| MobilePay | Denmark, Finland | One-time only |
+| MB WAY | Portugal | One-time only |
+| GrabPay | Malaysia, Singapore | One-time only |
+| PayPay | Japan | One-time only |
+
+## Bank redirects
+
+The customer is sent to their bank or banking app to approve the payment, then back to checkout.
+
+| Method | Where | Currency | Subscriptions |
+| --- | --- | --- | --- |
+| iDEAL (Wero) | Netherlands | EUR | Yes, renewals are charged by SEPA Direct Debit |
+| Bancontact | Belgium | EUR | Yes, renewals are charged by SEPA Direct Debit |
+| BLIK | Poland | PLN | Yes |
+| TWINT | Switzerland | CHF | Yes |
+| EPS | Austria | EUR | One-time only |
+| Przelewy24 | Poland | EUR, PLN | One-time only |
+| FPX | Malaysia | MYR | One-time only |
+
+## Bank debits
+
+The customer enters their bank account details once and is debited directly. Good for B2B customers and high-value subscriptions.
+
+| Method | Where | Currency | Subscriptions |
+| --- | --- | --- | --- |
+| SEPA Direct Debit | Euro area and SEPA countries | EUR | Yes |
+| ACH Direct Debit | United States | USD | Yes |
+| Bacs Direct Debit | United Kingdom | GBP | Yes |
+| BECS Direct Debit | Australia, New Zealand | AUD, NZD | Yes |
+
+## Buy now, pay later
+
+The customer splits the payment into instalments. The provider pays the full amount at checkout.
+
+| Method | Where | Subscriptions |
+| --- | --- | --- |
+| Klarna | US, Canada, UK, most of Europe, Australia, New Zealand | Yes, in some countries |
+| Afterpay / Clearpay | US, Canada, UK, Australia, New Zealand | One-time only |
+| Affirm | US, Canada | One-time only |
+| Zip | Australia | One-time only |
+
+## Real-time payments
+
+| Method | Where | Currency | Subscriptions |
+| --- | --- | --- | --- |
+| UPI | India | INR | Yes, with UPI AutoPay |
+| Pix | Brazil | BRL | Yes, with Pix Automático |
+| PayNow | Singapore | SGD | One-time only |
+| PromptPay | Thailand | THB | One-time only |
+| Pay by Bank | United Kingdom | GBP | One-time only |
+
+## Vouchers
+
+The customer gets a voucher and pays it in cash or online at a store, bank, or ATM. The order completes when the payment arrives, which can take a day or more.
+
+| Method | Where | Currency | Subscriptions |
+| --- | --- | --- | --- |
+| Boleto | Brazil | BRL | Yes, a new voucher for each renewal |
+| OXXO | Mexico | MXN | One-time only |
+| Konbini | Japan | JPY | One-time only |
+| Multibanco | Portugal | EUR | One-time only |
+
+## UPI
+
+UPI is the most used way to pay online in India. Customers pay from any UPI app, such as Google Pay, PhonePe, Paytm, or their bank's app, by scanning a QR code or entering their UPI ID.
+
+* **Who can use it:** customers in India, when the checkout is priced in INR.
+* **One-time payments:** from ₹1 up to ₹1,00,000 per payment.
+* **Subscriptions:** the customer approves a UPI AutoPay mandate in their UPI app at checkout. Kelviq then charges each renewal automatically, up to ₹15,000 per charge.
+* **QR codes** expire after 5 minutes.
+* **Refunds** can be issued for up to 60 days after the payment and take up to 7 business days to reach the customer.
+
+To offer UPI, give your plan an INR price with [location-based pricing](/product-catalog/location-based-pricing). Customers in India then see the INR price and UPI at checkout.
+
+## Related
+
+* [Checkout examples](/checkout/checkout-examples) shows checkout for each pricing model.
+* [Location-based pricing](/product-catalog/location-based-pricing) sets prices in local currencies.
+* [Managing payment methods](/customer-portal/managing-payment-methods) explains how customers update the method used for renewals.

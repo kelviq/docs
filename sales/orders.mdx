@@ -1,83 +1,38 @@
 ---
 title: 'Orders'
-description: 'Track revenue and manage individual customer purchases'
+description: 'Every purchase made through your checkout, with its status, amount, and quick actions'
 ---
 
-The **Orders** page is your central hub for transaction history. It shows a real-time list of every purchase made through your checkout.
-
-Navigate to **Sales > Orders** in the sidebar to access it.
+An order is created for each purchase made through your checkout: one-time payments, the first payment of a subscription, and each renewal. Open **Sales → Orders** to see them.
 
 <Frame>
-  <img height="200" src="/images/orders-list-view.png" alt="Orders list view showing customer email, product, and status" />
+  <img src="/images/orders/orders-list.webp" alt="The Orders page with the status filter open, listing orders with their customer, product, status, date, and amount" />
 </Frame>
 
-## The order list
+Each row shows the order ID, the customer's email and name, the product, the status, when the order was paid, and the amount. Search by name or order ID, filter by status, and change the date range with the filters above the list.
 
-The main view provides a high-level summary of your incoming revenue. You can see:
-* **Customer:** Email address of the buyer.
-* **Product:** What they purchased.
-* **Status:** The current state (Paid, Refunded, Chargeback).
-* **Date:** When the order was placed.
-* **Revenue:** The total amount captured.
+## Order statuses
 
-### Filtering
-You can filter the list to find specific transactions.
-* **Date range:** Select specific days or months.
-* **Status:** Filter by Paid, Refunded, or Chargeback.
+| Status | What it means |
+| --- | --- |
+| **Pending payment** | The order was created and the payment hasn't completed yet. |
+| **Complete** | The payment succeeded. Shown as **Completed** in the list. |
+| **Failed** | The payment was attempted and declined, or it errored. No money was collected. |
+| **Refunded** | The full amount was refunded to the customer. |
+| **Partial refund** | Part of the amount was refunded. The rest stays with you. |
+| **Canceled** | The payment was canceled before it completed. Nothing was charged. |
+| **Fraudulent** | The payment was identified as fraudulent. |
 
-### Quick actions
-Click the **three-dot menu (...)** on any row to perform quick actions without opening the full details.
+The same values come back as `status` from the [Orders API](/api-reference/orders/list-orders): `PENDING`, `COMPLETE`, `FAILED`, `REFUNDED`, `PARTIAL_REFUND`, `CANCELLED`, and `FRAUDULENT`.
 
-<Frame>
-  <img height="200" src="/images/orders-quick-actions.png" alt="Meatball menu showing refund and receipt options" />
-</Frame>
+## Quick actions
 
-* **Refund payment:** Initiate a full or partial refund.
-* **Send receipt:** Resend the email receipt to the customer.
-* **Generate invoice:** Download the official invoice for the transaction.
+Click **⋯** at the end of a row:
 
----
+* **Refund payment:** refund the full amount or part of it.
+* **Resend receipt:** email the receipt to the customer again.
+* **Generate invoice:** create and download the invoice for the order.
 
-## Order details
+## Custom field responses
 
-Click on any row to open the **Order Drawer**. This panel gives you complete control over that specific transaction.
-
-<Frame>
-  <img height="200" src="/images/order-drawer-overview.png" alt="Side drawer showing customer details and order summary" />
-</Frame>
-
-### Overview
-The default view shows the core transaction data.
-* **Customer details:** Name, email, and IP address.
-* **Payment info:** Credit card last-4, banking details, and billing address.
-* **Order summary:** Line items, taxes (VAT/GST), discounts applied, and the total charge.
-
-### Deliverables
-Manage exactly what this specific customer received.
-
-* **Licenses:**
-  View the generated license key. You can edit activation limits, change the expiry date, or deactivate the key entirely if you suspect abuse.
-* **Downloads:**
-  See which files the customer has access to. You can remove or hide specific files for this order if you need to revoke access to a particular asset.
-* **Links:**
-  View the external links shared with this customer.
-
-### Subscription
-If the order is tied to a recurring plan, a **Subscription** tab will appear.
-* Click the subscription ID to see the full billing history.
-* Check upcoming renewal dates and past invoices.
-* See if other products were bundled in the same plan.
-
-### Timeline
-The timeline acts as an audit log for the order. It tracks every event chronologically.
-
-<Frame>
-  <img height="200" src="/images/order-timeline.png" alt="Timeline view showing order creation, payment success, and email receipts" />
-</Frame>
-
-* Order created
-* Receipts and invoices sent
-* Payment success or failure
-* Subscription creation
-
-This is useful for debugging customer issues, such as verifying if they actually received their receipt email.
+If the checkout collected [custom fields](/checkout/custom-fields), the customer's answers are saved on the order. They're returned as `customFieldsData` on the order in the API and as `custom_fields_data` in the `order.created`, `order.updated`, and `order.refunded` [webhooks](/guides/webhooks#custom-field-responses).
