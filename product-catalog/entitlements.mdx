@@ -36,7 +36,6 @@ This approach has serious limitations:
 - **Code changes required** for any pricing restructure
 - **Deployment needed** to move a feature between plans
 - **Engineering bottleneck** for every pricing experiment
-- **Webhook complexity** to sync subscription state
 - **Stale cache issues** when plans change
 - **Custom deals are painful** requiring one-off code
 
@@ -77,7 +76,7 @@ Now you can:
 1) Customer gets immediate access
 
 
-### No Webhooks Required
+### Access right after checkout
 
 When a customer completes checkout:
 
@@ -86,11 +85,7 @@ When a customer completes checkout:
 3. Your app checks access via SDK
 4. Customer gets immediate access
 
-You don't need to:
-- Build webhook handlers
-- Sync subscription state to your database
-- Handle race conditions
-- Manage cache invalidation
+Your app checks access with Kelviq, so you don't have to copy subscription state into your own database. If you want to react to changes in your own systems, use [webhooks](/guides/webhooks).
 
 ---
 
@@ -261,8 +256,7 @@ After successful payment:
 
 1. Customer record is created/updated
 2. Plan entitlements are assigned instantly
-3. No webhook processing needed
-4. Customer can access features immediately
+3. Customer can access features immediately
 
 ---
 
@@ -455,7 +449,6 @@ When you set up inheritance:
 #### Successful Purchase
 - Entitlements assigned immediately
 - Customer can access features right away
-- No webhook handling required
 
 #### Upgrade
 - New plan entitlements replace old ones
