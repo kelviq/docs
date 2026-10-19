@@ -148,6 +148,23 @@ Read [Abandoned cart recovery](/sales/abandoned-cart-recovery) for the full sche
 
 </Update>
 
+<Update label="v1.8.3" description="October 15, 2026" tags={["API"]}>
+
+### Improvements
+
+#### Custom field responses in webhooks
+
+The `checkout.completed`, `order.created`, `order.updated`, and `order.refunded` webhook payloads now include `custom_fields_data` in `data.object`: the customer's responses to the custom fields collected during checkout, keyed by field identifier. The object is empty when no custom fields were collected.
+
+```json
+"custom_fields_data": {
+  "company-name": "Acme Inc",
+  "purchase-order-number": "PO-4821"
+}
+```
+
+See [Webhooks](/guides/webhooks#custom-field-responses) for details.
+
 <Update label="v1.8.2" description="October 13, 2026" tags={["API"]}>
 
 ### New Features
