@@ -78,13 +78,13 @@ Under the default `IMMEDIATE_CHARGE` proration behavior, Kelviq prorates the pri
 
 With `activate_on_payment`, Kelviq waits for that payment to succeed before activating the upgraded plan.
 
-For example, if a customer moves from a \$100 monthly plan to a $200 monthly plan halfway through the period, the approximate calculation is:
+For example, if a customer moves from a \$100 monthly plan to a \$200 monthly plan halfway through the period, the approximate calculation is:
 
 | Item | Amount |
 | --- | ---: |
-| Unused half of the old plan | -$50 credit |
-| Remaining half of the new plan | $100 charge |
-| Net amount collected | $50 |
+| Unused half of the old plan | -\$50 credit |
+| Remaining half of the new plan | \$100 charge |
+| Net amount collected | \$50 |
 
 The exact amount depends on when the upgrade is processed. Existing usage counters are retained and evaluated against the new plan's limits.
 

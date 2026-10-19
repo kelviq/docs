@@ -8,7 +8,7 @@ Checkout in Kelviq allows you to collect payments from customers. You can genera
 ## Overview
 Kelviq's checkout system:
 - **Powers your sales** - Collect payments and create customer subscriptions
-- **Integrates with Stripe** - Uses Stripe as the payment processor
+- **Many payment methods** - Cards, wallets, bank payments, and local methods
 - **Highly configurable** - Control plans, pricing, trial periods, and more
 - **Multi-currency ready** - Support customers worldwide
 - **Easy to embed** - Generate links for any product and plans
@@ -23,7 +23,7 @@ Checkout links are generated at the **product level**. Each link can include one
 ### Quick Start
 
 1. **Go to Products** → Select your product
-2. **Click "Generate Checkout Link"** → Opens the link builder
+2. **Click "Get Link"** → Opens the link builder
 3. **Select plans** → Choose which plans to include
 4. **Configure options** → Set defaults and features
 5. **Copy link** → Share with customers
@@ -36,7 +36,7 @@ A production checkout link starts with your product UUID:
 https://www.kelviq.com/buy/{PRODUCT_UUID}/
 ```
 
-Sandbox links use `https://www.kelviq.com/sandbox/buy/{PRODUCT_UUID}/`. Copy the link from the dashboard so the environment and product UUID are correct. The old product identifier is not used in checkout URLs.
+Sandbox links use `https://www.kelviq.com/sandbox/buy/{PRODUCT_UUID}/`. Copy the link from the dashboard so the environment and product UUID are correct.
 
 Add query parameters to control what the customer sees:
 
@@ -145,7 +145,7 @@ Plan: Basic
 
 Plan: Pro
 ├─ Monthly: $29/month
-└─ Yearly: $290/year (2.5% discount vs monthly)
+└─ Yearly: $290/year (17% discount vs monthly)
 
 Plan: Enterprise
 ├─ Monthly: $99/month
@@ -394,19 +394,7 @@ Link: ?enabled=free,premium
 
 ## Payment Methods
 
-Kelviq uses **Stripe** as its payment processor. Stripe supports:
-
-- **Credit/Debit Cards** - Visa, Mastercard, American Express, Discover
-- **Digital Wallets** - Apple Pay, Google Pay
-- **UPI and UPI AutoPay** - UPI payments and recurring subscription mandates for eligible customers in India
-- **Bank Transfers** - ACH, SEPA, etc. (regional)
-- **Local Methods** - iDEAL, Bancontact, Giropay, EPS (regional)
-
-Customers select their preferred payment method at checkout.
-
-<Info>
-  Payment method availability depends on customer location and Stripe's local support. Cards are universally supported.
-</Info>
+Checkout shows the payment methods available for the customer's location and currency: cards, wallets such as Apple Pay and Google Pay, bank payments, and local methods. Cards work everywhere. See [Payment methods](/checkout/payment-methods) for the full list.
 
 ### Does Kelviq support UPI AutoPay?
 
@@ -457,7 +445,7 @@ Plan: Professional ($29 in US)
 
 Test checkouts without processing real payments:
 
-1. **Use Stripe test cards** → Use 4242 4242 4242 4242
+1. **Use a test card** → Use 4242 4242 4242 4242
 2. **Test various scenarios** → Successful payment, declined card, etc.
 3. **Monitor test checkouts** → View in your dashboard
 

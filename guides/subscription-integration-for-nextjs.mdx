@@ -63,21 +63,20 @@ export const KELVIQ_API_URL =
 
 ### In Kelviq Dashboard
 
-1. Go to **Plans** section
-2. Create each subscription tier with:
+1. Go to **Product catalog → Products**, open your product, and add a plan for each tier with:
    - **Plan Identifier**: `base`, `pro`, `enterprise` (code-friendly names)
    - **Price**: Monthly/yearly pricing
    - **Features**: List of included features
 
-### Define Entitlements
+### Add features & limits
 
-For each plan, configure entitlements (feature access):
+For each plan, add features & limits:
 
 | Type | Description | Example |
 |------|-------------|---------|
-| **Boolean (FLAG)** | Feature is on/off | `export-data` |
-| **Metered (METER)** | Feature has usage limits | `max-projects: 10` |
-| **Config (CUSTOMIZABLE)** | Feature has configurable value | `team-size: 5` |
+| **Boolean (`BOOLEAN`)** | Feature is on/off | `export-data` |
+| **Meter feature (`METER`)** | Feature has usage limits | `max-projects: 10` |
+| **Customizable (`CUSTOMIZABLE`)** | Feature has configurable value | `team-size: 5` |
 
 **Example Plan Structure:**
 
@@ -431,7 +430,7 @@ export function MyFeature() {
           disabled={maxProjects !== null && currentProjects >= maxProjects}
           onClick={createProject}
         >
-          {remainingProjects > 0 ? "Create Project" : "Limit Reached"}
+          {remainingProjects === null || remainingProjects > 0 ? "Create Project" : "Limit Reached"}
         </button>
       </div>
 

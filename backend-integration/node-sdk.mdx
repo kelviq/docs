@@ -84,7 +84,7 @@ const client = new Kelviq({
 
 Set `enableCache: false` to disable caching.
 
-To drop a customer's cached entitlements before the window expires, for example in a `subscription.paused` or `subscription.cancelled` webhook handler:
+To drop a customer's cached entitlements before the window expires, for example in a `subscription.paused`, `subscription.resumed`, or `subscription.cancelled` webhook handler:
 
 ```typescript
 await client.entitlements.invalidateCache({ customerId });
@@ -1604,7 +1604,7 @@ res.redirect(portalLink);
 {
   "token": "cpt-4f7c5dc4-da9f-447b-d447-6206d835ed6d:23fca530-ajeb-4685-b3d5-9918h6d38275",
   "email": "geo@example.com",
-  "customerPortalUrl": "https://www.kelviq.com/portal/paritydeals/"
+  "customerPortalUrl": "https://www.kelviq.com/portal/acme/"
 }
 ```
 </Accordion>

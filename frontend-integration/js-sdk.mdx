@@ -114,15 +114,15 @@ await kq.ready();
 
 #### Options
 
-| Option | Type | Description |
-|--------|------|-------------|
-| `customerId` | `string` | Unique identifier for the customer (required for entitlements) |
-| `productId` | `string` | Product identifier for fetching pricing data (required for pricing) |
-| `accessToken` | `string` | Authentication token for API requests |
+| Option | Type | Default | Description |
+|--------|------|---------|-------------|
+| `customerId` | `string` | — | Unique identifier for the customer (required for entitlements) |
+| `productId` | `string` | — | Product identifier for fetching pricing data (required for pricing) |
+| `accessToken` | `string` | — | Authentication token for API requests |
 | `environment` | `sandbox\|production` | 'production' | The environment to use. If you want to use the sandbox, you must provide this. |
 | `initializeAndFetch` | `boolean` | `true` | Automatically fetch data on initialization |
-| `onError` | `(error: Error) => void` | Error callback function |
-| `mainApiUrl` | `string` | Optional override for the main API base URL (used by pricing) |
+| `onError` | `(error: Error) => void` | — | Error callback function |
+| `mainApiUrl` | `string` | — | Optional override for the main API base URL (used by pricing) |
 
 <Note>At least one of `customerId` or `productId` must be provided.</Note>
 
@@ -674,7 +674,7 @@ const kq = kelviqSDK({
 
 ## Using the Sandbox
 
-If you want to use the sandbox, you need to set the `environment` option to `sandbox` in the `init` function.
+Set `environment: "sandbox"` when you call `kelviqSDK()`, and use a sandbox Client API Key.
 
 ```typescript
 const kq = kelviqSDK({

@@ -24,7 +24,7 @@ The server runs locally on your machine as a Node process started by your AI cli
 
 When the LLM decides to call a Kelviq tool, the server:
 
-1. Validates the LLM-provided arguments against a Zod schema derived from Kelviq's OpenAPI spec.
+1. Validates the LLM-provided arguments against the tool's Zod schema.
 2. Adds your API key as a Bearer token and sends the HTTPS request to the appropriate Kelviq host.
 3. Returns the JSON response (or a structured `{"error": {...}}` object) back to the LLM.
 
@@ -388,7 +388,7 @@ For exhaustive per-endpoint request/response shapes, the **OpenAPI spec is the s
 
 ## Built-in Prompts
 
-The server ships three MCP prompts that encode Kelviq's golden-path workflows — including the gotchas (plans start as invisible drafts until published; entitlements attach by feature UUID; pricing is set in the dashboard or with the [Kelviq CLI](/cli/overview), not through the MCP server). In Claude Code they appear as slash commands (e.g. `/kelviq:setup_product`); other MCP clients list them under prompts.
+The server ships three MCP prompts that encode Kelviq's golden-path workflows — including the gotchas (plans start as invisible drafts until published; features attach by identifier or UUID; pricing is set in the dashboard or with the [Kelviq CLI](/cli/overview), not through the MCP server). In Claude Code they appear as slash commands (e.g. `/kelviq:setup_product`); other MCP clients list them under prompts.
 
 | Prompt | Arguments | What it guides |
 |--------|-----------|----------------|
