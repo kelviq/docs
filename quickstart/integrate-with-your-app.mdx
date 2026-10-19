@@ -2,7 +2,7 @@
 title: 'Integrate with your app'
 ---
 
-After setting up your product and plans in the dashboard, you can bring them into your app using the kelviq SDKs and UI components.
+After setting up your product and plans in the dashboard, you can bring them into your app using the Kelviq SDKs and UI components.
 
 > Note: In this guide we use the **Node SDK** and **React SDK** as examples.  
 > Other SDKs like Python, JavaScript, are also available — the steps are the same.
@@ -14,7 +14,7 @@ After setting up your product and plans in the dashboard, you can bring them int
 Typically, you create a customer record when someone signs up in your app.
 When they complete a purchase, Kelviq maps the transaction to the customer record automatically.
 
-This is optional, but creating a customer in kelviq makes it easy to track subscriptions and usage in the dashboard.
+This is optional, but creating a customer in Kelviq makes it easy to track subscriptions and usage in the dashboard.
 
 ### Get your API keys
 
@@ -118,22 +118,26 @@ function EntitlementsList() {
 
 ### Backend check with Node
 
+`max-upload-size-mb` is a Customizable feature: each plan stores the largest upload it allows. `getEntitlement` returns `null` when the customer doesn't have the feature, so treat that as no access.
+
 ```ts
 const ent = await client.entitlements.getEntitlement({
   customerId: "unique-customer-001",
-  featureId: "max_upload_size_mb",
+  featureId: "max-upload-size-mb",
 });
 
-if (ent && file.sizeMB > (ent.usageLimit ?? Infinity)) {
+const maxUploadMb = ent?.hasAccess ? ent.usageLimit ?? Infinity : 0;
+
+if (uploadSizeMb > maxUploadMb) {
   throw new Error("Upgrade required");
 }
 ```
 
 ---
 
-## 4. Report usage (metered features)
+## 4. Report usage (Meter features)
 
-For metered features (like downloads, exports, AI generations, or API calls), send usage events from your backend.
+For Meter features (like downloads, exports, AI generations, or API calls), send usage events from your backend.
 
 ```ts
 import { BEHAVIOUR_CHOICES } from '@kelviq/node-sdk';
@@ -142,9 +146,11 @@ await client.reporting.reportUsage({
   customerId: "unique-customer-001",
   featureId: "downloads",
   value: 1,
-  behaviour: BEHAVIOUR_CHOICES.DELTA, // or SET
+  behaviour: BEHAVIOUR_CHOICES.DELTA,
 });
 ```
+
+`DELTA` adds `value` to the customer's current usage, so send it each time something is used. `SET` replaces current usage with `value`, for numbers you already count yourself, such as seats in use.
 
 ---
 

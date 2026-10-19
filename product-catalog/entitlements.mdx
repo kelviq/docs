@@ -1,5 +1,5 @@
 ---
-title: 'Features & Limits (Entitlements)'
+title: 'Features & limits'
 description: 'Control feature access for your customers'
 ---
 Entitlements are the modern way to control feature access in your application. Instead of checking which plan a customer is on, you check which features they have access to. This fundamental shift gives you unprecedented flexibility to experiment with pricing, create custom deals, and iterate on your product—all without changing code.
@@ -116,7 +116,7 @@ See the [Node SDK caching configuration](/backend-integration/node-sdk#caching-a
 
 If you call the Entitlement API without an SDK, keep your own last-known response in an in-memory or persistent cache. Store when the value was fetched, set a maximum fallback age that matches the risk of the feature, and refresh the record after the API recovers.
 
-Use a short fallback window for high-risk actions such as exporting sensitive data or using an expensive metered feature. A longer window may be reasonable for low-risk interface features. Do not silently grant access when there is no previous entitlement state.
+Use a short fallback window for high-risk actions such as exporting sensitive data or using an expensive Meter feature. A longer window may be reasonable for low-risk interface features. Do not silently grant access when there is no previous entitlement state.
 
 If your architecture already maintains subscription state through webhooks, you can continue using that model. Process webhook events idempotently and reconcile the local record against the Entitlement API after an outage.
 
@@ -196,7 +196,7 @@ Dynamic values that aren't simple on/off or numeric limits.
 
 ## Soft Limits vs. Hard Limits
 
-Choose the right enforcement strategy for each feature.
+Choose the right enforcement strategy for each feature. [How usage limits work](/product-catalog/usage-limits) walks through resets, overage, and what happens at the limit.
 <Frame>
       <img height="200" src="/images/hard-limit.png" />
 </Frame>
@@ -404,7 +404,7 @@ Overrides are:
 For meter features, you can reset a customer's usage:
 
 1. Go to the customer's detail page
-2. Find the meter feature
+2. Find the Meter feature
 3. Click the menu (⋯) → **Reset usage**
 
 This sets their current usage back to 0, giving them their full quota again.

@@ -26,7 +26,7 @@ Pay as you go supports **Flat**, **Package**, **Tiered**, and **Volume** pricing
 
 1. Open the product and edit its plan.
 2. In the plan's billing periods, keep **Monthly** enabled and turn off every other period.
-3. Open **Usage charges** and select the metered feature you want to bill for. If the list is empty, [create a Meter feature](/product-catalog/create-a-feature) from **Product catalog → Features** first.
+3. Open **Usage charges** and select the Meter feature you want to bill for. If the list is empty, [create a Meter feature](/product-catalog/create-a-feature) from **Product catalog → Features** first.
 4. For **Billing model**, choose **Pay-as-you-go**.
 
 <Frame>
@@ -50,7 +50,7 @@ The billing model controls *when* the customer pays. The pricing model controls 
 | Tiered | Applies each rate only to the units inside that tier | First 100,000 tokens free, then $0.0002 per token |
 | Volume | Uses the rate for the customer's final usage band across all units | $0.01 per request, or $0.007 for all requests after 100,000 |
 
-See [Usage based pricing](/product-catalog/usage-based-billing) for the full calculation rules and examples for each model.
+See [Usage-based pricing](/product-catalog/usage-based-billing) for the full calculation rules and examples for each model.
 
 ### Combine a base price with usage
 
@@ -101,7 +101,7 @@ await client.reporting.reportUsage({
 | Field | What to send |
 | --- | --- |
 | `customerId` | The same customer identifier used for the subscription |
-| `featureId` | The identifier of the metered feature on the plan |
+| `featureId` | The identifier of the Meter feature on the plan |
 | `value` | A whole-number usage quantity |
 | `behaviour` | `DELTA` to add usage or `SET` to replace the current value |
 

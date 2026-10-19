@@ -42,6 +42,7 @@
               "product-catalog/subscriptions",
               "product-catalog/seat-based-pricing",
               "product-catalog/usage-based-billing",
+              "product-catalog/usage-limits",
               "product-catalog/pay-as-you-go",
               "product-catalog/usage-alerts",
               "product-catalog/free-and-trials",
@@ -87,7 +88,7 @@
             ]
           },
           {
-            "group": "Coustomers-management",
+            "group": "Customers",
             "pages": [
               "coustomers-management/overview"
             ]
@@ -101,7 +102,7 @@
             ]
           },
           {
-            "group": "Customer-portal",
+            "group": "Customer portal",
             "pages": [
               "customer-portal/overview",
               "customer-portal/retention",

@@ -4,7 +4,7 @@ description: "Documentation for the Kelviq React SDK"
 icon: 'react'
 ---
 
-The `@kelviq/react-sdk` provides a seamless way to integrate kelviq entitlement management into your React applications.
+The `@kelviq/react-sdk` provides a seamless way to integrate Kelviq entitlement management into your React applications.
 
 ## Overview
 
@@ -85,7 +85,7 @@ export default App;
 - `plansEnabled?: string`
   - Comma-separated list of plan identifiers to include in the pricing response. When omitted, all active plans for the product are returned. Example: `"pro,enterprise"`.
 - `apiUrl: string`
-  - The base URL for your kelviq API. For example, `https://edge.api.kelviq.com/api/v1`.
+  - The base URL for your Kelviq API. For example, `https://edge.api.kelviq.com/api/v1`.
 - `environment: 'sandbox' | 'production'`
   - The environment to use. If you want to use the sandbox, you must provide this.
 - `entitlementsPath: string`
@@ -626,10 +626,10 @@ const entitlement = useCustomizableEntitlement("max-items-per-page");
 
 ### `useMeteredEntitlement(featureId: string)`
 
-Returns the aggregated entitlement for a specific metered feature from the cache.
+Returns the aggregated entitlement for a specific Meter feature from the cache.
 
 - **Arguments:**
-  - `featureId: string`: The identifier of the metered feature.
+  - `featureId: string`: The identifier of the Meter feature.
 - **Returns:** `Entitlement | null`
 
 ```tsx
@@ -963,7 +963,7 @@ import { ShowWhenCustomizableEntitled } from '@kelviq/react-sdk';
 
 ### `ShowWhenMeteredEntitled`
 
-Renders children if the metered feature is enabled and, by default, if `remaining` usage is greater than 0 or unlimited (`usageLimit` is `null`).
+Renders children if the Meter feature is enabled and, by default, if `remaining` usage is greater than 0 or unlimited (`usageLimit` is `null`).
 
 - **Optional Prop:**
   - `condition?: (data: Entitlement) => boolean`: A custom function to further determine if children should render based on the entitlement data.
