@@ -28,11 +28,15 @@
             "group": "AI",
             "pages": [
               "ai/overview",
-              "guides/set-up-with-ai",
               {
-                "group": "For your agent",
+                "group": "For humans",
                 "expanded": true,
-                "pages": ["guides/mcp-server", "guides/agent-toolkit", "ai/docs-for-agents"]
+                "pages": ["guides/set-up-with-ai", "cli/overview"]
+              },
+              {
+                "group": "For agents",
+                "expanded": true,
+                "pages": ["guides/agent-toolkit", "guides/mcp-server", "ai/docs-for-agents"]
               }
             ]
           },
