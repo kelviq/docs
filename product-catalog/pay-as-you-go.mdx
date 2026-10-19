@@ -8,7 +8,7 @@ With pay as you go, the customer does not buy a block of usage upfront. Your bac
 The same plan can contain a monthly base price and one or more usage charges. You define the billable feature and its rates in the dashboard; your application supplies the usage.
 
 <Note>
-  Monthly must be the plan's only billing period. Pay as you go cannot be used on a plan that also offers yearly, quarterly, one-time, or another billing period.
+  Pay as you go bills usage every month. Use it with a Monthly price, or with a One time base fee that the customer pays upfront. Yearly, 3 Months, and other recurring periods aren't supported. With a One time base fee, use **Flat** or **Package** pricing.
 </Note>
 
 ## Before you start
@@ -17,7 +17,7 @@ You will need:
 
 - A product and a plan in Kelviq
 - A [Meter feature](/product-catalog/create-a-feature), such as `api-calls` or `tokens`
-- A monthly price on the plan
+- A Monthly price or a One time base fee on the plan
 - A server API key for the same environment as the plan
 
 Pay as you go supports **Flat**, **Package**, **Tiered**, and **Volume** pricing. It does not support **Stair-step** pricing.
@@ -25,7 +25,7 @@ Pay as you go supports **Flat**, **Package**, **Tiered**, and **Volume** pricing
 ## Configure the plan
 
 1. Open the product and edit its plan.
-2. In the plan's billing periods, keep **Monthly** enabled and turn off every other period.
+2. In the plan's billing periods, keep **Monthly**, or **One time** for an upfront base fee, and turn off the other periods.
 3. Open **Usage charges** and select the metered feature you want to bill for. If the list is empty, [create a Meter feature](/product-catalog/create-a-feature) from **Product catalog → Features** first.
 4. For **Billing model**, choose **Pay-as-you-go**.
 
@@ -37,7 +37,7 @@ Pay as you go supports **Flat**, **Package**, **Tiered**, and **Volume** pricing
 6. Add [usage alerts](/product-catalog/usage-alerts) if you want to notify your application when usage crosses a threshold.
 7. Save the plan. If you edited a published plan, publish the new version before testing it.
 
-When you select Pay as you go, Kelviq keeps Monthly as the plan's only billing period. Usage reset and credit rollover controls are removed because there is no prepaid balance to reset or carry into the next period.
+When you select Pay as you go, Kelviq turns off Yearly and the other recurring periods. Usage reset and credit rollover controls are removed because there is no prepaid balance to reset or carry into the next period.
 
 ## Choose a pricing model
 
@@ -163,7 +163,7 @@ See [Sandbox](/guides/sandbox) for environment setup and test-payment details.
 
 ### Pay as you go shows a billing-period error
 
-Remove every billing period except Monthly. A plan with both Monthly and Yearly pricing is not eligible, even if you only enter a usage rate under Monthly.
+Remove Yearly, 3 Months, and other recurring periods. Keep Monthly, or One time for an upfront base fee. A plan with both Monthly and Yearly pricing is not eligible, even if you only enter a usage rate under Monthly.
 
 ### Stair-step cannot be selected
 
