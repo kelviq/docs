@@ -26,7 +26,15 @@
           },
           {
             "group": "AI",
-            "pages": ["ai/overview", "guides/set-up-with-ai", "guides/agent-toolkit", "guides/mcp-server"]
+            "pages": [
+              "ai/overview",
+              "guides/set-up-with-ai",
+              {
+                "group": "For your agent",
+                "expanded": true,
+                "pages": ["guides/mcp-server", "guides/agent-toolkit", "ai/docs-for-agents"]
+              }
+            ]
           },
           {
             "group": "Quickstart",
