@@ -25,6 +25,10 @@
             "pages": ["getstarted/introduction-to-kelviq", "getstarted/merchant-of-record", "getstarted/payment-security-and-seller-funds", "getstarted/fees", "getstarted/review-process"]
           },
           {
+            "group": "AI",
+            "pages": ["ai/overview", "guides/set-up-with-ai", "guides/agent-toolkit", "guides/mcp-server"]
+          },
+          {
             "group": "Quickstart",
             "pages": ["quickstart/core-concepts", "quickstart/dashboard-setup", "quickstart/integrate-with-your-app"]
           },
@@ -121,10 +125,7 @@
               "guides/migrate-from-cashfree",
               "guides/subscription-integration",
               "guides/subscription-integration-for-nextjs",
-              "guides/webhooks",
-              "guides/set-up-with-ai",
-              "guides/mcp-server",
-              "guides/agent-toolkit"
+              "guides/webhooks"
             ]
           },
           {

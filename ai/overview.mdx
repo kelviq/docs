@@ -1,0 +1,45 @@
+---
+title: 'Build with AI'
+description: 'Set up Kelviq with your coding agent, or connect your agent to Kelviq and its docs'
+---
+
+Kelviq works with the AI tools you already use. Your coding agent can create your plans, add checkout and feature checks to your app, and wire up webhooks. You review and approve each change.
+
+<CardGroup cols={2}>
+  <Card title="Set up with AI" icon="wand-magic-sparkles" href="/guides/set-up-with-ai">
+    Copy a prompt from the dashboard and paste it into Claude Code, Cursor, Codex, Lovable, Replit, or Bolt.
+  </Card>
+  <Card title="Agent Toolkit" icon="toolbox" href="/guides/agent-toolkit">
+    One Claude Code plugin with the MCP server and skills that teach your agent how Kelviq works.
+  </Card>
+  <Card title="MCP server" icon="plug" href="/guides/mcp-server">
+    Manage customers, plans, subscriptions, and more from any MCP client.
+  </Card>
+  <Card title="CLI" icon="terminal" href="/cli/overview">
+    Define products, features, and plans as code and sync them from the terminal.
+  </Card>
+</CardGroup>
+
+## The quick version
+
+1. Open **Settings → Set up with AI** in the dashboard.
+2. Copy the keys block into your project's `.env.local`.
+3. Copy the prompt and paste it into your agent as the first message.
+
+Your agent can build and test everything with sandbox keys, then you go live when it's ready. You can also set it up directly in production. Either way, business verification and your keys stay with you.
+
+## Give your agent the docs
+
+Point your agent at the Kelviq docs so it answers from them instead of guessing.
+
+| Resource | Use it for |
+| --- | --- |
+| [`llms.txt`](https://docs.kelviq.com/llms.txt) | An index of every docs page, in Markdown |
+| [`llms-full.txt`](https://docs.kelviq.com/llms-full.txt) | All the docs in one file |
+| `https://docs.kelviq.com/mcp` | Docs MCP server: search and read the docs from any MCP client |
+
+In Claude Code, add the docs MCP server with:
+
+```bash
+claude mcp add --transport http kelviq-docs https://docs.kelviq.com/mcp
+```
