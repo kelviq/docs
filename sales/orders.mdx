@@ -33,6 +33,23 @@ Click **⋯** at the end of a row:
 * **Resend receipt:** email the receipt to the customer again.
 * **Generate invoice:** create and download the invoice for the order.
 
+## Order details
+
+Click the customer on any row to open the order's details.
+
+<Frame>
+  <img width="560" src="/images/orders/order-details.webp" alt="Order details for a $49 Acme Analytics Pro order, with the customer, line items, totals, and the order timeline" />
+</Frame>
+
+The panel shows the order status and date, the customer's name, email, and country, and each item with its subtotal, discount, tax, and total. Click **⋯** at the top for the same actions as the list, plus **Copy signed portal link** to send the customer a link to their [customer portal](/customer-portal/overview).
+
+The tabs below the totals show what the customer received and what happened to the order:
+
+* **Downloads:** the files the customer can download. You can remove or hide a file for this order to revoke access.
+* **License:** the license key issued for the order. You can edit the activation limit, change the expiry date, or deactivate the key.
+* **Links:** the links shared with the customer after purchase.
+* **Timeline:** every event on the order, newest first, such as **Order created**, **Order completed**, receipts and invoices sent, and payment results. Use it to check, for example, whether a customer was sent their receipt.
+
 ## Custom field responses
 
 If the checkout collected [custom fields](/checkout/custom-fields), the customer's answers are saved on the order. They're returned as `customFieldsData` on the order in the API and as `custom_fields_data` in the `order.created`, `order.updated`, and `order.refunded` [webhooks](/guides/webhooks#custom-field-responses).
