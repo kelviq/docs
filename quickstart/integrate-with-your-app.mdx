@@ -5,7 +5,7 @@ title: 'Integrate with your app'
 After setting up your product and plans in the dashboard, you can bring them into your app using the Kelviq SDKs and UI components.
 
 > Note: In this guide we use the **Node SDK** and **React SDK** as examples.  
-> Other SDKs like Python, JavaScript, are also available — the steps are the same.
+> Python and JavaScript SDKs are also available, and the steps are the same.
 
 ---
 
@@ -28,7 +28,7 @@ Open **Settings → API keys**. Use the **server key** in your backend and the *
 
 ```bash
 npm install @kelviq/node-sdk
-````
+```
 
 ```ts
 import { Kelviq } from "@kelviq/node-sdk";
@@ -50,12 +50,12 @@ const newCustomer = await client.customers.create({
 
 ## 2. Checkout links
 
-Every plan in Kelviq has a checkout link that you can use to send customers directly to checkout.
+Every published plan has a checkout link that sends customers straight to checkout.
 
 ### Get a checkout link
 
-1. In the dashboard, go to your **Product → Plan**
-2. Click **Get Link** in the top right
+1. Go to **Product catalog → Products** and open your product
+2. Open the plan's **⋯** menu and click **Get Link**
 3. Copy the checkout URL
 
 ### Using checkout links
@@ -67,12 +67,12 @@ You can use checkout links in multiple ways:
 - **With customer ID** — Append `?customer_id=unique-customer-001` to link the purchase to an existing customer
 
 ```html
-<a href="https://checkout.kelviq.com/your-plan-id?customer_id=unique-customer-001">
+<a href="https://www.kelviq.com/buy/{PRODUCT_UUID}/?plan_identifier=pro&customer_id=unique-customer-001">
   Buy Now
 </a>
 ```
 
-When a customer completes checkout, their subscription and entitlements are automatically available in Kelviq.
+When a customer completes checkout, their subscription and features are available in Kelviq. See [Static checkout URLs](/checkout/static-checkout-url) for all link options.
 
 ---
 
@@ -98,6 +98,8 @@ import { ShowWhenBooleanEntitled } from '@kelviq/react-sdk';
 
 ### React: read all entitlements
 
+The React hooks need your app wrapped in [`KelviqProvider`](/frontend-integration/react-sdk#kelviqprovider).
+
 ```tsx
 import { useAllEntitlements } from '@kelviq/react-sdk';
 
@@ -106,7 +108,7 @@ function EntitlementsList() {
 
   return (
     <ul>
-      {Object.values(entitlements).map(ent => (
+      {Object.values(entitlements ?? {}).map(ent => (
         <li key={ent.featureId}>
           {ent.featureId}: {ent.hasAccess ? 'Enabled' : 'Disabled'} ({ent.featureType})
         </li>
