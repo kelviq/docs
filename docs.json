@@ -86,7 +86,7 @@
           {
             "group": "Coustomers-management",
             "pages": [
-              "coustomers-management/overview"
+              "customers-management/overview"
             ]
           },
           {
@@ -212,6 +212,7 @@
     ]
   },
   "redirects": [
+    { "source": "/coustomers-management/:slug*", "destination": "/customers-management/:slug*" },
     { "source": "/changelog/app", "destination": "/changelog#app" },
     { "source": "/changelog/js-sdk", "destination": "/changelog#js-sdk" },
     { "source": "/changelog/react-sdk", "destination": "/changelog#react-sdk" },

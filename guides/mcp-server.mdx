@@ -3,7 +3,7 @@ title: "MCP Server"
 description: "Control Kelviq from Claude, Cursor, and any AI assistant that speaks the Model Context Protocol."
 ---
 
-`@kelviq/mcp-server` is the official [Model Context Protocol](https://modelcontextprotocol.io) server for Kelviq. It plugs into any MCP-compatible client — Claude Code, Claude Desktop, Cursor, Windsurf, VS Code, Antigravity — and exposes the full Kelviq API as **typed tools** that the LLM can call directly, plus the entire Kelviq documentation as **searchable resources**.
+`@kelviq/mcp-server` is the official [Model Context Protocol](https://modelcontextprotocol.io) server for Kelviq. It plugs into any MCP-compatible client — Claude Code, Claude Desktop, Cursor, Devin Desktop (formerly Windsurf), VS Code, Antigravity — and exposes the full Kelviq API as **typed tools** that the LLM can call directly, plus the entire Kelviq documentation as **searchable resources**.
 
 Instead of asking your assistant to "write me a curl command," you describe the outcome ("create a Pro plan under product X and publish it") and it does the work in a single turn.
 
@@ -168,7 +168,7 @@ Add a `.vscode/mcp.json` in your workspace, or run **"MCP: Open User Configurati
 Save, then click the **Start** CodeLens above the `kelviq` entry (or reload the window) and confirm it under the tools icon in Copilot Chat's Agent mode.
 
 <Tip>
-Already have Kelviq configured in Cursor or Windsurf? Under **Settings → Chat → MCP → Discovery**, check the matching box (e.g. "Windsurf configurations") to auto-import that server instead of retyping it. You can also use the `inputs` array to be prompted for the keys instead of storing them in plaintext.
+Already have Kelviq configured in Cursor or Devin Desktop (formerly Windsurf)? Under **Settings → Chat → MCP → Discovery**, check the matching box (e.g. "Windsurf configurations") to auto-import that server instead of retyping it. You can also use the `inputs` array to be prompted for the keys instead of storing them in plaintext.
 </Tip>
 </Tab>
 
