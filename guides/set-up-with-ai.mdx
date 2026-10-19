@@ -5,7 +5,7 @@ description: "Hand billing to your AI coding agent with a prompt generated from 
 
 **Settings → Set up with AI** writes a prompt for your coding agent. Paste it into Claude Code, Cursor, Codex, Lovable, Replit, Bolt, or any agent that can edit files and run commands, and the agent integrates Kelviq into your app.
 
-It works in your sandbox, asks before changing anything in Kelviq, and never needs your keys in the chat.
+It asks before changing anything in Kelviq and never needs your keys in the chat. Your agent can build and test everything with sandbox keys, then you go live when it's ready. You can also set it up directly in production.
 
 <Frame>
   <img src="/images/set-up-with-ai-integrate.webp" alt="The Set up with AI page" />
@@ -27,15 +27,13 @@ It works in your sandbox, asks before changing anything in Kelviq, and never nee
 2. **Describe what you want.** Plain language is fine: "one plan at $9/month with license keys, up to 3 devices per key, no free plan". Or add a common request, such as a monthly and yearly toggle or a 7-day free trial. The agent follows these on top of its defaults and asks if something conflicts.
 3. **Give the prompt to your agent.** Click **Copy prompt**, open your agent in your app's project, and paste it as the first message.
 
-The agent checks your sandbox keys with the Kelviq CLI without printing them, builds the app, and ends with a test purchase you can try with a [sandbox test card](/guides/sandbox).
+The agent checks your keys with the Kelviq CLI without printing them and builds the app. In sandbox, it ends with a test purchase you can try with a [test card](/guides/sandbox).
 
-## What stays with you
+## Sandbox or production
 
-The agent only works in your sandbox. Before you go live, you still:
+The page gives you keys and a prompt for the mode you're in. Switch to sandbox in the dashboard to get sandbox keys and a sandbox prompt.
 
-* complete [business verification](/getstarted/review-process) and set up [payouts](/payouts/overview);
-* add production keys to your hosting settings; and
-* register a production [webhook](/guides/webhooks) endpoint.
+[Business verification](/getstarted/review-process) and adding your keys to your project stay with you.
 
 On Claude Code, install the [Kelviq plugin](/guides/agent-toolkit) for extra tools. The prompt picks them up automatically.
 
