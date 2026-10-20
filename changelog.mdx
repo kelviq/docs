@@ -9,6 +9,29 @@ import { ChangelogFilter } from "/snippets/changelog-filter.jsx";
 
 <ChangelogFilter products={["App","JS SDK","React SDK","Node SDK","Python SDK","JS Promotions UI","MCP Server","CLI","API"]} />
 
+<Update label="v1.8.4" description="October 20, 2026" tags={["API"]}>
+
+### New Features
+
+#### Retention offers in the API
+
+Two new endpoints let you build the cancellation flow, with retention offers, in your own app instead of the customer portal:
+
+- [Get retention offers](/api-reference/subscriptions/get-retention-offers) returns every cancellation reason with the offer configured for it (discount, pause or support) and whether the subscription is eligible for it right now.
+- [Accept a retention offer](/api-reference/subscriptions/accept-a-retention-offer) applies the offer the customer chose: attaches the discount, pauses the subscription, or returns the support link.
+
+```json
+{
+  "offerType": "PAUSE",
+  "cancellationFeedback": "UNUSED",
+  "pauseMonths": 3
+}
+```
+
+Offers are configured in the dashboard retention settings. See [Retention offers](/product-catalog/subscriptions#retention-offers) for the flow.
+
+</Update>
+
 <Update label="v1.8.3" description="October 15, 2026" tags={["API"]}>
 
 ### Improvements

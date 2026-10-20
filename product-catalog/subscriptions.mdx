@@ -112,6 +112,20 @@ Under the default payment behavior, downgrades also apply immediately. If the cu
 
 When cancelling, choose whether the subscription should end immediately or at the end of the current billing period. A plan downgrade and a subscription cancellation are separate actions: the downgrade follows the payment behavior you choose, while the cancellation follows the timing option you select.
 
+### Retention offers
+
+Before a customer cancels, you can offer them a reason to stay. In the dashboard retention settings, switch retention on and map each cancellation reason to an offer:
+
+* **Discount**: a percentage off for a set number of billing cycles, applied as a single-use coupon.
+* **Pause**: a break of one of the lengths you allow. Billing and access stop, then resume on a renewal boundary.
+* **Support**: a link to a booking page or support form, for reasons a conversation can fix.
+
+The customer portal shows these offers automatically. To build the same flow in your own app, call [Get retention offers](/api-reference/subscriptions/get-retention-offers) for the subscription. It returns every cancellation reason with its configured offer and whether this subscription is eligible for it right now, so you can show an unavailable offer greyed out with a reason. When the customer takes an offer, call [Accept a retention offer](/api-reference/subscriptions/accept-a-retention-offer) with the reason and the offer. If they cancel anyway, call [Cancel a subscription](/api-reference/subscriptions/cancel-a-subscription) with the same reason as `cancellationFeedback`.
+
+<Note>
+  An offer must be the one configured for the reason the customer picked, and eligibility is checked again when it is accepted. The repeat policy you set decides whether a customer who has already taken an offer can be offered it again, so discounts cannot be stacked by reopening the cancellation flow.
+</Note>
+
 ## Refund a cancelled subscription
 
 Kelviq does not automatically refund unused time when a subscription is cancelled mid-period. You decide whether to issue a full refund, a partial refund, or no refund.
