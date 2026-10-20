@@ -97,7 +97,7 @@ Kelviq doesn't charge a payout fee. Payout providers charge one when funds are s
 
 ## Refunds
 
-The Kelviq fee is never returned, for full or partial refunds. Tax is returned to the customer along with the refund. Kelviq does this for you.
+The original transaction fee isn't returned when you refund a payment, in full or in part. Kelviq refunds the tax part of the refund for you.
 
 Using the &#36;54 sale above (fee &#36;2.29):
 
@@ -106,10 +106,9 @@ Using the &#36;54 sale above (fee &#36;2.29):
 | Customer gets back | &#36;54.00 | &#36;20.00 |
 | Tax part of the refund, returned by Kelviq | &#36;4.00 | &#36;1.48 |
 | Taken from your balance | &#36;50.00 | &#36;18.52 |
-| Kelviq fee returned | &#36;0.00 | &#36;0.00 |
 | **What you keep from the sale** | **−&#36;2.29** | **&#36;29.19** |
 
-A partial refund works like Stripe's: the amount you enter is what the customer gets back, and the tax inside it is worked out proportionally (&#36;20 × &#36;4 / &#36;54 = &#36;1.48).
+For a partial refund, the amount you enter is what the customer gets back, and the tax inside it is worked out proportionally (&#36;20 × &#36;4 / &#36;54 = &#36;1.48).
 
 ## Disputes and chargebacks
 
