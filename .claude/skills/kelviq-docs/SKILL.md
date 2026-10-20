@@ -13,6 +13,8 @@ description: Use for any Kelviq docs or changelog work - editing Mintlify pages,
 - Renaming a page or folder needs a redirect in `docs.json` (`"redirects"`).
 
 ## House style
+Read [copy-style.md](copy-style.md) for voice, words to avoid, structure and changelog style. Product facts live in `~/kelviq-social/memories/wiki/product-facts.md`.
+
 - Short, plain copy. No marketing filler, no emojis, no bold callouts for things a table already shows.
 - Kelviq with capital K. Boolean / Meter feature / Customizable. "Features & limits". "Usage-based pricing". In the API and SDKs it's an entitlement.
 - App paths as `**Product catalog → Products**`. Button names exactly as in the app (Get Link, Set up payouts, New customer, Publish / Publish updates).

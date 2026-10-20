@@ -4,6 +4,8 @@ Mintlify docs for Kelviq (docs.kelviq.com). Navigation lives in `docs.json`. Pre
 
 For any docs or changelog task, follow the `kelviq-docs` skill in `.claude/skills/kelviq-docs/SKILL.md`.
 
+Copy and tone: `.claude/skills/kelviq-docs/copy-style.md`. Product facts: `~/kelviq-social/memories/wiki/product-facts.md`.
+
 ## Must-follow rules
 - Never push to `main`. Work on a branch; Ujjwal reviews and merges.
 - Kelviq with a capital K. Feature types: Boolean, Meter feature, Customizable. "Features & limits" in the dashboard, "entitlement" in the API and SDKs.
