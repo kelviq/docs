@@ -194,9 +194,6 @@ html.dark img.sidebar-group-icon { background-color: rgb(140 135 132); }
 
 /* Introduction page (mode: frame): hero + cards on top, readable text below */
 .kq-intro { padding-top: 48px; }
-.kq-intro .kq-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
-.kq-intro .kq-grid-3 { grid-template-columns: repeat(3, minmax(0, 1fr)); }
-@media (max-width: 700px) { .kq-intro .kq-grid, .kq-intro .kq-grid-3 { grid-template-columns: 1fr; } }
 .kq-intro-body { max-width: 760px; margin: 0 auto; padding: 8px 24px 96px; }
 /* Introduction header: same size as Mintlify's docs header */
 .kq-intro .kq-hero-title { font-size: 36px; line-height: 40px; font-weight: 500; letter-spacing: -0.025em; }
