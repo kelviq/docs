@@ -34,7 +34,7 @@
         "groups": [
           {
             "group": "Get started",
-            "icon": "rocket",
+            "icon": "/icons/rocket.svg",
             "pages": [
               "index",
               "getstarted/introduction-to-kelviq",
@@ -45,7 +45,7 @@
           },
           {
             "group": "Build with AI",
-            "icon": "sparkles",
+            "icon": "/icons/sparkle.svg",
             "pages": [
               "ai/overview",
               {
@@ -69,7 +69,7 @@
           },
           {
             "group": "Merchant of record",
-            "icon": "shield-check",
+            "icon": "/icons/shield-check.svg",
             "pages": [
               "getstarted/merchant-of-record",
               "getstarted/fees",
@@ -79,7 +79,7 @@
           },
           {
             "group": "Product catalog",
-            "icon": "box",
+            "icon": "/icons/box.svg",
             "pages": [
               "product-catalog/products",
               "product-catalog/plans",
@@ -119,7 +119,7 @@
           },
           {
             "group": "Checkout",
-            "icon": "cart-shopping",
+            "icon": "/icons/credit-card.svg",
             "pages": [
               "checkout/checkout-configuration",
               "checkout/checkout-design",
@@ -133,7 +133,7 @@
           },
           {
             "group": "Promotions",
-            "icon": "tags",
+            "icon": "/icons/tag.svg",
             "pages": [
               "promotions/overview",
               "promotions/create-a-promotion",
@@ -143,7 +143,7 @@
           },
           {
             "group": "Sales",
-            "icon": "receipt",
+            "icon": "/icons/receipt.svg",
             "pages": [
               "sales/orders",
               "sales/create-a-one-time-charge",
@@ -154,7 +154,7 @@
           },
           {
             "group": "Customer portal",
-            "icon": "user",
+            "icon": "/icons/user.svg",
             "pages": [
               "customer-portal/overview",
               "customer-portal/retention",
@@ -163,7 +163,7 @@
           },
           {
             "group": "Payouts",
-            "icon": "building-columns",
+            "icon": "/icons/wallet.svg",
             "pages": [
               "payouts/overview",
               "payouts/transactions",
@@ -172,7 +172,7 @@
           },
           {
             "group": "Settings",
-            "icon": "gear",
+            "icon": "/icons/gear.svg",
             "pages": [
               "settings/profile",
               "settings/members",
@@ -182,7 +182,7 @@
           },
           {
             "group": "Guides",
-            "icon": "book-open",
+            "icon": "/icons/book-open.svg",
             "pages": [
               "guides/sandbox",
               "guides/migrate-from-cashfree",
@@ -193,7 +193,7 @@
           },
           {
             "group": "Legal",
-            "icon": "scale-balanced",
+            "icon": "/icons/gavel.svg",
             "pages": [
               "legal/buyer-terms",
               "legal/seller-terms",
