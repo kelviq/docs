@@ -5,7 +5,7 @@ description: 'Automatically remind customers who start checkout but do not pay'
 
 Abandoned cart recovery emails customers who start a checkout but do not complete payment. Kelviq detects the abandoned checkout, sends up to three reminder emails over three days, and expires the checkout after four. You do not need to build anything: detection, scheduling, and deduplication are handled for you.
 
-The feature is on by default for every organization. You can turn it off in **Settings**.
+The feature is on by default for every organization. You can turn it off in **Settings → Customer emails**.
 
 ## How a checkout becomes abandoned
 
@@ -51,9 +51,13 @@ Four days after creation, an unpaid checkout expires:
 
 Completed, closed, or expired checkouts never receive reminders.
 
+## Offer a discount in the final reminder
+
+Turn on **Offer a discount in the final reminder** in **Settings → Customer emails** and enter a percentage. The final reminder then offers that much off the checkout total. Only one discount can be active per product, so the offer isn't sent if another discount already applies to the checkout.
+
 ## Turning it off and on
 
-Use the **Abandoned cart recovery** toggle in **Settings &rarr; Notifications** to control the feature for your whole organization.
+Use the **Abandoned cart recovery** toggle in **Settings &rarr; Customer emails** to control the feature for your whole organization.
 
 * Turning it off stops future reminder emails. Emails that were already sent cannot be recalled.
 * Turning it back on resumes eligible reminders for checkouts that have not yet expired.

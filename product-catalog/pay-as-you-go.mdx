@@ -8,7 +8,7 @@ With pay as you go, the customer does not buy a block of usage upfront. Your bac
 The same plan can contain a monthly base price and one or more usage charges. You define the billable feature and its rates in the dashboard; your application supplies the usage.
 
 <Note>
-  Monthly must be the plan's only billing period. Pay as you go cannot be used on a plan that also offers yearly, quarterly, one-time, or another billing period.
+  Monthly must be the plan's only billing period. Pay as you go can't be used on a plan that also offers yearly, quarterly, one-time, or another billing period.
 </Note>
 
 ## Before you start
@@ -26,7 +26,7 @@ Pay as you go supports **Flat**, **Package**, **Tiered**, and **Volume** pricing
 
 1. Open the product and edit its plan.
 2. In the plan's billing periods, keep **Monthly** enabled and turn off every other period.
-3. Open **Usage charges** and select the metered feature you want to bill for. If the list is empty, [create a Meter feature](/product-catalog/create-a-feature) from **Product catalog → Features** first.
+3. Open **Usage charges** and select the Meter feature you want to bill for. If the list is empty, [create a Meter feature](/product-catalog/create-a-feature) from **Product catalog → Features** first.
 4. For **Billing model**, choose **Pay-as-you-go**.
 
 <Frame>
@@ -48,9 +48,9 @@ The billing model controls *when* the customer pays. The pricing model controls 
 | Flat | Uses one rate for every unit | $0.001 per API call |
 | Package | Bills in blocks of units | $2 per 10,000 tokens |
 | Tiered | Applies each rate only to the units inside that tier | First 100,000 tokens free, then $0.0002 per token |
-| Volume | Uses the rate for the customer's final usage band across all units | $0.01 per request, or $0.007 for all requests after 100,000 |
+| Volume | Uses the rate for the customer's final usage band across all units | \$0.01 per request, or \$0.007 for all requests after 100,000 |
 
-See [Usage based pricing](/product-catalog/usage-based-billing) for the full calculation rules and examples for each model.
+See [Usage-based pricing](/product-catalog/usage-based-billing) for the full calculation rules and examples for each model.
 
 ### Combine a base price with usage
 
@@ -62,7 +62,7 @@ Included usage: 100,000 tokens
 Additional usage: $0.0002 per token
 ```
 
-If the customer uses 120,000 tokens, the first 100,000 fall into a zero-priced tier. The remaining 20,000 tokens cost $4, so the period total is $24 before tax.
+If the customer uses 120,000 tokens, the first 100,000 fall into a zero-priced tier. The remaining 20,000 tokens cost \$4, so the period total is \$24 before tax.
 
 ## Report usage from your backend
 
@@ -101,7 +101,7 @@ await client.reporting.reportUsage({
 | Field | What to send |
 | --- | --- |
 | `customerId` | The same customer identifier used for the subscription |
-| `featureId` | The identifier of the metered feature on the plan |
+| `featureId` | The identifier of the Meter feature on the plan |
 | `value` | A whole-number usage quantity |
 | `behaviour` | `DELTA` to add usage or `SET` to replace the current value |
 

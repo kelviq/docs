@@ -1,6 +1,7 @@
 ---
 title: "Create a feature in Kelviq"
 description: "Create Boolean, Meter, or Customizable features in the Kelviq dashboard or with the API, then add them to a plan as entitlements."
+keywords: ['entitlements', 'entitlement', 'create feature', 'feature flags']
 ---
 
 A feature is something your product can enable, limit, or measure for a customer. Examples include analytics access, team size, API calls, storage, and AI credits.
@@ -11,7 +12,7 @@ Create the feature once, then reuse it across plans. Creating a feature does not
 
 | Dashboard option | API value | Use it for |
 | --- | --- | --- |
-| Switch/boolean | `BOOLEAN` | On-or-off access, such as analytics, SSO, or priority support |
+| Boolean | `BOOLEAN` | On-or-off access, such as analytics, SSO, or priority support |
 | Meter | `METER` | A quantity that is purchased or consumed, such as seats, API calls, storage, or credits |
 | Customizable | `CUSTOMIZABLE` | A plan-specific numeric limit or setting, such as maximum projects or upload size |
 
@@ -27,7 +28,7 @@ Create the feature once, then reuse it across plans. Creating a feature does not
 4. Enter an **Identifier**. Your application uses this value when checking access or reporting usage.
 5. Add a **Description** if your team needs more context about what the feature controls.
 6. Choose the **Feature type**:
-   - **Switch/boolean** for on-or-off access.
+   - **Boolean** for on-or-off access.
    - **Meter** for purchased or consumed quantities.
    - **Customizable** for a numeric limit or setting.
 7. For a Meter feature, enter the singular and plural units. For example, use `call` and `calls`, or `seat` and `seats`.
@@ -103,7 +104,7 @@ The feature remains independent until you attach it to a plan:
    - Set the limit, reset cadence, hard-limit behavior, rollover, or alerts for a Meter feature.
 6. Save the plan. Publish the draft when it is ready for customers.
 
-Read [Features and limits](/product-catalog/entitlements) to check access from your application, [Usage-based pricing](/product-catalog/usage-based-billing) to price metered consumption, or [Seat-based pricing](/product-catalog/seat-based-pricing) to sell purchased quantities.
+Read [Features & limits](/product-catalog/entitlements) to check access from your application, [Usage-based pricing](/product-catalog/usage-based-billing) to price metered consumption, or [Seat-based pricing](/product-catalog/seat-based-pricing) to sell purchased quantities.
 
 ## Common problems
 

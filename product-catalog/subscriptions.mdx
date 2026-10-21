@@ -51,21 +51,9 @@ Omit `paymentBehavior` to keep the default immediate-update behavior.
 
 ### Control how a change is billed
 
-Pass `prorationBehavior` when you update a subscription to choose when the customer pays for a mid-period change:
+Proration decides what the customer pays for the rest of the period: charged now (`IMMEDIATE_CHARGE`), added to the next invoice (`PRORATE_NEXT_INVOICE`), or skipped (`NO_PRORATION`). Set your defaults in **Settings → Subscription proration**, or pass `prorationBehavior` when you update a subscription.
 
-| Value | Effect |
-| --- | --- |
-| `IMMEDIATE_CHARGE` | Applies the change now, prorates the difference, and invoices it immediately. |
-| `PRORATE_NEXT_INVOICE` | Applies the change now and adds the prorated credit or charge to the next renewal invoice. Nothing is collected immediately. |
-| `NO_PRORATION` | Applies the change now without crediting or charging for the partial period. The next renewal invoice bills the full new price. |
-
-If you omit the field, Kelviq uses your organization's default. Set the defaults with `PATCH /organizations/settings/`: `updateSubscriptionProrationBehavior` covers upgrades and downgrades and defaults to `IMMEDIATE_CHARGE`, while `migrateSubscriptionProrationBehavior` covers plan migrations and defaults to `PRORATE_NEXT_INVOICE`.
-
-<Warning>
-  Changing the billing interval, such as monthly to yearly, starts and invoices the new billing period immediately, whichever option you pass. With `NO_PRORATION`, unused time on the old interval is not credited. The update time becomes the start of the new billing period and sets the new renewal date.
-</Warning>
-
-To see the exact amounts before committing to a change, call `POST /subscriptions/{subscriptionId}/update/preview/` with the same payload. If credits exceed the new charge, no payment is collected and the remainder is kept as customer credit.
+[Proration](/product-catalog/proration) walks through each option with an upgrade and a downgrade example. The defaults are also available through the API as `updateSubscriptionProrationBehavior` and `migrateSubscriptionProrationBehavior` on `PATCH /organizations/settings/`.
 
 ### Wait for payment before changing access
 
@@ -90,13 +78,13 @@ Under the default `IMMEDIATE_CHARGE` proration behavior, Kelviq prorates the pri
 
 With `activate_on_payment`, Kelviq waits for that payment to succeed before activating the upgraded plan.
 
-For example, if a customer moves from a \$100 monthly plan to a $200 monthly plan halfway through the period, the approximate calculation is:
+For example, if a customer moves from a \$100 monthly plan to a \$200 monthly plan halfway through the period, the approximate calculation is:
 
 | Item | Amount |
 | --- | ---: |
-| Unused half of the old plan | -$50 credit |
-| Remaining half of the new plan | $100 charge |
-| Net amount collected | $50 |
+| Unused half of the old plan | -\$50 credit |
+| Remaining half of the new plan | \$100 charge |
+| Net amount collected | \$50 |
 
 The exact amount depends on when the upgrade is processed. Existing usage counters are retained and evaluated against the new plan's limits.
 
@@ -111,6 +99,48 @@ Under the default payment behavior, downgrades also apply immediately. If the cu
 ## Cancel a subscription
 
 When cancelling, choose whether the subscription should end immediately or at the end of the current billing period. A plan downgrade and a subscription cancellation are separate actions: the downgrade follows the payment behavior you choose, while the cancellation follows the timing option you select.
+
+## Pause a subscription
+
+A paused subscription stops billing and stops access. The customer isn't charged, their entitlements return `hasAccess: false`, and plan changes are blocked until the subscription resumes. Cancelling stays available.
+
+When a customer tries to cancel, Kelviq shows the offer you've set for the reason they give: a discount, a pause, or a link to your support team. If the offer is a pause and they accept it, they pick a length from the ones you allow: 1, 3, or 6 months. This works in the customer portal and from a Cancel button in your own app. See [Retention offers](/customer-portal/retention#where-customers-see-offers).
+
+A pause has to cover at least one full billing period, so a 1-month pause on a yearly plan is refused. Only an `active` subscription can be paused, not one on trial, past due, already paused, or scheduled to cancel. Free and manually billed subscriptions can't be paused.
+
+### Resume a subscription
+
+A paused subscription resumes on its own at the end of the pause. Choose what happens on resume in **Settings → Retention → Advanced settings**:
+
+| | Reset billing cycle (default) | Keep billing day |
+| --- | --- | --- |
+| Charged on resume | A full period | Nothing |
+| Next charge | One period after the resume date | The original billing day |
+| Billing day afterwards | The resume date | Unchanged |
+
+For a monthly plan billed on the 1st, paused on 10 September and resumed on 20 October, reset charges a full month on 20 October and bills on the 20th from then on. Keep billing day charges nothing and bills on 1 November as before, which gives the customer free access from the 20th to the 1st. A customer who resumes inside a period they've already paid for is never charged again, whichever behavior you pick.
+
+On resume, entitlements come back with usage reset to zero and a fresh period.
+
+### What changes while paused
+
+The subscription has `status: "paused"`, `pausedAt`, and `pauseResumesAt` (`null` for an open-ended pause). Kelviq sends `subscription.paused` and `subscription.resumed` [webhooks](/guides/webhooks), whichever surface the change came from. Webhook payloads use snake_case, so the same fields arrive there as `paused_at` and `pause_resumes_at`. Renewals that would fall inside the pause are skipped silently, so a paused subscription sends no other events until it resumes.
+
+If you cache entitlement checks, clear them when you receive `subscription.paused`, otherwise the customer keeps access until the cache expires. Both SDKs have a call for it: `client.entitlements.invalidateCache({ customerId })` in Node and `client.entitlements.invalidate_cache(customerId=...)` in Python.
+
+### Retention offers
+
+Before a customer cancels, you can offer them a reason to stay. In the dashboard retention settings, switch retention on and map each cancellation reason to an offer:
+
+* **Discount**: a percentage off for a set number of billing cycles, applied as a single-use coupon.
+* **Pause**: a break of one of the lengths you allow. Billing and access stop, then resume on a renewal boundary.
+* **Support**: a link to a booking page or support form, for reasons a conversation can fix.
+
+The customer portal shows these offers automatically. To build the same flow in your own app, call [Get retention offers](/api-reference/subscriptions/get-retention-offers) for the subscription. It returns every cancellation reason with its configured offer and whether this subscription is eligible for it right now, so you can show an unavailable offer greyed out with a reason. When the customer takes an offer, call [Accept a retention offer](/api-reference/subscriptions/accept-a-retention-offer) with the reason and the offer. If they cancel anyway, call [Cancel a subscription](/api-reference/subscriptions/cancel-a-subscription) with the same reason as `cancellationFeedback`.
+
+<Note>
+  An offer must be the one configured for the reason the customer picked, and eligibility is checked again when it is accepted. The repeat policy you set decides whether a customer who has already taken an offer can be offered it again, so discounts cannot be stacked by reopening the cancellation flow.
+</Note>
 
 ## Refund a cancelled subscription
 

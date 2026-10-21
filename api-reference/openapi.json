@@ -1836,6 +1836,341 @@
           }
         }
       },
+      "RetentionOffersResponse": {
+        "type": "object",
+        "properties": {
+          "enabled": {
+            "type": "boolean",
+            "description": "Whether retention offers are switched on for the organization. When `false`, every reason has `offer: null`."
+          },
+          "writtenFeedback": {
+            "type": "object",
+            "description": "Whether to ask the customer for a free-text comment, and the question to show. Pass the answer as `cancellationComment` when cancelling.",
+            "properties": {
+              "enabled": {
+                "type": "boolean"
+              },
+              "question": {
+                "type": "string",
+                "nullable": true,
+                "example": "What could we have done better?"
+              }
+            }
+          },
+          "reasons": {
+            "type": "array",
+            "description": "One entry per cancellation reason, in a fixed order.",
+            "items": {
+              "$ref": "#/components/schemas/RetentionReason"
+            }
+          }
+        }
+      },
+      "RetentionReason": {
+        "type": "object",
+        "properties": {
+          "reason": {
+            "type": "string",
+            "enum": [
+              "TOO_EXPENSIVE",
+              "MISSING_FEATURES",
+              "SWITCHED_SERVICE",
+              "UNUSED",
+              "CUSTOMER_SERVICE",
+              "LOW_QUALITY",
+              "TOO_COMPLEX",
+              "OTHER"
+            ],
+            "description": "The cancellation reason. Use the same value as `cancellationFeedback` when accepting an offer or cancelling.",
+            "example": "TOO_EXPENSIVE"
+          },
+          "offer": {
+            "nullable": true,
+            "description": "The offer configured for this reason, or `null` when there is none.",
+            "oneOf": [
+              {
+                "$ref": "#/components/schemas/RetentionDiscountOffer"
+              },
+              {
+                "$ref": "#/components/schemas/RetentionPauseOffer"
+              },
+              {
+                "$ref": "#/components/schemas/RetentionSupportOffer"
+              }
+            ],
+            "discriminator": {
+              "propertyName": "type",
+              "mapping": {
+                "DISCOUNT": "#/components/schemas/RetentionDiscountOffer",
+                "PAUSE": "#/components/schemas/RetentionPauseOffer",
+                "SUPPORT": "#/components/schemas/RetentionSupportOffer"
+              }
+            }
+          }
+        }
+      },
+      "RetentionDiscountOffer": {
+        "type": "object",
+        "required": [
+          "type",
+          "eligible"
+        ],
+        "properties": {
+          "type": {
+            "type": "string",
+            "enum": [
+              "DISCOUNT"
+            ]
+          },
+          "percentageOff": {
+            "type": "integer",
+            "description": "Percentage taken off each invoice while the discount lasts.",
+            "example": 20
+          },
+          "billingCycles": {
+            "type": "integer",
+            "description": "How many billing cycles the discount applies to.",
+            "example": 3
+          },
+          "eligible": {
+            "type": "boolean",
+            "description": "Whether this subscription can take the offer right now."
+          },
+          "ineligibleReason": {
+            "type": "string",
+            "nullable": true,
+            "enum": [
+              "MANUAL_BILLING",
+              "NOT_RECURRING",
+              "FREE_SUBSCRIPTION",
+              "SUBSCRIPTION_NOT_ACTIVE",
+              "NOT_ACTIVE",
+              "ALREADY_PAUSED",
+              "SCHEDULED_TO_CANCEL",
+              "ALREADY_TAKEN",
+              "NO_USABLE_DURATION",
+              "SHORTER_THAN_BILLING_PERIOD",
+              "NOT_CONFIGURED"
+            ],
+            "description": "Why the offer cannot be taken, or `null` when `eligible` is `true`. `MANUAL_BILLING`, `NOT_RECURRING` and `FREE_SUBSCRIPTION` describe the subscription itself; `SUBSCRIPTION_NOT_ACTIVE`, `NOT_ACTIVE`, `ALREADY_PAUSED` and `SCHEDULED_TO_CANCEL` its current state; `ALREADY_TAKEN` means the organization's repeat policy blocks the offer; `NO_USABLE_DURATION` and `SHORTER_THAN_BILLING_PERIOD` mean every configured pause length is shorter than one billing period; `NOT_CONFIGURED` means the offer is missing its setup, such as a support URL."
+          }
+        }
+      },
+      "RetentionPauseOffer": {
+        "type": "object",
+        "required": [
+          "type",
+          "eligible"
+        ],
+        "properties": {
+          "type": {
+            "type": "string",
+            "enum": [
+              "PAUSE"
+            ]
+          },
+          "durations": {
+            "type": "array",
+            "description": "Pause lengths the customer may choose. Only lengths that skip at least one renewal for this subscription are listed.",
+            "items": {
+              "type": "object",
+              "properties": {
+                "months": {
+                  "type": "integer",
+                  "example": 3
+                },
+                "billingResumesOn": {
+                  "type": "string",
+                  "format": "date",
+                  "description": "The date billing and access resume if this length is chosen. Aligned to the end of a billing period.",
+                  "example": "2027-02-01"
+                }
+              }
+            }
+          },
+          "eligible": {
+            "type": "boolean",
+            "description": "Whether this subscription can take the offer right now."
+          },
+          "ineligibleReason": {
+            "type": "string",
+            "nullable": true,
+            "enum": [
+              "MANUAL_BILLING",
+              "NOT_RECURRING",
+              "FREE_SUBSCRIPTION",
+              "SUBSCRIPTION_NOT_ACTIVE",
+              "NOT_ACTIVE",
+              "ALREADY_PAUSED",
+              "SCHEDULED_TO_CANCEL",
+              "ALREADY_TAKEN",
+              "NO_USABLE_DURATION",
+              "SHORTER_THAN_BILLING_PERIOD",
+              "NOT_CONFIGURED"
+            ],
+            "description": "Why the offer cannot be taken, or `null` when `eligible` is `true`. `MANUAL_BILLING`, `NOT_RECURRING` and `FREE_SUBSCRIPTION` describe the subscription itself; `SUBSCRIPTION_NOT_ACTIVE`, `NOT_ACTIVE`, `ALREADY_PAUSED` and `SCHEDULED_TO_CANCEL` its current state; `ALREADY_TAKEN` means the organization's repeat policy blocks the offer; `NO_USABLE_DURATION` and `SHORTER_THAN_BILLING_PERIOD` mean every configured pause length is shorter than one billing period; `NOT_CONFIGURED` means the offer is missing its setup, such as a support URL."
+          }
+        }
+      },
+      "RetentionSupportOffer": {
+        "type": "object",
+        "required": [
+          "type",
+          "eligible"
+        ],
+        "properties": {
+          "type": {
+            "type": "string",
+            "enum": [
+              "SUPPORT"
+            ]
+          },
+          "url": {
+            "type": "string",
+            "nullable": true,
+            "description": "Where to send the customer, such as a booking page or a support form.",
+            "example": "https://cal.com/acme/15min"
+          },
+          "eligible": {
+            "type": "boolean",
+            "description": "Whether this subscription can take the offer right now."
+          },
+          "ineligibleReason": {
+            "type": "string",
+            "nullable": true,
+            "enum": [
+              "MANUAL_BILLING",
+              "NOT_RECURRING",
+              "FREE_SUBSCRIPTION",
+              "SUBSCRIPTION_NOT_ACTIVE",
+              "NOT_ACTIVE",
+              "ALREADY_PAUSED",
+              "SCHEDULED_TO_CANCEL",
+              "ALREADY_TAKEN",
+              "NO_USABLE_DURATION",
+              "SHORTER_THAN_BILLING_PERIOD",
+              "NOT_CONFIGURED"
+            ],
+            "description": "Why the offer cannot be taken, or `null` when `eligible` is `true`. `MANUAL_BILLING`, `NOT_RECURRING` and `FREE_SUBSCRIPTION` describe the subscription itself; `SUBSCRIPTION_NOT_ACTIVE`, `NOT_ACTIVE`, `ALREADY_PAUSED` and `SCHEDULED_TO_CANCEL` its current state; `ALREADY_TAKEN` means the organization's repeat policy blocks the offer; `NO_USABLE_DURATION` and `SHORTER_THAN_BILLING_PERIOD` mean every configured pause length is shorter than one billing period; `NOT_CONFIGURED` means the offer is missing its setup, such as a support URL."
+          }
+        }
+      },
+      "AcceptRetentionOfferRequest": {
+        "type": "object",
+        "required": [
+          "offerType",
+          "cancellationFeedback"
+        ],
+        "properties": {
+          "offerType": {
+            "type": "string",
+            "enum": [
+              "DISCOUNT",
+              "PAUSE",
+              "SUPPORT"
+            ],
+            "description": "The offer to apply. Must be the offer configured for `cancellationFeedback`.",
+            "example": "PAUSE"
+          },
+          "cancellationFeedback": {
+            "type": "string",
+            "enum": [
+              "TOO_EXPENSIVE",
+              "MISSING_FEATURES",
+              "SWITCHED_SERVICE",
+              "UNUSED",
+              "CUSTOMER_SERVICE",
+              "LOW_QUALITY",
+              "TOO_COMPLEX",
+              "OTHER"
+            ],
+            "description": "The cancellation reason the customer picked.",
+            "example": "UNUSED"
+          },
+          "pauseMonths": {
+            "type": "integer",
+            "nullable": true,
+            "minimum": 1,
+            "description": "Required when `offerType` is `PAUSE`. Must be one of the `durations` returned by Get retention offers.",
+            "example": 3
+          }
+        }
+      },
+      "AcceptRetentionOfferResponse": {
+        "type": "object",
+        "properties": {
+          "message": {
+            "type": "string",
+            "example": "Subscription paused successfully"
+          },
+          "subscriptionId": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "offerType": {
+            "type": "string",
+            "enum": [
+              "DISCOUNT",
+              "PAUSE",
+              "SUPPORT"
+            ]
+          },
+          "cancellationFeedback": {
+            "type": "string",
+            "enum": [
+              "TOO_EXPENSIVE",
+              "MISSING_FEATURES",
+              "SWITCHED_SERVICE",
+              "UNUSED",
+              "CUSTOMER_SERVICE",
+              "LOW_QUALITY",
+              "TOO_COMPLEX",
+              "OTHER"
+            ]
+          },
+          "percentageOff": {
+            "type": "integer",
+            "description": "`DISCOUNT` only.",
+            "example": 20
+          },
+          "billingCycles": {
+            "type": "integer",
+            "description": "`DISCOUNT` only.",
+            "example": 3
+          },
+          "appliesUntil": {
+            "type": "string",
+            "format": "date-time",
+            "nullable": true,
+            "description": "`DISCOUNT` only. When the discount stops applying, or `null` when it applies to a single invoice."
+          },
+          "originalAmount": {
+            "type": "string",
+            "description": "`DISCOUNT` only. The amount billed per period before the discount.",
+            "example": "50.00"
+          },
+          "discountedAmount": {
+            "type": "string",
+            "description": "`DISCOUNT` only. The amount billed per period while the discount lasts.",
+            "example": "40.00"
+          },
+          "pauseMonths": {
+            "type": "integer",
+            "description": "`PAUSE` only.",
+            "example": 3
+          },
+          "resumesAt": {
+            "type": "string",
+            "format": "date-time",
+            "description": "`PAUSE` only. When billing and access resume."
+          },
+          "url": {
+            "type": "string",
+            "description": "`SUPPORT` only. The support URL to send the customer to.",
+            "example": "https://cal.com/acme/15min"
+          }
+        }
+      },
       "PublicOfferingResponse": {
         "type": "object",
         "properties": {
@@ -8696,6 +9031,251 @@
                 },
                 "example": {
                   "message": "Subscription cancellation processed successfully."
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/subscriptions/{subscriptionId}/retention/": {
+      "get": {
+        "tags": [
+          "Subscriptions"
+        ],
+        "summary": "Get retention offers",
+        "description": "Returns what this subscription can be offered for each cancellation reason, so you can build the cancellation flow in your own app.\n\nEvery cancellation reason is listed with the offer configured for it in the Kelviq dashboard retention settings: a discount, a pause, a link to support, or nothing. Each offer carries an eligibility verdict for this particular subscription. An ineligible offer is still returned with `ineligibleReason` set, so you can show it greyed out with an explanation rather than hide it.\n\nWhen retention is switched off, `enabled` is `false` and every reason comes back with `offer: null`. The reason list is still returned so the same reason picker can be rendered either way.\n\nTo apply the offer the customer chooses, call [Accept a retention offer](/api-reference/subscriptions/accept-a-retention-offer). To record the cancellation instead, call [Cancel a subscription](/api-reference/subscriptions/cancel-a-subscription) with the same `cancellationFeedback`.",
+        "operationId": "getRetentionOffers",
+        "x-mint": {
+          "content": "<Info>Click the base URL in the API playground and select the **Sandbox** host for test data or the **Production** host for live data. Use credentials from the same environment.</Info>"
+        },
+        "parameters": [
+          {
+            "name": "subscriptionId",
+            "in": "path",
+            "required": true,
+            "description": "The unique identifier of the subscription.",
+            "example": "78058918-9746-4280-9b9b-1bd5115eec6e",
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "The retention configuration for this subscription.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/RetentionOffersResponse"
+                },
+                "example": {
+                  "enabled": true,
+                  "writtenFeedback": {
+                    "enabled": true,
+                    "question": "What could we have done better?"
+                  },
+                  "reasons": [
+                    {
+                      "reason": "TOO_EXPENSIVE",
+                      "offer": {
+                        "type": "DISCOUNT",
+                        "percentageOff": 20,
+                        "billingCycles": 3,
+                        "eligible": true,
+                        "ineligibleReason": null
+                      }
+                    },
+                    {
+                      "reason": "UNUSED",
+                      "offer": {
+                        "type": "PAUSE",
+                        "durations": [
+                          {
+                            "months": 1,
+                            "billingResumesOn": "2026-12-01"
+                          },
+                          {
+                            "months": 3,
+                            "billingResumesOn": "2027-02-01"
+                          }
+                        ],
+                        "eligible": true,
+                        "ineligibleReason": null
+                      }
+                    },
+                    {
+                      "reason": "CUSTOMER_SERVICE",
+                      "offer": {
+                        "type": "SUPPORT",
+                        "url": "https://cal.com/acme/15min",
+                        "eligible": true,
+                        "ineligibleReason": null
+                      }
+                    },
+                    {
+                      "reason": "MISSING_FEATURES",
+                      "offer": null
+                    },
+                    {
+                      "reason": "SWITCHED_SERVICE",
+                      "offer": null
+                    },
+                    {
+                      "reason": "LOW_QUALITY",
+                      "offer": null
+                    },
+                    {
+                      "reason": "TOO_COMPLEX",
+                      "offer": null
+                    },
+                    {
+                      "reason": "OTHER",
+                      "offer": null
+                    }
+                  ]
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "The subscription was not found, is not active, or the offer could not be applied. `detail` explains why.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "detail": {
+                      "type": "string"
+                    }
+                  }
+                },
+                "example": {
+                  "detail": "This offer has already been used on this subscription."
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/subscriptions/{subscriptionId}/retention/accept/": {
+      "post": {
+        "tags": [
+          "Subscriptions"
+        ],
+        "summary": "Accept a retention offer",
+        "description": "Applies the retention offer a customer accepted instead of cancelling.\n\nPass the cancellation reason the customer picked and the offer it maps to. `offerType` has to be the offer configured for that reason in the dashboard retention settings; any other pairing is rejected with `400`. Eligibility is checked again at this point, so an offer that was eligible when you fetched it can still be refused if, for example, the subscription was paused or scheduled to cancel in between.\n\nWhat happens depends on the offer:\n\n- `DISCOUNT` creates a single-use coupon for the configured percentage and billing cycles and attaches it to the subscription. The response includes the discounted amount and when the discount ends.\n- `PAUSE` pauses the subscription for `pauseMonths`, which must be one of the durations returned by [Get retention offers](/api-reference/subscriptions/get-retention-offers). Billing and access resume on the returned date, exactly as a merchant-initiated pause would.\n- `SUPPORT` records that the customer took the support offer and returns the configured support URL to send them to. Nothing changes on the subscription.\n\nEvery acceptance is recorded against the subscription and counted by the organization's offer repeat policy, so a customer cannot stack discounts or pause indefinitely by reopening the cancellation flow.",
+        "operationId": "acceptRetentionOffer",
+        "x-mint": {
+          "content": "<Info>Click the base URL in the API playground and select the **Sandbox** host for test data or the **Production** host for live data. Use credentials from the same environment.</Info>"
+        },
+        "parameters": [
+          {
+            "name": "subscriptionId",
+            "in": "path",
+            "required": true,
+            "description": "The unique identifier of the subscription.",
+            "example": "78058918-9746-4280-9b9b-1bd5115eec6e",
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/AcceptRetentionOfferRequest"
+              },
+              "example": {
+                "offerType": "PAUSE",
+                "cancellationFeedback": "UNUSED",
+                "pauseMonths": 3
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "The offer was applied. The fields after `cancellationFeedback` depend on `offerType`.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/AcceptRetentionOfferResponse"
+                },
+                "examples": {
+                  "discount": {
+                    "summary": "Discount applied",
+                    "value": {
+                      "message": "Discount applied successfully",
+                      "subscriptionId": "78058918-9746-4280-9b9b-1bd5115eec6e",
+                      "offerType": "DISCOUNT",
+                      "cancellationFeedback": "TOO_EXPENSIVE",
+                      "percentageOff": 20,
+                      "billingCycles": 3,
+                      "appliesUntil": "2027-01-01T00:00:00Z",
+                      "originalAmount": "50.00",
+                      "discountedAmount": "40.00"
+                    }
+                  },
+                  "pause": {
+                    "summary": "Subscription paused",
+                    "value": {
+                      "message": "Subscription paused successfully",
+                      "subscriptionId": "78058918-9746-4280-9b9b-1bd5115eec6e",
+                      "offerType": "PAUSE",
+                      "cancellationFeedback": "UNUSED",
+                      "pauseMonths": 3,
+                      "resumesAt": "2027-02-01T00:00:00Z"
+                    }
+                  },
+                  "support": {
+                    "summary": "Support link issued",
+                    "value": {
+                      "message": "Support link issued",
+                      "subscriptionId": "78058918-9746-4280-9b9b-1bd5115eec6e",
+                      "offerType": "SUPPORT",
+                      "cancellationFeedback": "CUSTOMER_SERVICE",
+                      "url": "https://cal.com/acme/15min"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Validation failed, the offer is not the one configured for this reason, the subscription is not eligible, or retention is switched off. Field errors are keyed by field name; everything else is reported in `detail`.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "additionalProperties": true
+                },
+                "examples": {
+                  "notConfiguredForReason": {
+                    "summary": "Offer not mapped to this reason",
+                    "value": {
+                      "detail": "That offer is not available for this reason."
+                    }
+                  },
+                  "alreadyTaken": {
+                    "summary": "Repeat policy",
+                    "value": {
+                      "detail": "This offer has already been used on this subscription."
+                    }
+                  },
+                  "invalidField": {
+                    "summary": "Validation error",
+                    "value": {
+                      "offerType": [
+                        "offer_type must be one of ['DISCOUNT', 'PAUSE', 'SUPPORT', 'NONE']."
+                      ]
+                    }
+                  }
                 }
               }
             }

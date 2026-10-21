@@ -19,7 +19,7 @@ License keys are configured at the **plan level**. When enabled, every order pla
       <img height="200" src="/images/enable-key.png" />
 </Frame>
 
-1. Navigate to **Products** → Select your product → Select the plan you want to configure
+1. Go to **Product catalog → Products** → Select your product → Select the plan you want to configure
 2. Scroll down to the **License keys** section
 3. Toggle the switch to **enable** license keys
 
@@ -63,14 +63,14 @@ After configuring the settings, click **Save Changes**. All future orders for th
 
 ---
 
-## 2. Managing Licenses from Order Details
+## 2. Managing licenses from an order
 
-Once a customer places an order for a plan with licenses enabled, you can manage their license from the **Order Details** page.
+Once a customer places an order for a plan with licenses enabled, you can manage their license from the order. Go to **Sales → Orders**, click the customer, and open the **License** tab.
 
 
 ### Viewing License Information
 
-Navigate to **Orders** → Click on an order to view details. The license section displays:
+The **License** tab displays:
 <Frame>
       <img height="200" src="/images/managing-licenses-from-order-details.png" />
 </Frame>
@@ -82,7 +82,7 @@ Navigate to **Orders** → Click on an order to view details. The license sectio
 
 ### Available Actions
 
-Click the **⋮** menu button on the license card to access these options:
+Click the **⋯** menu button on the license card to access these options:
 <Frame>
       <img height="200" src="/images/available-actions.png" />
 </Frame>
@@ -181,7 +181,7 @@ Both key types can call `POST /license/activate/`, `POST /license/validate/`, an
   Never expose a Server API Key in frontend code or software distributed to customers. Use a Client API Key for those integrations.
 </Warning>
 
-### 3.0 Reading a customer's key from your server
+### Reading a customer's key from your server
 
 A customer's keys come back with their purchase records, authenticated with your server API key. Orders, subscriptions and invoices all carry a `license` array, and each entry holds `licenseKey` alongside `activationUsage`, `activationLimit` and `expiresOn`.
 
@@ -291,7 +291,7 @@ Removes an activation from a specific device/instance.
 6. License is now active on customer's device
 ```
 
-For software the customer signs in to, skip steps 3 and 4: read the key from their subscription as in [3.0](#3-0-reading-a-customer-s-key-from-your-server) and call Activate for them.
+For software the customer signs in to, skip steps 3 and 4: read the key from their order or subscription as in [Reading a customer's key](#reading-a-customers-key-from-your-server) and call Activate for them.
 
 ### Workflow B: Customer Switches Devices
 
@@ -318,7 +318,7 @@ For software the customer signs in to, skip steps 3 and 4: read the key from the
 
 ```
 1. Customer requests extension
-2. Admin opens Order Details
+2. Admin opens the order's License tab
 3. Click license menu → "Manage expiry"
 4. Select new expiration date
 5. Save changes
@@ -329,7 +329,7 @@ For software the customer signs in to, skip steps 3 and 4: read the key from the
 
 ```
 1. Admin notices suspicious activity (too many activations)
-2. Open Order Details → View License Details
+2. Open the order's License tab
 3. Revoke unauthorized instances
 4. If key is widely leaked: Regenerate the key
 5. Send new key to legitimate customer
@@ -345,14 +345,14 @@ For software the customer signs in to, skip steps 3 and 4: read the key from the
 | Enable licenses for a plan | Plan Details | Toggle "License keys" switch |
 | Set activation limit (plan) | Plan Details → License keys | Enable limit + set number |
 | Set expiry duration (plan) | Plan Details → License keys | Enable expiry + set duration |
-| View customer's license | Order Details | See license card |
-| Copy license key | Order Details | Click on license key |
-| Regenerate key | Order Details → License menu | "Regenerate key" |
-| Change activation limit | Order Details → License menu | "Edit activation limit" |
-| Change expiry date | Order Details → License menu | "Manage expiry" |
-| View all activations | Order Details | Click license card |
+| View customer's license | Order's License tab | See license card |
+| Copy license key | Order's License tab | Click on license key |
+| Regenerate key | Order's License tab → ⋯ menu | "Regenerate key" |
+| Change activation limit | Order's License tab → ⋯ menu | "Edit activation limit" |
+| Change expiry date | Order's License tab → ⋯ menu | "Manage expiry" |
+| View all activations | Order's License tab | Click license card |
 | Revoke a device | License Details | Click "Revoke" on instance |
-| Deactivate entire license | Order Details → License menu | "Deactivate" |
+| Deactivate entire license | Order's License tab → ⋯ menu | "Deactivate" |
 
 ---
 

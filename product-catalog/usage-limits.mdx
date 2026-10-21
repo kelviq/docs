@@ -1,0 +1,81 @@
+---
+title: 'How usage limits work'
+description: 'What a limit is, when usage resets, what happens when a customer reaches the limit, and how overage is billed'
+---
+
+A usage limit is the amount of a Meter feature a plan includes, such as 10,000 API calls a month. Your app reports usage, Kelviq counts it against the limit, and your app checks what's left before letting the customer use more.
+
+This page follows one example: the **Pro** plan of an AI app costs \$29 a month and includes 10,000 `api-calls`, reset monthly.
+
+## The terms
+
+| Term | What it means |
+| --- | --- |
+| **Base fee** | The fixed price of the plan, charged each billing period whatever the usage. \$29 a month in the example. |
+| **Meter feature** | A feature Kelviq counts, such as API calls, tokens, credits, or seats. |
+| **Usage limit** | How much of a Meter feature the plan includes. Can be a number or unlimited. |
+| **Current usage** | How much the customer has used since the last reset. |
+| **Remaining** | Usage limit minus current usage. |
+| **Reset** | When current usage goes back to 0. |
+| **Hard limit** | Usage is blocked once the limit is reached. |
+| **Soft limit** | Usage can go past the limit. Your app decides what to do, such as warn the customer or bill overage. |
+| **Overage** | Usage past the included limit, billed at a per-unit rate. |
+| **Customizable feature** | A number or setting per plan, such as max upload size or number of projects. Kelviq stores the value; it doesn't count usage against it. |
+
+## How usage is counted
+
+Your backend reports usage for a customer and a Meter feature:
+
+* `DELTA` adds to current usage. Send it each time something is used: one API call, 1,200 tokens.
+* `SET` replaces current usage. Use it for numbers you already track, such as seats in use.
+
+In the example, after 6,500 calls the customer's entitlement looks like this:
+
+```json
+{
+  "featureId": "api-calls",
+  "featureType": "METER",
+  "hasAccess": true,
+  "hardLimit": true,
+  "usageLimit": 10000,
+  "currentUsage": 6500,
+  "remaining": 3500
+}
+```
+
+See [Features & limits](/product-catalog/entitlements#sdk-integration) for the SDK calls.
+
+## When usage resets
+
+Each Meter feature on a plan has a **usage reset**: never, or a recurring period such as every day, month, quarter, or year. For monthly resets you choose the first day of the month or the customer's subscription start date.
+
+A reset of **Never** makes the limit a lifetime allowance. Credit packs work this way.
+
+## What happens at the limit
+
+For a Meter feature, `hasAccess` is `true` while `remaining` is above 0 or the limit is unlimited.
+
+* **Hard limit:** at 10,000 calls, `hasAccess` turns `false` and additional usage is stopped until the next reset or an upgrade.
+* **Soft limit:** usage keeps counting past 10,000. `hasAccess` is also `false` here, so check `hardLimit` before blocking. If the plan has an overage price, let the customer continue and the extra usage is billed.
+
+Use [usage alerts](/product-catalog/usage-alerts) to warn customers before they get there, for example at 80% and 90%.
+
+## Overage
+
+To charge for usage past the included amount, add a **Pay as you go** usage price to the plan, for example a Tiered price whose first 10,000 calls are free and each call after that costs \$0.002. Kelviq bills the overage at the end of each monthly period from the usage you report. See [Pay as you go](/product-catalog/pay-as-you-go).
+
+## Rollover
+
+With an **Advance commitment** price, part of the unused allowance can carry into the next period. In the example, with 50% rollover capped at 750, a customer who has 2,000 calls left at the reset starts the next month with 10,750. See [credit rollover](/product-catalog/usage-based-billing#credit-rollover).
+
+## Plan changes
+
+When a customer upgrades or downgrades, the new plan's limits apply immediately and current usage is kept. A customer who used 6,500 calls and downgrades to a plan with 5,000 is over the limit straight away.
+
+## Change one customer's limit
+
+From the customer's page in the dashboard, you can override a limit for that customer or reset their usage to 0. Plan limits don't change. See [Managing customer entitlements](/product-catalog/entitlements#managing-customer-entitlements).
+
+## If Kelviq can't be reached
+
+The Node and Python SDKs return the last known entitlement when the API is unreachable, and queue usage reports to retry later. See [When the Entitlement API is unavailable](/product-catalog/entitlements#when-the-entitlement-api-is-unavailable).

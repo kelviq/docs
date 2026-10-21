@@ -38,7 +38,7 @@ Copy your promotion ID from the promotion detail page and call `init()`:
 KQPromotionUI.init({
   // Replace with your promotion ID
   promotionId: "YOUR_PROMOTION_ID",
-  // Access token can be found in the Settings -> API keys section
+  // Access token can be found in the Settings → API keys section
   accessToken: "YOUR_CLIENT_ACCESS_TOKEN",
   showBanner: true,
 });
@@ -68,7 +68,7 @@ This will automatically display a discount banner if the visitor is eligible for
 | `maximumDecimalDigits` | `number` | `2` | Maximum fraction digits (0–2) |
 | `banner.*`              | object  | —        | Customization for the discount banner    |
 | `banner.unStyled`       | boolean | false    | if true, no styling will be applied to the banner    |
-| `banner.addCloseIcon`| boolean | true     | Control close button visibility. This setting will work only if close button is enabled from the ParityDeals banner settings   |
+| `banner.addCloseIcon`| boolean | true     | Shows or hides the close button. Works only when the close button is enabled in the promotion's banner settings in Kelviq.   |
 | `banner.placement`      | `top\|bottom`  | 'top'    | The placement of the discount banner    |
 | `banner.container`      | string  | null     | The container for the discount banner    |
 | `banner.backgroundColor`| string  | '#f0f0f0'    | The background color of the discount banner    |

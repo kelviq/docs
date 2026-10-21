@@ -3,7 +3,7 @@ title: "MCP Server"
 description: "Control Kelviq from Claude, Cursor, and any AI assistant that speaks the Model Context Protocol."
 ---
 
-`@kelviq/mcp-server` is the official [Model Context Protocol](https://modelcontextprotocol.io) server for Kelviq. It plugs into any MCP-compatible client — Claude Code, Claude Desktop, Cursor, Windsurf, VS Code, Antigravity — and exposes the full Kelviq API as **typed tools** that the LLM can call directly, plus the entire Kelviq documentation as **searchable resources**.
+`@kelviq/mcp-server` is the official [Model Context Protocol](https://modelcontextprotocol.io) server for Kelviq. It plugs into any MCP-compatible client — Claude Code, Claude Desktop, Cursor, Devin Desktop (formerly Windsurf), VS Code, Antigravity — and exposes the full Kelviq API as **typed tools** that the LLM can call directly, plus the entire Kelviq documentation as **searchable resources**.
 
 Instead of asking your assistant to "write me a curl command," you describe the outcome ("create a Pro plan under product X and publish it") and it does the work in a single turn.
 
@@ -24,7 +24,7 @@ The server runs locally on your machine as a Node process started by your AI cli
 
 When the LLM decides to call a Kelviq tool, the server:
 
-1. Validates the LLM-provided arguments against a Zod schema derived from Kelviq's OpenAPI spec.
+1. Validates the LLM-provided arguments against the tool's Zod schema.
 2. Adds your API key as a Bearer token and sends the HTTPS request to the appropriate Kelviq host.
 3. Returns the JSON response (or a structured `{"error": {...}}` object) back to the LLM.
 
@@ -35,7 +35,7 @@ API errors are returned as content, not exceptions — the LLM reads them and re
 ## Step 1: Get Your API Keys
 
 1. Sign in at [app.kelviq.com](https://app.kelviq.com).
-2. Navigate to **Settings → API Keys**.
+2. Navigate to **Settings → API keys**.
 3. Copy:
    - **Server API Key** — required for all API tools.
    - **Client API Key** — required only for the `promotion_get` tool.
@@ -168,7 +168,7 @@ Add a `.vscode/mcp.json` in your workspace, or run **"MCP: Open User Configurati
 Save, then click the **Start** CodeLens above the `kelviq` entry (or reload the window) and confirm it under the tools icon in Copilot Chat's Agent mode.
 
 <Tip>
-Already have Kelviq configured in Cursor or Windsurf? Under **Settings → Chat → MCP → Discovery**, check the matching box (e.g. "Windsurf configurations") to auto-import that server instead of retyping it. You can also use the `inputs` array to be prompted for the keys instead of storing them in plaintext.
+Already have Kelviq configured in Cursor or Devin Desktop (formerly Windsurf)? Under **Settings → Chat → MCP → Discovery**, check the matching box (e.g. "Windsurf configurations") to auto-import that server instead of retyping it. You can also use the `inputs` array to be prompted for the keys instead of storing them in plaintext.
 </Tip>
 </Tab>
 
@@ -388,7 +388,7 @@ For exhaustive per-endpoint request/response shapes, the **OpenAPI spec is the s
 
 ## Built-in Prompts
 
-The server ships three MCP prompts that encode Kelviq's golden-path workflows — including the gotchas (plans start as invisible drafts until published; entitlements attach by feature UUID; pricing is set in the dashboard or with the [Kelviq CLI](/cli/overview), not through the MCP server). In Claude Code they appear as slash commands (e.g. `/kelviq:setup_product`); other MCP clients list them under prompts.
+The server ships three MCP prompts that encode Kelviq's golden-path workflows — including the gotchas (plans start as invisible drafts until published; features attach by identifier or UUID; pricing is set in the dashboard or with the [Kelviq CLI](/cli/overview), not through the MCP server). In Claude Code they appear as slash commands (e.g. `/kelviq:setup_product`); other MCP clients list them under prompts.
 
 | Prompt | Arguments | What it guides |
 |--------|-----------|----------------|
@@ -519,4 +519,4 @@ The repo is the canonical reference for tool schemas, build process, and contrib
 ## Need Help?
 
 - Email us at **hi@kelviq.com**
-- [Book a demo](https://tidycal.com/neravath/15-minute-meeting)
+- [Book a demo](https://cal.com/alok-vats-fkpnc9/30min)

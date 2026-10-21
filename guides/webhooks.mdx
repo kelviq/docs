@@ -63,6 +63,8 @@ Kelviq automatically retries timeouts, connection failures, and `5xx` or `429` r
 | `subscription.updated` | A subscription's details were modified — including when a cancellation is scheduled for the end of the current period (status stays active; `end_date` is set). |
 | `subscription.cancelled` | A subscription actually reached cancelled status. For a period-end cancellation, this fires later, when the period ends — not at the moment it was scheduled. |
 | `subscription.plan_changed` | A subscription was moved to a different plan. |
+| `subscription.paused` | A customer paused their subscription from the customer portal. The payload includes `paused_at` and `pause_resumes_at`. No other subscription events are sent while it stays paused. |
+| `subscription.resumed` | A paused subscription started billing again, either at its scheduled date or by a resume call. Clear any cached entitlement checks for the customer on both events. |
 | `subscription.trial_will_end` | A subscription's trial period is ending soon. |
 | `feature.usage_alert` | A customer's feature usage crossed a configured threshold. |
 | `invoice.created` | A new invoice was generated. |
@@ -86,7 +88,7 @@ Use your customer identifier or checkout `metadata` to correlate the two events.
 
 ### Custom field responses
 
-When a checkout session collects [custom fields](/api-reference/checkout/create-a-checkout-session), the customer's responses are included as `custom_fields_data` in `data.object` of `checkout.completed` and of the `order.created`, `order.updated`, and `order.refunded` events for the resulting order. The object is keyed by custom field identifier and is empty (`{}`) when the session collected no custom fields.
+When a checkout session collects [custom fields](/checkout/custom-fields), the customer's responses are included as `custom_fields_data` in `data.object` of `checkout.completed` and of the `order.created`, `order.updated`, and `order.refunded` events for the resulting order. The object is keyed by custom field identifier and is empty (`{}`) when the session collected no custom fields.
 
 ### Successful invoice payments
 
@@ -133,6 +135,14 @@ By default, Kelviq applies a plan change immediately, charges any prorated diffe
 If you update a subscription with `paymentBehavior: "activate_on_payment"`, the existing subscription remains `active` while payment is pending. A payment method that requires customer action leaves the updated subscription in `incomplete`. After payment succeeds, the updated subscription becomes `active` and the previous subscription becomes `superseded`. If an immediate charge fails, or the customer does not complete payment before expiry, the updated subscription becomes `incomplete_expired` and the existing subscription remains active.
 
 Do not provision the new plan from the update API response alone. Read the latest subscription status or query the customer's current entitlements before changing access.
+
+### Pauses and resumes
+
+A pause sends `subscription.paused` with `status: "paused"`, `paused_at`, and `pause_resumes_at`, which is `null` for an open-ended pause. Treat it like a cancellation for access: entitlement checks already return `false` for a paused customer, so clear any cached result when the event arrives (`client.entitlements.invalidateCache` in Node, `client.entitlements.invalidate_cache` in Python).
+
+The subscription is quiet until it resumes. Renewals that fall inside the pause are skipped without `subscription.updated` or invoice events. `subscription.resumed` arrives when billing starts again, at the scheduled date or after a resume call, with `status: "active"` and a new billing period. Usage counters are reset at that point.
+
+Both events fire whichever surface made the change: the dashboard, the customer portal, or your API call.
 
 ### Partial and full refunds
 
@@ -222,7 +232,7 @@ The request body is a JSON object with the following top-level fields:
       },
       "product": {
         "id": "df398021-477b-4e67-972d-c763a2f2ba7b",
-        "name": "ParityDeals"
+        "name": "Acme Analytics"
       },
       "billing_address": {
         "line1": null,
@@ -315,7 +325,7 @@ The request body is a JSON object with the following top-level fields:
 <Accordion title="Example: order.created payload">
 ```json
 {
-  "id": "evt_01HXYZ1234567890ABCDEF",
+  "id": "3f6a9c2e-1b4d-4e8f-9a7c-5d2e8b1f4a60",
   "type": "order.created",
   "created_at": "2026-04-01T17:36:41Z",
   "data": {
@@ -345,7 +355,7 @@ The request body is a JSON object with the following top-level fields:
       "subscription_id": "2c78e8f0-892e-406c-9896-18c69d3026c4",
       "product": {
         "id": "df398021-477b-4e67-972d-c763a2f2ba7b",
-        "name": "ParityDeals"
+        "name": "Acme Analytics"
       },
       "plan": {
         "name": "Exc Tax Plan",
@@ -364,7 +374,7 @@ The request body is a JSON object with the following top-level fields:
 <Accordion title="Example: order.updated payload">
 ```json
 {
-  "id": "evt_01HXYZ2345678901BCDEFG",
+  "id": "7c1e4b9a-2d5f-4a3c-8e6b-0f9d2a7c3e51",
   "type": "order.updated",
   "created_at": "2026-04-01T17:36:41Z",
   "data": {
@@ -401,7 +411,7 @@ The request body is a JSON object with the following top-level fields:
       "subscription_id": "2c78e8f0-892e-406c-9896-18c69d3026c4",
       "product": {
         "id": "df398021-477b-4e67-972d-c763a2f2ba7b",
-        "name": "ParityDeals"
+        "name": "Acme Analytics"
       },
       "plan": {
         "name": "Exc Tax Plan",
@@ -460,7 +470,7 @@ The request body is a JSON object with the following top-level fields:
       "subscription_id": "2c78e8f0-892e-406c-9896-18c69d3026c4",
       "product": {
         "id": "df398021-477b-4e67-972d-c763a2f2ba7b",
-        "name": "ParityDeals"
+        "name": "Acme Analytics"
       },
       "plan": {
         "name": "Exc Tax Plan",
@@ -491,16 +501,16 @@ The request body is a JSON object with the following top-level fields:
       "object": "subscription",
       "status": "active",
       "plan": {
-        "name": "default pd",
+        "name": "Pro",
         "version": 1,
-        "identifier": "default-pd"
+        "identifier": "pro"
       },
       "product": {
         "id": "b4ea7e75-5dbe-4b3b-96e0-9a31dfe5a600",
-        "name": "Migrate PD"
+        "name": "Acme Analytics"
       },
       "amount": "21.24",
-      "amount_units": 2100,
+      "amount_units": 2124,
       "currency": "USD",
       "recurrence": "1 month",
       "start_date": "2026-03-11",
@@ -559,7 +569,7 @@ The request body is a JSON object with the following top-level fields:
       },
       "product": {
         "id": "df398021-477b-4e67-972d-c763a2f2ba7b",
-        "name": "ParityDeals"
+        "name": "Acme Analytics"
       },
       "customer": {
         "id": "936cf361-3a4b-454c-a464-41ccc7600c2d",
@@ -617,7 +627,7 @@ The request body is a JSON object with the following top-level fields:
       },
       "product": {
         "id": "df398021-477b-4e67-972d-c763a2f2ba7b",
-        "name": "ParityDeals"
+        "name": "Acme Analytics"
       },
       "customer": {
         "id": "936cf361-3a4b-454c-a464-41ccc7600c2d",
@@ -651,7 +661,7 @@ The request body is a JSON object with the following top-level fields:
 <Accordion title="Example: subscription.plan_changed payload">
 ```json
 {
-  "id": "b9c2e1f0-7d3a-4b8e-a456-1f2g3h4i5j6k",
+  "id": "b9c2e1f0-7d3a-4b8e-a456-1f2a3b4c5d6e",
   "type": "subscription.plan_changed",
   "created_at": "2026-03-04T11:53:12Z",
   "data": {
@@ -730,6 +740,98 @@ The request body is a JSON object with the following top-level fields:
 ```
 </Accordion>
 
+<Accordion title="Example: subscription.paused payload">
+```json
+{
+  "id": "c4d1a2b3-9e8f-4a7b-b123-4c5d6e7f8a9b",
+  "type": "subscription.paused",
+  "created_at": "2026-09-30T10:00:00Z",
+  "data": {
+    "object": {
+      "id": "d1284180-beba-465a-b756-9a300324245e",
+      "object": "subscription",
+      "status": "paused",
+      "paused_at": "2026-09-30T10:00:00Z",
+      "pause_resumes_at": "2026-12-31T23:00:00Z",
+      "plan": {
+        "name": "Pro",
+        "version": 4,
+        "identifier": "pro"
+      },
+      "product": {
+        "id": "988dba89-0a96-4cb5-870a-34810011c1f1",
+        "name": "demo"
+      },
+      "amount": "29.00",
+      "amount_units": 2900,
+      "currency": "USD",
+      "recurrence": "1 month",
+      "start_date": "2026-02-26",
+      "end_date": null,
+      "billing_period_start_time": "2026-09-26T05:25:11Z",
+      "billing_period_end_time": "2026-10-26T05:25:11Z",
+      "customer": {
+        "id": "798e663f-2fe9-43d7-879f-2549263e20d1",
+        "name": "Geo",
+        "email": "geo@example.com",
+        "customer_id": "geo123",
+        "billing_address": {}
+      },
+      "organization": "5d0bec80-a7c1-41ae-bd24-ea9228500586",
+      "created_on": "2026-02-26T05:25:11Z",
+      "modified_on": "2026-09-30T10:00:00Z"
+    }
+  }
+}
+```
+</Accordion>
+
+<Accordion title="Example: subscription.resumed payload">
+```json
+{
+  "id": "e5f6a7b8-1c2d-4e3f-a456-7b8c9d0e1f2a",
+  "type": "subscription.resumed",
+  "created_at": "2026-12-31T23:00:00Z",
+  "data": {
+    "object": {
+      "id": "d1284180-beba-465a-b756-9a300324245e",
+      "object": "subscription",
+      "status": "active",
+      "paused_at": null,
+      "pause_resumes_at": null,
+      "plan": {
+        "name": "Pro",
+        "version": 4,
+        "identifier": "pro"
+      },
+      "product": {
+        "id": "988dba89-0a96-4cb5-870a-34810011c1f1",
+        "name": "demo"
+      },
+      "amount": "29.00",
+      "amount_units": 2900,
+      "currency": "USD",
+      "recurrence": "1 month",
+      "start_date": "2026-02-26",
+      "end_date": null,
+      "billing_period_start_time": "2026-12-31T23:00:00Z",
+      "billing_period_end_time": "2027-01-31T23:00:00Z",
+      "customer": {
+        "id": "798e663f-2fe9-43d7-879f-2549263e20d1",
+        "name": "Geo",
+        "email": "geo@example.com",
+        "customer_id": "geo123",
+        "billing_address": {}
+      },
+      "organization": "5d0bec80-a7c1-41ae-bd24-ea9228500586",
+      "created_on": "2026-02-26T05:25:11Z",
+      "modified_on": "2026-12-31T23:00:00Z"
+    }
+  }
+}
+```
+</Accordion>
+
 <Accordion title="Example: subscription.trial_will_end payload">
 ```json
 {
@@ -742,16 +844,16 @@ The request body is a JSON object with the following top-level fields:
       "object": "subscription",
       "status": "trialing",
       "plan": {
-        "name": "default pd",
+        "name": "Pro",
         "version": 1,
-        "identifier": "default-pd"
+        "identifier": "pro"
       },
       "product": {
         "id": "b4ea7e75-5dbe-4b3b-96e0-9a31dfe5a600",
-        "name": "Migrate PD"
+        "name": "Acme Analytics"
       },
       "amount": "21.24",
-      "amount_units": 2100,
+      "amount_units": 2124,
       "currency": "USD",
       "recurrence": "1 month",
       "start_date": "2026-08-01",
@@ -783,7 +885,7 @@ The request body is a JSON object with the following top-level fields:
 }
 ```
 
-`data.object` uses the same subscription payload shape as `subscription.created`/`subscription.updated`; the trial's remaining time is in `trial_end`. Kelviq sends this once, a few days before `trial_end`, mirroring Stripe's own `customer.subscription.trial_will_end` timing — it's skipped if the subscription has already converted to `active` or has no trial days left by the time Stripe's notice arrives.
+`data.object` uses the same subscription payload shape as `subscription.created`/`subscription.updated`; the trial's remaining time is in `trial_end`. Kelviq sends this once, a few days before `trial_end`. It's skipped if the subscription has already converted to `active` or has no trial days left.
 </Accordion>
 
 <Accordion title="Example: feature.usage_alert payload">
@@ -872,7 +974,7 @@ The request body is a JSON object with the following top-level fields:
       "organization": "9b759915-5387-4e61-90e9-2162318e8d17",
       "product": {
         "id": "df398021-477b-4e67-972d-c763a2f2ba7b",
-        "name": "ParityDeals"
+        "name": "Acme Analytics"
       },
       "created_on": "2026-04-02T05:56:33Z",
       "modified_on": "2026-04-02T05:56:33Z"
@@ -922,7 +1024,7 @@ The request body is a JSON object with the following top-level fields:
       "organization": "9b759915-5387-4e61-90e9-2162318e8d17",
       "product": {
         "id": "df398021-477b-4e67-972d-c763a2f2ba7b",
-        "name": "ParityDeals"
+        "name": "Acme Analytics"
       },
       "created_on": "2026-04-02T05:56:33Z",
       "modified_on": "2026-04-02T06:00:00Z"
@@ -965,7 +1067,7 @@ The request body is a JSON object with the following top-level fields:
       },
       "product": {
         "id": "df398021-477b-4e67-972d-c763a2f2ba7b",
-        "name": "ParityDeals"
+        "name": "Acme Analytics"
       },
       "subscription_id": "a2951973-aca5-408d-bd9c-1d86827ed463",
       "order_id": null,
@@ -1035,7 +1137,7 @@ The request body is a JSON object with the following top-level fields:
 <Accordion title="Example: refund.updated payload">
 ```json
 {
-  "id": "evt_01HXYZ2345678901BCDEFG",
+  "id": "e2b8d4f1-6a3c-4f9e-b7d2-9c1a5e3f8b04",
   "type": "refund.updated",
   "created_at": "2026-04-02T05:41:30Z",
   "data": {
@@ -1479,4 +1581,4 @@ func main() {
 ## Need Help?
 
 - Email us at **hi@kelviq.com**
-- [Book a demo](https://tidycal.com/neravath/15-minute-meeting)
+- [Book a demo](https://cal.com/alok-vats-fkpnc9/30min)

@@ -1,0 +1,143 @@
+---
+title: 'Overview'
+description: 'View and manage customer details, subscriptions, and entitlements.'
+---
+
+Managing customers sits at the center of Kelviq. Each customer connects directly to their subscriptions, the plans behind them, and the features they own. You need to understand these relationships to handle the full customer lifecycle.
+
+## View customer list
+
+Select **Customers** in the main navigation to see your list.
+
+You can do a few things here.
+* **Search** by name, email, or identifier.
+* **Add a new customer** with **New customer** in the top right.
+* **Manage a customer** by clicking their row to see details.
+
+<Frame>
+  <img height="200" src="/images/customers-list.png" />
+</Frame>
+
+## Add a new customer
+
+You can create records manually.
+
+<Steps>
+  <Step title="Open the modal">
+    Click **+ New customer** in the top right of the list page.
+  </Step>
+  <Step title="Fill in details">
+    You need to provide a few key pieces of info.
+    * **Customer name** is required. Use the person's full name or company name.
+    * **Identifier** is the unique ID the API uses. We auto-generate this based on the name, but you can edit it. Linking this to the ID in your own database is usually a good idea.
+    * **Email address** is optional.
+  </Step>
+  <Step title="Create">
+    Click **Create** to finish.
+    
+    If you are adding a batch of people, toggle on **Create more**. This keeps the window open so you can add the next one immediately.
+  </Step>
+</Steps>
+
+<Frame>
+  <img height="200" src="/images/create-customer-modal.png" />
+</Frame>
+
+<Note>
+  More than one customer record can use the same email address, but every record must have a unique **Identifier**. The API calls this value `customerId`.
+
+  When recreating a test customer, you can reuse the email address, but you must provide a new Identifier. An Identifier cannot be reused after its customer is archived. If you receive a `customer already exists` error, check the Identifier first.
+</Note>
+
+## Manage existing customers
+
+You can edit details or revoke access from the list view.
+
+### Edit a customer
+Click the **three dots** on the right side of the customer row and select **Edit**.
+
+<Frame>
+  <img height="200" src="/images/edit-customer.png" />
+</Frame>
+
+You can update the **Customer name** and **Email address**. The Identifier is fixed after creation and cannot be changed.
+
+
+### Archive a customer
+Archiving makes a customer inactive and revokes their access. Click the **three dots** and select **Archive**.
+
+<Frame>
+  <img height="200" src="/images/archive-customer.png" />
+</Frame>
+You will see a confirmation warning. Click **Confirm** to proceed.
+
+Kelviq archives customers; it does not hard-delete them. The archived record keeps its Identifier, so that value cannot be reused. To create another customer with the same email address, use a new Identifier.
+
+<Warning>
+  You cannot archive a customer with an active subscription. You must cancel their subscription first.
+</Warning>
+
+## Customer details
+
+Click on any customer row to open their full profile.
+
+This page holds the source of truth for that user. You can see their unique Billing ID and timestamps for when they joined or were last updated.
+
+<Frame>
+  <img height="200" src="/images/customer-details.png" />
+</Frame>
+
+### Subscriptions
+
+This section lists active and past plans. It shows the status, such as Active or Canceled, and the relevant dates. For a canceled subscription, the date it was canceled appears alongside the status.
+
+
+{/*
+**Add a subscription**
+You can generate a checkout link for a customer from here. The plan must already exist and have a published price.
+
+<Frame>
+  <img height="200" src="/images/add-subscription.png" />
+</Frame>
+
+1. Click **Add subscription**.
+2. Select a published plan.
+3. Choose the **Billing period** and **Currency**.
+4. Enter quantities for priced features when required.
+5. Enter the checkout **Success URL**.
+6. Click **Generate checkout link** and share it with the customer.
+
+The subscription starts only after the customer completes checkout. This flow does not create a plan or accept a negotiated custom amount. For either case, see [Create an Enterprise plan](/product-catalog/create-an-enterprise-plan).
+
+**Edit a subscription**
+You can also modify an existing subscription. Click on the subscription card to update terms, change status, or extend trial dates.
+*/}
+
+### Files, links, and license keys
+
+The customer detail page shows the deliverables the customer received through their plans:
+
+* **Files** — View and download digital files available to the customer.
+* **Links** — Open private or external resource links attached to the plan.
+* **License keys** — View issued license keys and use the available license-management controls.
+
+These sections let support teams confirm access without opening each order separately.
+
+For catalog setup, see [Digital Downloads](/product-catalog/digital-downloads), [Links](/product-catalog/links), and [License Key Management](/product-catalog/license-keys).
+
+
+### Entitlements
+
+This view shows exactly what the customer can do right now based on their plan.
+
+**Overrides**
+You often need to make exceptions for specific users. You can do that here without changing the underlying plan.
+* Change the value of a specific feature.
+* Update the usage limit for a Meter feature.
+
+Changes made here apply only to this specific customer.
+
+<Frame>
+  <img height="200" src="/images/entitlements-details.png" />
+</Frame>
+

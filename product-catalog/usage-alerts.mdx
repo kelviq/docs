@@ -3,7 +3,7 @@ title: Usage alerts
 description: Configure usage thresholds and receive feature.usage_alert webhooks
 ---
 
-Usage alerts tell your application when a customer's metered feature crosses a threshold. Use them with any meter feature, such as API calls, credits, tokens, or storage.
+Usage alerts tell your application when a customer's Meter feature crosses a threshold. Use them with any Meter feature, such as API calls, credits, tokens, or storage.
 
 <Info>
   A usage alert has two parts. You configure the threshold on the plan, then receive the `feature.usage_alert` event through a webhook. Turning on the alert does not email the customer or show an in-app message by itself. Your webhook handler decides what happens next.
@@ -40,9 +40,9 @@ You can add more than one threshold. For example, use 75% for an early warning a
 ## Configure usage alerts in the dashboard
 
 1. Open **Product Catalog → Products** and select the product.
-2. Open the plan that contains the metered feature.
-3. Edit **Usage pricing** or open **Manage features & limits**.
-4. Select the meter feature and enter its usage value or pricing configuration.
+2. Open the plan that contains the Meter feature.
+3. Edit **Usage charges** or open **Manage features & limits**.
+4. Select the Meter feature and enter its usage value or pricing configuration.
 5. Turn on **Usage alert**.
 6. Choose **Percentage** or **Balance** as the threshold type.
 7. Click **Add threshold** and enter each threshold.
@@ -52,7 +52,7 @@ You can add more than one threshold. For example, use 75% for an early warning a
   <img height="400" src="/images/usage-alerts.png" />
 </Frame>
 
-If the Usage alert switch is disabled while managing an entitlement, make sure you selected a meter feature and entered a value. Percentage alerts also need a finite usage limit so Kelviq can calculate the percentage used.
+If the Usage alert switch is disabled while managing an entitlement, make sure you selected a Meter feature and entered a value. Percentage alerts also need a finite usage limit so Kelviq can calculate the percentage used.
 
 <Note>
   Regional prices inherit usage alerts from the base price. Change the base price when the same alert configuration should apply to every regional price.

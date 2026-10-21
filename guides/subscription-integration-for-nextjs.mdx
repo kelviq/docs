@@ -18,7 +18,7 @@ Integrate Kelviq subscription billing into your Next.js application using the Ap
 ## Step 1: Get Your API Keys
 
 1. Sign up at [app.kelviq.com](https://app.kelviq.com)
-2. Navigate to **Settings → API Keys**
+2. Navigate to **Settings → API keys**
 3. Copy two keys:
    - **Server API Key** — For API routes (keep secret)
    - **Client API Key** — For React SDK (safe to expose)
@@ -63,25 +63,24 @@ export const KELVIQ_API_URL =
 
 ### In Kelviq Dashboard
 
-1. Go to **Plans** section
-2. Create each subscription tier with:
+1. Go to **Product catalog → Products**, open your product, and add a plan for each tier with:
    - **Plan Identifier**: `base`, `pro`, `enterprise` (code-friendly names)
    - **Price**: Monthly/yearly pricing
    - **Features**: List of included features
 
-### Define Entitlements
+### Add features & limits
 
-For each plan, configure entitlements (feature access):
+For each plan, add features & limits:
 
 | Type | Description | Example |
 |------|-------------|---------|
-| **Boolean (FLAG)** | Feature is on/off | `export-data` |
-| **Metered (METER)** | Feature has usage limits | `max-projects: 10` |
-| **Config (CUSTOMIZABLE)** | Feature has configurable value | `team-size: 5` |
+| **Boolean (`BOOLEAN`)** | Feature is on/off | `export-data` |
+| **Meter feature (`METER`)** | Feature has usage limits | `max-projects: 10` |
+| **Customizable (`CUSTOMIZABLE`)** | Feature has configurable value | `team-size: 5` |
 
 **Example Plan Structure:**
 
-| Feature | Base ($9/mo) | Pro ($49/mo) | Enterprise ($199/mo) |
+| Feature | Base (\$9/mo) | Pro (\$49/mo) | Enterprise (\$199/mo) |
 |---------|--------------|--------------|----------------------|
 | max-projects | 10 | 100 | Unlimited |
 | export-data | No | Yes | Yes |
@@ -431,7 +430,7 @@ export function MyFeature() {
           disabled={maxProjects !== null && currentProjects >= maxProjects}
           onClick={createProject}
         >
-          {remainingProjects > 0 ? "Create Project" : "Limit Reached"}
+          {remainingProjects === null || remainingProjects > 0 ? "Create Project" : "Limit Reached"}
         </button>
       </div>
 
@@ -556,4 +555,4 @@ function DashboardFeatures() {
 Have questions or need implementation support?
 
 - Email us at **hi@kelviq.com**
-- [Book a demo](https://tidycal.com/neravath/15-minute-meeting)
+- [Book a demo](https://cal.com/alok-vats-fkpnc9/30min)

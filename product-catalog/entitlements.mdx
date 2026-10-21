@@ -1,8 +1,10 @@
 ---
-title: 'Features & Limits (Entitlements)'
-description: 'Control feature access for your customers'
+title: 'Features & limits (entitlements)'
+sidebarTitle: 'Features & limits (entitlements)'
+description: 'Entitlements decide which features and limits each customer gets'
+keywords: ['entitlements', 'entitlement', 'feature access', 'feature flags', 'usage limits']
 ---
-Entitlements are the modern way to control feature access in your application. Instead of checking which plan a customer is on, you check which features they have access to. This fundamental shift gives you unprecedented flexibility to experiment with pricing, create custom deals, and iterate on your product—all without changing code.
+Check features, not plans. Your code asks whether a customer has a feature, and Kelviq answers from their plan. You can change plans, prices, and custom deals without changing code. In the API and SDKs, a feature on a plan is called an entitlement.
 <Frame>
       <img height="200" src="/images/features-limits-enttilements.png" />
 </Frame>
@@ -36,7 +38,6 @@ This approach has serious limitations:
 - **Code changes required** for any pricing restructure
 - **Deployment needed** to move a feature between plans
 - **Engineering bottleneck** for every pricing experiment
-- **Webhook complexity** to sync subscription state
 - **Stale cache issues** when plans change
 - **Custom deals are painful** requiring one-off code
 
@@ -77,7 +78,7 @@ Now you can:
 1) Customer gets immediate access
 
 
-### No Webhooks Required
+### Access right after checkout
 
 When a customer completes checkout:
 
@@ -86,11 +87,7 @@ When a customer completes checkout:
 3. Your app checks access via SDK
 4. Customer gets immediate access
 
-You don't need to:
-- Build webhook handlers
-- Sync subscription state to your database
-- Handle race conditions
-- Manage cache invalidation
+Your app checks access with Kelviq, so you don't have to copy subscription state into your own database. If you want to react to changes in your own systems, use [webhooks](/guides/webhooks).
 
 ---
 
@@ -116,7 +113,7 @@ See the [Node SDK caching configuration](/backend-integration/node-sdk#caching-a
 
 If you call the Entitlement API without an SDK, keep your own last-known response in an in-memory or persistent cache. Store when the value was fetched, set a maximum fallback age that matches the risk of the feature, and refresh the record after the API recovers.
 
-Use a short fallback window for high-risk actions such as exporting sensitive data or using an expensive metered feature. A longer window may be reasonable for low-risk interface features. Do not silently grant access when there is no previous entitlement state.
+Use a short fallback window for high-risk actions such as exporting sensitive data or using an expensive Meter feature. A longer window may be reasonable for low-risk interface features. Do not silently grant access when there is no previous entitlement state.
 
 If your architecture already maintains subscription state through webhooks, you can continue using that model. Process webhook events idempotently and reconcile the local record against the Entitlement API after an outage.
 
@@ -196,7 +193,7 @@ Dynamic values that aren't simple on/off or numeric limits.
 
 ## Soft Limits vs. Hard Limits
 
-Choose the right enforcement strategy for each feature.
+Choose the right enforcement strategy for each feature. [How usage limits work](/product-catalog/usage-limits) walks through resets, overage, and what happens at the limit.
 <Frame>
       <img height="200" src="/images/hard-limit.png" />
 </Frame>
@@ -261,8 +258,7 @@ After successful payment:
 
 1. Customer record is created/updated
 2. Plan entitlements are assigned instantly
-3. No webhook processing needed
-4. Customer can access features immediately
+3. Customer can access features immediately
 
 ---
 
@@ -404,7 +400,7 @@ Overrides are:
 For meter features, you can reset a customer's usage:
 
 1. Go to the customer's detail page
-2. Find the meter feature
+2. Find the Meter feature
 3. Click the menu (⋯) → **Reset usage**
 
 This sets their current usage back to 0, giving them their full quota again.
@@ -455,7 +451,6 @@ When you set up inheritance:
 #### Successful Purchase
 - Entitlements assigned immediately
 - Customer can access features right away
-- No webhook handling required
 
 #### Upgrade
 - New plan entitlements replace old ones

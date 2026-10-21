@@ -1,0 +1,40 @@
+---
+title: 'Kelviq and AI'
+sidebarTitle: 'Overview'
+description: 'Set up Kelviq with your coding agent, or connect your agent to Kelviq and its docs'
+---
+
+Kelviq works with the AI tools you already use. Your coding agent can create your plans, add checkout and feature checks to your app, and wire up webhooks. You review and approve each change.
+
+## For humans
+
+<CardGroup cols={2}>
+  <Card title="Set up with AI" icon="wand-magic-sparkles" href="/guides/set-up-with-ai">
+    Copy a prompt from the dashboard and paste it into Claude Code, Cursor, Codex, Lovable, Replit, or Bolt.
+  </Card>
+  <Card title="CLI" icon="terminal" href="/cli/overview">
+    Define products, features, and plans as code and sync them from the terminal.
+  </Card>
+</CardGroup>
+
+The quickest start:
+
+1. Open **Settings → Set up with AI** in the dashboard.
+2. Copy the keys block into your project's `.env.local`.
+3. Copy the prompt and paste it into your agent as the first message.
+
+Your agent can build and test everything with sandbox keys, then you go live when it's ready. You can also set it up directly in production. Either way, business verification and your keys stay with you.
+
+## For agents
+
+<CardGroup cols={3}>
+  <Card title="Agent Toolkit" icon="toolbox" href="/guides/agent-toolkit">
+    The MCP server plus skills that teach Claude Code how Kelviq works.
+  </Card>
+  <Card title="MCP server" icon="plug" href="/guides/mcp-server">
+    Manage customers, plans, subscriptions, and more from any MCP client.
+  </Card>
+  <Card title="Docs for agents" icon="book-open" href="/ai/docs-for-agents">
+    `llms.txt` and a docs MCP server, so your agent answers from the Kelviq docs.
+  </Card>
+</CardGroup>
