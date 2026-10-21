@@ -9,6 +9,37 @@ import { ChangelogFilter } from "/snippets/changelog-filter.jsx";
 
 <ChangelogFilter products={["App","JS SDK","React SDK","Node SDK","Python SDK","JS Promotions UI","MCP Server","CLI","API"]} />
 
+
+
+
+
+
+
+
+
+<Update label="v1.24" description="October 30, 2026" tags={["API"]}>
+
+### New Features
+
+#### Retention offers in the API
+
+Two new endpoints let you build the cancellation flow, with retention offers, in your own app instead of the customer portal:
+
+- [Get retention offers](/api-reference/subscriptions/get-retention-offers) returns every cancellation reason with the offer configured for it (discount, pause or support) and whether the subscription is eligible for it right now.
+- [Accept a retention offer](/api-reference/subscriptions/accept-a-retention-offer) applies the offer the customer chose: attaches the discount, pauses the subscription, or returns the support link.
+
+```json
+{
+  "offerType": "PAUSE",
+  "cancellationFeedback": "UNUSED",
+  "pauseMonths": 3
+}
+```
+
+Offers are configured in the dashboard retention settings. See [Retention offers](/product-catalog/subscriptions#retention-offers) for the flow.
+
+
+
 <Update label="v1.23" description="October 30, 2026" tags={["App"]}>
 
 ## Custom fields
@@ -174,6 +205,7 @@ Kelviq now follows up with customers who start a checkout but do not pay. When a
 You do not need to set anything up. Recovery emails are on by default for every organization, and you can turn them off with the **Abandoned cart recovery** toggle in **Settings → Notifications**. Reminders are only sent when there is a customer email to send them to, and a customer is never emailed twice for the same step. A customer who starts several checkouts gets one set of reminders, not one per checkout.
 
 Read [Abandoned cart recovery](/sales/abandoned-cart-recovery) for the full schedule, the abandonment rules, and what happens at expiration.
+
 
 </Update>
 
