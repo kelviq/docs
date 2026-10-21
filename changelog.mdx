@@ -67,9 +67,19 @@ Settings now has four groups so related pages sit together: **Account** (Profile
 
 ### New Features
 
-#### Paused subscriptions
+{/* Hidden until the pause/resume API is public. Restore at launch.
 
-Subscription objects gain the `paused` status, `pausedAt`, and `pauseResumesAt`. Plan changes return `400` while a subscription is paused.
+#### Pause and resume a subscription
+
+Two new endpoints:
+
+```http
+POST /api/v1/subscriptions/{subscriptionId}/pause/
+POST /api/v1/subscriptions/{subscriptionId}/resume/
+```
+
+Pause with `pauseMonths` (1 to 12), a `resumesAt` date, or neither for an open-ended pause. Resume takes an optional `billingBehavior` of `RESET_BILLING_CYCLE` or `KEEP_BILLING_DAY`. Subscription objects gain the `paused` status, `pausedAt`, and `pauseResumesAt`. Plan changes return `400` while a subscription is paused.
+*/}
 
 #### Webhooks
 
