@@ -320,7 +320,7 @@ Automatically populate pricing into HTML elements using `data-kq-price` attribut
 
 ```html
 <span data-kq-price="starter" data-kq-period="MONTHLY">Loading...</span>
-<span data-kq-price="starter" data-kq-period="ANNUALLY">Loading...</span>
+<span data-kq-price="starter" data-kq-period="YEARLY">Loading...</span>
 <span data-kq-price="free" data-kq-period="MONTHLY">Loading...</span>
 ```
 
@@ -335,7 +335,7 @@ kq.renderPricing(); // Scans DOM and populates data-kq-price elements
 ```
 
 - `data-kq-price` — the plan identifier (e.g., `"starter"`, `"pro"`)
-- `data-kq-period` — the charge period (e.g., `"MONTHLY"`, `"ANNUALLY"`)
+- `data-kq-period` — the charge period (e.g., `"MONTHLY"`, `"YEARLY"`)
 - Free plans display `"Free"` instead of a price
 - Disabled or missing plans result in empty text
 
@@ -428,7 +428,7 @@ interface RawPricingPrice {
 }
 
 interface RawPricingCharge {
-  chargePeriod: string;      // e.g., "MONTHLY", "ANNUALLY"
+  chargePeriod: string;      // e.g., "MONTHLY", "YEARLY"
   priceData: { amount: number };
 }
 ```
