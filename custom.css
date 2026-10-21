@@ -103,8 +103,10 @@ td:has(> img.pm-logo) {
 .kq-hero-actions { display: flex; gap: 12px; justify-content: center; flex-wrap: wrap; margin-top: 32px; }
 .kq-btn { display: inline-flex; align-items: center; height: 44px; padding: 0 20px; border-radius: 10px; font-weight: 500; font-size: 15px; text-decoration: none !important; border-bottom: none !important; transition: transform .15s ease, background-color .15s ease, border-color .15s ease; }
 .kq-btn:active { transform: scale(0.97); }
-.kq-btn-primary { background: rgb(var(--primary)); color: #fff !important; }
-.kq-btn-primary:hover { background: rgb(var(--primary-dark)); }
+.kq-btn-primary { background: #1A202C; color: #fff !important; }
+.kq-btn-primary:hover { background: #2D3748; }
+.dark .kq-btn-primary { background: #fff; color: #1A202C !important; }
+.dark .kq-btn-primary:hover { background: rgb(229 231 235); }
 .kq-btn-secondary { background: #fff; color: #1A202C !important; border: 1px solid rgb(229 231 235) !important; }
 .kq-btn-secondary:hover { border-color: rgb(209 213 219) !important; }
 
@@ -150,3 +152,15 @@ td:has(> img.pm-logo) {
 
 /* ---------- Screenshots: show them full width, with a soft frame ---------- */
 #content-area [data-name="frame"] img, #content-area .frame img { width: 100%; height: auto !important; }
+
+/* Home card illustrations (images/illustrations/*.svg) */
+img.kq-art {
+  display: block !important; width: 100% !important; height: auto !important; aspect-ratio: 240 / 140;
+  margin: -4px 0 4px !important; border-radius: 10px !important;
+  background: rgb(250 249 247); border: 1px solid rgb(0 0 0 / 0.04);
+}
+.dark img.kq-art { background: rgb(255 255 255 / 0.03); border-color: rgb(255 255 255 / 0.06); }
+.kq-card:hover img.kq-art { border-color: rgb(var(--primary) / 0.25); }
+
+/* Sidebar: line pages up with the group name, not the group icon */
+.sidebar-group-header:has(svg) ~ ul.sidebar-group { margin-left: 24px; }
