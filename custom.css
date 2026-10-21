@@ -226,3 +226,9 @@ img.kq-hero2-art { display: block !important; width: 100% !important; height: au
 
 /* Question chips used inside a normal page */
 .prose .kq-chips, #content-area .kq-chips { margin: 4px 0 32px; }
+
+/* Same sidebar width on every page (the Overview page layout was shrinking it) */
+@media (min-width: 1024px) { #sidebar-content { width: 19rem !important; min-width: 19rem !important; flex-shrink: 0 !important; } }
+/* Overview spacing: room between "Get started" and the chips, and after the last cards */
+.kq-hero2 .kq-chips { margin-top: 36px !important; }
+.kq-intro { padding-bottom: 120px !important; }
