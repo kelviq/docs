@@ -164,8 +164,20 @@ img.kq-art {
 
 /* Sidebar: line pages up with the group name, not the group icon */
 .sidebar-group-header:has(svg, .sidebar-group-icon) ~ ul.sidebar-group { margin-left: 24px; }
-/* Nucleo group icons are <img>, so they can't inherit text colour: invert them in dark mode */
-.dark img.sidebar-group-icon { filter: invert(1) brightness(0.88); }
+/* Sidebar group icons: draw each one in the group name's colour (light, dark, hover) */
+img.sidebar-group-icon { background-color: currentColor; object-position: -9999px 0; -webkit-mask-size: contain; mask-size: contain; -webkit-mask-repeat: no-repeat; mask-repeat: no-repeat; -webkit-mask-position: center; mask-position: center; }
+img.sidebar-group-icon[src="/icons/book-open.svg"] { -webkit-mask-image: url(/icons/book-open.svg); mask-image: url(/icons/book-open.svg); }
+img.sidebar-group-icon[src="/icons/box.svg"] { -webkit-mask-image: url(/icons/box.svg); mask-image: url(/icons/box.svg); }
+img.sidebar-group-icon[src="/icons/credit-card.svg"] { -webkit-mask-image: url(/icons/credit-card.svg); mask-image: url(/icons/credit-card.svg); }
+img.sidebar-group-icon[src="/icons/gavel.svg"] { -webkit-mask-image: url(/icons/gavel.svg); mask-image: url(/icons/gavel.svg); }
+img.sidebar-group-icon[src="/icons/gear.svg"] { -webkit-mask-image: url(/icons/gear.svg); mask-image: url(/icons/gear.svg); }
+img.sidebar-group-icon[src="/icons/receipt.svg"] { -webkit-mask-image: url(/icons/receipt.svg); mask-image: url(/icons/receipt.svg); }
+img.sidebar-group-icon[src="/icons/rocket.svg"] { -webkit-mask-image: url(/icons/rocket.svg); mask-image: url(/icons/rocket.svg); }
+img.sidebar-group-icon[src="/icons/shield-check.svg"] { -webkit-mask-image: url(/icons/shield-check.svg); mask-image: url(/icons/shield-check.svg); }
+img.sidebar-group-icon[src="/icons/sparkle.svg"] { -webkit-mask-image: url(/icons/sparkle.svg); mask-image: url(/icons/sparkle.svg); }
+img.sidebar-group-icon[src="/icons/tag.svg"] { -webkit-mask-image: url(/icons/tag.svg); mask-image: url(/icons/tag.svg); }
+img.sidebar-group-icon[src="/icons/user.svg"] { -webkit-mask-image: url(/icons/user.svg); mask-image: url(/icons/user.svg); }
+img.sidebar-group-icon[src="/icons/wallet.svg"] { -webkit-mask-image: url(/icons/wallet.svg); mask-image: url(/icons/wallet.svg); }
 
 .kq-ico { display: block; width: 18px; height: 18px; background-color: rgb(var(--primary));
   -webkit-mask-size: contain; mask-size: contain; -webkit-mask-repeat: no-repeat; mask-repeat: no-repeat; -webkit-mask-position: center; mask-position: center; }
