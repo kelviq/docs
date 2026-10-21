@@ -23,7 +23,7 @@ Supported attributes for creating these rules include:
 * **Browser:** Target based on the web browser being used (e.g., Chrome, Safari, Firefox). (`Coming soon`)
 
 <Frame>
-        <img height="200" src="/images/trageting-rule-illustartion.png" />
+        <img src="/images/trageting-rule-illustartion.png" />
 </Frame>  
 ---
 
@@ -34,7 +34,7 @@ You create, view, and manage your Targeting Rules directly from the Kelviq dashb
 1.  From the main sidebar navigation, go to **Monetization > Targeting Rules**.
 2.  On the "Targeting Rules" page, click the **"+ Create rule"** button, located in the top-left corner.
     <Frame>
-        <img height="200" src="/images/create-rule.png" />
+        <img src="/images/create-rule.webp" />
     </Frame>  
 
 This action opens a dedicated page where you will define all aspects of your new rule.
@@ -46,11 +46,11 @@ Begin by providing the basic identifying information for your rule. This helps y
 * **Rule Name:** Click into the rule name field and enter a clear, descriptive name. This name is for your internal reference.
     * **Example:** "PPP Discount - Tier 3 Countries," "EU Early Adopter Offer," "USA - Standard Pricing."
      <Frame>
-        <img height="200" src="/images/rule-information.png" />
+        <img src="/images/rule-information.webp" />
     </Frame>  
 * **Select Product(s):** Click the dropdown field to choose one or more products from your catalog to which this rule's pricing adjustments will apply. You can search by product name or ID.
     <Frame>
-        <img height="200" src="/images/select-product.png" />
+        <img src="/images/select-product.webp" />
     </Frame> 
 <Info>
 A Targeting Rule only becomes active and influences customer experiences once it is connected to an **Offering**.
@@ -69,22 +69,22 @@ This is the core of your Targeting Rule. Here, you define the specific customer 
     * **Platform / OS:** (`Coming soon`)
     * **Browser:** (`Coming soon`)
     <Frame>
-        <img height="200" src="/images/setting-conditions.png" />
+        <img src="/images/setting-conditions.webp" />
     </Frame> 
 3.  **Select Operator:** Choose how the condition should evaluate the selected attribute:
     * **`is any of`**: The rule applies if the customer's attribute matches *at least one* of the values you specify. For example, if "Country `is any of` [India, Brazil, Nigeria]," the rule applies if the user is in India OR Brazil OR Nigeria.
     * **`is not any of`**: The rule applies if the customer's attribute does *not match any* of the values you specify. For example, if "Country `is not any of` [USA, Canada]," the rule applies if the user is in any country *except* the USA or Canada.
     <Frame>
-        <img height="200" src="/images/select-operator.png" />
+        <img src="/images/select-operator.png" />
     </Frame>   
 4.  **Select Value(s):** Based on the condition type and operator, select the specific values.
     * If you selected "Country," a multi-select dropdown appears where you can search for and choose specific countries.
     <Frame>
-        <img height="200" src="/images/select-country.png" />
+        <img src="/images/select-country.png" />
     </Frame>     
     * If you selected "PPP group," select from predefined PPP groups in the dropdown.
     <Frame>
-        <img height="200" src="/images/select-ppp-group.png" />
+        <img src="/images/select-ppp-group.png" />
     </Frame> 
 
 #### PPP Groups
@@ -105,11 +105,11 @@ Purchasing Power Parity (PPP) targeting is a strategic way to offer your product
 Once your conditions are set, specify how the pricing should change for customers who match this rule:
 1.  From the "Then" section of the condition block, choose either **"Increase price by"** or **"Decrease price by"** from the dropdown menu.
     <Frame>
-        <img height="200" src="/images/define-price-adjustment.png" />
+        <img src="/images/define-price-adjustment.webp" />
     </Frame> 
 2.  Enter the **percentage** value for the adjustment (e.g., `20` for a 20% change) in the adjacent input field.
     <Frame>
-        <img height="200" src="/images/define-price-adjustment-value.png" />
+        <img src="/images/define-price-adjustment-value.png" />
     </Frame> 
 * **When to use "Decrease price by":**
     * **PPP Adjustments:** To make products more affordable in lower PPP regions.
@@ -128,16 +128,16 @@ You can create highly specific targeting rules by layering multiple conditions.
 * **AND Logic:** To add more criteria that *must all be met* for the rule to apply, click the **"+ AND"** button within the same condition block. Each new condition added this way narrows the target segment.
     * **Example:** "If customer is in `PPP Group: Low PPP` **AND** Country `is any of` [India]".
     <Frame>
-        <img height="200" src="/images/and-logic.png" />
+        <img src="/images/and-logic.webp" />
     </Frame>    
     * **Precedence with AND:** When building complex rules with multiple AND conditions that might appear to overlap (e.g., a country is in a selected PPP group, AND that same country is also specifically targeted with a different adjustment), rules are evaluated based on their defined order or specificity. **It is highly recommended to test complex rule interactions thoroughly to confirm the exact behavior and ensure they produce the desired outcome before activating them for live offerings.**
     <Frame>
-        <img height="200" src="/images/two-and-condition.png" />
+        <img src="/images/two-and-condition.webp" />
     </Frame>    
 * **OR Logic:** To apply the same price adjustment to several distinct customer segments, click the **"+ Add condition group (OR)"** button. This creates a new, independent block of conditions. The rule will apply if a customer matches *all* conditions in Group 1 **OR** *all* conditions in Group 2, etc.
     * **Example:** "(If Country `is any of` [USA, Canada]) **OR** (If Country `is any of` [UK, Germany] **AND** Browser `is any of` [Chrome])".
     <Frame>
-        <img height="200" src="/images/two-or-conditions.png" />
+        <img src="/images/two-or-conditions.png" />
     </Frame> 
     The evaluation of combined AND/OR conditions follows a structured logic. The diagram below illustrates a simplified flow where a rule applies if either "Condition Group 1" (which itself might contain multiple AND conditions) OR "Condition Group 2" is met:
 
@@ -162,7 +162,7 @@ Support for targeting by **Platform / OS** and **Browser** is planned for a futu
 Kelviq will allow you to create multiple variants within a single Targeting Rule (e.g., Variant A with a 10% discount, Variant B with a 15% discount). This will enable you to A/B test different pricing adjustments for the same customer segment to determine which performs best. This feature is `Coming soon`.
 
 <Frame>
-        <img height="200" src="/images/a-b-testing-with-variants.png" />
+        <img src="/images/a-b-testing-with-variants.webp" />
 </Frame> 
 ### Step 3: Creating the Rule
 
@@ -173,7 +173,7 @@ Kelviq will allow you to create multiple variants within a single Targeting Rule
 1.  After you have carefully defined your rule name, selected the product(s), and set all conditions and price adjustments, click the **"Create rule"** button, located at the bottom of the page.
     *[Image: The bottom of the Targeting Rule creation page with the "Create rule" button clearly highlighted.]*
     <Frame>
-        <img height="200" src="/images/creating-the-rule.png" />
+        <img src="/images/creating-the-rule.webp" />
     </Frame> 
 
 ---
@@ -196,7 +196,7 @@ graph LR
 After successfully creating a Targeting Rule, you will be directed to the Offering creation page, with the "Create offering" modal appearing and your newly created rule pre-selected.
 
 <Frame>
-        <img height="200" src="/images/create-offering.png" />
+        <img src="/images/create-offering.webp" />
 </Frame> 
 1.  **In the "Create offering" (or "Edit offering") modal:**
     * **Pricing Table Linking (Optional):** An option exists to "Skip if you don't want to link a pricing table to this offering." If your Offering's purpose is *only* to apply rule-based price adjustments without using the pricing table, you can skip this.
@@ -211,7 +211,7 @@ This action creates (or updates) the Offering and effectively activates your Tar
 * **Offering ID:** This ID is essential. Copy this ID and paste it into your application's code where you initialize the Kelviq SDK or render the pricing table component. This `Offering ID` instructs your application to apply the dynamic pricing and pricing table configuration determined by the linked Targeting Rule.
 
     <Frame>
-        <img height="200" src="/images/offering-id-to-copy.png" />
+        <img src="/images/offering-id-to-copy.webp" />
     </Frame> 
 
 ---
@@ -226,7 +226,7 @@ To maintain clarity and organization, you can edit the name of a Targeting Rule 
 2.  Locate the rule you wish to rename in the list.
 3.  Click the **three-dot menu icon** on that rule's row and select **"Edit"**.
     <Frame>
-        <img height="200" src="/images/edit-targeting-rules.png" />
+        <img src="/images/edit-targeting-rules.webp" />
     </Frame> 
 4.  Modify the name in the input field and save your changes.
 
@@ -243,12 +243,12 @@ The primary way to manage and iterate on your live targeting strategies is by ed
 2.  Find the Offering you wish to modify in the list.
 3.  Click  "**Edit**" icon.
     <Frame>
-        <img height="200" src="/images/edit-offering.png" />
+        <img src="/images/edit-offering.webp" />
     </Frame> 
 4.  In the "Edit offering" modal, you can:
     * Select a **different Targeting Rule** from the dropdown to change the pricing logic applied.
     * Select a **different Pricing Table** from the dropdown to change the visual presentation.
      <Frame>
-        <img height="200" src="/images/offerings-edit.png" />
+        <img src="/images/offerings-edit.png" />
     </Frame> 
 5.  Click **"Update"**. The Offering ID embedded in your code remains unchanged, but it now serves the new configuration (new rule and/or new pricing table) to your users.

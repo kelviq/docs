@@ -1,3 +1,5 @@
+@import url("https://fonts.googleapis.com/css2?family=Roboto+Serif:ital,opsz,wght@1,8..144,600;1,8..144,700&display=swap");
+
 /* Make tables full width */
 table {
   width: 100% !important;
@@ -78,3 +80,73 @@ img.pm-logo {
 td:has(> img.pm-logo) {
   white-space: nowrap;
 }
+
+
+/* ---------- Headings: match kelviq.com (Inter, tight tracking) ---------- */
+#content-area h1, #header h1 { letter-spacing: -0.02em; }
+#content-area h2 { letter-spacing: -0.01em; }
+
+/* ---------- Home page (index.mdx, mode: custom) ---------- */
+.kq-home { max-width: 1080px; margin: 0 auto; padding: 72px 24px 96px; }
+.kq-hero { text-align: center; padding: 24px 0 56px; }
+.kq-eyebrow {
+  display: inline-block; font-size: 13px; font-weight: 500; letter-spacing: 0.02em;
+  color: rgb(var(--primary)); background: rgb(var(--primary) / 0.08);
+  border: 1px solid rgb(var(--primary) / 0.2); border-radius: 999px; padding: 4px 12px; margin: 0 0 20px;
+}
+.kq-hero-title {
+  font-size: clamp(40px, 6vw, 64px); line-height: 1.05; font-weight: 700;
+  letter-spacing: -0.03em; color: #1A202C; margin: 0;
+}
+.kq-hero-title em { font-family: "Roboto Serif", Georgia, serif; font-style: italic; font-weight: 700; letter-spacing: -0.02em; }
+.kq-hero-sub { max-width: 620px; margin: 20px auto 0; font-size: 18px; line-height: 1.6; color: rgb(75 85 99); }
+.kq-hero-actions { display: flex; gap: 12px; justify-content: center; flex-wrap: wrap; margin-top: 32px; }
+.kq-btn { display: inline-flex; align-items: center; height: 44px; padding: 0 20px; border-radius: 10px; font-weight: 500; font-size: 15px; text-decoration: none !important; border-bottom: none !important; transition: transform .15s ease, background-color .15s ease, border-color .15s ease; }
+.kq-btn:active { transform: scale(0.97); }
+.kq-btn-primary { background: rgb(var(--primary)); color: #fff !important; }
+.kq-btn-primary:hover { background: rgb(var(--primary-dark)); }
+.kq-btn-secondary { background: #fff; color: #1A202C !important; border: 1px solid rgb(229 231 235) !important; }
+.kq-btn-secondary:hover { border-color: rgb(209 213 219) !important; }
+
+.kq-section { margin-top: 48px; }
+.kq-section-title { font-size: 14px; font-weight: 600; text-transform: uppercase; letter-spacing: 0.06em; color: rgb(107 114 128); margin: 0 0 16px; }
+.kq-grid { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 16px; }
+.kq-grid-3 { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+@media (max-width: 900px) { .kq-grid, .kq-grid-3 { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
+@media (max-width: 560px) { .kq-grid, .kq-grid-3 { grid-template-columns: 1fr; } .kq-home { padding: 40px 16px 64px; } }
+
+.kq-card {
+  display: block; padding: 20px; border-radius: 14px; background: #fff;
+  border: 1px solid rgb(229 231 235) !important; text-decoration: none !important;
+  box-shadow: 0 1px 2px rgb(0 0 0 / 0.04); transition: border-color .15s ease, box-shadow .15s ease, transform .15s ease;
+}
+.kq-card:hover { border-color: rgb(var(--primary) / 0.45) !important; box-shadow: 0 4px 16px rgb(0 0 0 / 0.06); transform: translateY(-1px); }
+.kq-card h3 { margin: 16px 0 6px; font-size: 16px; font-weight: 600; color: #1A202C; letter-spacing: -0.01em; }
+.kq-card p { margin: 0; font-size: 14px; line-height: 1.5; color: rgb(107 114 128); }
+.kq-card-row { display: flex; gap: 14px; align-items: center; }
+.kq-card-row h3 { margin: 0 0 2px; }
+
+/* Icon tile with a faint grid, like Paddle's cards */
+.kq-tile {
+  width: 48px; height: 48px; border-radius: 12px; display: flex; align-items: center; justify-content: center;
+  color: rgb(var(--primary)); border: 1px solid rgb(var(--primary) / 0.18);
+  background-color: rgb(var(--primary) / 0.06);
+  background-image: linear-gradient(rgb(var(--primary) / 0.08) 1px, transparent 1px), linear-gradient(90deg, rgb(var(--primary) / 0.08) 1px, transparent 1px);
+  background-size: 8px 8px; flex-shrink: 0;
+}
+.kq-tile svg, .kq-tile i { color: rgb(var(--primary)) !important; background-color: rgb(var(--primary)) !important; }
+.kq-tile-sm { width: 40px; height: 40px; border-radius: 10px; }
+
+.kq-help { margin-top: 56px; text-align: center; color: rgb(107 114 128); font-size: 14px; }
+
+/* Dark mode */
+.dark .kq-hero-title, .dark .kq-card h3 { color: #fff; }
+.dark .kq-hero-sub { color: rgb(166 161 159); }
+.dark .kq-card { background: rgb(255 255 255 / 0.02); border-color: rgb(255 255 255 / 0.08) !important; box-shadow: none; }
+.dark .kq-card:hover { border-color: rgb(var(--primary-light) / 0.5) !important; }
+.dark .kq-card p, .dark .kq-section-title, .dark .kq-help { color: rgb(156 150 147); }
+.dark .kq-btn-secondary { background: transparent; color: #fff !important; border-color: rgb(255 255 255 / 0.15) !important; }
+.dark .kq-tile { color: rgb(var(--primary-light)); }
+
+/* ---------- Screenshots: show them full width, with a soft frame ---------- */
+#content-area [data-name="frame"] img, #content-area .frame img { width: 100%; height: auto !important; }

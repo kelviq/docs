@@ -11,9 +11,21 @@
   "favicon": "/favicon.svg",
   "integrations": {
     "posthog": {
-        "apiKey": "phc_SG5oh2LfDgDWOpoTingeHcyUWSiQBxgGhYgkfNUv5Qb",
-        "apiHost": "https://d.kelviq.com"
+      "apiKey": "phc_SG5oh2LfDgDWOpoTingeHcyUWSiQBxgGhYgkfNUv5Qb",
+      "apiHost": "https://d.kelviq.com"
     }
+  },
+  "contextual": {
+    "options": [
+      "copy",
+      "view",
+      "chatgpt",
+      "claude",
+      "perplexity",
+      "mcp",
+      "cursor",
+      "vscode"
+    ]
   },
   "navigation": {
     "tabs": [
@@ -21,65 +33,93 @@
         "tab": "Documentation",
         "groups": [
           {
-            "group": "Get Started",
-            "pages": ["getstarted/introduction-to-kelviq", "getstarted/merchant-of-record", "getstarted/payment-security-and-seller-funds", "getstarted/fees", "getstarted/review-process"]
+            "group": "Get started",
+            "icon": "rocket",
+            "pages": [
+              "index",
+              "getstarted/introduction-to-kelviq",
+              "quickstart/core-concepts",
+              "quickstart/dashboard-setup",
+              "quickstart/integrate-with-your-app"
+            ]
           },
           {
-            "group": "AI",
+            "group": "Build with AI",
+            "icon": "sparkles",
             "pages": [
               "ai/overview",
               {
                 "group": "For humans",
                 "expanded": true,
-                "pages": ["guides/set-up-with-ai", "cli/overview"]
+                "pages": [
+                  "guides/set-up-with-ai",
+                  "cli/overview"
+                ]
               },
               {
                 "group": "For agents",
                 "expanded": true,
-                "pages": ["guides/agent-toolkit", "guides/mcp-server", "ai/docs-for-agents"]
+                "pages": [
+                  "guides/agent-toolkit",
+                  "guides/mcp-server",
+                  "ai/docs-for-agents"
+                ]
               }
             ]
           },
           {
-            "group": "Quickstart",
-            "pages": ["quickstart/core-concepts", "quickstart/dashboard-setup", "quickstart/integrate-with-your-app"]
+            "group": "Merchant of record",
+            "icon": "shield-check",
+            "pages": [
+              "getstarted/merchant-of-record",
+              "getstarted/fees",
+              "getstarted/payment-security-and-seller-funds",
+              "getstarted/review-process"
+            ]
           },
           {
-            "group": "Product Catalog",
+            "group": "Product catalog",
+            "icon": "box",
             "pages": [
               "product-catalog/products",
               "product-catalog/plans",
               "product-catalog/create-a-feature",
-              "product-catalog/one-time-payments",
-              "product-catalog/subscriptions",
-              "product-catalog/proration",
-              "product-catalog/seat-based-pricing",
-              "product-catalog/usage-based-billing",
-              "product-catalog/usage-limits",
-              "product-catalog/pay-as-you-go",
-              "product-catalog/usage-alerts",
-              "product-catalog/free-and-trials",
-              "product-catalog/location-based-pricing",
-              "product-catalog/digital-downloads",
-              "product-catalog/license-keys",
-              "product-catalog/links",
               "product-catalog/entitlements",
+              {
+                "group": "Pricing models",
+                "pages": [
+                  "product-catalog/one-time-payments",
+                  "product-catalog/subscriptions",
+                  "product-catalog/seat-based-pricing",
+                  "product-catalog/usage-based-billing",
+                  "product-catalog/pay-as-you-go",
+                  "product-catalog/free-and-trials",
+                  "product-catalog/location-based-pricing"
+                ]
+              },
+              {
+                "group": "Usage and billing",
+                "pages": [
+                  "product-catalog/usage-limits",
+                  "product-catalog/usage-alerts",
+                  "product-catalog/proration"
+                ]
+              },
+              {
+                "group": "What customers get",
+                "pages": [
+                  "product-catalog/digital-downloads",
+                  "product-catalog/license-keys",
+                  "product-catalog/links"
+                ]
+              },
               "product-catalog/discounts",
               "product-catalog/tax-settings"
             ]
           },
-          
-          {
-            "group": "Promotions",
-            "pages": [
-              "promotions/overview",
-              "promotions/create-a-promotion",
-              "promotions/integrate",
-              "promotions/customize-banner"
-            ]
-          },
           {
             "group": "Checkout",
+            "icon": "cart-shopping",
             "pages": [
               "checkout/checkout-configuration",
               "checkout/checkout-design",
@@ -92,30 +132,29 @@
             ]
           },
           {
+            "group": "Promotions",
+            "icon": "tags",
+            "pages": [
+              "promotions/overview",
+              "promotions/create-a-promotion",
+              "promotions/integrate",
+              "promotions/customize-banner"
+            ]
+          },
+          {
             "group": "Sales",
+            "icon": "receipt",
             "pages": [
               "sales/orders",
               "sales/create-a-one-time-charge",
               "sales/checkout-sessions",
-              "sales/abandoned-cart-recovery"
-            ]
-          },
-          {
-            "group": "Customers",
-            "pages": [
+              "sales/abandoned-cart-recovery",
               "customers-management/overview"
             ]
           },
           {
-            "group": "Payouts",
-            "pages": [
-              "payouts/overview",
-              "payouts/transactions",
-              "payouts/payout-account"
-            ]
-          },
-          {
             "group": "Customer portal",
+            "icon": "user",
             "pages": [
               "customer-portal/overview",
               "customer-portal/retention",
@@ -123,7 +162,17 @@
             ]
           },
           {
+            "group": "Payouts",
+            "icon": "building-columns",
+            "pages": [
+              "payouts/overview",
+              "payouts/transactions",
+              "payouts/payout-account"
+            ]
+          },
+          {
             "group": "Settings",
+            "icon": "gear",
             "pages": [
               "settings/profile",
               "settings/members",
@@ -133,6 +182,7 @@
           },
           {
             "group": "Guides",
+            "icon": "book-open",
             "pages": [
               "guides/sandbox",
               "guides/migrate-from-cashfree",
@@ -143,6 +193,7 @@
           },
           {
             "group": "Legal",
+            "icon": "scale-balanced",
             "pages": [
               "legal/buyer-terms",
               "legal/seller-terms",
@@ -154,7 +205,6 @@
           }
         ]
       },
-
       {
         "tab": "API Reference",
         "groups": [
@@ -211,31 +261,93 @@
       {
         "tab": "Changelog",
         "anchors": [
-          { "anchor": "All", "pages": ["changelog"] },
-          { "anchor": "App", "href": "https://docs.kelviq.com/changelog#app" },
-          { "anchor": "JS SDK", "href": "https://docs.kelviq.com/changelog#js-sdk" },
-          { "anchor": "React SDK", "href": "https://docs.kelviq.com/changelog#react-sdk" },
-          { "anchor": "Node SDK", "href": "https://docs.kelviq.com/changelog#node-sdk" },
-          { "anchor": "Python SDK", "href": "https://docs.kelviq.com/changelog#python-sdk" },
-          { "anchor": "JS Promotions UI", "href": "https://docs.kelviq.com/changelog#js-promotions-ui" },
-          { "anchor": "MCP Server", "href": "https://docs.kelviq.com/changelog#mcp-server" },
-          { "anchor": "CLI", "href": "https://docs.kelviq.com/changelog#cli" },
-          { "anchor": "API", "href": "https://docs.kelviq.com/changelog#api" }
+          {
+            "anchor": "All",
+            "pages": [
+              "changelog"
+            ]
+          },
+          {
+            "anchor": "App",
+            "href": "https://docs.kelviq.com/changelog#app"
+          },
+          {
+            "anchor": "JS SDK",
+            "href": "https://docs.kelviq.com/changelog#js-sdk"
+          },
+          {
+            "anchor": "React SDK",
+            "href": "https://docs.kelviq.com/changelog#react-sdk"
+          },
+          {
+            "anchor": "Node SDK",
+            "href": "https://docs.kelviq.com/changelog#node-sdk"
+          },
+          {
+            "anchor": "Python SDK",
+            "href": "https://docs.kelviq.com/changelog#python-sdk"
+          },
+          {
+            "anchor": "JS Promotions UI",
+            "href": "https://docs.kelviq.com/changelog#js-promotions-ui"
+          },
+          {
+            "anchor": "MCP Server",
+            "href": "https://docs.kelviq.com/changelog#mcp-server"
+          },
+          {
+            "anchor": "CLI",
+            "href": "https://docs.kelviq.com/changelog#cli"
+          },
+          {
+            "anchor": "API",
+            "href": "https://docs.kelviq.com/changelog#api"
+          }
         ]
       }
     ]
   },
   "redirects": [
-    { "source": "/coustomers-management/:slug*", "destination": "/customers-management/:slug*" },
-    { "source": "/changelog/app", "destination": "/changelog#app" },
-    { "source": "/changelog/js-sdk", "destination": "/changelog#js-sdk" },
-    { "source": "/changelog/react-sdk", "destination": "/changelog#react-sdk" },
-    { "source": "/changelog/node-sdk", "destination": "/changelog#node-sdk" },
-    { "source": "/changelog/python-sdk", "destination": "/changelog#python-sdk" },
-    { "source": "/changelog/js-promotions-ui", "destination": "/changelog#js-promotions-ui" },
-    { "source": "/changelog/mcp-server", "destination": "/changelog#mcp-server" },
-    { "source": "/changelog/cli", "destination": "/changelog#cli" },
-    { "source": "/changelog/api", "destination": "/changelog#api" }
+    {
+      "source": "/coustomers-management/:slug*",
+      "destination": "/customers-management/:slug*"
+    },
+    {
+      "source": "/changelog/app",
+      "destination": "/changelog#app"
+    },
+    {
+      "source": "/changelog/js-sdk",
+      "destination": "/changelog#js-sdk"
+    },
+    {
+      "source": "/changelog/react-sdk",
+      "destination": "/changelog#react-sdk"
+    },
+    {
+      "source": "/changelog/node-sdk",
+      "destination": "/changelog#node-sdk"
+    },
+    {
+      "source": "/changelog/python-sdk",
+      "destination": "/changelog#python-sdk"
+    },
+    {
+      "source": "/changelog/js-promotions-ui",
+      "destination": "/changelog#js-promotions-ui"
+    },
+    {
+      "source": "/changelog/mcp-server",
+      "destination": "/changelog#mcp-server"
+    },
+    {
+      "source": "/changelog/cli",
+      "destination": "/changelog#cli"
+    },
+    {
+      "source": "/changelog/api",
+      "destination": "/changelog#api"
+    }
   ],
   "logo": {
     "light": "/logo/light.svg",
