@@ -1,0 +1,98 @@
+---
+title: "Retention offers"
+description: "Ask customers why they're cancelling and make an offer to keep them"
+---
+
+When a customer cancels a subscription in the [customer portal](/customer-portal/overview), Kelviq asks why, then shows the offer you picked for that reason: a discount, a pause, or a link to your support team. If the customer says no, they continue to cancel.
+
+Set it up in **Settings → Retention** and turn on **Enable retention offer**.
+
+## What the customer sees
+
+<Steps>
+  <Step title="They pick a reason">
+    <Frame>
+      <img src="/images/retention/retention-reason.webp" alt="The cancellation dialog asking the customer to pick a reason" />
+    </Frame>
+  </Step>
+  <Step title="They see your offer">
+    The offer depends on the reason. Here, **Not using it enough** leads to a pause.
+
+    <Frame>
+      <img src="/images/retention/retention-pause-offer.webp" alt="An offer to pause the subscription for 1, 3, or 6 months" />
+    </Frame>
+  </Step>
+  <Step title="They confirm or keep the subscription">
+    A customer who declines the offer chooses when access ends: at the end of the billing period, immediately, or on a date they pick. If you've turned on written feedback, your question appears here too.
+
+    <Frame>
+      <img src="/images/retention/retention-confirm.webp" alt="The final cancellation step with end date options and a feedback question" />
+    </Frame>
+  </Step>
+</Steps>
+
+## Set up your offers
+
+Set each offer up once. Then choose which reasons show it.
+
+<Frame>
+  <img src="/images/retention/retention-offers.webp" alt="Retention settings with the Discount, Pause, and Support offers" />
+</Frame>
+
+| Offer | What you set | What happens if the customer accepts |
+| --- | --- | --- |
+| Discount | A percentage off and how many billing cycles it lasts | The plan stays the same and the next payments are discounted. After that, the price goes back to normal |
+| Pause | Which lengths to offer: 1, 3, or 6 months | Billing and access stop for the period they choose, then resume. See [Pause a subscription](/product-catalog/subscriptions#pause-a-subscription) |
+| Support | A link to a booking page, live chat, or your help site | They go to that link. Nothing changes on the subscription |
+
+Use the eye icon next to an offer to preview it.
+
+<Frame>
+  <img src="/images/retention/retention-discount-offer.webp" alt="A discount offer of 20% off the next 3 payments" />
+</Frame>
+
+## Match offers to reasons
+
+Under **Offers by cancellation reason**, pick an offer for each reason, or **No offer** to let the customer go straight to the final step.
+
+<Frame>
+  <img src="/images/retention/retention-offers-by-reason.webp" alt="Offers by cancellation reason, with an offer chosen for each reason" />
+</Frame>
+
+| Reason | Example offer |
+| --- | --- |
+| Too expensive | Discount |
+| Not using it enough | Pause |
+| Missing features | Support |
+| Switching to another product | No offer |
+| Technical issues | Support |
+| Poor support experience | Support |
+| Business or project ended | No offer |
+| Other | No offer |
+
+<Tip>
+  Offer what fits the reason. A customer who isn't using the product won't stay for a discount, but might come back after a pause.
+</Tip>
+
+## Ask for written feedback
+
+Turn on **Written feedback** to ask one open question before the customer confirms, such as "What could we do better?". Answering is optional. The answer is saved as the cancellation comment on the subscription.
+
+## When an offer isn't available
+
+An offer the customer can't use still appears, greyed out, with the reason. A customer sees an offer only once per subscription unless you change the repeat policy below, and offers aren't available on free or manually billed subscriptions.
+
+A pause has to cover at least one full billing period, so a 1-month pause isn't offered on a yearly plan, and a yearly plan usually gets no pause offer at all. Only an active subscription can be paused: not one on trial, past due, or already scheduled to cancel.
+
+## Advanced settings
+
+| Setting | Options |
+| --- | --- |
+| Resume billing behavior | **Reset billing cycle** (default) charges a full period on the day the subscription resumes and makes that the new billing day. **Keep billing day** charges nothing on resume and waits for the original billing day. A customer who resumes inside a period they've already paid for is never charged again, whichever you choose |
+| Offer repeat policy | **Once per subscription** (default), **After previous offer ends**, or **Unlimited**. Controls whether a customer who accepted an offer can accept it again on a later cancellation. A plan change doesn't reset this |
+
+## Related documentation
+
+- [Customer portal](/customer-portal/overview)
+- [Subscriptions](/product-catalog/subscriptions)
+- [Discounts](/product-catalog/discounts)

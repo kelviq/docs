@@ -114,15 +114,15 @@ await kq.ready();
 
 #### Options
 
-| Option | Type | Description |
-|--------|------|-------------|
-| `customerId` | `string` | Unique identifier for the customer (required for entitlements) |
-| `productId` | `string` | Product identifier for fetching pricing data (required for pricing) |
-| `accessToken` | `string` | Authentication token for API requests |
+| Option | Type | Default | Description |
+|--------|------|---------|-------------|
+| `customerId` | `string` | — | Unique identifier for the customer (required for entitlements) |
+| `productId` | `string` | — | Product identifier for fetching pricing data (required for pricing) |
+| `accessToken` | `string` | — | Authentication token for API requests |
 | `environment` | `sandbox\|production` | 'production' | The environment to use. If you want to use the sandbox, you must provide this. |
 | `initializeAndFetch` | `boolean` | `true` | Automatically fetch data on initialization |
-| `onError` | `(error: Error) => void` | Error callback function |
-| `mainApiUrl` | `string` | Optional override for the main API base URL (used by pricing) |
+| `onError` | `(error: Error) => void` | — | Error callback function |
+| `mainApiUrl` | `string` | — | Optional override for the main API base URL (used by pricing) |
 
 <Note>At least one of `customerId` or `productId` must be provided.</Note>
 
@@ -320,7 +320,7 @@ Automatically populate pricing into HTML elements using `data-kq-price` attribut
 
 ```html
 <span data-kq-price="starter" data-kq-period="MONTHLY">Loading...</span>
-<span data-kq-price="starter" data-kq-period="ANNUALLY">Loading...</span>
+<span data-kq-price="starter" data-kq-period="YEARLY">Loading...</span>
 <span data-kq-price="free" data-kq-period="MONTHLY">Loading...</span>
 ```
 
@@ -335,7 +335,7 @@ kq.renderPricing(); // Scans DOM and populates data-kq-price elements
 ```
 
 - `data-kq-price` — the plan identifier (e.g., `"starter"`, `"pro"`)
-- `data-kq-period` — the charge period (e.g., `"MONTHLY"`, `"ANNUALLY"`)
+- `data-kq-period` — the charge period (e.g., `"MONTHLY"`, `"YEARLY"`)
 - Free plans display `"Free"` instead of a price
 - Disabled or missing plans result in empty text
 
@@ -428,7 +428,7 @@ interface RawPricingPrice {
 }
 
 interface RawPricingCharge {
-  chargePeriod: string;      // e.g., "MONTHLY", "ANNUALLY"
+  chargePeriod: string;      // e.g., "MONTHLY", "YEARLY"
   priceData: { amount: number };
 }
 ```
@@ -674,7 +674,7 @@ const kq = kelviqSDK({
 
 ## Using the Sandbox
 
-If you want to use the sandbox, you need to set the `environment` option to `sandbox` in the `init` function.
+Set `environment: "sandbox"` when you call `kelviqSDK()`, and use a sandbox Client API Key.
 
 ```typescript
 const kq = kelviqSDK({

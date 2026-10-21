@@ -1,79 +1,63 @@
 ---
-title: 'Introduction to kelviq'
+title: 'Introduction to Kelviq'
+description: 'What Kelviq does, how it fits into your app, and where to start.'
 ---
 
+Kelviq is a merchant of record with billing built in. You set your prices and plans, Kelviq sells them, collects the tax, and pays you out. Your app asks Kelviq what each customer can use.
 
+<Card title="Set up with your coding agent" icon="wand-magic-sparkles" href="/ai/overview" horizontal>
+  Using Claude Code, Cursor, or Codex? Your agent can set up Kelviq for you.
+</Card>
 
-##### Kelviq is the complete monetization platform for your SaaS, AI agents, and digital products. It combines a merchant of record, subscription management, and usage-based billing into one system so you can set prices, track variable compute costs, collect payments, and stay compliant with global tax.
+## What Kelviq handles
 
----
+| Area | What you get |
+| --- | --- |
+| **Tax and compliance** | Kelviq is the seller of record. We calculate, collect, and file sales tax, VAT, and GST, and handle fraud and chargebacks. |
+| **Checkout** | Hosted checkout with plan picker, trials, discounts, business purchases, and local payment methods. |
+| **Pricing** | Flat, per seat, usage-based, tiered, volume, credits, pay as you go, one-time, or a mix. |
+| **Entitlements** | Turn features on per plan, set usage limits, and check what each customer can access with one SDK call. In the dashboard, these are **Features & limits**. |
+| **Usage** | Report usage as it happens. Kelviq counts it, resets it, and bills overage. |
+| **Subscriptions** | Upgrades, downgrades, proration, and cancellations, plus a customer portal. |
+| **Digital products** | File downloads, license keys, and links delivered after purchase. |
+| **Local pricing** | Prices by country in 135+ currencies. |
 
-## Why Kelviq
+Pricing changes happen in the dashboard or the CLI, not in your code. Your app checks features, not plan names, so moving a feature between plans needs no deploy.
 
-Monetization is more than just a payment. It's a complex system of pricing models, usage metering, subscription logic, feature access, global tax, and compliance. Building this from scratch takes months of engineering time and ongoing legal overhead.
+## How it fits together
 
-Kelviq is the complete revenue system that handles all this complexity for you. You can launch any pricing model and sell globally from day one, all while staying compliant.
+1. Create **products**, **plans**, and **features** in the dashboard or with the CLI.
+2. Send customers to **checkout**. Kelviq takes the payment and the tax.
+3. Your app **checks access** and **reports usage** with the SDK.
+4. Kelviq bills renewals and overage, and **pays you out**.
 
-With Kelviq you can:
+## FAQ
 
+<AccordionGroup>
+  <Accordion title="Do I need to handle webhooks?">
+    No. Your app can ask Kelviq for a customer's access at any time, so you don't need to keep subscription state in your database. [Webhooks](/guides/webhooks) are there if you want events in your own systems.
+  </Accordion>
+  <Accordion title="What if Kelviq can't be reached?">
+    The Node and Python SDKs return the last known access for a customer and retry usage reports later. See [When the Entitlement API is unavailable](/product-catalog/entitlements#when-the-entitlement-api-is-unavailable).
+  </Accordion>
+  <Accordion title="Can I test without real payments?">
+    Yes. The [sandbox](/guides/sandbox) is a separate environment with its own keys and test cards.
+  </Accordion>
+  <Accordion title="What does it cost?">
+    A percentage of each transaction, with no monthly fee. See [Fees](/getstarted/fees).
+  </Accordion>
+  <Accordion title="Do I need a Stripe account?">
+    No. You can sell and get paid without one, including in countries where Stripe doesn't offer its own accounts, such as India. Payouts go through a payout account you set up in Kelviq. See [Payouts](/payouts/overview#do-i-need-a-stripe-account).
+  </Accordion>
+  <Accordion title="Can I use my own Stripe account?">
+    Yes, if you'd rather stay the merchant of record yourself. You then handle your own tax and compliance. See [Merchant of record](/getstarted/merchant-of-record).
+  </Accordion>
+</AccordionGroup>
 
-- **Get started in minutes** You don’t have to handle dozens of webhooks, build a database layer to track customers, manage subscription states, or hardcode feature access. Kelviq provides a single, unified system.
-
-- **Handle Global Tax & Compliance Automatically** As your Merchant of Record, Kelviq takes on the full liability for global sales tax (VAT, GST, etc.), fraud, and regulatory compliance. You can sell in 100+ countries without ever registering for a foreign tax ID.
-
-- **Run any pricing model** Flat fee, usage, seats, tiers, volume, credits, pay-as-you-go, overage charges, or hybrids. Configure them in minutes.
-
-- **Sell digital products with ease** Securely deliver files, e-books, or software on purchase and automatically generates license keys right after checkout.
-
-- **Meter usage in real time** Track every API request, workflow run, background agent task, or LLM token usage as it happens. Set soft or hard caps, pick reset cycles, send alerts, and handle overages with one call.
-
-- **Control feature access** Define features per plan. Turn them on or off and check access in your app with one SDK call.
-
-- **Localized pricing by country** Offer country-specific prices in 135+ currencies with VPN, proxy, and fraud protection built in. You can also set up promotions for specific countries.
-
-- **Ship pricing changes without touching code** A/B test plans, roll out changes, or update pricing in real time without redeploys.
-
-- **Manage the full customer lifecycle** Handle upgrades, downgrades, migrations, overrides, and grandfathering without writing custom scripts.
-
----
-## How Kelviq is Different
-
-Traditional billing forces you to build complex infrastructure. Kelviq eliminates this overhead entirely.
-
-<CardGroup cols={2}>
-  <Card title="No Webhooks Required" icon="webhook">
-    Stop handling dozens of webhook events to sync subscription state. Query customer data directly from our API—always accurate, always real-time.
-  </Card>
-  <Card title="No Subscription Data to Maintain" icon="database">
-    No more subscription tables in your database. No sync jobs. No stale data. Kelviq is your source of truth.
-  </Card>
-  <Card title="No Hardcoded Feature Flags" icon="toggle-on">
-    Stop scattering feature checks throughout your codebase. Check entitlements with one SDK call. Update plans from the dashboard.
-  </Card>
-  <Card title="No Code Deploys for Pricing" icon="rocket">
-    Change prices, plans, trials, or entitlements from the dashboard. Ship pricing changes instantly without waiting for engineering.
-  </Card>
-</CardGroup>
-
----
-
-
-## Who kelviq is for
-
-- **AI product companies** — track what your autonomous agents do for each customer and bill based on actual usage. Maintain healthy unit economics as your underlying compute costs scale.
-
-- **Developers** — integrate billing without spending weeks writing complex custom usage code, database sync jobs, or webhook listeners.
-
-- **Product managers** — take ownership of pricing and plans. Run experiments, roll out promotions, and update entitlements directly from the dashboard without waiting for engineering.  
-
-- **Founders** — Launch globally from day one without becoming a tax expert. Kelviq acts as your merchant of record and takes on the full legal liability for VAT, sales tax, and compliance so you can focus on building the product.
-
-- **Digital creators** — Sell your e-books, software, design assets, or courses with zero hassle. Kelviq provides a complete, all-in-one solution that securely delivers your files, generates license keys, and handles all global taxes for you—no code or complex setup required.
-
+<Card title="Next: set up your dashboard" icon="arrow-right" href="/quickstart/dashboard-setup" horizontal>
+  Create a product, a plan, and your first feature.
+</Card>
 
 ## Need help?
 
-Have questions, need help with implementation, or want a walkthrough?  
-Email us at **hi@kelviq.com** or [book a demo](https://tidycal.com/neravath/15-minute-meeting).
-
----
+Email us at **hi@kelviq.com** or [book a demo](https://cal.com/alok-vats-fkpnc9/30min).

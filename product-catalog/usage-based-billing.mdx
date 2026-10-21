@@ -1,18 +1,91 @@
 ---
-title: Usage based pricing
+title: Usage-based pricing
 description: Charge customers for the actual work your product performs
 ---
 
-AI products perform actual work. Flat rate subscriptions force you to guess at average compute costs which destroys your margins. Usage based pricing lets you charge for exact consumption.
+Usage-based pricing charges customers for what they use: API calls, tokens, compute, or any other Meter feature.
 
 ## Set up a usage plan
 
-To add consumption tracking to a plan, open its pricing configuration and expand **Usage charges**.
-<Frame>
-  <img height="200" src="/images/usage-pricing-card.png" />
-</Frame>
+The example below is a **Pro** plan: \$29 a month, 10,000 API calls included, then \$0.002 per call. [How usage limits work](/product-catalog/usage-limits) explains what happens at the limit.
 
-### 1. Select or create a metered feature
+<Tabs>
+  <Tab title="Dashboard">
+    Open the plan's pricing and expand **Usage charges**, then follow the steps below.
+
+    <Frame>
+      <img height="200" src="/images/usage-pricing-card.png" />
+    </Frame>
+  </Tab>
+  <Tab title="CLI">
+    Define the plan in `kelviq.config.ts`. The entitlement sets the included 10,000 calls. The Pay as you go price bills calls past that at the end of each month.
+
+    ```ts kelviq.config.ts
+    import { feature, plan } from '@kelviq/cli/config';
+
+    export const apiCalls = feature({
+      identifier: 'api-calls',
+      name: 'API calls',
+      type: 'METER',
+      featureDetails: {
+        featureSubType: 'PRE_AGGREGATED_USAGE',
+        units: { singular: 'call', plural: 'calls' },
+      },
+    });
+
+    export const pro = plan({
+      identifier: 'pro',
+      name: 'Pro',
+      product: 'my-app',
+      entitlements: [
+        { feature: 'api-calls', value: 10000, reset: 'EVERY_MONTH', hardLimit: false },
+      ],
+      prices: [
+        {
+          priceType: 'PAID',
+          currency: 'USD',
+          chargeCatalogPrice: [
+            {
+              feature: null,
+              priceModel: 'FLAT',
+              paymentType: 'ADVANCE_COMMITMENT',
+              reset: 'NEVER',
+              charges: [{ chargePeriod: 'MONTHLY', priceData: { amount: 29 } }],
+            },
+            {
+              feature: 'api-calls',
+              priceModel: 'TIERED',
+              paymentType: 'PAY_AS_YOU_GO',
+              reset: 'EVERY_MONTH',
+              charges: [
+                {
+                  chargePeriod: 'MONTHLY',
+                  priceData: { currency: 'USD' },
+                  tiers: [
+                    { upTo: 10000, unitAmount: 0, flatAmount: 0 },
+                    { upTo: 'inf', unitAmount: 0.002, flatAmount: 0 },
+                  ],
+                },
+              ],
+            },
+          ],
+        },
+      ],
+    });
+    ```
+
+    Preview the change, then push and publish it:
+
+    ```bash
+    npx kelviq push --dry-run
+    npx kelviq push --publish
+    ```
+
+    See the [CLI overview](/cli/overview) and the [config reference](/cli/kelviq-config).
+  </Tab>
+</Tabs>
+
+### 1. Select or create a Meter feature
 
 Choose the metric you want to track from the dropdown list, such as API requests or tokens consumed. If the list is empty, [create a Meter feature](/product-catalog/create-a-feature) from **Product catalog → Features**, then return to the plan.
 
@@ -32,7 +105,7 @@ Select how payments are structured.
 Customers pay upfront for a baseline allotment of usage. This gives your users a predictable budget. They buy a set bucket of AI tokens or API requests at the start of the month. They consume what they paid for and avoid surprise overages.
 
 **Pay as you go**
-Customers pay for their recorded usage at the end of the monthly subscription period. You can bill for API calls, tokens, storage, compute time, or another metered feature, either on its own or alongside a monthly base price. See [Pay as you go](/product-catalog/pay-as-you-go) for setup, usage reporting, sandbox testing, and troubleshooting.
+Customers pay for their recorded usage at the end of the monthly subscription period. You can bill for API calls, tokens, storage, compute time, or another Meter feature, either on its own or alongside a monthly base price. See [Pay as you go](/product-catalog/pay-as-you-go) for setup, usage reporting, sandbox testing, and troubleshooting.
 
 <Note>
   Monthly must be the plan's only billing period. Pay as you go does not support Stair-step pricing or credit rollover.
@@ -54,7 +127,7 @@ The simplest way to charge for usage. Set one fixed rate for every unit consumed
 
 **Best for** API products and services where the cost of serving each unit stays relatively consistent.
 
-**Example** A translation API charging for each character processed.
+**Example** A translation API charging for each API call.
 
 **Sample calculation**
 
@@ -116,7 +189,7 @@ A customer uses 3,500 tokens.
 | Tier 2 | 2,500 × \$0.05 = \$125 |
 | **Total** | \$100 + \$125 = **\$225** |
 
-Kelviq tracks each pricing bracket automatically, with sub-100ms real-time access checks.
+Kelviq tracks each pricing bracket automatically.
 
 <Frame>
   <img height="400" src="/images/tiered-pricing.png" />
@@ -158,7 +231,7 @@ Kelviq automatically applies the correct rate when customers cross a volume thre
 
 Customers pay a fixed fee based on the usage bracket they fall into, regardless of the exact number of units used within that bracket. There is no per-unit rate.
 
-**Why it's useful** Combines the simplicity of subscription plans with the flexibility of usage-based scaling. Perfect for API plans, infrastructure products, and other services with clear usage bands.
+**Why it's useful** Combines the simplicity of subscription plans with the flexibility of usage-based scaling.
 
 **Example** An email delivery platform charging based on monthly email volume.
 
@@ -185,7 +258,7 @@ Once you pick a pricing model you define the exact boundaries.
 
 If you select Tiered you specify the first unit and last unit for each bucket. You can charge a per unit price and a flat fee within that same tier.
 
-You can also set localized pricing for usage based billing. This lets you define different per unit rates for specific countries and currencies.
+You can also set localized pricing for usage-based pricing. This lets you define different per unit rates for specific countries and currencies.
 
 #### Regional pricing and usage controls
 
@@ -210,7 +283,7 @@ Credit rollover lets a customer keep part of an advance commitment they did not 
 
 To configure it:
 
-1. In the plan editor, expand **Usage charges** and open the metered feature.
+1. In the plan editor, expand **Usage charges** and open the Meter feature.
 2. Choose **Advance commitment** as the billing model.
 3. Set the included **Value** and a recurring **Usage reset**.
 4. Turn on **Credit rollover**.
@@ -229,7 +302,7 @@ For example, suppose a plan includes 10,000 credits each month. The customer has
 
 #### Usage alerts
 
-Usage alerts watch a metered feature for percentage or absolute-unit thresholds. When a customer crosses a threshold, Kelviq sends `feature.usage_alert` to your subscribed webhook endpoint. Your application can then send an email, show an in-app warning, or start an upgrade flow.
+Usage alerts watch a Meter feature for percentage or absolute-unit thresholds. When a customer crosses a threshold, Kelviq sends `feature.usage_alert` to your subscribed webhook endpoint. Your application can then send an email, show an in-app warning, or start an upgrade flow.
 
 See [Usage alerts](/product-catalog/usage-alerts) for dashboard and API configuration, the webhook payload, a Node.js handler, and sandbox testing steps.
 
@@ -240,6 +313,60 @@ See [Usage alerts](/product-catalog/usage-alerts) for dashboard and API configur
 </Frame>
 
 AI products rarely track just one variable. You can add as many metered usage features as you want to a single plan. Just click the Add usage pricing button at the bottom of the section to set up another metric.
+
+## Check access and report usage
+
+Report usage from your backend each time the feature is used, then check what's left before the next request.
+
+<CodeGroup>
+
+```ts Node
+import { BEHAVIOUR_CHOICES } from '@kelviq/node-sdk';
+
+// Count one API call
+await client.reporting.reportUsage({
+  customerId: 'cust_123',
+  featureId: 'api-calls',
+  value: 1,
+  behaviour: BEHAVIOUR_CHOICES.DELTA,
+});
+
+// Check what's left
+const ent = await client.entitlements.getEntitlement({
+  customerId: 'cust_123',
+  featureId: 'api-calls',
+});
+
+if (!ent || (!ent.hasAccess && ent.hardLimit)) {
+  // No access, or a hard limit was reached: block or ask the customer to upgrade
+}
+// Past a soft limit, let the call through: it's billed as overage
+```
+
+```python Python
+# Count one API call
+client.reporting.report_usage(
+    customerId="cust_123",
+    featureId="api-calls",
+    value=1,
+    behaviour="DELTA",
+)
+
+# Check what's left
+ent = client.entitlements.get_entitlement(
+    customerId="cust_123",
+    featureId="api-calls",
+)
+
+if not ent or (not ent.hasAccess and ent.hardLimit):
+    # No access, or a hard limit was reached: block or ask the customer to upgrade
+    ...
+# Past a soft limit, let the call through: it's billed as overage
+```
+
+</CodeGroup>
+
+`remaining` is the usage left in the current period. `hasAccess` turns `false` when it reaches 0; `hardLimit` tells you whether to block. See the [Node SDK](/backend-integration/node-sdk#entitlements) and [Python SDK](/backend-integration/python-sdk) for every method.
 
 ## Model a plan with different kinds of limits
 
@@ -255,6 +382,6 @@ Not every plan limit should be a meter. Choose the feature type based on what th
 | Analytics | Boolean | Enable on the plans that include it |
 | Priority support | Boolean | Enable on the plans that include it |
 
-For metered limits, consider usage alerts at 80% and 90%. These thresholds give customers time to reduce usage or upgrade before they reach a hard limit. Rollover and overage behavior depend on your pricing policy; do not enable them automatically for every meter.
+For metered limits, consider usage alerts at 80% and 90%. These thresholds give customers time to reduce usage or upgrade before they reach a hard limit. Rollover and overage are optional; turn them on only where they fit your pricing. See [How usage limits work](/product-catalog/usage-limits).
 
 When a customer changes plans, Kelviq retains their existing usage counters and evaluates them against the new limits. A customer who has already consumed more than the downgraded limit may therefore become over limit as soon as the downgrade takes effect.

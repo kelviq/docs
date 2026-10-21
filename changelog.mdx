@@ -9,7 +9,15 @@ import { ChangelogFilter } from "/snippets/changelog-filter.jsx";
 
 <ChangelogFilter products={["App","JS SDK","React SDK","Node SDK","Python SDK","JS Promotions UI","MCP Server","CLI","API"]} />
 
-<Update label="v1.8.4" description="October 20, 2026" tags={["API"]}>
+
+
+
+
+
+
+
+
+<Update label="v1.24" description="October 30, 2026" tags={["API"]}>
 
 ### New Features
 
@@ -29,6 +37,175 @@ Two new endpoints let you build the cancellation flow, with retention offers, in
 ```
 
 Offers are configured in the dashboard retention settings. See [Retention offers](/product-catalog/subscriptions#retention-offers) for the flow.
+
+</Update>
+
+<Update label="v1.23" description="October 30, 2026" tags={["App"]}>
+
+## Custom fields
+
+Ask customers your own questions at checkout, such as a company name for the invoice, a purchase order number, or agreement to your terms.
+
+<Frame>
+  <img width="480" src="/images/settings/custom-field-create.webp" alt="Creating a required Company name custom field" />
+</Frame>
+
+Create a field in **Settings → Custom fields** and pick its type: text, number, yes/no, email, dropdown, URL, or date. Make it required, add help text and a placeholder, and set limits such as length, a pattern, or a date range. Customers see your error message if an answer doesn't pass.
+
+Add the field to a checkout link from **Get Link** on the product page, or pass it in `customFields` when you create a checkout session. Answers are saved with the order and subscription, and sent in your webhooks.
+
+Read [Custom fields](/checkout/custom-fields) to set one up.
+
+</Update>
+
+<Update label="v1.22" description="October 23, 2026" tags={["App"]}>
+
+## Retention offers
+
+Customers who cancel in the customer portal can now get an offer to stay. Kelviq asks why they're leaving, then shows the offer you picked for that reason.
+
+<Frame>
+  <img src="/images/retention/retention-pause-offer.webp" alt="A retention offer to pause the subscription for 1, 3, or 6 months" />
+</Frame>
+
+Set up three kinds of offer in **Settings → Retention**:
+
+* **Discount:** a percentage off the next few payments.
+* **Pause:** 1, 3, or 6 months without billing.
+* **Support:** a link to a booking page, live chat, or your help site.
+
+Then match each cancellation reason to an offer, such as a discount for "Too expensive" or a pause for "Not using it enough". You can also ask one optional question before the customer confirms, and choose whether an offer can be accepted more than once.
+
+Read [Retention offers](/customer-portal/retention) to set it up.
+
+## Pause and resume subscriptions
+
+Customers can now pause their subscription from the customer portal, when a retention offer includes a pause. A paused subscription isn't billed and its entitlements are off until it resumes. Choose in **Settings → Retention → Advanced settings** whether resuming charges a full period on the spot or waits for the original billing day.
+
+Read [Pause a subscription](/product-catalog/subscriptions#pause-a-subscription).
+
+## A discount in the final abandoned cart reminder
+
+The last [abandoned cart](/sales/abandoned-cart-recovery) reminder can now offer a percentage off the checkout total. Turn it on in **Settings → Customer emails** and set the percentage. It isn't offered when another discount already applies to the product.
+
+## Settings, regrouped
+
+Settings now has four groups so related pages sit together: **Account** (Profile), **Organization** (Set up with AI, General, Members, Business details, Tax settings), **Checkout & subscriptions** (Checkout design, Custom fields, Subscription proration, Customer emails, Retention), and **Developers** (API keys, Webhooks, Integrations). **Notifications** is now **Customer emails**. Nothing moved out of Settings and no setting changed.
+
+</Update>
+
+<Update label="v1.9.0" description="October 23, 2026" tags={["API"]}>
+
+### New Features
+
+{/* Hidden until the pause/resume API is public. Restore at launch.
+
+#### Pause and resume a subscription
+
+Two new endpoints:
+
+```http
+POST /api/v1/subscriptions/{subscriptionId}/pause/
+POST /api/v1/subscriptions/{subscriptionId}/resume/
+```
+
+Pause with `pauseMonths` (1 to 12), a `resumesAt` date, or neither for an open-ended pause. Resume takes an optional `billingBehavior` of `RESET_BILLING_CYCLE` or `KEEP_BILLING_DAY`. Subscription objects gain the `paused` status, `pausedAt`, and `pauseResumesAt`. Plan changes return `400` while a subscription is paused.
+*/}
+
+#### Webhooks
+
+`subscription.paused` and `subscription.resumed`, sent whichever surface the change came from. Renewals skipped during a pause send no events.
+
+#### Retention settings
+
+`GET` and `PATCH /api/v1/organizations/retention-settings/` read and update the offers, the reason-to-offer map, written feedback, and the resume and repeat policies. The customer portal API gains `…/retention/` to load the offers for a subscription and `…/retention/accept/` to accept one. The cancel endpoint accepts an optional `offerType` to record an offer the customer declined.
+
+#### SDKs
+
+`entitlements.invalidateCache` (Node) and `entitlements.invalidate_cache` (Python) drop a customer's cached entitlements, for use in `subscription.paused` and `subscription.cancelled` handlers.
+
+See [Pause a subscription](/product-catalog/subscriptions#pause-a-subscription) and [Retention offers](/customer-portal/retention).
+
+</Update>
+
+<Update label="v1.21" description="October 16, 2026" tags={["App"]}>
+
+## Set up with AI
+
+Billing is now something you can hand to your coding agent. The new **Settings → Set up with AI** page writes a prompt for Claude Code, Cursor, Codex, Lovable, Replit, Bolt, or any agent that can edit files and run commands, and you paste it in as your first message.
+
+<Frame>
+  <img src="/images/set-up-with-ai-integrate.webp" alt="The Set up with AI page with its three steps and the prompt it generates" />
+</Frame>
+
+Pick one of two paths. **Integrate with my app** connects the plans you have already published: the agent adds checkout, the billing portal, feature checks, and a verified webhook route, and registers the webhook when your app has a public URL. **Set up everything** starts earlier. The agent reads your app, proposes plans, prices, limits, license keys and discount codes, and only creates them in your sandbox after you approve.
+
+Describe what you want in plain language, or add a common request such as a monthly and yearly toggle or a 7-day free trial, and the prompt includes it.
+
+Your keys never go in the chat. The page gives you a block to paste into your project's `.env.local`, and the agent reads them from the file. Build and test with sandbox keys, or set it up directly in production. Business verification and your keys stay with you.
+
+## Checkout design
+
+Make checkout look like the rest of your product. **Settings → Checkout design** has your logo, colors, and corner radius in one place, with a live preview next to the controls.
+
+<Frame>
+  <img src="/images/checkout-design/checkout-design-settings.webp" alt="The Checkout design settings page with a live preview" />
+</Frame>
+
+Change any color for light and dark mode, set how rounded cards and buttons are, and choose whether checkout opens light, dark, or matching the buyer's device. You can also hide parts of checkout you don't need, such as product images or the discount code field. Read [Checkout design](/checkout/checkout-design) for every setting.
+
+## Fixes
+
+* Amounts show two decimal places everywhere in the dashboard.
+* In promotion settings, the security options are now off for new promotions.
+
+</Update>
+
+<Update label="v1.20" description="October 9, 2026" tags={["App"]}>
+
+## New checkout
+
+Every checkout link and checkout session now opens in a redesigned page.
+
+<Frame>
+  <img src="/images/checkout-design/checkout-design-light-dark.webp" alt="The new checkout in light mode and in dark mode" />
+</Frame>
+
+Checkout follows the customer's device setting for light or dark mode, and a switch in the corner lets them change it. Plans, billing periods, included features, promotion codes, tax, and business purchases are all on the one page.
+
+See every variation on the [Checkout examples](/checkout/checkout-examples) page, and change the look in [Checkout design](/checkout/checkout-design).
+
+</Update>
+
+<Update label="v1.19" description="October 2, 2026" tags={["App"]}>
+
+## Choose how plan changes are billed
+
+When a customer moves between plans mid-period, you decide what happens to the partial period. **Settings → Subscription proration** has two defaults:
+
+<Frame>
+  <img src="/images/subscription-proration-settings.webp" alt="The Subscription proration settings page with defaults for plan changes and plan version migrations" />
+</Frame>
+
+* **Plan upgrades and downgrades** defaults to **Immediate charge**: Kelviq prorates the difference and invoices it right away.
+* **Plan version migrations** defaults to **Prorate on next invoice**: the change applies now and the difference lands on the next renewal.
+
+Both accept a third option, **No proration**, which changes the plan without crediting or charging for the partial period. Switching between monthly and yearly billing always invoices immediately, whatever you choose here. API requests that pass `prorationBehavior` override these defaults.
+
+[Subscriptions](/product-catalog/subscriptions#control-how-a-change-is-billed) explains each option with an example.
+
+</Update>
+
+<Update label="v1.18" description="September 4, 2026" tags={["App"]}>
+
+## Abandoned cart recovery
+
+Kelviq now follows up with customers who start a checkout but do not pay. When a checkout sits untouched for an hour, Kelviq marks it as abandoned and sends up to three reminder emails, one each day for three days. Each email carries a **Return to checkout** link that takes the customer back to their session. The checkout expires four days after it was created.
+
+You do not need to set anything up. Recovery emails are on by default for every organization, and you can turn them off with the **Abandoned cart recovery** toggle in **Settings → Notifications**. Reminders are only sent when there is a customer email to send them to, and a customer is never emailed twice for the same step. A customer who starts several checkouts gets one set of reminders, not one per checkout.
+
+Read [Abandoned cart recovery](/sales/abandoned-cart-recovery) for the full schedule, the abandonment rules, and what happens at expiration.
+
 
 </Update>
 

@@ -63,6 +63,20 @@ This example uses a &#36;100 gross charge. If the payment includes tax, the gros
 | Subscription, domestic card | &#36;4.00 | &#36;4.60 |
 | Subscription, international card | &#36;5.50 | &#36;6.10 |
 
+### Example: a sale with sales tax
+
+A customer in the US buys a &#36;50 product with a US card. Sales tax is 8%, so they pay &#36;54. Your organization has already passed &#36;5,000 in sales, so the base fee is 3.5% + &#36;0.40. The fee is charged on the full amount the customer pays, including tax.
+
+| | Amount |
+| --- | ---: |
+| Customer pays (&#36;50 + &#36;4 sales tax) | &#36;54.00 |
+| Kelviq fee (3.5% of &#36;54 + &#36;0.40) | −&#36;2.29 |
+| Sales tax, collected and remitted by Kelviq | −&#36;4.00 |
+| **Added to your balance** | **&#36;47.71** |
+| Payout fee | &#36;0.00 |
+
+Before the &#36;5,000 threshold, the same sale costs 2.9% + &#36;0.40, a &#36;1.97 fee.
+
 ## How fees appear in Transactions
 
 The **Fee** column under **Payouts → Transactions** shows the total fee deducted from a payment. It combines the applicable base rate, recurring fee, and international-card fee into one amount. Tax is shown separately.
@@ -77,26 +91,24 @@ Net = Gross - Fee - Tax
 
 ## Payout fees
 
-<Note>
-  Currently, Kelviq is bearing the payout fee.
-</Note>
-
-Transaction fees and payout fees happen at different stages. The transaction fee is deducted when a customer pays. A payout fee would typically apply later when funds are sent to your bank account or eligible debit card, but Kelviq currently covers this cost.
+There's no payout fee. Your full balance is sent to your bank account or eligible debit card. If your bank account uses a different currency, the amount is converted when the payout is sent.
 
 [Learn how Kelviq payouts work →](/payouts/overview)
 
 ## Refunds
 
-When you issue a refund to a customer, the original transaction fee is **retained**. This applies to both full and partial refunds.
+Here's how a refund of the &#36;54 sale above is paid out:
 
-| Scenario | What happens |
-|----------|--------------|
-| Full refund | Customer receives full amount; original fee retained |
-| Partial refund | Customer receives partial amount; proportional fee retained |
+| | Full refund | Partial refund of &#36;20 |
+| --- | ---: | ---: |
+| Customer gets back | &#36;54.00 | &#36;20.00 |
+| Tax part of the refund, returned by Kelviq | &#36;4.00 | &#36;1.48 |
+| Taken from your balance | &#36;50.00 | &#36;18.52 |
+| **What you keep from the sale** | **−&#36;2.29** | **&#36;29.19** |
 
-<Warning>
-Our payment partners charge non-refundable processing fees on the original transaction. We pass this cost structure through to maintain transparent pricing.
-</Warning>
+For a partial refund, the amount you enter is what the customer gets back, and the tax inside it is worked out proportionally (&#36;20 × &#36;4 / &#36;54 = &#36;1.48).
+
+If your balance is lower than the amount taken for a refund, the refund still goes through and your balance goes negative.
 
 ## Disputes and chargebacks
 

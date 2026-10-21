@@ -25,6 +25,22 @@
             "pages": ["getstarted/introduction-to-kelviq", "getstarted/merchant-of-record", "getstarted/payment-security-and-seller-funds", "getstarted/fees", "getstarted/review-process"]
           },
           {
+            "group": "AI",
+            "pages": [
+              "ai/overview",
+              {
+                "group": "For humans",
+                "expanded": true,
+                "pages": ["guides/set-up-with-ai", "cli/overview"]
+              },
+              {
+                "group": "For agents",
+                "expanded": true,
+                "pages": ["guides/agent-toolkit", "guides/mcp-server", "ai/docs-for-agents"]
+              }
+            ]
+          },
+          {
             "group": "Quickstart",
             "pages": ["quickstart/core-concepts", "quickstart/dashboard-setup", "quickstart/integrate-with-your-app"]
           },
@@ -36,8 +52,10 @@
               "product-catalog/create-a-feature",
               "product-catalog/one-time-payments",
               "product-catalog/subscriptions",
+              "product-catalog/proration",
               "product-catalog/seat-based-pricing",
               "product-catalog/usage-based-billing",
+              "product-catalog/usage-limits",
               "product-catalog/pay-as-you-go",
               "product-catalog/usage-alerts",
               "product-catalog/free-and-trials",
@@ -64,7 +82,11 @@
             "group": "Checkout",
             "pages": [
               "checkout/checkout-configuration",
+              "checkout/checkout-design",
+              "checkout/payment-methods",
+              "checkout/custom-fields",
               "checkout/static-checkout-url",
+              "checkout/checkout-examples",
               "checkout/apply-a-discount-code",
               "checkout/checkout-metadata"
             ]
@@ -79,9 +101,9 @@
             ]
           },
           {
-            "group": "Coustomers-management",
+            "group": "Customers",
             "pages": [
-              "coustomers-management/overview"
+              "customers-management/overview"
             ]
           },
           {
@@ -93,10 +115,20 @@
             ]
           },
           {
-            "group": "Customer-portal",
+            "group": "Customer portal",
             "pages": [
               "customer-portal/overview",
+              "customer-portal/retention",
               "customer-portal/managing-payment-methods"
+            ]
+          },
+          {
+            "group": "Settings",
+            "pages": [
+              "settings/profile",
+              "settings/members",
+              "settings/customer-emails",
+              "settings/zapier"
             ]
           },
           {
@@ -106,9 +138,7 @@
               "guides/migrate-from-cashfree",
               "guides/subscription-integration",
               "guides/subscription-integration-for-nextjs",
-              "guides/webhooks",
-              "guides/mcp-server",
-              "guides/agent-toolkit"
+              "guides/webhooks"
             ]
           },
           {
@@ -196,6 +226,7 @@
     ]
   },
   "redirects": [
+    { "source": "/coustomers-management/:slug*", "destination": "/customers-management/:slug*" },
     { "source": "/changelog/app", "destination": "/changelog#app" },
     { "source": "/changelog/js-sdk", "destination": "/changelog#js-sdk" },
     { "source": "/changelog/react-sdk", "destination": "/changelog#react-sdk" },
