@@ -204,3 +204,22 @@ html.dark img.sidebar-group-icon { background-color: rgb(140 135 132); }
 .kq-intro .kq-hero-title { font-size: 36px; line-height: 40px; font-weight: 500; letter-spacing: -0.025em; }
 .kq-intro .kq-hero-sub { font-size: 18px; line-height: 28px; max-width: 600px; }
 .kq-intro .kq-hero { padding: 16px 0 48px; }
+
+/* Introduction header, Paddle-style: text left, illustration right, question chips */
+.kq-intro .kq-hero::before { display: none; }
+.kq-hero2 { display: grid; grid-template-columns: minmax(0, 1.25fr) minmax(0, 1fr); gap: 32px; align-items: center; padding: 8px 0 40px; }
+@media (max-width: 900px) { .kq-hero2 { grid-template-columns: 1fr; } .kq-hero2-art { display: none !important; } }
+.kq-crumb { margin: 0 0 12px; font-size: 14px; color: rgb(107 114 128); }
+.kq-hero2-title { margin: 0; font-size: 36px; line-height: 40px; font-weight: 500; letter-spacing: -0.025em; color: #1A202C; }
+.kq-hero2-sub { margin: 16px 0 0; font-size: 18px; line-height: 28px; color: rgb(75 85 99); max-width: 560px; }
+.kq-go { display: inline-flex; align-items: center; gap: 10px; margin-top: 24px; font-size: 17px; font-weight: 600; color: #1A202C !important; text-decoration: none !important; border: none !important; }
+.kq-go-arrow { display: inline-flex; width: 26px; height: 26px; align-items: center; justify-content: center; border-radius: 6px; background: rgb(var(--primary)); color: #fff; font-size: 15px; transition: transform .15s ease; }
+.kq-go:hover .kq-go-arrow { transform: translateX(3px); }
+.kq-chips { display: flex; flex-wrap: wrap; gap: 10px; margin-top: 28px; }
+.kq-chip { display: inline-flex; align-items: center; gap: 8px; padding: 8px 14px; border-radius: 999px; font-size: 14px; font-weight: 500; color: #1A202C !important; text-decoration: none !important; border: 1px solid rgb(229 231 235) !important; background: #fff; transition: border-color .15s ease; }
+.kq-chip:hover { border-color: rgb(var(--primary) / 0.45) !important; }
+.kq-chip-ico { width: 14px; height: 14px; background-color: rgb(var(--primary)); -webkit-mask: url(/icons/sparkle.svg) center / contain no-repeat; mask: url(/icons/sparkle.svg) center / contain no-repeat; }
+img.kq-hero2-art { display: block !important; width: 100% !important; height: auto !important; margin: 0 !important; }
+.dark .kq-hero2-title, .dark .kq-go, .dark .kq-chip { color: #fff !important; }
+.dark .kq-hero2-sub, .dark .kq-crumb { color: rgb(166 161 159); }
+.dark .kq-chip { background: transparent; border-color: rgb(255 255 255 / 0.12) !important; }
