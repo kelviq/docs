@@ -49,7 +49,7 @@ Read [Retention offers](/customer-portal/retention) to set it up.
 
 ## Pause and resume subscriptions
 
-Subscriptions can now be paused, from the subscription page, from the customer portal through a retention offer, or through the API. A paused subscription isn't billed and its entitlements are off until it resumes. Choose in **Settings → Retention → Advanced settings** whether resuming charges a full period on the spot or waits for the original billing day.
+Customers can now pause their subscription from the customer portal, when a retention offer includes a pause. A paused subscription isn't billed and its entitlements are off until it resumes. Choose in **Settings → Retention → Advanced settings** whether resuming charges a full period on the spot or waits for the original billing day.
 
 Read [Pause a subscription](/product-catalog/subscriptions#pause-a-subscription).
 
@@ -59,7 +59,7 @@ The last [abandoned cart](/sales/abandoned-cart-recovery) reminder can now offer
 
 ## Settings, regrouped
 
-Settings now has four groups so related pages sit together: **Account** (Profile), **Organization** (Set up with AI, General, Members, Business verification, Tax settings), **Checkout & subscriptions** (Checkout design, Custom fields, Subscription proration, Customer emails, Retention), and **Developers** (API keys, Webhooks, Integrations, Analytics & tracking). **Notifications** is now **Customer emails**. Nothing moved out of Settings and no setting changed.
+Settings now has four groups so related pages sit together: **Account** (Profile), **Organization** (Set up with AI, General, Members, Business details, Tax settings), **Checkout & subscriptions** (Checkout design, Custom fields, Subscription proration, Customer emails, Retention), and **Developers** (API keys, Webhooks, Integrations). **Notifications** is now **Customer emails**. Nothing moved out of Settings and no setting changed.
 
 </Update>
 
@@ -67,16 +67,9 @@ Settings now has four groups so related pages sit together: **Account** (Profile
 
 ### New Features
 
-#### Pause and resume a subscription
+#### Paused subscriptions
 
-Two new endpoints:
-
-```http
-POST /api/v1/subscriptions/{subscriptionId}/pause/
-POST /api/v1/subscriptions/{subscriptionId}/resume/
-```
-
-Pause with `pauseMonths` (1 to 12), a `resumesAt` date, or neither for an open-ended pause. Resume takes an optional `billingBehavior` of `RESET_BILLING_CYCLE` or `KEEP_BILLING_DAY`. Subscription objects gain the `paused` status, `pausedAt`, and `pauseResumesAt`. Plan changes return `400` while a subscription is paused.
+Subscription objects gain the `paused` status, `pausedAt`, and `pauseResumesAt`. Plan changes return `400` while a subscription is paused.
 
 #### Webhooks
 
