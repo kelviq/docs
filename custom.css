@@ -163,7 +163,9 @@ img.kq-art {
 .kq-card:hover img.kq-art { border-color: rgb(var(--primary) / 0.25); }
 
 /* Sidebar: line pages up with the group name, not the group icon */
-.sidebar-group-header:has(svg) ~ ul.sidebar-group { margin-left: 24px; }
+.sidebar-group-header:has(svg, .sidebar-group-icon) ~ ul.sidebar-group { margin-left: 24px; }
+/* Nucleo group icons are <img>, so they can't inherit text colour: invert them in dark mode */
+.dark img.sidebar-group-icon { filter: invert(1) brightness(0.88); }
 
 .kq-ico { display: block; width: 18px; height: 18px; background-color: rgb(var(--primary));
   -webkit-mask-size: contain; mask-size: contain; -webkit-mask-repeat: no-repeat; mask-repeat: no-repeat; -webkit-mask-position: center; mask-position: center; }
