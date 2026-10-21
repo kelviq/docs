@@ -36,6 +36,7 @@
             "group": "Get started",
             "icon": "/icons/rocket.svg",
             "pages": [
+              "getstarted/overview",
               "getstarted/introduction-to-kelviq",
               "quickstart/core-concepts",
               "quickstart/dashboard-setup",

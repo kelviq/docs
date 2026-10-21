@@ -223,3 +223,6 @@ img.kq-hero2-art { display: block !important; width: 100% !important; height: au
 .dark .kq-hero2-title, .dark .kq-go, .dark .kq-chip { color: #fff !important; }
 .dark .kq-hero2-sub, .dark .kq-crumb { color: rgb(166 161 159); }
 .dark .kq-chip { background: transparent; border-color: rgb(255 255 255 / 0.12) !important; }
+
+/* Question chips used inside a normal page */
+.prose .kq-chips, #content-area .kq-chips { margin: 4px 0 32px; }
