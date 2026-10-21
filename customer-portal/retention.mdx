@@ -7,6 +7,15 @@ When a customer cancels a subscription in the [customer portal](/customer-portal
 
 Set it up in **Settings → Retention** and turn on **Enable retention offer**.
 
+## Where customers see offers
+
+| Where the customer cancels | What you do |
+| --- | --- |
+| **Customer portal** | Nothing. Offers show automatically. |
+| **A Cancel button in your own app** | When the customer clicks it, call [Get retention offers](/api-reference/subscriptions/get-retention-offers) to show the reasons and offers, then [Accept a retention offer](/api-reference/subscriptions/accept-a-retention-offer) for the one they pick. |
+
+Offers, reasons and rules are the same in both. You set them once in **Settings → Retention**.
+
 ## What the customer sees
 
 <Steps>
