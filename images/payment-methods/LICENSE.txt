@@ -1,4 +1,4 @@
-Payment method logos from Shopify's payment_icons (https://github.com/activemerchant/payment_icons), MIT license. Logos are trademarks of their owners.
+Payment method logos from Shopify's payment_icons (https://github.com/activemerchant/payment_icons), MIT license. Logos are trademarks of their owners. link.svg is Stripe's Link mark (as shown in Stripe's payment methods docs), redrawn as a 38x24 badge to match the set.
 
 Copyright 2015 Shopify Inc
 

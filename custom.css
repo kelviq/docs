@@ -75,3 +75,6 @@ img.pm-logo {
   vertical-align: -5px;
   border-radius: 3px;
 }
+td:has(> img.pm-logo) {
+  white-space: nowrap;
+}
