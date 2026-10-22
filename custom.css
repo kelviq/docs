@@ -89,8 +89,8 @@ td:has(> img.pm-logo) {
 
 /* ---------- Sidebar ---------- */
 /* Same width on every page (the Overview page layout would otherwise shrink it) */
-@media (min-width: 1024px) { #sidebar-content:not(.w-16) { width: 19rem !important; min-width: 19rem !important; flex-shrink: 0 !important; } }
-/* (.w-16 is Mintlify's collapsed sidebar: leave it alone so collapse works) */
+@media (min-width: 1024px) { #sidebar-content:not(.w-16):not(.w-\[4rem\]) { width: 19rem !important; min-width: 19rem !important; flex-shrink: 0 !important; } }
+/* (.w-16 on the live site and .w-[4rem] in `mintlify dev` mark the collapsed sidebar: leave it alone so collapse works) */
 /* Pages line up with the group name, not the group icon */
 .sidebar-group-header:has(svg, .sidebar-group-icon) ~ ul.sidebar-group { margin-left: 24px; }
 /* Group icons (Nucleo, /icons/*.svg) drawn in a muted grey in both themes */
