@@ -91,9 +91,7 @@ Your app checks access with Kelviq, so you don't have to copy subscription state
 
 ---
 
-<span id="when-the-entitlement-api-is-unavailable" />
-
-## Keep access working during network issues
+## When the Entitlement API is unavailable
 
 Kelviq serves entitlement checks through its edge API. The service targets P95 response times below 100 ms and an uptime SLA above 99.99%, but your access-control path should still account for a temporary network or API failure.
 
