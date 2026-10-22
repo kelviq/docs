@@ -38,6 +38,7 @@
             "pages": [
               "getstarted/overview",
               "getstarted/introduction-to-kelviq",
+              "getstarted/fees",
               "quickstart/core-concepts",
               "quickstart/dashboard-setup",
               "quickstart/integrate-with-your-app"
@@ -72,7 +73,6 @@
             "icon": "/icons/shield-check.svg",
             "pages": [
               "getstarted/merchant-of-record",
-              "getstarted/fees",
               "getstarted/payment-security-and-seller-funds",
               "getstarted/review-process"
             ]
