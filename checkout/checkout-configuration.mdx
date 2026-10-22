@@ -425,14 +425,16 @@ Plan: Pro
 
 ### Regional Pricing
 
-Offer different prices based on customer location (PPP - Purchasing Power Parity):
+A plan can have a fixed price in other currencies. Buyers get the price for where they are when checkout opens:
 
 ```
-Plan: Professional ($29 in US)
-├─ India: ₹599 (auto-adjusted for PPP)
-├─ Brazil: R$99
-└─ US: $29
+Plan: Professional
+├─ US: $29
+├─ India: ₹599
+└─ Brazil: R$99
 ```
+
+You set each amount yourself. See [Location-based pricing](/product-catalog/location-based-pricing). To give a percentage off by country instead, use [Promotions](/promotions/overview).
 
 ## Testing Checkout
 
