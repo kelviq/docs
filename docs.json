@@ -351,6 +351,14 @@
     {
       "source": "/getstarted/payment-security-and-seller-funds",
       "destination": "/getstarted/merchant-of-record"
+    },
+    {
+      "source": "/api-reference/backend-integration/:slug*",
+      "destination": "/backend-integration/:slug*"
+    },
+    {
+      "source": "/api-reference/frontend-integration/:slug*",
+      "destination": "/frontend-integration/:slug*"
     }
   ],
   "logo": {
