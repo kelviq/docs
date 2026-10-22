@@ -30,7 +30,7 @@ You can create records manually.
   <Step title="Fill in details">
     You need to provide a few key pieces of info.
     * **Customer name** is required. Use the person's full name or company name.
-    * **Identifier** is the unique ID the API uses. We auto-generate this based on the name, but you can edit it. Linking this to the ID in your own database is usually a good idea.
+    * **Identifier** is the unique ID the API uses. We auto-generate this based on the name, but you can edit it. Use the ID from your own database so the API and your app match.
     * **Email address** is optional.
   </Step>
   <Step title="Create">
@@ -74,9 +74,9 @@ You will see a confirmation warning. Click **Confirm** to proceed.
 
 Kelviq archives customers; it does not hard-delete them. The archived record keeps its Identifier, so that value cannot be reused. To create another customer with the same email address, use a new Identifier.
 
-<Warning>
-  You cannot archive a customer with an active subscription. You must cancel their subscription first.
-</Warning>
+<Note>
+  To archive a customer with an active subscription, cancel the subscription first.
+</Note>
 
 ## Customer details
 

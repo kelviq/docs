@@ -31,7 +31,7 @@ If the plan has only one currency, only that currency is listed. This lets you m
 
 ## Business tax ID behavior
 
-When you sell to other businesses they are often exempt from paying sales tax or VAT. Kelviq handles this verification automatically. If a business enters a valid tax ID at checkout we apply a reverse charge and drop the tax requirement.
+When a business customer enters a valid tax ID at checkout, Kelviq verifies it and applies the reverse charge, so no tax is added.
 
 If you enabled tax inclusive pricing in the steps above you need to tell Kelviq how to handle the final math for these exempt B2B customers.
 
@@ -43,4 +43,4 @@ Open **Settings → Tax settings**.
 
 Turn on the Business tax ID behavior toggle. When this is active Kelviq automatically reduces the checkout total by the included tax amount if the customer enters a valid business tax ID. 
 
-If you leave this disabled the checkout total remains the exact same and we attribute the extra margin directly to your account.
+If it's off, the customer pays the same total and the tax portion goes to your balance.

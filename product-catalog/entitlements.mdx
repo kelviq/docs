@@ -91,21 +91,23 @@ Your app checks access with Kelviq, so you don't have to copy subscription state
 
 ---
 
-## When the Entitlement API is unavailable
+<span id="when-the-entitlement-api-is-unavailable" />
+
+## Keep access working during network issues
 
 Kelviq serves entitlement checks through its edge API. The service targets P95 response times below 100 ms and an uptime SLA above 99.99%, but your access-control path should still account for a temporary network or API failure.
 
 ### Node and Python SDK fallback
 
-The current Node and Python SDKs cache entitlement responses by default. Each process keeps a fresh in-memory entry for 60 seconds. If the edge API is unreachable or returns a server error, the SDK can return the last known entitlement state instead of failing the access check.
+The Node and Python SDKs cache entitlement responses for 60 seconds in each process. If the edge API doesn't respond or returns a server error, they return the last known entitlement state instead of failing the access check.
 
 The in-memory cache is local to one process and is lost when that process restarts. For multiple application instances, workers, or containers, configure the optional Redis store. It shares the cache across instances and keeps the fallback state available through application restarts.
 
 Usage and event reports that fail because of a temporary network problem are queued. The SDK retries them on the next report call, or you can flush the queue explicitly. An in-memory queue is suitable for one process; use Redis when the queue must be shared and durable.
 
-<Warning>
-  The SDK cannot return a last known value for a customer or feature that has never been fetched. Decide whether your application should deny access, allow limited access, or show a temporary error when no cached state exists.
-</Warning>
+<Note>
+  The fallback covers customers and features the SDK has already checked. For a first-time check, choose whether to deny access, allow limited access, or show a retry message.
+</Note>
 
 See the [Node SDK caching configuration](/backend-integration/node-sdk#caching-and-offline-resilience) or [Python SDK caching configuration](/backend-integration/python-sdk#caching-and-offline-resilience) for setup examples.
 
@@ -469,10 +471,10 @@ When you set up inheritance:
 #### Failed Payment
 - A failed card renewal moves the subscription to `past_due`
 - Kelviq retries card payments for up to 14 days before cancellation
-- Failed non-card renewals are not retried and the subscription is cancelled
+- Card and UPI AutoPay renewals are retried for up to 14 days, then the subscription is canceled
 
 #### Refund
-- Cancelling mid-period does not automatically create a refund
+- You decide whether to refund a mid-period cancellation
 - The merchant decides whether to issue a full, partial, or no refund
 
 <Info>

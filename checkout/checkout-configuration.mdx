@@ -71,7 +71,7 @@ Include multiple plans in a single checkout to let customers choose their tier.
   **Plans Configuration**
   - Select which plans are enabled (shown to customer)
   - Choose a recommended plan (highlighted by default)
-  - Cannot disable all plans
+  - At least one plan stays enabled
   - Disabled plans don't appear in checkout
 </Card>
 
@@ -281,16 +281,10 @@ Discount codes are applied automatically if the customer enters a valid code.
 
 ### Tax Collection
 
-Kelviq can collect and handle taxes:
+Kelviq calculates and collects tax on every checkout, based on the customer's location.
 
-**Tax ID Collection:**
-- Customers can enter their tax ID (VAT number, EIN, etc.)
-- Used to determine applicable taxes
-- Required for some jurisdictions
-
-**Configuration:**
-- Enable/disable tax collection per product
-- Taxes are calculated based on customer location and tax ID
+- Business customers can enter a VAT number or other tax ID. When it's valid, Kelviq applies the reverse charge.
+- Choose per plan whether listed prices include tax or tax is added at checkout. See [Tax settings](/product-catalog/tax-settings).
 
 ### Country Restrictions
 
