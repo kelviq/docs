@@ -73,7 +73,6 @@
             "icon": "/icons/shield-check.svg",
             "pages": [
               "getstarted/merchant-of-record",
-              "getstarted/payment-security-and-seller-funds",
               "getstarted/review-process"
             ]
           },
@@ -348,6 +347,10 @@
     {
       "source": "/changelog/api",
       "destination": "/changelog#api"
+    },
+    {
+      "source": "/getstarted/payment-security-and-seller-funds",
+      "destination": "/getstarted/merchant-of-record"
     }
   ],
   "logo": {
