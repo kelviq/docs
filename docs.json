@@ -90,6 +90,7 @@
                 "pages": [
                   "product-catalog/one-time-payments",
                   "product-catalog/subscriptions",
+                  "product-catalog/proration",
                   "product-catalog/seat-based-pricing",
                   "product-catalog/usage-based-billing",
                   "product-catalog/pay-as-you-go",
@@ -101,8 +102,7 @@
                 "group": "Usage and billing",
                 "pages": [
                   "product-catalog/usage-limits",
-                  "product-catalog/usage-alerts",
-                  "product-catalog/proration"
+                  "product-catalog/usage-alerts"
                 ]
               },
               {
@@ -200,7 +200,8 @@
               "legal/master-service-agreement",
               "legal/compliant-user-flow",
               "legal/approved-prohibited-policy",
-              "legal/payment-flow-diagram"
+              "legal/payment-flow-diagram",
+              "legal/account-and-funds"
             ]
           }
         ]
