@@ -89,24 +89,25 @@ td:has(> img.pm-logo) {
 
 /* ---------- Sidebar ---------- */
 /* Same width on every page (the Overview page layout would otherwise shrink it) */
-@media (min-width: 1024px) { #sidebar-content { width: 19rem !important; min-width: 19rem !important; flex-shrink: 0 !important; } }
+@media (min-width: 1024px) { #sidebar-content:not(.w-16) { width: 19rem !important; min-width: 19rem !important; flex-shrink: 0 !important; } }
+/* (.w-16 is Mintlify's collapsed sidebar: leave it alone so collapse works) */
 /* Pages line up with the group name, not the group icon */
 .sidebar-group-header:has(svg, .sidebar-group-icon) ~ ul.sidebar-group { margin-left: 24px; }
 /* Group icons (Nucleo, /icons/*.svg) drawn in a muted grey in both themes */
 img.sidebar-group-icon { object-position: -9999px 0; -webkit-mask-size: contain; mask-size: contain; -webkit-mask-repeat: no-repeat; mask-repeat: no-repeat; -webkit-mask-position: center; mask-position: center; background-color: rgb(120 113 108); }
 html.dark img.sidebar-group-icon { background-color: rgb(140 135 132); }
-img.sidebar-group-icon[src="/icons/book-open.svg"] { -webkit-mask-image: url(/icons/book-open.svg); mask-image: url(/icons/book-open.svg); }
-img.sidebar-group-icon[src="/icons/box.svg"] { -webkit-mask-image: url(/icons/box.svg); mask-image: url(/icons/box.svg); }
-img.sidebar-group-icon[src="/icons/credit-card.svg"] { -webkit-mask-image: url(/icons/credit-card.svg); mask-image: url(/icons/credit-card.svg); }
-img.sidebar-group-icon[src="/icons/gavel.svg"] { -webkit-mask-image: url(/icons/gavel.svg); mask-image: url(/icons/gavel.svg); }
-img.sidebar-group-icon[src="/icons/gear.svg"] { -webkit-mask-image: url(/icons/gear.svg); mask-image: url(/icons/gear.svg); }
-img.sidebar-group-icon[src="/icons/receipt.svg"] { -webkit-mask-image: url(/icons/receipt.svg); mask-image: url(/icons/receipt.svg); }
-img.sidebar-group-icon[src="/icons/rocket.svg"] { -webkit-mask-image: url(/icons/rocket.svg); mask-image: url(/icons/rocket.svg); }
-img.sidebar-group-icon[src="/icons/shield-check.svg"] { -webkit-mask-image: url(/icons/shield-check.svg); mask-image: url(/icons/shield-check.svg); }
-img.sidebar-group-icon[src="/icons/sparkle.svg"] { -webkit-mask-image: url(/icons/sparkle.svg); mask-image: url(/icons/sparkle.svg); }
-img.sidebar-group-icon[src="/icons/tag.svg"] { -webkit-mask-image: url(/icons/tag.svg); mask-image: url(/icons/tag.svg); }
-img.sidebar-group-icon[src="/icons/user.svg"] { -webkit-mask-image: url(/icons/user.svg); mask-image: url(/icons/user.svg); }
-img.sidebar-group-icon[src="/icons/wallet.svg"] { -webkit-mask-image: url(/icons/wallet.svg); mask-image: url(/icons/wallet.svg); }
+img.sidebar-group-icon[src$="/icons/book-open.svg"] { -webkit-mask-image: url(/icons/book-open.svg); mask-image: url(/icons/book-open.svg); }
+img.sidebar-group-icon[src$="/icons/box.svg"] { -webkit-mask-image: url(/icons/box.svg); mask-image: url(/icons/box.svg); }
+img.sidebar-group-icon[src$="/icons/credit-card.svg"] { -webkit-mask-image: url(/icons/credit-card.svg); mask-image: url(/icons/credit-card.svg); }
+img.sidebar-group-icon[src$="/icons/gavel.svg"] { -webkit-mask-image: url(/icons/gavel.svg); mask-image: url(/icons/gavel.svg); }
+img.sidebar-group-icon[src$="/icons/gear.svg"] { -webkit-mask-image: url(/icons/gear.svg); mask-image: url(/icons/gear.svg); }
+img.sidebar-group-icon[src$="/icons/receipt.svg"] { -webkit-mask-image: url(/icons/receipt.svg); mask-image: url(/icons/receipt.svg); }
+img.sidebar-group-icon[src$="/icons/rocket.svg"] { -webkit-mask-image: url(/icons/rocket.svg); mask-image: url(/icons/rocket.svg); }
+img.sidebar-group-icon[src$="/icons/shield-check.svg"] { -webkit-mask-image: url(/icons/shield-check.svg); mask-image: url(/icons/shield-check.svg); }
+img.sidebar-group-icon[src$="/icons/sparkle.svg"] { -webkit-mask-image: url(/icons/sparkle.svg); mask-image: url(/icons/sparkle.svg); }
+img.sidebar-group-icon[src$="/icons/tag.svg"] { -webkit-mask-image: url(/icons/tag.svg); mask-image: url(/icons/tag.svg); }
+img.sidebar-group-icon[src$="/icons/user.svg"] { -webkit-mask-image: url(/icons/user.svg); mask-image: url(/icons/user.svg); }
+img.sidebar-group-icon[src$="/icons/wallet.svg"] { -webkit-mask-image: url(/icons/wallet.svg); mask-image: url(/icons/wallet.svg); }
 
 /* ---------- Overview page (getstarted/overview.mdx, mode: frame) ---------- */
 /* The live site can wrap this page in a narrow column: let the Overview use the full content width */
