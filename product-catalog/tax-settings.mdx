@@ -10,20 +10,20 @@ You manage your tax configuration in two places. You set how prices display on i
 By default Kelviq adds tax on top of your listed price at checkout. If you want customers to see the final price upfront you can enable tax inclusive pricing. You configure this per plan.
 
 <Frame>
-  <img height="400" src="/images/Tax-inclusive-drodown.png" />
+  <img src="/images/Tax-inclusive-drodown.webp" />
 </Frame>
 
 To change how prices are displayed open your plan draft. Click the menu icon next to the Publish button and select Tax behavior.
 
 <Frame>
-  <img height="400" src="/images/tax-modal.png" />
+  <img src="/images/tax-modal.webp" />
 </Frame>
 
 
 Toggle Include tax in prices to turn on inclusive pricing. Kelviq will ask you to select the specific currencies where the listed price should include tax. 
 
 <Frame>
-  <img height="400" src="/images/select-countries-tax.png" />
+  <img src="/images/select-countries-tax.webp" />
 </Frame>
 
 If the plan has only one currency, only that currency is listed. This lets you mix billing styles on a single plan. You can select EUR to give European buyers an inclusive experience while leaving USD unchecked so North American buyers pay tax at checkout.
@@ -31,7 +31,7 @@ If the plan has only one currency, only that currency is listed. This lets you m
 
 ## Business tax ID behavior
 
-When you sell to other businesses they are often exempt from paying sales tax or VAT. Kelviq handles this verification automatically. If a business enters a valid tax ID at checkout we apply a reverse charge and drop the tax requirement.
+When a business customer enters a valid tax ID at checkout, Kelviq verifies it and applies the reverse charge, so no tax is added.
 
 If you enabled tax inclusive pricing in the steps above you need to tell Kelviq how to handle the final math for these exempt B2B customers.
 
@@ -43,4 +43,4 @@ Open **Settings → Tax settings**.
 
 Turn on the Business tax ID behavior toggle. When this is active Kelviq automatically reduces the checkout total by the included tax amount if the customer enters a valid business tax ID. 
 
-If you leave this disabled the checkout total remains the exact same and we attribute the extra margin directly to your account.
+If it's off, the customer pays the same total and the tax portion goes to your balance.

@@ -1,12 +1,12 @@
 ---
-title: 'Features & limits (entitlements)'
-sidebarTitle: 'Features & limits (entitlements)'
+title: 'Features & limits (Entitlements)'
+sidebarTitle: 'Features & limits (Entitlements)'
 description: 'Entitlements decide which features and limits each customer gets'
 keywords: ['entitlements', 'entitlement', 'feature access', 'feature flags', 'usage limits']
 ---
 Check features, not plans. Your code asks whether a customer has a feature, and Kelviq answers from their plan. You can change plans, prices, and custom deals without changing code. In the API and SDKs, a feature on a plan is called an entitlement.
 <Frame>
-      <img height="200" src="/images/features-limits-enttilements.png" />
+      <img src="/images/features-limits-enttilements.webp" />
 </Frame>
 <Info>
 For SDK installation and API reference, see:
@@ -69,7 +69,7 @@ Now you can:
 
 ### The Flow
 <Frame>
-      <img height="200" src="/images/features-kelviq-dashboard.png" />
+      <img src="/images/features-kelviq-dashboard.webp" />
 </Frame>
 
 1) Setup plans and features on Kelviq Dashboard 
@@ -97,15 +97,15 @@ Kelviq serves entitlement checks through its edge API. The service targets P95 r
 
 ### Node and Python SDK fallback
 
-The current Node and Python SDKs cache entitlement responses by default. Each process keeps a fresh in-memory entry for 60 seconds. If the edge API is unreachable or returns a server error, the SDK can return the last known entitlement state instead of failing the access check.
+The Node and Python SDKs cache entitlement responses for 60 seconds in each process. If the edge API doesn't respond or returns a server error, they return the last known entitlement state instead of failing the access check.
 
 The in-memory cache is local to one process and is lost when that process restarts. For multiple application instances, workers, or containers, configure the optional Redis store. It shares the cache across instances and keeps the fallback state available through application restarts.
 
 Usage and event reports that fail because of a temporary network problem are queued. The SDK retries them on the next report call, or you can flush the queue explicitly. An in-memory queue is suitable for one process; use Redis when the queue must be shared and durable.
 
-<Warning>
-  The SDK cannot return a last known value for a customer or feature that has never been fetched. Decide whether your application should deny access, allow limited access, or show a temporary error when no cached state exists.
-</Warning>
+<Note>
+  The fallback covers customers and features the SDK has already checked. For a first-time check, choose whether to deny access, allow limited access, or show a retry message.
+</Note>
 
 See the [Node SDK caching configuration](/backend-integration/node-sdk#caching-and-offline-resilience) or [Python SDK caching configuration](/backend-integration/python-sdk#caching-and-offline-resilience) for setup examples.
 
@@ -127,7 +127,7 @@ Kelviq supports three types of features to cover all access control scenarios.
 
 Simple on/off access control.
 <Frame>
-      <img height="200" src="/images/boolean.png" />
+      <img src="/images/boolean.webp" />
 </Frame>
 
 **Use for:**
@@ -148,7 +148,7 @@ Simple on/off access control.
 
 Usage-based features with limits and tracking.
 <Frame>
-      <img height="200" src="/images/raw-meter(empty-state).png" />
+      <img src="/images/raw-meter(empty-state).webp" />
 </Frame>
 **Use for:**
 - API calls, requests, or operations
@@ -167,7 +167,7 @@ Usage-based features with limits and tracking.
 | **Soft Limit** | Allow overages but notify/warn |
 | **Rollover** | Carry unused quota to next period |
 <Frame>
-      <img height="200" src="/images/aggregate-meter.png" />
+      <img src="/images/aggregate-meter.webp" />
 </Frame>
 **Example configuration:**
 
@@ -181,7 +181,7 @@ Usage-based features with limits and tracking.
 
 Dynamic values that aren't simple on/off or numeric limits.
 <Frame>
-      <img height="200" src="/images/customizable.png" />
+      <img src="/images/customizable.webp" />
 </Frame>
 
 **Use for:**
@@ -195,7 +195,7 @@ Dynamic values that aren't simple on/off or numeric limits.
 
 Choose the right enforcement strategy for each feature. [How usage limits work](/product-catalog/usage-limits) walks through resets, overage, and what happens at the limit.
 <Frame>
-      <img height="200" src="/images/hard-limit.png" />
+      <img src="/images/hard-limit.webp" />
 </Frame>
 
 ### Hard Limits
@@ -469,10 +469,10 @@ When you set up inheritance:
 #### Failed Payment
 - A failed card renewal moves the subscription to `past_due`
 - Kelviq retries card payments for up to 14 days before cancellation
-- Failed non-card renewals are not retried and the subscription is cancelled
+- Card and UPI AutoPay renewals are retried for up to 14 days. If payment still fails, the subscription is canceled
 
 #### Refund
-- Cancelling mid-period does not automatically create a refund
+- You decide whether to refund a mid-period cancellation
 - The merchant decides whether to issue a full, partial, or no refund
 
 <Info>

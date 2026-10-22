@@ -121,7 +121,7 @@ Kelviq does not currently send a separate `payment.failed` event. For a failed c
 Do not remove access when you receive the first `subscription.updated` with `past_due` unless that is your own policy. Use the final subscription status or a live entitlement check to decide when access should end.
 
 <Note>
-  The retry window applies only to card payments. Kelviq does not retry a failed non-card renewal; the subscription is cancelled after the failure.
+  Card and UPI AutoPay renewals are retried for up to 14 days. If the payment still fails, the subscription is canceled.
 </Note>
 
 ### Billing period field names

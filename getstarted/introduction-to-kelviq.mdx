@@ -5,9 +5,14 @@ description: 'What Kelviq does, how it fits into your app, and where to start.'
 
 Kelviq is a merchant of record with billing built in. You set your prices and plans, Kelviq sells them, collects the tax, and pays you out. Your app asks Kelviq what each customer can use.
 
-<Card title="Set up with your coding agent" icon="wand-magic-sparkles" href="/ai/overview" horizontal>
-  Using Claude Code, Cursor, or Codex? Your agent can set up Kelviq for you.
-</Card>
+<div className="kq-chips">
+  <a className="kq-chip" href="#what-kelviq-handles"><span className="kq-chip-ico" />Will Kelviq work for my product?</a>
+  <a className="kq-chip" href="/payouts/overview#do-i-need-a-stripe-account"><span className="kq-chip-ico" />Do I need a Stripe account?</a>
+  <a className="kq-chip" href="/getstarted/fees"><span className="kq-chip-ico" />What does Kelviq cost?</a>
+  <a className="kq-chip" href="/product-catalog/usage-based-billing"><span className="kq-chip-ico" />Can I charge per token or API call?</a>
+  <a className="kq-chip" href="/guides/set-up-with-ai"><span className="kq-chip-ico" />What's the fastest way to integrate Kelviq?</a>
+</div>
+
 
 ## What Kelviq handles
 
@@ -30,29 +35,6 @@ Pricing changes happen in the dashboard or the CLI, not in your code. Your app c
 2. Send customers to **checkout**. Kelviq takes the payment and the tax.
 3. Your app **checks access** and **reports usage** with the SDK.
 4. Kelviq bills renewals and overage, and **pays you out**.
-
-## FAQ
-
-<AccordionGroup>
-  <Accordion title="Do I need to handle webhooks?">
-    No. Your app can ask Kelviq for a customer's access at any time, so you don't need to keep subscription state in your database. [Webhooks](/guides/webhooks) are there if you want events in your own systems.
-  </Accordion>
-  <Accordion title="What if Kelviq can't be reached?">
-    The Node and Python SDKs return the last known access for a customer and retry usage reports later. See [When the Entitlement API is unavailable](/product-catalog/entitlements#when-the-entitlement-api-is-unavailable).
-  </Accordion>
-  <Accordion title="Can I test without real payments?">
-    Yes. The [sandbox](/guides/sandbox) is a separate environment with its own keys and test cards.
-  </Accordion>
-  <Accordion title="What does it cost?">
-    A percentage of each transaction, with no monthly fee. See [Fees](/getstarted/fees).
-  </Accordion>
-  <Accordion title="Do I need a Stripe account?">
-    No. You can sell and get paid without one, including in countries where Stripe doesn't offer its own accounts, such as India. Payouts go through a payout account you set up in Kelviq. See [Payouts](/payouts/overview#do-i-need-a-stripe-account).
-  </Accordion>
-  <Accordion title="Can I use my own Stripe account?">
-    Yes, if you'd rather stay the merchant of record yourself. You then handle your own tax and compliance. See [Merchant of record](/getstarted/merchant-of-record).
-  </Accordion>
-</AccordionGroup>
 
 <Card title="Next: set up your dashboard" icon="arrow-right" href="/quickstart/dashboard-setup" horizontal>
   Create a product, a plan, and your first feature.

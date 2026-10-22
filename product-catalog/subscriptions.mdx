@@ -8,7 +8,7 @@ Subscriptions are the default for traditional SaaS products. You charge customer
 ## Set up recurring billing
 
 <Frame>
-  <img height="200" src="/images/subscription-pricing.png" />
+  <img src="/images/subscription-pricing.webp" />
 </Frame>
 
 1. Open a draft plan and make sure it is set to **Paid**.
@@ -68,9 +68,9 @@ Proration decides what the customer pays for the rest of the period: charged now
 
 Card payments that do not require authentication are usually completed during the update request, so the status change can happen immediately. When the payment method requires customer action, continue using the existing subscription until the updated subscription becomes `active`.
 
-<Warning>
-  A successful update API response does not always mean the new plan is active. When you use `activate_on_payment`, check the subscription status or the customer's current entitlements before granting access to the new plan.
-</Warning>
+<Note>
+  With `activate_on_payment`, the new plan goes live after its payment succeeds. Check the subscription's plan or the customer's entitlements before granting access to the new plan.
+</Note>
 
 ### Upgrades
 
@@ -106,7 +106,7 @@ A paused subscription stops billing and stops access. The customer isn't charged
 
 When a customer tries to cancel, Kelviq shows the offer you've set for the reason they give: a discount, a pause, or a link to your support team. If the offer is a pause and they accept it, they pick a length from the ones you allow: 1, 3, or 6 months. This works in the customer portal and from a Cancel button in your own app. See [Retention offers](/customer-portal/retention#where-customers-see-offers).
 
-A pause has to cover at least one full billing period, so a 1-month pause on a yearly plan is refused. Only an `active` subscription can be paused, not one on trial, past due, already paused, or scheduled to cancel. Free and manually billed subscriptions can't be paused.
+A pause has to cover at least one full billing period, so yearly plans can't be paused. Only an `active` subscription can be paused, not one on trial, past due, already paused, or scheduled to cancel. Free and manually billed subscriptions can't be paused.
 
 ### Resume a subscription
 
@@ -144,13 +144,13 @@ The customer portal shows these offers automatically. To build the same flow in 
 
 ## Refund a cancelled subscription
 
-Kelviq does not automatically refund unused time when a subscription is cancelled mid-period. You decide whether to issue a full refund, a partial refund, or no refund.
+When a subscription is canceled mid-period, you decide whether to refund: in full, in part, or not at all.
 
-For a usage-based subscription, calculate the refund under your own policy using the customer's consumed usage and remaining time. Kelviq does not currently calculate usage-adjusted refunds for you. Once you decide the amount, open the corresponding order in the dashboard and issue the full or partial refund there.
+For a usage-based subscription, work out the amount from the customer's usage and the time left. Then open the corresponding order in the dashboard and issue the full or partial refund there.
 
 ## Failed subscription payments
 
-A failed automatic card payment does not cancel the customer's payment authorization. Kelviq can use the same authorization for later attempts and future billing cycles.
+After a failed card payment, the customer's authorization stays in place, so Kelviq can retry and bill future cycles.
 
 If the customer pays the failed card invoice manually, automatic payments remain active. Kelviq will still use the saved payment method for the next billing cycle.
 
@@ -163,5 +163,5 @@ After each failed attempt, Kelviq emails the customer a link to pay the invoice.
 You do not need to schedule retries, send card payment links, or ask the customer to set up automatic payments again. Kelviq handles this recovery flow.
 
 <Note>
-  This retry schedule applies only to cards. Kelviq does not retry a failed non-card renewal or send a recovery payment link. The subscription is canceled after the payment fails.
+  Card and UPI AutoPay renewals follow this retry schedule. If the payment still hasn't gone through after 14 days, the subscription is canceled.
 </Note>

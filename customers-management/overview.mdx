@@ -1,5 +1,6 @@
 ---
 title: 'Overview'
+sidebarTitle: 'Customers'
 description: 'View and manage customer details, subscriptions, and entitlements.'
 ---
 
@@ -15,7 +16,7 @@ You can do a few things here.
 * **Manage a customer** by clicking their row to see details.
 
 <Frame>
-  <img height="200" src="/images/customers-list.png" />
+  <img src="/images/customers-list.webp" />
 </Frame>
 
 ## Add a new customer
@@ -29,18 +30,16 @@ You can create records manually.
   <Step title="Fill in details">
     You need to provide a few key pieces of info.
     * **Customer name** is required. Use the person's full name or company name.
-    * **Identifier** is the unique ID the API uses. We auto-generate this based on the name, but you can edit it. Linking this to the ID in your own database is usually a good idea.
+    * **Identifier** is the unique ID the API uses. We auto-generate this based on the name, but you can edit it. Use the ID from your own database so the API and your app match.
     * **Email address** is optional.
   </Step>
   <Step title="Create">
     Click **Create** to finish.
-    
-    If you are adding a batch of people, toggle on **Create more**. This keeps the window open so you can add the next one immediately.
   </Step>
 </Steps>
 
 <Frame>
-  <img height="200" src="/images/create-customer-modal.png" />
+  <img src="/images/create-customer-modal.webp" />
 </Frame>
 
 <Note>
@@ -57,7 +56,7 @@ You can edit details or revoke access from the list view.
 Click the **three dots** on the right side of the customer row and select **Edit**.
 
 <Frame>
-  <img height="200" src="/images/edit-customer.png" />
+  <img src="/images/edit-customer.webp" />
 </Frame>
 
 You can update the **Customer name** and **Email address**. The Identifier is fixed after creation and cannot be changed.
@@ -67,15 +66,15 @@ You can update the **Customer name** and **Email address**. The Identifier is fi
 Archiving makes a customer inactive and revokes their access. Click the **three dots** and select **Archive**.
 
 <Frame>
-  <img height="200" src="/images/archive-customer.png" />
+  <img src="/images/archive-customer.webp" />
 </Frame>
 You will see a confirmation warning. Click **Confirm** to proceed.
 
 Kelviq archives customers; it does not hard-delete them. The archived record keeps its Identifier, so that value cannot be reused. To create another customer with the same email address, use a new Identifier.
 
-<Warning>
-  You cannot archive a customer with an active subscription. You must cancel their subscription first.
-</Warning>
+<Note>
+  To archive a customer with an active subscription, cancel the subscription first.
+</Note>
 
 ## Customer details
 
@@ -84,7 +83,7 @@ Click on any customer row to open their full profile.
 This page holds the source of truth for that user. You can see their unique Billing ID and timestamps for when they joined or were last updated.
 
 <Frame>
-  <img height="200" src="/images/customer-details.png" />
+  <img src="/images/customer-details.webp" />
 </Frame>
 
 ### Subscriptions
@@ -97,7 +96,7 @@ This section lists active and past plans. It shows the status, such as Active or
 You can generate a checkout link for a customer from here. The plan must already exist and have a published price.
 
 <Frame>
-  <img height="200" src="/images/add-subscription.png" />
+  <img src="/images/add-subscription.webp" />
 </Frame>
 
 1. Click **Add subscription**.
@@ -138,6 +137,6 @@ You often need to make exceptions for specific users. You can do that here witho
 Changes made here apply only to this specific customer.
 
 <Frame>
-  <img height="200" src="/images/entitlements-details.png" />
+  <img src="/images/entitlements-details.webp" />
 </Frame>
 

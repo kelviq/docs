@@ -8,7 +8,7 @@ With pay as you go, the customer does not buy a block of usage upfront. Your bac
 The same plan can contain a monthly base price and one or more usage charges. You define the billable feature and its rates in the dashboard; your application supplies the usage.
 
 <Note>
-  Monthly must be the plan's only billing period. Pay as you go can't be used on a plan that also offers yearly, quarterly, one-time, or another billing period.
+  Pay as you go plans bill monthly, so Monthly is the plan's only billing period.
 </Note>
 
 ## Before you start
@@ -30,7 +30,7 @@ Pay as you go supports **Flat**, **Package**, **Tiered**, and **Volume** pricing
 4. For **Billing model**, choose **Pay-as-you-go**.
 
 <Frame>
-  <img src="/images/select-billing-model.png" alt="Selecting Pay-as-you-go as the billing model in Kelviq" />
+  <img src="/images/select-billing-model-payg.webp" alt="Selecting Pay-as-you-go as the billing model in Kelviq" />
 </Frame>
 
 5. Choose a pricing model and enter its rates.
@@ -66,7 +66,7 @@ If the customer uses 120,000 tokens, the first 100,000 fall into a zero-priced t
 
 ## Report usage from your backend
 
-Kelviq can only bill usage that your application reports. Send usage from trusted server-side code after the billable action succeeds. Do not expose a server API key in browser or mobile code.
+Kelviq bills the usage your application reports. Send it from trusted server-side code after the billable action succeeds. Do not expose a server API key in browser or mobile code.
 
 ### Node.js
 

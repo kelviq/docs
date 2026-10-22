@@ -78,3 +78,86 @@ img.pm-logo {
 td:has(> img.pm-logo) {
   white-space: nowrap;
 }
+
+
+/* ---------- Headings: match kelviq.com (Inter, tight tracking) ---------- */
+#content-area h1, #header h1 { letter-spacing: -0.02em; }
+#content-area h2 { letter-spacing: -0.01em; }
+
+/* ---------- Screenshots: full column width ---------- */
+#content-area [data-name="frame"] img, #content-area .frame img { width: 100%; height: auto !important; }
+
+/* ---------- Sidebar ---------- */
+/* Same width on every page (the Overview page layout would otherwise shrink it) */
+@media (min-width: 1024px) { #sidebar-content { width: 19rem !important; min-width: 19rem !important; flex-shrink: 0 !important; } }
+/* Pages line up with the group name, not the group icon */
+.sidebar-group-header:has(svg, .sidebar-group-icon) ~ ul.sidebar-group { margin-left: 24px; }
+/* Group icons (Nucleo, /icons/*.svg) drawn in a muted grey in both themes */
+img.sidebar-group-icon { object-position: -9999px 0; -webkit-mask-size: contain; mask-size: contain; -webkit-mask-repeat: no-repeat; mask-repeat: no-repeat; -webkit-mask-position: center; mask-position: center; background-color: rgb(120 113 108); }
+html.dark img.sidebar-group-icon { background-color: rgb(140 135 132); }
+img.sidebar-group-icon[src="/icons/book-open.svg"] { -webkit-mask-image: url(/icons/book-open.svg); mask-image: url(/icons/book-open.svg); }
+img.sidebar-group-icon[src="/icons/box.svg"] { -webkit-mask-image: url(/icons/box.svg); mask-image: url(/icons/box.svg); }
+img.sidebar-group-icon[src="/icons/credit-card.svg"] { -webkit-mask-image: url(/icons/credit-card.svg); mask-image: url(/icons/credit-card.svg); }
+img.sidebar-group-icon[src="/icons/gavel.svg"] { -webkit-mask-image: url(/icons/gavel.svg); mask-image: url(/icons/gavel.svg); }
+img.sidebar-group-icon[src="/icons/gear.svg"] { -webkit-mask-image: url(/icons/gear.svg); mask-image: url(/icons/gear.svg); }
+img.sidebar-group-icon[src="/icons/receipt.svg"] { -webkit-mask-image: url(/icons/receipt.svg); mask-image: url(/icons/receipt.svg); }
+img.sidebar-group-icon[src="/icons/rocket.svg"] { -webkit-mask-image: url(/icons/rocket.svg); mask-image: url(/icons/rocket.svg); }
+img.sidebar-group-icon[src="/icons/shield-check.svg"] { -webkit-mask-image: url(/icons/shield-check.svg); mask-image: url(/icons/shield-check.svg); }
+img.sidebar-group-icon[src="/icons/sparkle.svg"] { -webkit-mask-image: url(/icons/sparkle.svg); mask-image: url(/icons/sparkle.svg); }
+img.sidebar-group-icon[src="/icons/tag.svg"] { -webkit-mask-image: url(/icons/tag.svg); mask-image: url(/icons/tag.svg); }
+img.sidebar-group-icon[src="/icons/user.svg"] { -webkit-mask-image: url(/icons/user.svg); mask-image: url(/icons/user.svg); }
+img.sidebar-group-icon[src="/icons/wallet.svg"] { -webkit-mask-image: url(/icons/wallet.svg); mask-image: url(/icons/wallet.svg); }
+
+/* ---------- Overview page (getstarted/overview.mdx, mode: frame) ---------- */
+/* The live site can wrap this page in a narrow column: let the Overview use the full content width */
+#content-area:has(.kq-home), #content-area:has(.kq-home) .mdx-content, :has(> .kq-home) { max-width: none !important; }
+.kq-home { width: 100%; max-width: 1080px; margin: 0 auto; padding: 48px 24px 120px; container-type: inline-size; container-name: kqhome; }
+@media (max-width: 560px) { .kq-home { padding: 32px 16px 64px; } }
+
+/* Header: text left, illustration right */
+.kq-hero2 { display: grid; grid-template-columns: minmax(0, 1.25fr) minmax(0, 1fr); gap: 32px; align-items: center; padding: 8px 0 40px; }
+@container kqhome (max-width: 760px) { .kq-hero2 { grid-template-columns: 1fr; } img.kq-hero2-art { max-width: 360px !important; margin: 8px 0 0 !important; } }
+.kq-crumb { margin: 0 0 12px; font-size: 14px; color: rgb(107 114 128); }
+.kq-hero2-title { margin: 0; font-size: 36px; line-height: 40px; font-weight: 500; letter-spacing: -0.025em; color: #1A202C; }
+.kq-hero2-sub { margin: 16px 0 0; font-size: 18px; line-height: 28px; color: rgb(75 85 99); max-width: 560px; }
+.kq-go { display: inline-flex; align-items: center; gap: 10px; margin-top: 24px; font-size: 17px; font-weight: 600; color: #1A202C !important; text-decoration: none !important; border: none !important; }
+.kq-go-arrow { display: inline-flex; width: 26px; height: 26px; align-items: center; justify-content: center; border-radius: 6px; background: rgb(var(--primary)); color: #fff; font-size: 15px; transition: transform .15s ease; }
+.kq-go:hover .kq-go-arrow { transform: translateX(3px); }
+img.kq-hero2-art { display: block !important; width: 100% !important; height: auto !important; margin: 0 !important; }
+
+/* Question chips (Overview header and Introduction page) */
+.kq-chips { display: flex; flex-wrap: wrap; gap: 10px; margin: 4px 0 32px; }
+.kq-hero2 .kq-chips { margin: 36px 0 0; }
+.kq-chip { display: inline-flex; align-items: center; gap: 8px; padding: 8px 14px; border-radius: 999px; font-size: 14px; font-weight: 500; color: #1A202C !important; text-decoration: none !important; border: 1px solid rgb(229 231 235) !important; background: #fff; transition: border-color .15s ease; }
+.kq-chip:hover { border-color: rgb(var(--primary) / 0.45) !important; }
+.kq-chip-ico { width: 14px; height: 14px; background-color: rgb(var(--primary)); -webkit-mask: url(/icons/sparkle.svg) center / contain no-repeat; mask: url(/icons/sparkle.svg) center / contain no-repeat; }
+
+/* Card sections */
+.kq-section { margin-top: 48px; }
+.kq-section-title { font-size: 14px; font-weight: 600; text-transform: uppercase; letter-spacing: 0.06em; color: rgb(107 114 128); margin: 0 0 16px; }
+.kq-grid { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 16px; }
+.kq-grid-3 { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+@container kqhome (max-width: 900px) { .kq-grid, .kq-grid-3 { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
+@container kqhome (max-width: 520px) { .kq-grid, .kq-grid-3 { grid-template-columns: 1fr; } }
+.kq-card { display: block; padding: 20px; border-radius: 14px; background: #fff; border: 1px solid rgb(229 231 235) !important; text-decoration: none !important; box-shadow: 0 1px 2px rgb(0 0 0 / 0.04); transition: border-color .15s ease, box-shadow .15s ease, transform .15s ease; }
+.kq-card:hover { border-color: rgb(var(--primary) / 0.45) !important; box-shadow: 0 4px 16px rgb(0 0 0 / 0.06); transform: translateY(-1px); }
+.kq-card h3 { margin: 16px 0 6px; font-size: 16px; font-weight: 600; color: #1A202C; letter-spacing: -0.01em; }
+.kq-card p { margin: 0; font-size: 14px; line-height: 1.5; color: rgb(107 114 128); }
+.kq-card-row { display: flex; gap: 14px; align-items: center; }
+.kq-card-row h3 { margin: 0 0 2px; }
+/* Card illustrations (images/illustrations/*.svg) */
+img.kq-art { display: block !important; width: 100% !important; height: auto !important; aspect-ratio: 240 / 140; margin: -4px 0 4px !important; border-radius: 10px !important; background: rgb(250 249 247); border: 1px solid rgb(0 0 0 / 0.04); }
+.kq-card:hover img.kq-art { border-color: rgb(var(--primary) / 0.25); }
+/* Small icon tile on the Reference cards */
+.kq-tile { width: 40px; height: 40px; border-radius: 10px; display: flex; align-items: center; justify-content: center; flex-shrink: 0; border: 1px solid rgb(var(--primary) / 0.18); background-color: rgb(var(--primary) / 0.06); background-image: linear-gradient(rgb(var(--primary) / 0.08) 1px, transparent 1px), linear-gradient(90deg, rgb(var(--primary) / 0.08) 1px, transparent 1px); background-size: 8px 8px; }
+.kq-ico { display: block; width: 18px; height: 18px; background-color: rgb(var(--primary)); -webkit-mask-size: contain; mask-size: contain; -webkit-mask-repeat: no-repeat; mask-repeat: no-repeat; -webkit-mask-position: center; mask-position: center; }
+
+/* Dark mode */
+.dark .kq-hero2-title, .dark .kq-go, .dark .kq-chip, .dark .kq-card h3 { color: #fff !important; }
+.dark .kq-hero2-sub, .dark .kq-crumb { color: rgb(166 161 159); }
+.dark .kq-chip { background: transparent; border-color: rgb(255 255 255 / 0.12) !important; }
+.dark .kq-card { background: rgb(255 255 255 / 0.02); border-color: rgb(255 255 255 / 0.08) !important; box-shadow: none; }
+.dark .kq-card:hover { border-color: rgb(var(--primary-light) / 0.5) !important; }
+.dark .kq-card p, .dark .kq-section-title { color: rgb(156 150 147); }
+.dark img.kq-art { background: rgb(255 255 255 / 0.03); border-color: rgb(255 255 255 / 0.06); }
+.dark .kq-ico { background-color: rgb(var(--primary-light)); }

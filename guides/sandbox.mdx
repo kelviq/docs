@@ -104,7 +104,7 @@ After payment, confirm that the test order, customer, subscription, and entitlem
 ## Test a subscription renewal
 
 <Note>
-  Daily billing is not enabled by default. Any sandbox organization can request it by contacting [Kelviq support](mailto:hi@kelviq.com).
+  To test renewals faster, ask [Kelviq support](mailto:hi@kelviq.com) to turn on Daily billing for your sandbox.
 </Note>
 
 After Daily billing is enabled, use it to test a renewal without waiting for a monthly or yearly billing cycle.
@@ -129,9 +129,9 @@ If you create the checkout session through the API, set `chargePeriod` to `DAILY
 
 ## Can I test production with my own card?
 
-No. Do not place a live order using your own card just to test production credentials. Payment providers can treat a self-payment as suspicious and block the card, even when the amount is small. There is no safe minimum price for this test.
+Test in Sandbox or with a 100% discount code. A payment provider can flag your card if you pay yourself, even for a small amount.
 
-Use one of these options instead:
+Here's how:
 
 * Keep payment and renewal testing in Sandbox.
 * If you need to inspect the production checkout, [create a 100% discount code](/product-catalog/discounts) so no real payment is collected.
