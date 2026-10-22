@@ -471,7 +471,7 @@ When you set up inheritance:
 #### Failed Payment
 - A failed card renewal moves the subscription to `past_due`
 - Kelviq retries card payments for up to 14 days before cancellation
-- Card and UPI AutoPay renewals are retried for up to 14 days, then the subscription is canceled
+- Card and UPI AutoPay renewals are retried for up to 14 days. If payment still fails, the subscription is canceled
 
 #### Refund
 - You decide whether to refund a mid-period cancellation
