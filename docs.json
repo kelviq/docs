@@ -122,7 +122,13 @@
             "pages": [
               "checkout/checkout-configuration",
               "checkout/checkout-design",
-              "checkout/payment-methods",
+              {
+                "group": "Payment methods",
+                "pages": [
+                  "checkout/payment-methods",
+                  "checkout/payment-methods/upi"
+                ]
+              },
               "checkout/custom-fields",
               "checkout/static-checkout-url",
               "checkout/checkout-examples",
