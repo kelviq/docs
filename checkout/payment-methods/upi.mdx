@@ -1,0 +1,69 @@
+---
+title: 'Accept UPI and UPI AutoPay payments'
+sidebarTitle: 'UPI'
+description: 'Take one-time UPI payments and UPI AutoPay subscriptions from customers in India, with no UPI setup of your own'
+keywords: ['UPI', 'UPI AutoPay', 'accept UPI payments', 'UPI subscriptions', 'UPI recurring payments', 'India payments', 'INR']
+---
+
+UPI is the most used way to pay online in India. Your customer scans a QR code with any UPI app, such as Google Pay, PhonePe, Paytm or their bank's app, and approves the payment there.
+
+You don't sign up with a UPI provider or a bank. Kelviq is the merchant of record, so UPI shows up at checkout for the right customers and the money reaches you in your normal [payout](/payouts/overview).
+
+## Who sees UPI at checkout
+
+UPI appears when both of these are true:
+
+| Condition | Why |
+| --- | --- |
+| The customer is in India | UPI is an Indian payment network. |
+| The checkout is priced in INR | UPI only works in rupees. |
+
+To get there, add a localized INR price to your plan with [Price localization](/product-catalog/location-based-pricing). Customers in India then see the INR price, and UPI next to cards and wallets.
+
+## One-time payments
+
+The customer picks UPI at checkout, scans the QR code with their UPI app and approves the payment.
+
+* A single payment can be from ₹1 up to ₹1,00,000.
+* QR codes expire after 5 minutes.
+* Checkout supports UPI by QR code only. Customers can't enter a UPI ID.
+
+## Subscriptions with UPI AutoPay
+
+For a subscription, the customer approves a UPI AutoPay mandate in their UPI app at checkout. Kelviq then charges each renewal automatically.
+
+| | One-time payment | UPI AutoPay renewal |
+| --- | --- | --- |
+| Amount per payment | ₹1 to ₹1,00,000 | Up to ₹15,000 per charge |
+| Customer action | Scan and approve each time | Approve the mandate once at checkout |
+| Failed payments | Not applicable | Retried for up to 14 days, then the subscription is canceled |
+
+UPI AutoPay depends on the customer's bank and UPI app supporting it. Failed renewals follow the same retry schedule as cards. See [failed subscription payments](/product-catalog/subscriptions#failed-subscription-payments).
+
+If you [change a plan's price](/product-catalog/plans) and migrate existing customers, a UPI AutoPay mandate may need the customer to approve a renewal when the new amount is above the applicable regulatory threshold.
+
+## Refunds
+
+Refund a UPI payment from the order in [Orders](/sales/orders) with **Refund payment**. You can refund up to 60 days after the payment. The money takes up to 7 business days to reach the customer.
+
+As with every refund on Kelviq, the transaction fee isn't returned and the tax part goes back to the customer.
+
+To find UPI payments, search for `upi` in [Transactions](/payouts/transactions).
+
+## UPI questions
+
+<AccordionGroup>
+  <Accordion title="Do I need to sign up with a UPI provider?">
+    No. Kelviq is the merchant of record and collects UPI payments for you. You only need an INR price on your plan.
+  </Accordion>
+  <Accordion title="Can customers pay with a UPI ID instead of a QR code?">
+    Not at the moment. Kelviq checkout supports UPI by QR code.
+  </Accordion>
+  <Accordion title="Is there a limit on UPI AutoPay renewals?">
+    Yes. Each UPI AutoPay renewal can be up to ₹15,000. One-time UPI payments can be up to ₹1,00,000.
+  </Accordion>
+</AccordionGroup>
+
+<Card title="Next: set local prices" icon="/icons/tag.svg" href="/product-catalog/location-based-pricing">
+  Add an INR price so customers in India see UPI at checkout.
+</Card>
