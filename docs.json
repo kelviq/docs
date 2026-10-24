@@ -126,7 +126,8 @@
                 "group": "Payment methods",
                 "pages": [
                   "checkout/payment-methods",
-                  "checkout/payment-methods/upi"
+                  "checkout/payment-methods/upi",
+                  "checkout/payment-methods/pix"
                 ]
               },
               "checkout/custom-fields",

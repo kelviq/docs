@@ -1,0 +1,50 @@
+---
+title: 'Accept Pix payments'
+sidebarTitle: 'Pix'
+description: 'Take one-time Pix payments and Pix Automático subscriptions from customers in Brazil, with no Pix setup of your own'
+keywords: ['Pix', 'Pix Automático', 'accept Pix payments', 'Pix subscriptions', 'Pix recurring payments', 'Brazil payments', 'BRL']
+---
+
+Pix is Brazil's instant payment system, run by the Banco Central do Brasil. Your customer pays from their bank app and the payment goes through in seconds.
+
+You don't sign up with a Pix provider or a Brazilian bank. Kelviq is the merchant of record, so Pix shows up at checkout for the right customers and the money reaches you in your normal [payout](/payouts/overview).
+
+## Who sees Pix at checkout
+
+| Condition | Why |
+| --- | --- |
+| The customer is in Brazil | Pix is a Brazilian payment system. |
+| The checkout is priced in BRL | Pix only works in reais. |
+
+Add a localized BRL price to your plan with [Price localization](/product-catalog/location-based-pricing). Customers in Brazil then see the BRL price, and Pix next to cards.
+
+## Subscriptions with Pix Automático
+
+Pix Automático is Pix's recurring payment option. The customer authorizes it once in their bank app at checkout, and Kelviq charges each renewal automatically, without the customer approving every payment.
+
+| | One-time Pix | Pix Automático renewal |
+| --- | --- | --- |
+| Customer action | Pay each time | Authorize once at checkout |
+| Good for | One-time purchases | Subscriptions |
+
+## Refunds
+
+Refund a Pix payment from the order in [Orders](/sales/orders) with **Refund payment**. As with every refund on Kelviq, the transaction fee isn't returned and the tax part goes back to the customer.
+
+## Pix questions
+
+<AccordionGroup>
+  <Accordion title="Do I need to sign up with a Pix provider?">
+    No. Kelviq is the merchant of record and collects Pix payments for you. You only need a BRL price on your plan.
+  </Accordion>
+  <Accordion title="Is Pix Automático the same as a scheduled Pix?">
+    No. With Pix Automático, Kelviq requests each renewal under the customer's one-time authorization. A scheduled Pix is set up by the customer in their own bank app.
+  </Accordion>
+  <Accordion title="Can I also offer Boleto in Brazil?">
+    Yes. Boleto is also available for customers in Brazil, and each renewal gets a new voucher. See [payment methods](/checkout/payment-methods#vouchers).
+  </Accordion>
+</AccordionGroup>
+
+<Card title="Next: set local prices" icon="/icons/tag.svg" href="/product-catalog/location-based-pricing">
+  Add a BRL price so customers in Brazil see Pix at checkout.
+</Card>
