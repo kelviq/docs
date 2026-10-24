@@ -1,0 +1,54 @@
+---
+title: 'Accept iDEAL payments'
+sidebarTitle: 'iDEAL'
+description: 'Take iDEAL | Wero payments from customers in the Netherlands, including subscriptions that renew by SEPA Direct Debit'
+keywords: ['iDEAL', 'iDEAL Wero', 'accept iDEAL payments', 'iDEAL subscriptions', 'iDEAL recurring payments', 'Netherlands payments', 'EUR', 'SEPA Direct Debit']
+---
+
+iDEAL is a Dutch online payment method. Your customer pays straight from their Dutch bank account through their own banking app or online banking. iDEAL now runs under the name iDEAL | Wero.
+
+You don't sign up with iDEAL or a Dutch bank. Kelviq is the merchant of record, so iDEAL shows up at checkout for the right customers and the money reaches you in your normal [payout](/payouts/overview).
+
+## Who sees iDEAL at checkout
+
+| Condition | Why |
+| --- | --- |
+| The customer is in the Netherlands | iDEAL works with Dutch banks. |
+| The checkout is priced in EUR | iDEAL only works in euros. |
+
+If your plans are priced in USD, add a localized EUR price with [Price localization](/product-catalog/location-based-pricing) so customers in the Netherlands see iDEAL.
+
+## How the customer pays
+
+iDEAL is a bank redirect. The customer picks iDEAL at checkout, is sent to their bank or banking app to approve the payment, then comes back to checkout.
+
+## Subscriptions with iDEAL
+
+The first payment is made with iDEAL. Renewals are then charged by SEPA Direct Debit, so the customer doesn't approve each renewal.
+
+| | First payment | Renewals |
+| --- | --- | --- |
+| How it's paid | iDEAL, approved in the bank app | SEPA Direct Debit |
+| Customer action | Approve once | None |
+
+## Refunds
+
+Refund an iDEAL payment from the order in [Orders](/sales/orders) with **Refund payment**. As with every refund on Kelviq, the transaction fee isn't returned and the tax part goes back to the customer.
+
+## iDEAL questions
+
+<AccordionGroup>
+  <Accordion title="Do I need to sign up with iDEAL or a Dutch bank?">
+    No. Kelviq is the merchant of record and collects iDEAL payments for you. You only need a EUR price on your plan.
+  </Accordion>
+  <Accordion title="Can I use iDEAL for subscriptions?">
+    Yes. The first payment is made with iDEAL and renewals are charged by SEPA Direct Debit.
+  </Accordion>
+  <Accordion title="What about customers in Belgium or other euro countries?">
+    Customers in Belgium can pay with Bancontact, which works the same way. Other euro customers can pay by card, wallet or SEPA Direct Debit. See [payment methods](/checkout/payment-methods).
+  </Accordion>
+</AccordionGroup>
+
+<Card title="Next: set local prices" icon="/icons/tag.svg" href="/product-catalog/location-based-pricing">
+  Add a EUR price so customers in the Netherlands see iDEAL at checkout.
+</Card>
