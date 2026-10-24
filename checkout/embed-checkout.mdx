@@ -1,0 +1,256 @@
+---
+title: "Embed checkout on your site"
+description: "Open Kelviq Checkout as an overlay or mount it inline on your own page with kelviq.js"
+---
+
+By default, a checkout link sends the customer to a Kelviq-hosted page. With the `@kelviq/js-checkout` SDK you can keep the customer on your site instead: open checkout as a **modal overlay** over your current page, or mount it **inline** inside your own layout. The SDK reports the checkout lifecycle (loaded, success, close, error) back to callbacks you provide.
+
+It is a small script with no dependencies. It works with plain HTML and with any framework.
+
+<Note>
+Embedded checkout needs a **checkout session URL** created with the [Checkout API](/api-reference/checkout/create-a-checkout-session). Static `/buy/` links are not supported in embedded mode yet.
+</Note>
+
+## 1. Install the SDK
+
+<Tabs>
+  <Tab title="npm">
+    ```bash
+    npm install @kelviq/js-checkout
+    ```
+
+    ```ts
+    import { open, embed } from '@kelviq/js-checkout';
+    ```
+
+    The package ships ESM and TypeScript types. The examples below use the `Kelviq` global; with npm, call `open()` and `embed()` directly instead.
+  </Tab>
+  <Tab title="Script tag">
+    Add the script tag to any page that opens checkout. It defines one global, `Kelviq`.
+
+    ```html
+    <script src="https://cdn.jsdelivr.net/npm/@kelviq/js-checkout@1/dist/kelviq.js"></script>
+    ```
+
+    The `@1` pin receives backwards-compatible updates automatically. Do not copy the file to your own server: the SDK and the checkout page share one messaging protocol, and Kelviq updates both together.
+  </Tab>
+</Tabs>
+
+## 2. Create a checkout session
+
+Create the session from your backend with your server API key and pass the returned `checkoutUrl` to the browser. The same call accepts a customer, discount code, metadata, and the other options described in [Create a checkout session](/api-reference/checkout/create-a-checkout-session).
+
+```bash
+curl -X POST https://api.kelviq.com/api/v1/checkout/ \
+  -H "Authorization: Bearer $KELVIQ_SERVER_API_KEY" \
+  -H "Content-Type: application/json" \
+  -d '{
+    "planIdentifier": "pro",
+    "chargePeriod": "MONTHLY",
+    "customerId": "cust_789"
+  }'
+```
+
+```json
+{
+  "checkoutUrl": "https://checkout.kelviq.com/checkout/cs_eeCGdGayc5oTMdGNV5XocfRk6o87K0vlwwCuKeiE7BLU9/",
+  "checkoutSessionId": "cs_eeCGdGayc5oTMdGNV5XocfRk6o87K0vlwwCuKeiE7BLU9"
+}
+```
+
+<Warning>
+Leave `successUrl` out of sessions you open with `kelviq.js` if you want the `onSuccess` callback. A session with a `successUrl` redirects your whole page to that URL when payment completes, and `onSuccess` never fires. See [Success callback or redirect](#success-callback-or-redirect).
+</Warning>
+
+Pass the `checkoutUrl` to the browser exactly as returned. Do not rewrite its host: the script only accepts messages from the origin of the URL you give it.
+
+## 3. Open checkout
+
+<Tabs>
+  <Tab title="Overlay">
+    Open checkout as a modal over the current page. Good for a **Buy** button anywhere on your site.
+
+    ```html
+    <button id="buy">Buy Pro</button>
+
+    <script>
+      document.getElementById('buy').addEventListener('click', async () => {
+        // Your backend creates the session and returns { checkoutUrl }
+        const { checkoutUrl } = await fetch('/api/checkout', { method: 'POST' })
+          .then((r) => r.json());
+
+        Kelviq.open({
+          url: checkoutUrl,
+          onSuccess: (order) => {
+            console.log('Paid', order.orderId, order.planName);
+          },
+          onClose: () => {
+            console.log('Checkout closed');
+          },
+        });
+      });
+    </script>
+    ```
+
+    `Kelviq.open()` returns a handle with `close()`. The overlay also closes when the customer clicks the × button, presses Escape, or clicks the backdrop.
+  </Tab>
+  <Tab title="Inline">
+    Mount checkout inside an element on your page. Good for a dedicated checkout page on your own domain. The frame resizes itself to the checkout's height.
+
+    ```html
+    <div id="checkout"></div>
+
+    <script>
+      const handle = Kelviq.embed({
+        url: checkoutUrl, // from your backend
+        container: '#checkout',
+        onSuccess: (order) => {
+          console.log('Paid', order.orderId);
+        },
+      });
+
+      // In a single-page app, unmount when the user navigates away:
+      // handle.destroy();
+    </script>
+    ```
+
+    `container` accepts a CSS selector or an `HTMLElement`. `Kelviq.embed()` returns a handle with `destroy()`.
+  </Tab>
+</Tabs>
+
+## Options
+
+Both methods take `url` plus the callbacks below. `Kelviq.open()` also accepts the overlay options.
+
+### Callbacks
+
+| Callback | When it fires | Argument |
+| --- | --- | --- |
+| `onLoaded` | The checkout has finished loading | — |
+| `onSuccess` | Payment completed and the confirmation rendered inside the checkout (sessions without a `successUrl` only) | `{ orderId, planName, amount, currency, email }` (all optional) |
+| `onClose` | The checkout was closed: × button, Escape, backdrop click, the checkout's own back action, or `handle.close()` / `handle.destroy()` | — |
+| `onError` | The session cannot be checked out: expired, not found, or a network failure. The checkout shows its own error page | `{ code, message }` (both optional), for example `ERR_SESSION_EXPIRED` or `ERR_SESSION_NOT_FOUND` |
+
+`onClose` does not fire when the checkout is about to redirect your page (see below). Use `onError` to recover, for example by creating a fresh session and opening it again.
+
+### Overlay options (`Kelviq.open` only)
+
+| Option | Type | Default | Description |
+| --- | --- | --- | --- |
+| `size` | `"sm" \| "md" \| "lg"` | `"md"` | Modal width preset: 400px, 480px, or 640px |
+| `width` | CSS length | — | Explicit modal width; overrides `size` |
+| `height` | CSS length | `"720px"` | Explicit modal height |
+| `showCloseButton` | `boolean` | `true` | Render the × button in the corner |
+| `dismissible` | `boolean` | `true` | Close on Escape or backdrop click. The × button and `handle.close()` always work |
+| `title` | `string` | `"Checkout"` | Accessible label for the dialog |
+
+The modal never exceeds the viewport: width and height are capped at the viewport size minus a 16px margin on each side.
+
+### Handles
+
+```ts
+const overlay = Kelviq.open({ url });   // { close(): void }
+const inline = Kelviq.embed({ url, container }); // { destroy(): void }
+```
+
+Opening a second overlay closes the first one. Calling `close()` or `destroy()` twice is safe.
+
+## Use with a framework
+
+Call the SDK only in the browser, after the component has mounted, and clean up with the handle when the component unmounts. Never call it during server rendering.
+
+<Tabs>
+  <Tab title="React">
+    ```tsx
+    import { useEffect, useRef } from 'react';
+    import { embed, open } from '@kelviq/js-checkout';
+
+    // Inline checkout on a dedicated page
+    export function InlineCheckout({ url }: { url: string }) {
+      const container = useRef<HTMLDivElement>(null);
+
+      useEffect(() => {
+        if (!container.current) return;
+        const handle = embed({
+          url,
+          container: container.current,
+          onSuccess: (order) => console.log('paid', order.orderId),
+        });
+        return () => handle.destroy();
+      }, [url]);
+
+      return <div ref={container} />;
+    }
+
+    // Overlay from a button
+    export function BuyButton({ url }: { url: string }) {
+      return <button onClick={() => open({ url })}>Buy</button>;
+    }
+    ```
+
+    In Next.js, mark the component with `'use client'`. The `url` comes from a server action or route handler that calls the Checkout API with your server API key.
+  </Tab>
+  <Tab title="Vue">
+    ```vue
+    <script setup lang="ts">
+    import { onBeforeUnmount, onMounted, ref } from 'vue';
+    import { embed, type KelviqEmbedHandle } from '@kelviq/js-checkout';
+
+    const props = defineProps<{ url: string }>();
+    const container = ref<HTMLElement>();
+    let handle: KelviqEmbedHandle | undefined;
+
+    onMounted(() => {
+      handle = embed({ url: props.url, container: container.value! });
+    });
+    onBeforeUnmount(() => handle?.destroy());
+    </script>
+
+    <template><div ref="container" /></template>
+    ```
+  </Tab>
+</Tabs>
+
+## Success callback or redirect
+
+A checkout session ends in exactly one of two ways, decided by whether it has a `successUrl`:
+
+| Session | On payment success |
+| --- | --- |
+| **Without `successUrl`** | The confirmation screen renders inside the overlay or frame and `onSuccess` fires with the order details. Your page does not navigate. |
+| **With `successUrl`** | Your whole page (not just the frame) navigates to `successUrl`. `onSuccess` and `onClose` do not fire. |
+
+If you rely on `onSuccess` for analytics or to update your UI, create the session without a `successUrl`. For fulfilment, use the [`checkout.completed` webhook](/guides/webhooks) in either case: a browser callback can be missed if the customer closes the tab.
+
+## Sandbox
+
+Sessions created with a sandbox server API key return a sandbox `checkoutUrl`. Pass it to `kelviq.js` the same way; the script works with both environments. Use Stripe test cards (for example `4242 4242 4242 4242`) to complete a test payment. See [Sandbox](/guides/sandbox).
+
+## Browser support
+
+- **Your page (the SDK)**: every browser Stripe.js supports, including Chrome 38+, Safari 10.1+, Firefox 29+, Edge 15+, iOS Safari 9+ and Android Chrome 38+. The script never breaks the host page on an unsupported browser.
+- **The checkout inside the frame**: Chrome and Edge 99+, Firefox 97+, Safari 15.4+. On older browsers the customer sees a "browser not supported" message instead of the form, and `onClose` still fires if they dismiss it.
+
+## Limitations
+
+- **Static checkout links** (`https://www.kelviq.com/buy/…`) cannot be embedded yet. Create a session with the Checkout API and embed its `checkoutUrl`.
+- **Redirect-based payment methods** such as iDEAL and Bancontact are not supported in embedded mode. Card payments, including 3D Secure challenges, work.
+- Kelviq controls which sites may frame the checkout. If your embed renders blank and the browser console reports a `frame-ancestors` violation, contact [hi@kelviq.com](mailto:hi@kelviq.com) with the domain you embed from.
+
+## Troubleshooting
+
+<Accordion title="The overlay opens but stays blank">
+  Check the browser console. A Content-Security-Policy `frame-ancestors` error means the page is not allowed to frame Kelviq Checkout from your domain. A 404 inside the frame means the session ID is wrong or the session has expired.
+</Accordion>
+
+<Accordion title="onSuccess never fires">
+  The session was created with a `successUrl`, so the page redirected instead. Create the session without a `successUrl`, or handle the redirect landing page on your side.
+</Accordion>
+
+<Accordion title="The frame shows an error page">
+  The session has expired, was already used, or could not be loaded. `onError` fires with a `code` such as `ERR_SESSION_EXPIRED`; create a new session and open it again.
+</Accordion>
+
+<Accordion title="The inline frame does not resize">
+  Make sure you passed the `checkoutUrl` exactly as the API returned it. The script ignores messages from any other origin, including a different subdomain of the same host.
+</Accordion>
