@@ -120,7 +120,22 @@ Pass the `checkoutUrl` to the browser exactly as returned. Do not rewrite its ho
 
 ## Options
 
-Both methods take `url` plus the callbacks below. `Kelviq.open()` also accepts the overlay options.
+Both methods take `url`, the optional `theme`, and the callbacks below. `Kelviq.open()` also accepts the overlay options.
+
+### Color mode (`theme`)
+
+| Option | Type | Default | Description |
+| --- | --- | --- | --- |
+| `theme` | `"light" \| "dark" \| "system"` | Dashboard default | The color mode the checkout renders in, so it matches your page. `"system"` follows the customer's OS preference. Requires `@kelviq/js-checkout` 1.1.0 or later. |
+
+Pass the mode your page is currently showing. When you omit it, the **Default mode** configured in the dashboard applies. The checkout's own light/dark switcher is hidden whenever it is embedded; your page decides.
+
+```js
+Kelviq.open({
+  url: checkoutUrl,
+  theme: document.documentElement.classList.contains('dark') ? 'dark' : 'light',
+});
+```
 
 ### Callbacks
 
@@ -137,23 +152,40 @@ Both methods take `url` plus the callbacks below. `Kelviq.open()` also accepts t
 
 | Option | Type | Default | Description |
 | --- | --- | --- | --- |
-| `size` | `"sm" \| "md" \| "lg"` | `"md"` | Modal width preset: 400px, 480px, or 640px |
+| `size` | `"sm" \| "md" \| "lg"` | `"md"` | Modal width preset: 480px, 960px, or 1120px. `md` and `lg` show the two-column checkout; `sm` stacks it in one column |
 | `width` | CSS length | — | Explicit modal width; overrides `size` |
 | `height` | CSS length | `"720px"` | Explicit modal height |
 | `showCloseButton` | `boolean` | `true` | Render the × button in the corner |
 | `dismissible` | `boolean` | `true` | Close on Escape or backdrop click. The × button and `handle.close()` always work |
 | `title` | `string` | `"Checkout"` | Accessible label for the dialog |
 
-The modal never exceeds the viewport: width and height are capped at the viewport size minus a 16px margin on each side.
+The modal never exceeds the viewport: width and height are capped at the viewport size minus a 24px margin on each side. On phones (viewports up to 519px wide) it opens as a full-screen sheet instead.
 
 ### Handles
 
 ```ts
-const overlay = Kelviq.open({ url });   // { close(): void }
-const inline = Kelviq.embed({ url, container }); // { destroy(): void }
+const overlay = Kelviq.open({ url });   // { close(), update() }
+const inline = Kelviq.embed({ url, container }); // { destroy(), update() }
 ```
 
 Opening a second overlay closes the first one. Calling `close()` or `destroy()` twice is safe.
+
+### Change the plan from your page (`update`)
+
+`update({ planIdentifier?, chargePeriod? })` switches the plan or billing period of the running checkout in place, without reloading it or losing what the customer typed. Use it when your own page has the pricing controls, for example a monthly/yearly toggle next to an inline checkout. Requires `@kelviq/js-checkout` 1.1.0 or later.
+
+```js
+const inline = Kelviq.embed({ url: checkoutUrl, container: '#checkout' });
+
+document.querySelector('#yearly').addEventListener('change', (event) => {
+  inline.update({ chargePeriod: event.target.checked ? 'YEARLY' : 'MONTHLY' });
+});
+```
+
+- Values must exist on the session: a plan from the offering and one of its enabled billing periods. The checkout ignores anything else.
+- If you change only the period and the current plan has no price for it, the checkout picks the first plan that does, as its own period tabs do.
+- Calls made before `onLoaded` are queued and applied once the checkout has loaded.
+- To hide the checkout's own plan selector and keep yours as the single source of truth, create the session with `plansEnabled: false`.
 
 ## Use with a framework
 
