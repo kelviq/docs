@@ -10,6 +10,12 @@ td {
   white-space: normal;
 }
 
+/* Inline code in a table cell, such as a card number or IBAN, stays on one line. */
+td code,
+th code {
+  white-space: nowrap;
+}
+
 table tr th {
   text-align: left;
 }

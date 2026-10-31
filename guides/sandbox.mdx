@@ -87,13 +87,15 @@ See the [Node SDK](/backend-integration/node-sdk), [Python SDK](/backend-integra
 
 ## Test checkout
 
-Create a checkout in the sandbox and use these test card details. Use any future expiration date and a valid test CVC.
+Create a checkout in the sandbox and pay with a test card. Use any future expiration date and any CVC.
 
 | Card number | Result |
 | --- | --- |
 | `4242 4242 4242 4242` | Successful payment |
 | `4000 0000 0000 0002` | Declined payment |
 | `4000 0025 0000 3155` | Payment requiring authentication |
+
+For every other outcome, including specific decline reasons, disputes, refunds, wallets, SEPA Direct Debit and UPI, see [Test payments](/guides/test-payments).
 
 <Warning>
 Do not enter a real card number in the sandbox.

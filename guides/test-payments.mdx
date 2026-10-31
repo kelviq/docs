@@ -1,0 +1,603 @@
+---
+title: "Test payments in the sandbox"
+sidebarTitle: "Test payments"
+description: "Test card numbers, IBANs and wallet details that simulate every checkout outcome in the Kelviq sandbox: success, declines, 3D Secure, disputes, refunds, wallets, SEPA Direct Debit and UPI"
+keywords: ['test cards', 'test card numbers', '4242 4242 4242 4242', 'sandbox', 'test payments', '3D Secure test card', 'declined card', 'test UPI', 'test SEPA', 'test Apple Pay', 'test Google Pay', 'test Link']
+---
+
+In the [sandbox](/guides/sandbox), checkout runs on the payment provider's test mode. No money moves and nothing you do touches production. The details on this page make a sandbox checkout behave a certain way: a successful payment, a decline, a 3D Secure prompt, a dispute, or a wallet, SEPA Direct Debit or UPI payment.
+
+## Before you start
+
+* **Any test card takes any future expiry date and any CVC.** Use 3 digits for the CVC, or 4 for American Express. Any valid postal code works.
+* **Never enter a real card number in the sandbox.** Test mode rejects real cards.
+* **Checkout shows the methods that fit the customer's country and the checkout currency.** To test UPI or SEPA Direct Debit, give the plan an INR or EUR price with [location-based pricing](/product-catalog/location-based-pricing) and choose the matching billing country at checkout. See [Payment methods](/checkout/payment-methods) for which method needs which currency.
+* **Redirect methods open a test page instead of the wallet or bank.** The page has **Authorize test payment** and **Fail test payment** buttons. Choose one to finish the payment.
+* **SEPA Direct Debit finishes in about 3 minutes in the sandbox.** It takes several business days in production. See [Timing in the sandbox](#timing-in-the-sandbox).
+
+After each test, check the order, customer, subscription and entitlements in the sandbox dashboard, and the [webhook events](/guides/webhooks) your endpoint received.
+
+## The cards you need most
+
+| Card number | Result |
+| --- | --- |
+| `4242 4242 4242 4242` | Payment succeeds |
+| `4000 0000 0000 0002` | Card is declined |
+| `4000 0000 0000 9995` | Declined for insufficient funds |
+| `4000 0025 0000 3155` | 3D Secure prompt, then the payment succeeds |
+| `4000 0000 0000 0341` | Card is saved at checkout, but every charge on it fails. Use with a free trial to test a failed first charge |
+
+The rest of this page lists every other scenario.
+
+## Cards by brand
+
+All of these succeed.
+
+| Brand | Card number | CVC |
+| --- | --- | --- |
+| Visa | `4242 4242 4242 4242` | Any 3 digits |
+| Visa (debit) | `4000 0566 5566 5556` | Any 3 digits |
+| Mastercard | `5555 5555 5555 4444` | Any 3 digits |
+| Mastercard (2-series) | `2223 0031 2200 3222` | Any 3 digits |
+| Mastercard (debit) | `5200 8282 8282 8210` | Any 3 digits |
+| Mastercard (prepaid) | `5105 1051 0510 5100` | Any 3 digits |
+| American Express | `3782 822463 10005` | Any 4 digits |
+| American Express | `3714 496353 98431` | Any 4 digits |
+| Discover | `6011 1111 1111 1117` | Any 3 digits |
+| Discover | `6011 0009 9013 9424` | Any 3 digits |
+| Discover (debit) | `6011 9811 1111 1113` | Any 3 digits |
+| Diners Club | `3056 9300 0902 0004` | Any 3 digits |
+| Diners Club (14 digits) | `3622 720627 1667` | Any 3 digits |
+| BCcard and DinaCard | `6555 9000 0060 4105` | Any 3 digits |
+| JCB | `3566 0020 2036 0505` | Any 3 digits |
+| UnionPay | `6200 0000 0000 0005` | Any 3 digits |
+| UnionPay (debit) | `6200 0000 0000 0047` | Any 3 digits |
+| UnionPay (19 digits) | `6205 5000 0000 0000 004` | Any 3 digits |
+
+### Co-branded cards
+
+| Brand | Card number |
+| --- | --- |
+| Cartes Bancaires / Visa | `4000 0025 0000 1001` |
+| Cartes Bancaires / Mastercard | `5555 5525 0000 1001` |
+| eftpos Australia / Visa | `4000 0503 6000 0001` |
+| eftpos Australia / Mastercard | `5555 0503 6000 0080` |
+
+## Cards by country
+
+Use these to see how checkout, tax and pricing behave for a card issued in a given country. All of them succeed. Cards from Europe and the Middle East succeed without a 3D Secure prompt.
+
+<AccordionGroup>
+  <Accordion title="Americas">
+    | Country | Card number | Brand |
+    | --- | --- | --- |
+    | United States | `4242 4242 4242 4242` | Visa |
+    | Argentina | `4000 0003 2000 0021` | Visa |
+    | Brazil | `4000 0007 6000 0002` | Visa |
+    | Canada | `4000 0012 4000 0000` | Visa |
+    | Chile | `4000 0015 2000 0001` | Visa |
+    | Colombia | `4000 0017 0000 0003` | Visa |
+    | Costa Rica | `4000 0018 8000 0005` | Visa |
+    | Ecuador | `4000 0021 8000 0000` | Visa |
+    | Mexico | `4000 0048 4000 8001` | Visa |
+    | Mexico | `5062 2100 0000 0009` | Carnet |
+    | Panama | `4000 0059 1000 0000` | Visa |
+    | Paraguay | `4000 0060 0000 0066` | Visa |
+    | Peru | `4000 0060 4000 0068` | Visa |
+    | Uruguay | `4000 0085 8000 0003` | Visa |
+  </Accordion>
+  <Accordion title="Europe and Middle East">
+    | Country | Card number | Brand |
+    | --- | --- | --- |
+    | Austria | `4000 0004 0000 0008` | Visa |
+    | Belarus | `4000 0011 2000 0005` | Visa |
+    | Belgium | `4000 0005 6000 0004` | Visa |
+    | Bulgaria | `4000 0010 0000 0000` | Visa |
+    | Croatia | `4000 0019 1000 0009` | Visa |
+    | Cyprus | `4000 0019 6000 0008` | Visa |
+    | Czech Republic | `4000 0020 3000 0002` | Visa |
+    | Denmark | `4000 0020 8000 0001` | Visa |
+    | Estonia | `4000 0023 3000 0009` | Visa |
+    | Finland | `4000 0024 6000 0001` | Visa |
+    | France | `4000 0025 0000 0003` | Visa |
+    | Germany | `4000 0027 6000 0016` | Visa |
+    | Gibraltar | `4000 0029 2000 0005` | Visa |
+    | Greece | `4000 0030 0000 0030` | Visa |
+    | Hungary | `4000 0034 8000 0005` | Visa |
+    | Ireland | `4000 0037 2000 0005` | Visa |
+    | Italy | `4000 0038 0000 0008` | Visa |
+    | Latvia | `4000 0042 8000 0005` | Visa |
+    | Liechtenstein | `4000 0043 8000 0004` | Visa |
+    | Lithuania | `4000 0044 0000 0000` | Visa |
+    | Luxembourg | `4000 0044 2000 0006` | Visa |
+    | Malta | `4000 0047 0000 0007` | Visa |
+    | Netherlands | `4000 0052 8000 0002` | Visa |
+    | Norway | `4000 0057 8000 0007` | Visa |
+    | Poland | `4000 0061 6000 0005` | Visa |
+    | Portugal | `4000 0062 0000 0007` | Visa |
+    | Romania | `4000 0064 2000 0001` | Visa |
+    | Saudi Arabia | `4000 0068 2000 0007` | Visa |
+    | Slovakia | `4000 0070 3000 0001` | Visa |
+    | Slovenia | `4000 0070 5000 0006` | Visa |
+    | Spain | `4000 0072 4000 0007` | Visa |
+    | Sweden | `4000 0075 2000 0008` | Visa |
+    | Switzerland | `4000 0075 6000 0009` | Visa |
+    | United Arab Emirates | `4000 0078 4000 0001` | Visa |
+    | United Arab Emirates | `5200 0078 4000 0022` | Mastercard |
+    | United Kingdom | `4000 0082 6000 0000` | Visa |
+    | United Kingdom | `4000 0582 6000 0005` | Visa (debit) |
+    | United Kingdom | `5555 5582 6555 4449` | Mastercard |
+  </Accordion>
+  <Accordion title="Asia Pacific">
+    | Country | Card number | Brand |
+    | --- | --- | --- |
+    | Australia | `4000 0003 6000 0006` | Visa |
+    | China | `4000 0015 6000 0002` | Visa |
+    | Hong Kong | `4000 0034 4000 0004` | Visa |
+    | India | `4000 0035 6000 0008` | Visa |
+    | Japan | `4000 0039 2000 0003` | Visa |
+    | Japan | `3530 1113 3330 0000` | JCB |
+    | Malaysia | `4000 0045 8000 0002` | Visa |
+    | New Zealand | `4000 0055 4000 0008` | Visa |
+    | Singapore | `4000 0070 2000 0003` | Visa |
+    | Taiwan | `4000 0015 8000 0008` | Visa |
+    | Thailand | `4000 0076 4000 0003` | Visa (credit) |
+    | Thailand | `4000 0576 4000 0008` | Visa (debit) |
+  </Accordion>
+</AccordionGroup>
+
+## Declined payments
+
+Checkout shows the decline to the customer and no order is created.
+
+| Scenario | Card number | Decline reason |
+| --- | --- | --- |
+| Generic decline | `4000 0000 0000 0002` | `generic_decline` |
+| Insufficient funds | `4000 0000 0000 9995` | `insufficient_funds` |
+| Lost card | `4000 0000 0000 9987` | `lost_card` |
+| Stolen card | `4000 0000 0000 9979` | `stolen_card` |
+| Expired card | `4000 0000 0000 0069` | `expired_card` |
+| Incorrect CVC | `4000 0000 0000 0127` | `incorrect_cvc` |
+| Processing error | `4000 0000 0000 0119` | `processing_error` |
+| Incorrect number | `4242 4242 4242 4241` | `incorrect_number` (fails the Luhn check) |
+| Too many attempts | `4000 0000 0000 6975` | `card_velocity_exceeded` |
+| Decline after saving | `4000 0000 0000 0341` | The card is saved, then every charge fails. See [Subscriptions and saved cards](#subscriptions-and-saved-cards) |
+
+### Invalid card details
+
+These errors come from the checkout form itself, before anything is sent to the payment provider.
+
+| Scenario | What to enter |
+| --- | --- |
+| Invalid expiry month | Month `13` |
+| Invalid expiry year | A year in the past, such as `95` |
+| Invalid CVC | A 2-digit CVC, such as `99` |
+| Invalid number | A number that fails the Luhn check, such as `4242 4242 4242 4241` |
+
+## 3D Secure authentication
+
+These cards show a 3D Secure test dialog at checkout. Click **Complete** to pass authentication or **Fail** to fail it.
+
+| Card number | 3D Secure | Result |
+| --- | --- | --- |
+| `4000 0000 0000 3220` | Required | Authentication must be completed. Irish-issued card |
+| `4000 0084 0000 0027` | Required | Authentication must be completed. US-issued card |
+| `4000 0084 0000 1629` | Required | Authentication succeeds, then the payment is declined |
+| `4000 0084 0000 1280` | Required | The 3D Secure lookup fails with a processing error and the payment is declined |
+| `4000 0000 3220 0000` | Required | Authentication is required and passes with a frictionless flow. The customer sees no dialog |
+| `4000 0000 0000 3055` | Supported | Authentication is supported but not required. No prompt by default |
+| `4000 0000 0000 3097` | Supported | Authentication is supported but not required. If attempted, it fails with a processing error |
+| `4242 4242 4242 4242` | Supported | The card is not enrolled. The customer is never prompted |
+| `3782 822463 10005` | Not supported | 3D Secure cannot run. The payment proceeds without it |
+
+### Challenge screens
+
+Each of these requires 3D Secure 2 on every payment and shows a different kind of challenge screen in the test dialog.
+
+| Card number | Challenge type |
+| --- | --- |
+| `4000 5826 0000 0094` | Out of band, approved in another app |
+| `4000 5826 0000 0045` | One-time passcode |
+| `4000 5826 0000 0102` | Single select |
+| `4000 5826 0000 0110` | Multi select |
+
+## Subscriptions and saved cards
+
+A subscription charges the saved card again at each renewal without the customer present. These cards behave differently on the first payment and on renewals.
+
+| Card number | At checkout | On renewal |
+| --- | --- | --- |
+| `4000 0025 0000 3155` | 3D Secure prompt | Succeeds, because the card was set up at checkout |
+| `4000 0027 6000 3184` | 3D Secure prompt | Renewal needs authentication, so the automatic charge fails |
+| `4000 0038 0000 0446` | 3D Secure prompt | Succeeds |
+| `4000 0082 6000 3178` | 3D Secure prompt, then declined for insufficient funds | Declined for insufficient funds |
+| `4000 0000 0000 0341` | Saved successfully. A paid plan is declined right away; a free trial starts | Every charge fails |
+
+To run a renewal without waiting a month, use the Daily billing cycle described in [Test a subscription renewal](/guides/sandbox#test-a-subscription-renewal). Failed renewals follow the retry schedule in [Failed subscription payments](/product-catalog/subscriptions#failed-subscription-payments).
+
+## Fraud checks
+
+Kelviq screens every payment for fraud. These cards exercise the CVC, postal code and address checks, and the risk score. Checks only run on fields you fill in, so enter a CVC or postal code to trigger them.
+
+| Card number | Scenario | Result |
+| --- | --- | --- |
+| `4100 0000 0000 0019` | Highest risk | Always blocked |
+| `4000 0000 0000 4954` | Highest risk | Usually blocked |
+| `4000 0000 0000 9235` | Elevated risk | Succeeds, may be flagged for review |
+| `4000 0084 0000 0407` | High fraud dispute score | May be blocked |
+| `4000 0084 0000 0159` | High early fraud warning score | May be blocked |
+| `4000 0084 0000 1017` | Dynamic risk threshold | May be blocked |
+| `4001 8588 2184 3804` | Free trial abuse signal | May be blocked |
+| `4000 0084 0560 0003` | Adaptive 3D Secure | 3D Secure is requested |
+| `4000 0000 0000 0101` | CVC check fails | May be blocked |
+| `4000 0584 0030 7872` | CVC check fails, elevated risk | May be blocked |
+| `4000 0000 0000 0036` | Postal code check fails | May be blocked |
+| `4000 0584 0030 6072` | Postal code check fails, elevated risk | May be blocked |
+| `4000 0000 0000 0028` | Address line 1 check fails | Succeeds |
+| `4000 0000 0000 0010` | Postal code and address line 1 checks fail | May be blocked |
+| `4000 0000 0000 0044` | Address checks unavailable | Succeeds |
+
+### Captcha challenge
+
+| Card number | Result |
+| --- | --- |
+| `4000 0000 0000 1208` | Shows a captcha. The payment succeeds when the customer answers it |
+| `4000 0000 0000 3725` | Shows a captcha. The payment succeeds when the customer answers it |
+
+## Disputes
+
+The payment succeeds, then a test dispute is opened on it. Kelviq handles disputes with the bank for you, so there is nothing to respond to. Use these to see how a disputed order looks and which webhook events it sends.
+
+| Card number | Dispute |
+| --- | --- |
+| `4000 0000 0000 0259` | Fraudulent, opened during the payment |
+| `4061 2199 4639 3810` | Fraudulent, opened shortly after the payment |
+| `6026 5078 3837 7928` | Fraudulent, Discover card |
+| `4000 0000 0000 2685` | Product not received |
+| `4000 0000 0000 1976` | Enquiry (a question from the bank, not yet a chargeback) |
+| `4000 0000 0000 5423` | Early fraud warning, no dispute |
+| `4000 0004 0400 0079` | Disputed several times |
+| `4000 0004 0400 0038` | Visa Compelling Evidence 3.0 eligible |
+| `4000 0084 0000 0779` | Visa compliance dispute |
+| `5105 0084 0000 0002` | Mastercard compliance dispute |
+| `4000 0000 0100 0043` | Smart Disputes eligible |
+| `4000 0084 0000 0795` | No dispute at first. A partial refund opens a fraudulent dispute for the rest; a full refund opens none |
+| `4000 0004 0400 4816` | Dispute prevented by Visa Rapid Dispute Resolution |
+| `4000 0004 0400 5649` | Dispute blocked by Verifi Compelling Evidence 3.0 |
+| `5105 0003 0000 0018` | Dispute prevented by an Ethoca alert |
+
+## Refunds
+
+Refund a sandbox order from [Orders](/sales/orders) with **Refund payment**. With most test cards the refund succeeds at once. These two cards make it asynchronous, the way some banks behave in production.
+
+| Card number | Refund result |
+| --- | --- |
+| `4000 0000 0000 7726` | Refund starts as pending, then succeeds |
+| `4000 0000 0000 5126` | Refund looks successful, then fails |
+
+## Wallets
+
+### Apple Pay and Google Pay
+
+Apple Pay and Google Pay have no test cards. In the sandbox, pay with a real card in your wallet: test mode recognises it, returns a test token and never charges the card. Test cards cannot be added to a wallet.
+
+* **Apple Pay** needs Safari on a device with a card in Apple Wallet.
+* **Google Pay** needs a browser signed in to a Google account with at least one real card saved. Once the Google Pay sheet opens, you can also pick a card from Google's test card suite.
+
+If the wallet button does not appear, the device or browser does not meet the wallet's requirements.
+
+### Link
+
+Link saves card details for one-click checkout. In the sandbox, create a Link account with any email address. The one-time passcode decides the outcome.
+
+| Passcode | Result |
+| --- | --- |
+| Any 6 digits not listed below | Signs in |
+| `000001` | Code invalid |
+| `000002` | Code expired |
+| `000003` | Too many attempts |
+
+Do not store real personal data in sandbox Link accounts.
+
+### Amazon Pay, Kakao Pay and Naver Pay
+
+Select the wallet and click **Pay**. The test page opens. Click **Authorize test payment** to succeed or **Fail test payment** to fail. There are no special test values.
+
+Kakao Pay and Naver Pay need a KRW price and a customer in South Korea.
+
+## SEPA Direct Debit
+
+SEPA Direct Debit is delayed: checkout completes, then the outcome arrives a few minutes later in the sandbox. Watch the order status and your webhook endpoint rather than the checkout page.
+
+Enter an IBAN from the list for the customer's country. Every country has the same set of outcomes.
+
+<AccordionGroup>
+  <Accordion title="Germany (DE)">
+    | IBAN | Result |
+    | --- | --- |
+    | `DE89370400440532013000` | Payment succeeds |
+    | `DE08370400440532013003` | Payment succeeds after about 3 minutes |
+    | `DE62370400440532013001` | Payment fails |
+    | `DE78370400440532013004` | Payment fails after about 3 minutes |
+    | `DE84370400440000454545` | Payment fails because the customer revoked the mandate. The account cannot be charged again |
+    | `DE35370400440532013002` | Payment succeeds, then is disputed straight away |
+    | `DE65370400440000343434` | Payment fails because the weekly payment volume limit is exceeded |
+    | `DE27370400440000121212` | Payment fails because the amount is over the transaction limit |
+    | `DE65370400440002222227` | Payment fails because of insufficient funds |
+    | `DE18370400440000066666` | Checkout rejects the account as unusable |
+  </Accordion>
+  <Accordion title="France (FR)">
+    | IBAN | Result |
+    | --- | --- |
+    | `FR1420041010050500013M02606` | Payment succeeds |
+    | `FR3020041010050500013M02609` | Payment succeeds after about 3 minutes |
+    | `FR8420041010050500013M02607` | Payment fails |
+    | `FR7920041010050500013M02600` | Payment fails after about 3 minutes |
+    | `FR1920041010050000000454545` | Payment fails because the customer revoked the mandate. The account cannot be charged again |
+    | `FR5720041010050500013M02608` | Payment succeeds, then is disputed straight away |
+    | `FR9720041010050000000343434` | Payment fails because the weekly payment volume limit is exceeded |
+    | `FR5920041010050000000121212` | Payment fails because the amount is over the transaction limit |
+    | `FR9720041010050000002222227` | Payment fails because of insufficient funds |
+    | `FR5020041010050000000066666` | Checkout rejects the account as unusable |
+  </Accordion>
+  <Accordion title="Netherlands (NL)">
+    | IBAN | Result |
+    | --- | --- |
+    | `NL39RABO0300065264` | Payment succeeds |
+    | `NL55RABO0300065267` | Payment succeeds after about 3 minutes |
+    | `NL91ABNA0417164300` | Payment fails |
+    | `NL28RABO0300065268` | Payment fails after about 3 minutes |
+    | `NL46RABO0000454545` | Payment fails because the customer revoked the mandate. The account cannot be charged again |
+    | `NL82RABO0300065266` | Payment succeeds, then is disputed straight away |
+    | `NL27RABO0000343434` | Payment fails because the weekly payment volume limit is exceeded |
+    | `NL86RABO0000121212` | Payment fails because the amount is over the transaction limit |
+    | `NL27RABO0002222227` | Payment fails because of insufficient funds |
+    | `NL77RABO0000066666` | Checkout rejects the account as unusable |
+  </Accordion>
+  <Accordion title="Spain (ES)">
+    | IBAN | Result |
+    | --- | --- |
+    | `ES0700120345030000067890` | Payment succeeds |
+    | `ES2300120345030000067893` | Payment succeeds after about 3 minutes |
+    | `ES9121000418450200051332` | Payment fails |
+    | `ES9300120345030000067894` | Payment fails after about 3 minutes |
+    | `ES3600120345000000454545` | Payment fails because the customer revoked the mandate. The account cannot be charged again |
+    | `ES5000120345030000067892` | Payment succeeds, then is disputed straight away |
+    | `ES1700120345000000343434` | Payment fails because the weekly payment volume limit is exceeded |
+    | `ES7600120345000000121212` | Payment fails because the amount is over the transaction limit |
+    | `ES1700120345000002222227` | Payment fails because of insufficient funds |
+    | `ES6700120345000000066666` | Checkout rejects the account as unusable |
+  </Accordion>
+  <Accordion title="Austria (AT)">
+    | IBAN | Result |
+    | --- | --- |
+    | `AT611904300234573201` | Payment succeeds |
+    | `AT321904300235473204` | Payment succeeds after about 3 minutes |
+    | `AT861904300235473202` | Payment fails |
+    | `AT051904300235473205` | Payment fails after about 3 minutes |
+    | `AT201904300000454545` | Payment fails because the customer revoked the mandate. The account cannot be charged again |
+    | `AT591904300235473203` | Payment succeeds, then is disputed straight away |
+    | `AT981904300000343434` | Payment fails because the weekly payment volume limit is exceeded |
+    | `AT601904300000121212` | Payment fails because the amount is over the transaction limit |
+    | `AT981904300002222227` | Payment fails because of insufficient funds |
+    | `AT511904300000066666` | Checkout rejects the account as unusable |
+  </Accordion>
+  <Accordion title="Belgium (BE)">
+    | IBAN | Result |
+    | --- | --- |
+    | `BE62510007547061` | Payment succeeds |
+    | `BE78510007547064` | Payment succeeds after about 3 minutes |
+    | `BE68539007547034` | Payment fails |
+    | `BE51510007547065` | Payment fails after about 3 minutes |
+    | `BE12510000454545` | Payment fails because the customer revoked the mandate. The account cannot be charged again |
+    | `BE08510007547063` | Payment succeeds, then is disputed straight away |
+    | `BE90510000343434` | Payment fails because the weekly payment volume limit is exceeded |
+    | `BE52510000121212` | Payment fails because the amount is over the transaction limit |
+    | `BE90510002222227` | Payment fails because of insufficient funds |
+    | `BE43510000066666` | Checkout rejects the account as unusable |
+  </Accordion>
+  <Accordion title="Croatia (HR)">
+    | IBAN | Result |
+    | --- | --- |
+    | `HR7624020064583467589` | Payment succeeds |
+    | `HR6323600002337876649` | Payment succeeds after about 3 minutes |
+    | `HR2725000096983499248` | Payment fails |
+    | `HR6723600004878117427` | Payment fails after about 3 minutes |
+    | `HR9324020060000454545` | Payment fails because the customer revoked the mandate. The account cannot be charged again |
+    | `HR8724840081455523553` | Payment succeeds, then is disputed straight away |
+    | `HR7424020060000343434` | Payment fails because the weekly payment volume limit is exceeded |
+    | `HR3624020060000121212` | Payment fails because the amount is over the transaction limit |
+    | `HR7424020060002222227` | Payment fails because of insufficient funds |
+    | `HR2724020060000066666` | Checkout rejects the account as unusable |
+  </Accordion>
+  <Accordion title="Estonia (EE)">
+    | IBAN | Result |
+    | --- | --- |
+    | `EE382200221020145685` | Payment succeeds |
+    | `EE222200221020145682` | Payment succeeds after about 3 minutes |
+    | `EE762200221020145680` | Payment fails |
+    | `EE922200221020145683` | Payment fails after about 3 minutes |
+    | `EE862200000000454545` | Payment fails because the customer revoked the mandate. The account cannot be charged again |
+    | `EE492200221020145681` | Payment succeeds, then is disputed straight away |
+    | `EE672200000000343434` | Payment fails because the weekly payment volume limit is exceeded |
+    | `EE292200000000121212` | Payment fails because the amount is over the transaction limit |
+    | `EE672200000002222227` | Payment fails because of insufficient funds |
+    | `EE202200000000066666` | Checkout rejects the account as unusable |
+  </Accordion>
+  <Accordion title="Finland (FI)">
+    | IBAN | Result |
+    | --- | --- |
+    | `FI2112345600000785` | Payment succeeds |
+    | `FI3712345600000788` | Payment succeeds after about 3 minutes |
+    | `FI9112345600000786` | Payment fails |
+    | `FI1012345600000789` | Payment fails after about 3 minutes |
+    | `FI8612345600454545` | Payment fails because the customer revoked the mandate. The account cannot be charged again |
+    | `FI6412345600000787` | Payment succeeds, then is disputed straight away |
+    | `FI6712345600343434` | Payment fails because the weekly payment volume limit is exceeded |
+    | `FI2912345600121212` | Payment fails because the amount is over the transaction limit |
+    | `FI6712345602222227` | Payment fails because of insufficient funds |
+    | `FI2012345600066666` | Checkout rejects the account as unusable |
+  </Accordion>
+  <Accordion title="Gibraltar (GI)">
+    | IBAN | Result |
+    | --- | --- |
+    | `GI60MPFS599327643783385` | Payment succeeds |
+    | `GI08RRNW626436291644533` | Payment succeeds after about 3 minutes |
+    | `GI41SAFA461293238477751` | Payment fails |
+    | `GI50LROG772261344693297` | Payment fails after about 3 minutes |
+    | `GI33NWBK000000000454545` | Payment fails because the customer revoked the mandate. The account cannot be charged again |
+    | `GI26KJBC361883934534696` | Payment succeeds, then is disputed straight away |
+    | `GI14NWBK000000000343434` | Payment fails because the weekly payment volume limit is exceeded |
+    | `GI73NWBK000000000121212` | Payment fails because the amount is over the transaction limit |
+    | `GI14NWBK000000002222227` | Payment fails because of insufficient funds |
+    | `GI64NWBK000000000066666` | Checkout rejects the account as unusable |
+  </Accordion>
+  <Accordion title="Ireland (IE)">
+    | IBAN | Result |
+    | --- | --- |
+    | `IE29AIBK93115212345678` | Payment succeeds |
+    | `IE24AIBK93115212345671` | Payment succeeds after about 3 minutes |
+    | `IE02AIBK93115212345679` | Payment fails |
+    | `IE94AIBK93115212345672` | Payment fails after about 3 minutes |
+    | `IE29AIBK93115200454545` | Payment fails because the customer revoked the mandate. The account cannot be charged again |
+    | `IE51AIBK93115212345670` | Payment succeeds, then is disputed straight away |
+    | `IE10AIBK93115200343434` | Payment fails because the weekly payment volume limit is exceeded |
+    | `IE69AIBK93115200121212` | Payment fails because the amount is over the transaction limit |
+    | `IE10AIBK93115202222227` | Payment fails because of insufficient funds |
+    | `IE60AIBK93115200066666` | Checkout rejects the account as unusable |
+  </Accordion>
+  <Accordion title="Liechtenstein (LI)">
+    | IBAN | Result |
+    | --- | --- |
+    | `LI0508800636123378777` | Payment succeeds |
+    | `LI4408800387787111369` | Payment succeeds after about 3 minutes |
+    | `LI1208800143823175626` | Payment fails |
+    | `LI4908800356441975566` | Payment fails after about 3 minutes |
+    | `LI4308800000000454545` | Payment fails because the customer revoked the mandate. The account cannot be charged again |
+    | `LI7708800125525347723` | Payment succeeds, then is disputed straight away |
+    | `LI2408800000000343434` | Payment fails because the weekly payment volume limit is exceeded |
+    | `LI8308800000000121212` | Payment fails because the amount is over the transaction limit |
+    | `LI2408800000002222227` | Payment fails because of insufficient funds |
+    | `LI7408800000000066666` | Checkout rejects the account as unusable |
+  </Accordion>
+  <Accordion title="Lithuania (LT)">
+    | IBAN | Result |
+    | --- | --- |
+    | `LT121000011101001000` | Payment succeeds |
+    | `LT281000011101001003` | Payment succeeds after about 3 minutes |
+    | `LT821000011101001001` | Payment fails |
+    | `LT981000011101001004` | Payment fails after about 3 minutes |
+    | `LT781000000000454545` | Payment fails because the customer revoked the mandate. The account cannot be charged again |
+    | `LT551000011101001002` | Payment succeeds, then is disputed straight away |
+    | `LT591000000000343434` | Payment fails because the weekly payment volume limit is exceeded |
+    | `LT211000000000121212` | Payment fails because the amount is over the transaction limit |
+    | `LT591000000002222227` | Payment fails because of insufficient funds |
+    | `LT121000000000066666` | Checkout rejects the account as unusable |
+  </Accordion>
+  <Accordion title="Luxembourg (LU)">
+    | IBAN | Result |
+    | --- | --- |
+    | `LU280019400644750000` | Payment succeeds |
+    | `LU440019400644750003` | Payment succeeds after about 3 minutes |
+    | `LU980019400644750001` | Payment fails |
+    | `LU170019400644750004` | Payment fails after about 3 minutes |
+    | `LU120010000000454545` | Payment fails because the customer revoked the mandate. The account cannot be charged again |
+    | `LU710019400644750002` | Payment succeeds, then is disputed straight away |
+    | `LU900010000000343434` | Payment fails because the weekly payment volume limit is exceeded |
+    | `LU520010000000121212` | Payment fails because the amount is over the transaction limit |
+    | `LU900010000002222227` | Payment fails because of insufficient funds |
+    | `LU430010000000066666` | Checkout rejects the account as unusable |
+  </Accordion>
+  <Accordion title="Norway (NO)">
+    | IBAN | Result |
+    | --- | --- |
+    | `NO9386011117947` | Payment succeeds |
+    | `NO8886011117940` | Payment succeeds after about 3 minutes |
+    | `NO6686011117948` | Payment fails |
+    | `NO6186011117941` | Payment fails after about 3 minutes |
+    | `NO2486010454545` | Payment fails because the customer revoked the mandate. The account cannot be charged again |
+    | `NO3986011117949` | Payment succeeds, then is disputed straight away |
+    | `NO0586010343434` | Payment fails because the weekly payment volume limit is exceeded |
+    | `NO6486010121212` | Payment fails because the amount is over the transaction limit |
+    | `NO0586012222227` | Payment fails because of insufficient funds |
+    | `NO5586010066666` | Checkout rejects the account as unusable |
+  </Accordion>
+  <Accordion title="Portugal (PT)">
+    | IBAN | Result |
+    | --- | --- |
+    | `PT50000201231234567890154` | Payment succeeds |
+    | `PT66000201231234567890157` | Payment succeeds after about 3 minutes |
+    | `PT23000201231234567890155` | Payment fails |
+    | `PT39000201231234567890158` | Payment fails after about 3 minutes |
+    | `PT24000201230000000454545` | Payment fails because the customer revoked the mandate. The account cannot be charged again |
+    | `PT93000201231234567890156` | Payment succeeds, then is disputed straight away |
+    | `PT05000201230000000343434` | Payment fails because the weekly payment volume limit is exceeded |
+    | `PT64000201230000000121212` | Payment fails because the amount is over the transaction limit |
+    | `PT05000201230000002222227` | Payment fails because of insufficient funds |
+    | `PT55000201230000000066666` | Checkout rejects the account as unusable |
+  </Accordion>
+  <Accordion title="Sweden (SE)">
+    | IBAN | Result |
+    | --- | --- |
+    | `SE3550000000054910000003` | Payment succeeds |
+    | `SE5150000000054910000006` | Payment succeeds after about 3 minutes |
+    | `SE0850000000054910000004` | Payment fails |
+    | `SE2450000000054910000007` | Payment fails after about 3 minutes |
+    | `SE4750000000000000454545` | Payment fails because the customer revoked the mandate. The account cannot be charged again |
+    | `SE7850000000054910000005` | Payment succeeds, then is disputed straight away |
+    | `SE2850000000000000343434` | Payment fails because the weekly payment volume limit is exceeded |
+    | `SE8750000000000000121212` | Payment fails because the amount is over the transaction limit |
+    | `SE2850000000000002222227` | Payment fails because of insufficient funds |
+    | `SE7850000000000000066666` | Checkout rejects the account as unusable |
+  </Accordion>
+  <Accordion title="Switzerland (CH)">
+    | IBAN | Result |
+    | --- | --- |
+    | `CH9300762011623852957` | Payment succeeds |
+    | `CH8656663438253651553` | Payment succeeds after about 3 minutes |
+    | `CH5362200119938136497` | Payment fails |
+    | `CH1843597160341964438` | Payment fails after about 3 minutes |
+    | `CH3700762000000454545` | Payment fails because the customer revoked the mandate. The account cannot be charged again |
+    | `CH1260378413965193069` | Payment succeeds, then is disputed straight away |
+    | `CH1800762000000343434` | Payment fails because the weekly payment volume limit is exceeded |
+    | `CH7700762000000121212` | Payment fails because the amount is over the transaction limit |
+    | `CH1800762000002222227` | Payment fails because of insufficient funds |
+    | `CH6800762000000066666` | Checkout rejects the account as unusable |
+  </Accordion>
+  <Accordion title="United Kingdom (GB)">
+    | IBAN | Result |
+    | --- | --- |
+    | `GB82WEST12345698765432` | Payment succeeds |
+    | `GB98WEST12345698765435` | Payment succeeds after about 3 minutes |
+    | `GB55WEST12345698765433` | Payment fails |
+    | `GB71WEST12345698765436` | Payment fails after about 3 minutes |
+    | `GB89WEST12345600454545` | Payment fails because the customer revoked the mandate. The account cannot be charged again |
+    | `GB28WEST12345698765434` | Payment succeeds, then is disputed straight away |
+    | `GB70WEST12345600343434` | Payment fails because the weekly payment volume limit is exceeded |
+    | `GB32WEST12345600121212` | Payment fails because the amount is over the transaction limit |
+    | `GB70WEST12345602222227` | Payment fails because of insufficient funds |
+    | `GB23WEST12345600066666` | Checkout rejects the account as unusable |
+  </Accordion>
+</AccordionGroup>
+
+## UPI
+
+Select UPI and click **Pay**. A QR code appears. Scan it with your phone to open a UPI test payment page, where you can **Authorize** or **Expire** the payment. There are no test UPI IDs: checkout only takes UPI by QR code.
+
+The same flow sets up the UPI AutoPay mandate for a subscription. Limits, AutoPay and refunds are on the [UPI page](/checkout/payment-methods/upi).
+
+## Timing in the sandbox
+
+| Method | Sandbox | Production |
+| --- | --- | --- |
+| Cards, Apple Pay, Google Pay, Link | Immediate | Immediate |
+| Amazon Pay, Kakao Pay, Naver Pay | Immediate, after the test page | Immediate, after the wallet |
+| SEPA Direct Debit | Immediate, or about 3 minutes for the delayed IBANs | Several business days |
+| UPI | Immediate, after the test page | Immediate, after the customer pays |
+| Refunds | Immediate, except the two asynchronous refund cards | Minutes to several days |
+
+## Related
+
+* [Sandbox](/guides/sandbox) explains environments, keys and the daily billing cycle for renewal tests.
+* [Payment methods](/checkout/payment-methods) lists which methods appear for which countries and currencies.
+* [Webhooks](/guides/webhooks) covers the events each outcome sends.

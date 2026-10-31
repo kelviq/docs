@@ -190,6 +190,7 @@
             "icon": "/icons/book-open.svg",
             "pages": [
               "guides/sandbox",
+              "guides/test-payments",
               "guides/migrate-from-cashfree",
               "guides/subscription-integration",
               "guides/subscription-integration-for-nextjs",
