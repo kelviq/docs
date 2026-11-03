@@ -1,0 +1,72 @@
+---
+title: 'Proration'
+description: 'What a customer pays when they change plans in the middle of a billing period'
+---
+
+When a customer changes plans mid-period, proration decides what they pay for the time left. Kelviq credits the unused part of the old plan and charges for the rest of the period on the new plan. You choose whether that difference is charged now, added to the next invoice, or skipped.
+
+Both examples below use monthly plans, with the change made exactly halfway through the month.
+
+## Upgrade: \$100 → \$200
+
+The unused half of the old plan is worth a \$50 credit. The remaining half of the new plan costs \$100. The difference is \$50.
+
+| Option | Today | Next renewal |
+| --- | --- | --- |
+| **Immediate charge** | \$50 charged | \$200 |
+| **Prorate on next invoice** | Nothing | \$200 + \$50 = \$250 |
+| **No proration** | Nothing | \$200 |
+
+## Downgrade: \$200 → \$100
+
+The unused half of the old plan is worth a \$100 credit. The remaining half of the new plan costs \$50. The customer is owed \$50.
+
+| Option | Today | Next renewal |
+| --- | --- | --- |
+| **Immediate charge** | Nothing; \$50 is kept as account credit | \$100, less the \$50 credit = \$50 |
+| **Prorate on next invoice** | Nothing | \$100 − \$50 = \$50 |
+| **No proration** | Nothing | \$100 |
+
+The new plan and its limits apply as soon as the change is made, whichever option you pick. Amounts depend on the exact time of the change.
+
+## Set your defaults
+
+Open **Settings → Subscription proration**. There are two defaults:
+
+| Setting | Applies to | Default |
+| --- | --- | --- |
+| **Plan upgrades & downgrades** | A customer moving to a different plan | Immediate charge |
+| **Plan version migrations** | Moving customers to a new version of the same plan | Prorate on next invoice |
+
+<Frame>
+  <img src="/images/subscription-proration-settings.webp" alt="The Subscription proration settings page with defaults for plan changes and plan version migrations" />
+</Frame>
+
+<Warning>
+  Switching between monthly and yearly billing always invoices immediately, whatever you choose here. The change starts a new billing period and sets the new renewal date. With **No proration**, unused time on the old interval isn't credited.
+</Warning>
+
+## Override per change
+
+Pass `prorationBehavior` when you update a subscription through the API or SDK. It overrides the default for that change.
+
+| Value | Dashboard name |
+| --- | --- |
+| `IMMEDIATE_CHARGE` | Immediate charge |
+| `PRORATE_NEXT_INVOICE` | Prorate on next invoice |
+| `NO_PRORATION` | No proration |
+
+```ts
+import { CHARGE_PERIOD_CHOICES, PRORATION_BEHAVIORS } from '@kelviq/node-sdk';
+
+await client.subscriptions.update({
+  subscriptionId: 'sub_123',
+  planIdentifier: 'pro',
+  chargePeriod: CHARGE_PERIOD_CHOICES.MONTHLY,
+  prorationBehavior: PRORATION_BEHAVIORS.PRORATE_NEXT_INVOICE,
+});
+```
+
+To see the exact amounts before you commit, call `client.subscriptions.previewUpdate` with the same fields, or `POST /subscriptions/{subscriptionId}/update/preview/`.
+
+To keep the old plan until the customer pays for the new one, see [Wait for payment before changing access](/product-catalog/subscriptions#wait-for-payment-before-changing-access).

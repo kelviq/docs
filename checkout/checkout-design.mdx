@@ -1,0 +1,87 @@
+---
+title: "Checkout design"
+description: "Match checkout to your brand with your logo, colors, and the sections you want customers to see"
+---
+
+**Settings → Checkout design** controls how every checkout for your business looks. The preview on the right updates as you make changes, and the changes apply to all checkout links and checkout sessions when you save.
+
+<Frame>
+  <img src="/images/checkout-design/checkout-design-settings.webp" alt="Branding, Editing, and Theme settings on the Checkout design page" />
+</Frame>
+
+## Branding
+
+| Setting | What it changes |
+| --- | --- |
+| Business name | The name shown at the top of checkout |
+| Logo | Shown at the top of checkout. Upload a **Dark mode logo** if your logo doesn't read well on a dark background |
+| Logo height | Size of the logo, in pixels |
+| Favicon | The icon in the browser tab |
+| Background image | An image behind the checkout page |
+
+## Theme and colors
+
+Checkout starts on the **Kelviq** theme. Change any color and it becomes **Custom**.
+
+Light and dark mode each have their own set of colors. Under **Editing**, pick which one you're changing. This only affects the editor, not what customers see.
+
+<Frame>
+  <img src="/images/checkout-design/checkout-design-theme-colors.webp" alt="The Editing toggle, theme picker, and brand colors" />
+</Frame>
+
+<br />
+
+<Frame>
+  <img src="/images/checkout-design/checkout-design-light-dark.webp" alt="The same checkout in light and dark mode" />
+</Frame>
+
+| Group | Colors |
+| --- | --- |
+| Brand | Primary (buttons and the selected plan), Primary text (text on buttons) |
+| Backgrounds | Product panel, Payment panel, Raised surface, Selected plan, Subtle fill, Billing period track |
+| Inputs | Input background, Focus ring, Focus glow |
+| Text | Text, Muted text, Placeholder text, Disabled text |
+| Borders | Input border, Dividers, Plan card border |
+| Status | Error, Success, Warning |
+
+<Tip>
+  Keep enough contrast between **Primary** and **Primary text**. The button label sits on the primary color.
+</Tip>
+
+## Shape
+
+Set how rounded cards, buttons, and inputs are. Tick **Link card, button, and input radius** to use one value for all three, or untick it to set **Corner radius**, **Button radius**, and **Input radius** separately.
+
+## Default mode
+
+Choose how checkout opens: **Match buyer's device**, **Light**, or **Dark**. Customers can still switch modes themselves from the corner of the page.
+
+## Choose what customers see
+
+Under **Visibility**, turn sections of checkout on or off. Everything is on by default except **Metered features**.
+
+<Frame>
+  <img src="/images/checkout-design/checkout-design-visibility.webp" alt="The Visibility checklist with every section on except metered features" />
+</Frame>
+
+| Section | Shows |
+| --- | --- |
+| Logo | Your logo at the top |
+| Heading | The product name |
+| Product description | The text under the product image |
+| Product images | The images you added to the product |
+| Plan selector | The list of plans and the billing-period tabs |
+| Metered features | Usage included in the plan and its usage rates, such as credits and the price per 1,000 after that |
+| Included features | The plan's features and limits |
+| Discount code field | The **Add promotion code** field |
+| Price breakdown | Subtotal, discount, and tax lines above the total |
+
+<Note>
+  Hiding the plan selector only hides the list. Checkout still uses the plan from the link. To hide the discount field for one link rather than every checkout, add `discounts_enabled=false` to the [checkout URL](/checkout/static-checkout-url).
+</Note>
+
+## Related documentation
+
+- [Checkout examples](/checkout/checkout-examples)
+- [Customize a static checkout URL](/checkout/static-checkout-url)
+- [Products](/product-catalog/products)

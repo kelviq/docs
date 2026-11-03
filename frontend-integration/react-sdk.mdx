@@ -4,7 +4,7 @@ description: "Documentation for the Kelviq React SDK"
 icon: 'react'
 ---
 
-The `@kelviq/react-sdk` provides a seamless way to integrate kelviq entitlement management into your React applications.
+The `@kelviq/react-sdk` provides a seamless way to integrate Kelviq entitlement management into your React applications.
 
 ## Overview
 
@@ -85,7 +85,7 @@ export default App;
 - `plansEnabled?: string`
   - Comma-separated list of plan identifiers to include in the pricing response. When omitted, all active plans for the product are returned. Example: `"pro,enterprise"`.
 - `apiUrl: string`
-  - The base URL for your kelviq API. For example, `https://edge.api.kelviq.com/api/v1`.
+  - The base URL for your Kelviq API. For example, `https://edge.api.kelviq.com/api/v1`.
 - `environment: 'sandbox' | 'production'`
   - The environment to use. If you want to use the sandbox, you must provide this.
 - `entitlementsPath: string`
@@ -100,11 +100,11 @@ This optional object can contain the following properties:
 - `onError?: (error: Error) => void`
   - A callback function that will be invoked if an error occurs during the API request for entitlements.
 - `maxRetries?: number`
-  - The maximum number of times to retry a failed API request. Defaults to the value set in your `apiRequest` service (typically 3).
+  - The maximum number of times to retry a failed API request. Defaults to `3`.
 - `timeout?: number`
-  - Timeout for API requests in milliseconds. Defaults to the value set in your `apiRequest` service (typically 5000ms).
+  - Timeout for API requests in milliseconds. Defaults to `5000`.
 - `backoffBaseDelay?: number`
-  - Base delay (in milliseconds) for the exponential backoff strategy used in retries. Defaults to the value set in your `apiRequest` service (typically 1000ms).
+  - Base delay (in milliseconds) for the exponential backoff strategy used in retries. Defaults to `1000`.
 - `fetchEntitlementsOnMount?: boolean`
   - Defaults to `true`. If true, entitlements are fetched automatically when the `KelviqProvider` mounts.
   - Set to `false` if you want to control the initial fetch manually using the `refreshAllEntitlements` function from the `useKelviq` hook.
@@ -626,10 +626,10 @@ const entitlement = useCustomizableEntitlement("max-items-per-page");
 
 ### `useMeteredEntitlement(featureId: string)`
 
-Returns the aggregated entitlement for a specific metered feature from the cache.
+Returns the aggregated entitlement for a specific Meter feature from the cache.
 
 - **Arguments:**
-  - `featureId: string`: The identifier of the metered feature.
+  - `featureId: string`: The identifier of the Meter feature.
 - **Returns:** `Entitlement | null`
 
 ```tsx
@@ -963,7 +963,7 @@ import { ShowWhenCustomizableEntitled } from '@kelviq/react-sdk';
 
 ### `ShowWhenMeteredEntitled`
 
-Renders children if the metered feature is enabled and, by default, if `remaining` usage is greater than 0 or unlimited (`usageLimit` is `null`).
+Renders children if the Meter feature is enabled and, by default, if `remaining` usage is greater than 0 or unlimited (`usageLimit` is `null`).
 
 - **Optional Prop:**
   - `condition?: (data: Entitlement) => boolean`: A custom function to further determine if children should render based on the entitlement data.
@@ -1179,47 +1179,6 @@ A comprehensive example is provided within the comments of the SDK code, demonst
 
 1. Wrapping your application with `KelviqProvider` and providing the required props (`customerId`, `accessToken`)
 2. Using hooks like `useBooleanEntitlement` or conditional components like `ShowWhenBooleanEntitled` in your components to control UI and behavior based on entitlements.
-
-## **11. API Request Service**
-
-The SDK relies on an `apiRequest` function for making HTTP requests. The SDK's `KelviqProvider` passes configuration like `timeout`, `maxRetries`, `backoffBaseDelay`, and `accessToken` to this function.
-
-- **Your Responsibility:** You need to ensure that your project includes an implementation of this `apiRequest` service (e.g., in `src/services/makeRequest.service.ts`) that matches the `ApiRequestConfig` and `ApiResponse` interfaces used by the SDK. This service should handle actual HTTP communication, including appending query parameters passed via `ApiRequestConfig.queryParams` and using the `accessToken` to set the `Authorization` header.
-- The placeholder `apiRequest` function included in the SDK's source code is for demonstration and type-checking purposes only and will not make real API calls.
-
-## **12. Project Structure (for contributors/reference)**
-
-The SDK source code (`lib/`) is organized as follows:
-
-- `components/`: Contains conditional rendering and pricing React components.
-  - `ShowWhenBooleanEntitled.tsx`
-  - `ShowWhenCustomizableEntitled.tsx`
-  - `ShowWhenMeteredEntitled.tsx`
-  - `ShowWhenEntitledInternal.tsx` (Internal helper, not typically exported)
-  - `KQPrice.tsx`
-  - `KQFeatureList.tsx`
-- `contexts/`: Defines the React Context and Provider.
-  - `KelviqContext.ts`
-  - `KelviqProvider.tsx`
-- `hooks/`: Contains all custom React Hooks.
-  - `useKelviq.ts`
-  - `useAllEntitlements.ts`
-  - `useBooleanEntitlement.ts`
-  - `useCustomizableEntitlement.ts`
-  - `useMeteredEntitlement.ts`
-  - `useSubscriptions.ts`
-  - `useCustomer.ts`
-  - `usePricing.ts`
-  - `index.ts` (Exports all hooks)
-- `types/`: Contains all TypeScript definitions.
-  - `api.types.ts` (Raw types from API, including pricing types)
-  - `sdk.types.ts` (Processed types for SDK and public use)
-  - `index.ts` (Re-exports all types)
-- `utils/`: Contains utility functions.
-  - `transformations.ts` (For `transformApiEntitlements`)
-  - `formatPrice.ts` (For `kqFormatPrice`)
-  - `index.ts` (Exports utilities)
-- `index.ts`: The main entry point of the SDK, re-exporting all public APIs (provider, hooks, components, types).
 
 ## Using the Sandbox
 

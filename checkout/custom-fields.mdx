@@ -1,0 +1,61 @@
+---
+title: 'Custom fields'
+description: 'Ask customers for extra information at checkout, such as a company name, PO number, or use case'
+---
+
+Custom fields add your own questions to checkout. Use them for anything Kelviq doesn't already collect, such as a company name for the invoice, a purchase order number, a team size, or agreement to your terms.
+
+You create a field once in Settings, then choose which checkout links or checkout sessions should ask it.
+
+## Create a field
+
+1. Open **Settings → Custom fields** and click **Create custom field**.
+2. Pick a **Field type** and decide whether the field is **required**.
+3. Enter the **Field label**, the question customers see above the input.
+4. Add optional **Help text**, shown below the input, and a **Placeholder** that shows the expected format.
+5. Set the validation for the type you picked, and the **Validation error message** customers see when their answer doesn't pass.
+6. Click **Create field**.
+
+<Frame>
+  <img width="480" src="/images/settings/custom-field-create.webp" alt="The Create string field dialog with a required Company name field, help text, placeholder, and length limits" />
+</Frame>
+
+## Field types
+
+| Type | What the customer enters | Validation you can set |
+| --- | --- | --- |
+| **String** | A single line of text | Minimum and maximum length, and a regex pattern the answer must match |
+| **Number** | A number | Minimum and maximum value |
+| **Boolean** | Yes or no, with a checkbox | Required or not |
+| **Email** | An email address | Checked as a valid email |
+| **Dropdown** | One option from a list you define. Each option has a value and a label. | The answer must be one of your options |
+| **URL** | A web address | Checked as a valid URL |
+| **Date** | A date, in `YYYY-MM-DD` format | Earliest and latest date |
+
+Use a required **Boolean** field for "I agree to the terms" style checkboxes.
+
+## Add a field to checkout
+
+**Checkout links:** on the product page, click **Get Link**. Under **Assign custom field**, choose the field, then copy the checkout link. Customers who open that link see the question.
+
+**Checkout sessions from the API:** pass the field identifiers in `customFields` when you [create a checkout session](/api-reference/checkout/create-a-checkout-session):
+
+```json
+{
+  "planIdentifier": "pro-plan",
+  "chargePeriod": "MONTHLY",
+  "successUrl": "https://example.com/welcome",
+  "customFields": ["company-name", "purchase-order-number"]
+}
+```
+
+Fields appear in the order they're sorted in Settings. Each answer is checked against the field's type and validation before payment. Identifiers that don't exist or belong to archived fields are ignored.
+
+Editing a field changes it on every checkout link that already uses it.
+
+## Where the answers go
+
+Answers are saved with the [checkout session](/sales/checkout-sessions) and the [order](/sales/orders) and subscription it creates. Through the API and webhooks they arrive keyed by field identifier:
+
+* `customFieldsData` on orders, checkout sessions, and invoices in the API.
+* `custom_fields_data` in the `checkout.completed`, `order.created`, `order.updated`, and `order.refunded` [webhooks](/guides/webhooks#custom-field-responses).

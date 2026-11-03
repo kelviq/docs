@@ -1,5 +1,6 @@
 ---
 title: 'Configuration & Customization'
+sidebarTitle: 'Configure checkout'
 description: 'Configure and customize checkout experiences for your customers'
 ---
 
@@ -8,22 +9,22 @@ Checkout in Kelviq allows you to collect payments from customers. You can genera
 ## Overview
 Kelviq's checkout system:
 - **Powers your sales** - Collect payments and create customer subscriptions
-- **Integrates with Stripe** - Uses Stripe as the payment processor
+- **Many payment methods** - Cards, wallets, bank payments, and local methods
 - **Highly configurable** - Control plans, pricing, trial periods, and more
 - **Multi-currency ready** - Support customers worldwide
-- **Easy to embed** - Generate links for any product and plans
+- **Easy to embed** - Generate links for any product and plans, or [embed checkout on your own site](/checkout/embed-checkout)
 
 ## Generating Checkout Links
 
 Checkout links are generated at the **product level**. Each link can include one or more plans.
 <Frame>
-      <img height="200" src="/images/accessing-checkout.png" />
+      <img src="/images/accessing-checkout.webp" />
 </Frame>
 
 ### Quick Start
 
 1. **Go to Products** → Select your product
-2. **Click "Generate Checkout Link"** → Opens the link builder
+2. **Click "Get Link"** → Opens the link builder
 3. **Select plans** → Choose which plans to include
 4. **Configure options** → Set defaults and features
 5. **Copy link** → Share with customers
@@ -36,7 +37,7 @@ A production checkout link starts with your product UUID:
 https://www.kelviq.com/buy/{PRODUCT_UUID}/
 ```
 
-Sandbox links use `https://www.kelviq.com/sandbox/buy/{PRODUCT_UUID}/`. Copy the link from the dashboard so the environment and product UUID are correct. The old product identifier is not used in checkout URLs.
+Sandbox links use `https://www.kelviq.com/sandbox/buy/{PRODUCT_UUID}/`. Copy the link from the dashboard so the environment and product UUID are correct.
 
 Add query parameters to control what the customer sees:
 
@@ -70,7 +71,7 @@ Include multiple plans in a single checkout to let customers choose their tier.
   **Plans Configuration**
   - Select which plans are enabled (shown to customer)
   - Choose a recommended plan (highlighted by default)
-  - Cannot disable all plans
+  - At least one plan stays enabled
   - Disabled plans don't appear in checkout
 </Card>
 
@@ -145,7 +146,7 @@ Plan: Basic
 
 Plan: Pro
 ├─ Monthly: $29/month
-└─ Yearly: $290/year (2.5% discount vs monthly)
+└─ Yearly: $290/year (17% discount vs monthly)
 
 Plan: Enterprise
 ├─ Monthly: $99/month
@@ -263,7 +264,7 @@ const { checkoutUrl } = await response.json();
 
 Allow customers to apply discount codes at checkout:
 <Frame>
-      <img height="200" src="/images/generate-checkout-discounts.png" />
+      <img src="/images/generate-checkout-discounts.webp" />
 </Frame>
 
 ```
@@ -280,16 +281,10 @@ Discount codes are applied automatically if the customer enters a valid code.
 
 ### Tax Collection
 
-Kelviq can collect and handle taxes:
+Kelviq calculates and collects tax on every checkout, based on the customer's location.
 
-**Tax ID Collection:**
-- Customers can enter their tax ID (VAT number, EIN, etc.)
-- Used to determine applicable taxes
-- Required for some jurisdictions
-
-**Configuration:**
-- Enable/disable tax collection per product
-- Taxes are calculated based on customer location and tax ID
+- Business customers can enter a VAT number or other tax ID. When it's valid, Kelviq applies the reverse charge.
+- Choose per plan whether listed prices include tax or tax is added at checkout. See [Tax settings](/product-catalog/tax-settings).
 
 ### Country Restrictions
 
@@ -302,50 +297,9 @@ Plan: Premium Tier
 └─ Checkout effect: Plan hidden for customers in restricted countries
 ```
 
-## Checkout Session Lifecycle
+## Checkout session lifecycle
 
-Checkout sessions track the state of each checkout attempt:
-
-### Session States
-
-```
-open
-├─ Customer is in checkout
-├─ No payment yet
-└─ Session expires 96 hours (4 days) after creation
-
-↓
-
-success
-├─ Payment completed
-├─ Customer created (if new)
-├─ Subscription created
-└─ Files and licenses delivered
-
-OR
-
-closed
-├─ Customer abandoned checkout
-├─ No payment processed
-├─ Customer can restart
-└─ Session expired
-```
-
-### Monitoring Checkouts
-
-View checkout sessions in the dashboard:
-<Frame>
-      <img height="200" src="/images/checkout-sessions.png" />
-</Frame>
-
-1. **Go to Sales** → Checkout sessions
-2. **View sessions** → See all active and completed checkouts
-3. **Filter by status** → Open, Success, Closed, Expired
-4. **Conversion metrics** → Track conversion rates
-
-<Frame>
-      <img height="200" src="/images/checkout-sessions-detials.png" />
-</Frame>
+Each checkout attempt is a session with one of five statuses: **Open**, **Processing**, **Success**, **Closed**, or **Expired**. An unpaid session expires four days after it's created. [Checkout sessions](/sales/checkout-sessions) explains each status and how to read a session's timeline in the dashboard.
 
 ### Create Checkout Sessions via API
 
@@ -435,19 +389,7 @@ Link: ?enabled=free,premium
 
 ## Payment Methods
 
-Kelviq uses **Stripe** as its payment processor. Stripe supports:
-
-- **Credit/Debit Cards** - Visa, Mastercard, American Express, Discover
-- **Digital Wallets** - Apple Pay, Google Pay
-- **UPI and UPI AutoPay** - UPI payments and recurring subscription mandates for eligible customers in India
-- **Bank Transfers** - ACH, SEPA, etc. (regional)
-- **Local Methods** - iDEAL, Bancontact, Giropay, EPS (regional)
-
-Customers select their preferred payment method at checkout.
-
-<Info>
-  Payment method availability depends on customer location and Stripe's local support. Cards are universally supported.
-</Info>
+Checkout shows the payment methods available for the customer's location and currency: cards, wallets such as Apple Pay and Google Pay, bank payments, and local methods. Cards work everywhere. See [Payment methods](/checkout/payment-methods) for the full list.
 
 ### Does Kelviq support UPI AutoPay?
 
@@ -481,16 +423,18 @@ Plan: Pro
 └─ AUD: A$45/month
 ```
 
-### Regional Pricing
+### Price localization
 
-Offer different prices based on customer location (PPP - Purchasing Power Parity):
+A plan can have a fixed price in other currencies. Buyers get the price for where they are when checkout opens:
 
 ```
-Plan: Professional ($29 in US)
-├─ India: ₹599 (auto-adjusted for PPP)
-├─ Brazil: R$99
-└─ US: $29
+Plan: Professional
+├─ US: $29
+├─ India: ₹599
+└─ Brazil: R$99
 ```
+
+You set each amount yourself. See [Location-based pricing](/product-catalog/location-based-pricing). To give a percentage off by country instead, use [Promotions](/promotions/overview).
 
 ## Testing Checkout
 
@@ -498,7 +442,7 @@ Plan: Professional ($29 in US)
 
 Test checkouts without processing real payments:
 
-1. **Use Stripe test cards** → Use 4242 4242 4242 4242
+1. **Use a test card** → Use 4242 4242 4242 4242
 2. **Test various scenarios** → Successful payment, declined card, etc.
 3. **Monitor test checkouts** → View in your dashboard
 
@@ -509,3 +453,5 @@ Test checkouts without processing real payments:
 | 4242 4242 4242 4242 | Successful payment |
 | 4000 0000 0000 0002 | Card declined |
 | 4000 0025 0000 3155 | Requires authentication |
+
+Every other scenario, from specific decline reasons to wallets, SEPA Direct Debit and UPI, is listed in [Test payments](/guides/test-payments).

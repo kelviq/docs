@@ -81,6 +81,12 @@ client = Kelviq.create_sync_client(
 
 Set `enable_cache=False` to disable caching.
 
+To drop a customer's cached entitlements before the window expires, for example in a `subscription.paused`, `subscription.resumed`, or `subscription.cancelled` webhook handler:
+
+```python
+client.entitlements.invalidate_cache(customerId=customer_id)
+```
+
 ### Share the cache across workers
 
 The in-memory cache and offline reporting queue belong to one process and disappear when it restarts. Use the optional Redis store when multiple workers, processes, or containers need one shared, durable cache and queue.
@@ -386,11 +392,11 @@ print(f"Checkout Session URL: {response.checkoutUrl}")
 
     * `offeringId` (str): The ID (uuid) of the offering the customer is checking out with.
 
-    * `pricingTableId` (str): Required. The id (uuid) of the pricingTable being used for this checkout. (Considered only if `offeringId` is not provided)
+    * `pricingTableId` (str): The id (uuid) of the pricingTable being used for this checkout. (Considered only if `offeringId` is not provided)
 
-    * `ruleId` (str): Required. The id (uuid) of the pricing rule being applied. (Considered only if `offeringId` is not provided)
+    * `ruleId` (str): The id (uuid) of the pricing rule being applied. (Considered only if `offeringId` is not provided)
 
-    * `customerId` (str): Required. The ID of the customer initiating the checkout. (If not provided, a new customer will be created)
+    * `customerId` (str): The ID of the customer initiating the checkout. If you omit it, Kelviq creates a new customer.
 
     * `features` (List[Dict[str, Union[str, int]]]): Optional. A list of dictionaries, where each dictionary represents a feature and its desired quantity. Each dictionary **must** have two keys:
         * `"identifier"` (str): The unique identifier for the feature.

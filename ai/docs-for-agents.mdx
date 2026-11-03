@@ -1,0 +1,20 @@
+---
+title: 'Docs for agents'
+description: 'Give your coding agent the Kelviq docs through llms.txt or the docs MCP server'
+---
+
+Point your agent at the Kelviq docs so it answers from them instead of guessing.
+
+| Resource | Use it for |
+| --- | --- |
+| [`llms.txt`](https://docs.kelviq.com/llms.txt) | An index of every docs page, in Markdown |
+| [`llms-full.txt`](https://docs.kelviq.com/llms-full.txt) | All the docs in one file |
+| `https://docs.kelviq.com/mcp` | Docs MCP server: search and read the docs from any MCP client |
+
+In Claude Code, add the docs MCP server with:
+
+```bash
+claude mcp add --transport http kelviq-docs https://docs.kelviq.com/mcp
+```
+
+In other MCP clients, add `https://docs.kelviq.com/mcp` as a remote HTTP server.

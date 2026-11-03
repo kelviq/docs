@@ -1,60 +1,50 @@
 ---
-title: 'Checkout Sessions'
-description: 'Monitor live traffic and debug failed purchase attempts'
+title: 'Checkout sessions'
+description: 'Every checkout attempt, paid or not, with a timeline of what the customer did'
 ---
 
-While the **Orders** page tracks successful revenue, the **Checkout Sessions** page tracks every single attempt.
+A checkout session is created each time a customer opens a checkout link or your app creates a checkout through the API. [Orders](/sales/orders) only show purchases that went through. Checkout sessions show every attempt, so you can see where customers stop.
 
-This is your granular, real-time log of what is happening on your payment page right now. It is essential for debugging failed transactions and recovering abandoned carts.
-
-## Accessing sessions
-
-<Steps>
-  <Step title="Navigate">
-    Go to **Sales > Checkout sessions** in the sidebar.
-  </Step>
-  <Step title="Filter">
-    Use the status tabs to isolate specific types of traffic:
-    * **Open:** Customers currently on the payment page.
-    * **Succeeded:** Completed purchases.
-    * **Failed:** Declined cards or errors.
-    * **Expired:** Sessions where the customer left without paying.
-  </Step>
-</Steps>
+Open **Sales → Checkout sessions**.
 
 <Frame>
-  <img height="200" src="/images/checkout-sessions-list.png" alt="List of checkout sessions showing status and customer emails" />
+  <img src="/images/checkout-sessions/checkout-sessions-list.webp" alt="The Checkout sessions page with the status filter open, listing sessions with their amount, status, customer, product, and date" />
 </Frame>
+
+Each row shows the session ID, the amount and billing period, the status, the customer's country and email (or N/A if they never entered one), the product and plan, and when the session was created. Search by name or session ID, filter by status, and change the date range above the list.
+
+## Session statuses
+
+| Status | What it means |
+| --- | --- |
+| **Open** | The customer has the checkout and hasn't paid yet. |
+| **Processing** | The customer submitted a payment and it's being confirmed. |
+| **Success** | The payment went through and an [order](/sales/orders) was created. |
+| **Closed** | The session ended without a payment before it expired. |
+| **Expired** | Nobody paid within four days of the session being created. |
+
+A session that's still **Open** or **Processing** an hour after it was created, with no customer activity in the last 30 minutes, is treated as abandoned and gets [recovery emails](/sales/abandoned-cart-recovery) if the customer entered an email address.
 
 ## Session details
 
-Click on any session to see the raw data. This is useful if you need to understand *why* a transaction failed (e.g. "Card expired" vs "Insufficient funds").
+Click a session to open its details: the items in the checkout, the customer, the payment method used, and the session timeline.
 
 <Frame>
-  <img height="200" src="/images/checkout-session-detail.png" alt="Detailed view of a checkout session including timeline" />
+  <img src="/images/checkout-sessions/checkout-session-detail.webp" alt="Details of an expired checkout session, showing the purchased item and a timeline from Checkout started to Checkout session expired" />
 </Frame>
 
-### Customer & context
-See exactly who is attempting to buy and where they are coming from.
-* **Customer info:** Email address, location, and IP address.
-* **Product:** The specific item or license they are trying to purchase.
-* **Device:** The payment method and device type used.
+The timeline lists what happened in the session, newest first, with the time of each event. For example:
 
-### The timeline
-The timeline allows you to reconstruct the customer's journey step-by-step.
-1. **Session created:** The moment they clicked your buy button.
-2. **Details provided:** When they filled in their email or card info.
-3. **Outcome:** The specific failure reason (e.g. `card_declined`) or success message.
+| Event | When it's added |
+| --- | --- |
+| **Checkout started** | The customer opened the checkout. Shows whether it's a subscription or one-time purchase, and the amount. |
+| **Plan selected** | The customer picked a plan or billing period. Shows the plan, period, and price. |
+| **Billing address updated** | The customer entered or changed their country or address. |
+| **Checkout session abandoned** | The customer left without paying. |
+| **Checkout session expired** | The session reached its four-day limit without a payment. |
 
-## Actions & recovery
+Payment attempts appear in the timeline too, including the decline reason when a payment fails, such as `insufficient_funds`. Use it to answer "why didn't this customer get charged?" without asking them to try again.
 
-This page gives you tools to assist customers who are stuck.
+## Custom field responses
 
-* **Recover sales**
-  If you see a **Failed** session, you can use the email address to reach out and offer support.
-* **Share portal access**
-  For successful sessions, you can copy the **Portal Link** directly from the details view and send it to the customer manually.
-* **Resend receipt**
-  Trigger a new email receipt if the customer missed the first one.
-* **View order**
-  Click the **Order** button to jump straight to the official revenue record in the Orders page.
+If the checkout collected [custom fields](/checkout/custom-fields), the customer's answers are saved on the session as `customFieldsData` in the API, and sent as `custom_fields_data` in the `checkout.completed` [webhook](/guides/webhooks#custom-field-responses).

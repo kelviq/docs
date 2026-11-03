@@ -1,5 +1,6 @@
 ---
 title: Location based pricing
+sidebarTitle: 'Location-based pricing'
 description: Set custom prices for specific countries to optimize global conversion
 ---
 Location based pricing is a feature that allows you to set custom prices for specific countries to optimize global conversion.
@@ -9,7 +10,7 @@ Location based pricing is a feature that allows you to set custom prices for spe
 To offer a localized price open your plan configuration and expand the Price localization card.
 
 <Info>
-  Regional prices inherit the base price's usage reset, usage alert, and credit rollover settings. Regional pricing changes the localized monetary price; it does not create a separate usage-policy configuration.
+  Localized prices inherit the base price's usage reset, usage alert, and credit rollover settings. Price localization changes the localized monetary price; it does not create a separate usage-policy configuration.
 </Info>
 
 ### 1. Choose a currency
@@ -17,7 +18,7 @@ To offer a localized price open your plan configuration and expand the Price loc
 Select your target currency from the dropdown list. You can choose options like Euro or Indian Rupee. Click Add localized price to open the configuration panel.
 
 <Frame>
-  <img height="200" src="/images/choose-currency.png" />
+  <img src="/images/choose-currency.webp" />
 </Frame>
 
 ### 2. Set the fixed base charge
@@ -25,17 +26,17 @@ Select your target currency from the dropdown list. You can choose options like 
 Kelviq automatically displays the billing cycles you already enabled for your default base price and usage based pricing. Enter the exact localized amount you want to charge for each active interval.
 
 <Frame>
-  <img height="400" src="/images/base-pricing.png" />
+  <img src="/images/base-pricing.webp" />
 </Frame>
 
 ### 3. Localize usage based features
 
-If your plan includes metered features like API calls Kelviq pulls those in automatically right below the fixed charge section. You can set localized unit prices and flat fees for every single usage tier.
+If your plan includes Meter features like API calls Kelviq pulls those in automatically right below the fixed charge section. You can set localized unit prices and flat fees for every single usage tier.
 
 You must configure these usage rates across all active billing periods. Use the tabs to switch between your monthly and yearly configurations and ensure every input has a defined price.
 
 <Frame>
-  <img height="600" src="/images/usage-pricing.png" />
+  <img src="/images/usage-pricing.webp" />
 </Frame>
 
 ### 4. Save and stack regions
@@ -44,6 +45,4 @@ Click Save to lock in the location based pricing configuration. The currency wil
 
 You can repeat this process to add as many localized currencies as you need. 
 
-## Fraud protection
 
-Kelviq analyzes the IP address, browser fingerprint, and issuing bank of the credit card during checkout. If a customer attempts to use a card from a high income country while pretending to be in a lower income region we block the transaction or force the standard global price automatically.

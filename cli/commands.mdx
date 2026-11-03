@@ -37,7 +37,7 @@ kelviq init --force
 
 Each template is a complete catalog that `kelviq push` accepts as written, using the typed builders from `@kelviq/cli/config` — see the [format reference](/cli/kelviq-config):
 
-- **`saas`** — a product with a free plan and a Pro plan billed monthly or yearly, gating a boolean feature and a configurable limit.
+- **`saas`** — a product with a free plan and a Pro plan billed monthly or yearly, gating a Boolean feature and a Customizable limit.
 - **`usage`** — a `METER` feature with the details the API requires, a free plan with a hard monthly allowance, and a Pro plan with an included quantity plus a tiered pay-as-you-go overage price.
 - **`license`** — a Pro plan whose orders issue license keys valid on up to three devices.
 
@@ -66,7 +66,7 @@ What it does:
 Paste a **Server API Key**, not a Client API Key. Server keys have full API access — treat the config file like any other credential store, and never commit it anywhere.
 </Warning>
 
-Kelviq has no key-introspection endpoint yet, so `login` cannot verify the key is valid or show which organization it belongs to — the first `pull` is where a bad key surfaces.
+`login` does not check the key. Run `kelviq env --check` afterwards to confirm the API accepts it. Kelviq has no key-introspection endpoint yet, so the CLI can't show which organization the key belongs to.
 
 For CI and other non-interactive contexts, skip `login` entirely and set an environment variable instead — see [Environments & authentication](/cli/environments#environment-variables).
 
@@ -214,7 +214,7 @@ The API rejects a `METER` feature created without `featureDetails` (`featureSubT
 
 ### Features can't be updated — by design
 
-The Kelviq API deliberately treats feature attributes as immutable; renaming a feature is a dashboard operation. If a feature in your config differs from its remote counterpart, push stops **before writing anything** and lists the drifted fields — fix the feature in the [dashboard](https://app.kelviq.com), run `kelviq pull`, and push again.
+The Kelviq API deliberately treats feature attributes as immutable; renaming a feature is a dashboard operation. If a feature in your config differs from its remote counterpart, push stops **before writing anything** and lists the drifted fields. A feature's identifier and type can't change: to change them, create a new feature, then run `kelviq pull` and push again. Edit the name in the [dashboard](https://app.kelviq.com).
 
 ### Publishing
 
