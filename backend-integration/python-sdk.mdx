@@ -1324,8 +1324,8 @@ page = await async_client.refunds.list(status="SUCCEEDED", page=1, page_size=10)
 
 * `search` : Search by refund ID, order ID, customer name, email, or ID.
 * `status` : Filter by refund status. One of `"PENDING"`, `"PROCESSING"`, `"SUCCEEDED"`, `"FAILED"`, `"CANCELED"`.
-* `start_date` : Include refunds created on or after this date (`YYYY-MM-DD`).
-* `end_date` : Include refunds created on or before this date (`YYYY-MM-DD`).
+* `start_date` : Include refunds created on or after this date. Accepts a date (`YYYY-MM-DD`, treated as a UTC calendar day) or an ISO 8601 datetime with an offset (`2026-07-01T00:00:00+05:30`) for an exact instant.
+* `end_date` : Include refunds created on or before this date. A date (`YYYY-MM-DD`) is inclusive of the whole UTC day; a datetime is an exclusive upper bound, so pass the next local midnight (`2026-07-02T00:00:00+05:30`) to get exactly one local day.
 * `page` : Page number to return.
 * `page_size` : Number of results per page. Defaults to 10, maximum 100.
 
@@ -1534,8 +1534,8 @@ page = await async_client.transactions.list(status="success")
 
 * `search` : Search by payment-provider IDs, customer name, email or ID, product name, or payment method type.
 * `status` : Filter by transaction status. One of `"success"`, `"failure"`, `"pending"`.
-* `start_date` : Include transactions created on or after this date (`YYYY-MM-DD`).
-* `end_date` : Include transactions created on or before this date (`YYYY-MM-DD`).
+* `start_date` : Include transactions created on or after this date. Accepts a date (`YYYY-MM-DD`, treated as a UTC calendar day) or an ISO 8601 datetime with an offset (`2026-07-01T00:00:00+05:30`) for an exact instant.
+* `end_date` : Include transactions created on or before this date. A date (`YYYY-MM-DD`) is inclusive of the whole UTC day; a datetime is an exclusive upper bound, so pass the next local midnight (`2026-07-02T00:00:00+05:30`) to get exactly one local day.
 * `page` : Page number to return.
 * `page_size` : Number of results per page. Defaults to 10, maximum 100.
 

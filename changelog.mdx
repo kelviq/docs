@@ -9,6 +9,22 @@ import { ChangelogFilter } from "/snippets/changelog-filter.jsx";
 
 <ChangelogFilter products={["App","JS SDK","React SDK","Node SDK","Python SDK","JS Promotions UI","MCP Server","CLI","API"]} />
 
+<Update label="v1.8.5" description="November 3, 2026" tags={["API""]}>
+
+### Improvements
+
+#### Timezone-aware date range filters
+
+The `start_date` / `end_date` query params on the orders, transactions, refunds, webhook logs and checkout session list endpoints now also accept an ISO 8601 datetime with a UTC offset, so a client in another timezone can filter on its own local day even though records are stored in UTC.
+
+```
+GET /api/v1/orders/?start_date=2026-11-03T00:00:00%2B05:30&end_date=2026-11-04T00:00:00%2B05:30
+```
+
+A datetime `start_date` is inclusive and a datetime `end_date` is exclusive, so local midnight-to-midnight returns exactly one local day. Plain `YYYY-MM-DD` values keep working as inclusive UTC calendar days. Remember to URL-encode `+` as `%2B`; the API also tolerates an unencoded offset.
+
+</Update>
+
 <Update label="v1.8.4" description="October 20, 2026" tags={["API"]}>
 
 ### New Features

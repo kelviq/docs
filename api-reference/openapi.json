@@ -6840,21 +6840,21 @@
             "name": "start_date",
             "in": "query",
             "required": false,
-            "description": "Include sessions created on or after this date.",
+            "description": "Include sessions created on or after this date. Accepts a date (`YYYY-MM-DD`, treated as a UTC calendar day) or an ISO 8601 datetime with a UTC offset (for example `2026-07-01T00:00:00+05:30`) for an exact instant. URL-encode `+` as `%2B`.",
             "schema": {
-              "type": "string",
-              "format": "date"
-            }
+              "type": "string"
+            },
+            "example": "2026-07-01T00:00:00+05:30"
           },
           {
             "name": "end_date",
             "in": "query",
             "required": false,
-            "description": "Include sessions created on or before this date.",
+            "description": "Include sessions created on or before this date. A date (`YYYY-MM-DD`) includes the whole UTC day. A datetime is an exclusive upper bound, so pass the next local midnight (for example `2026-07-02T00:00:00+05:30`) to get exactly one local day. URL-encode `+` as `%2B`.",
             "schema": {
-              "type": "string",
-              "format": "date"
-            }
+              "type": "string"
+            },
+            "example": "2026-07-02T00:00:00+05:30"
           },
           {
             "name": "page_size",
@@ -7535,21 +7535,21 @@
             "name": "start_date",
             "in": "query",
             "required": false,
-            "description": "Include transactions created on or after this date.",
+            "description": "Include transactions created on or after this date. Accepts a date (`YYYY-MM-DD`, treated as a UTC calendar day) or an ISO 8601 datetime with a UTC offset (for example `2026-07-01T00:00:00+05:30`) for an exact instant. URL-encode `+` as `%2B`.",
             "schema": {
-              "type": "string",
-              "format": "date"
-            }
+              "type": "string"
+            },
+            "example": "2026-07-01T00:00:00+05:30"
           },
           {
             "name": "end_date",
             "in": "query",
             "required": false,
-            "description": "Include transactions created on or before this date.",
+            "description": "Include transactions created on or before this date. A date (`YYYY-MM-DD`) includes the whole UTC day. A datetime is an exclusive upper bound, so pass the next local midnight (for example `2026-07-02T00:00:00+05:30`) to get exactly one local day. URL-encode `+` as `%2B`.",
             "schema": {
-              "type": "string",
-              "format": "date"
-            }
+              "type": "string"
+            },
+            "example": "2026-07-02T00:00:00+05:30"
           },
           {
             "name": "page_size",
@@ -7655,21 +7655,21 @@
             "name": "start_date",
             "in": "query",
             "required": false,
-            "description": "Include orders paid on or after this date.",
+            "description": "Include orders paid on or after this date. Accepts a date (`YYYY-MM-DD`, treated as a UTC calendar day) or an ISO 8601 datetime with a UTC offset (for example `2026-07-01T00:00:00+05:30`) for an exact instant. URL-encode `+` as `%2B`.",
             "schema": {
-              "type": "string",
-              "format": "date"
-            }
+              "type": "string"
+            },
+            "example": "2026-07-01T00:00:00+05:30"
           },
           {
             "name": "end_date",
             "in": "query",
             "required": false,
-            "description": "Include orders paid on or before this date.",
+            "description": "Include orders paid on or before this date. A date (`YYYY-MM-DD`) includes the whole UTC day. A datetime is an exclusive upper bound, so pass the next local midnight (for example `2026-07-02T00:00:00+05:30`) to get exactly one local day. URL-encode `+` as `%2B`.",
             "schema": {
-              "type": "string",
-              "format": "date"
-            }
+              "type": "string"
+            },
+            "example": "2026-07-02T00:00:00+05:30"
           },
           {
             "name": "page_size",
@@ -8099,21 +8099,21 @@
             "name": "start_date",
             "in": "query",
             "required": false,
-            "description": "Include delivery attempts made on or after this date. Clamped to at most 30 days back regardless of the value passed.",
+            "description": "Include delivery attempts made on or after this date. Clamped to at most 30 days back regardless of the value passed. Accepts a date (`YYYY-MM-DD`, treated as a UTC calendar day) or an ISO 8601 datetime with a UTC offset (for example `2026-07-01T00:00:00+05:30`) for an exact instant. URL-encode `+` as `%2B`.",
             "schema": {
-              "type": "string",
-              "format": "date"
-            }
+              "type": "string"
+            },
+            "example": "2026-07-01T00:00:00+05:30"
           },
           {
             "name": "end_date",
             "in": "query",
             "required": false,
-            "description": "Include delivery attempts made on or before this date.",
+            "description": "Include delivery attempts made on or before this date. A date (`YYYY-MM-DD`) includes the whole UTC day. A datetime is an exclusive upper bound, so pass the next local midnight (for example `2026-07-02T00:00:00+05:30`) to get exactly one local day. URL-encode `+` as `%2B`.",
             "schema": {
-              "type": "string",
-              "format": "date"
-            }
+              "type": "string"
+            },
+            "example": "2026-07-02T00:00:00+05:30"
           },
           {
             "name": "page_size",
@@ -8195,21 +8195,21 @@
             "name": "start_date",
             "in": "query",
             "required": false,
-            "description": "Include refunds created on or after this date.",
+            "description": "Include refunds created on or after this date. Accepts a date (`YYYY-MM-DD`, treated as a UTC calendar day) or an ISO 8601 datetime with a UTC offset (for example `2026-07-01T00:00:00+05:30`) for an exact instant. URL-encode `+` as `%2B`.",
             "schema": {
-              "type": "string",
-              "format": "date"
-            }
+              "type": "string"
+            },
+            "example": "2026-07-01T00:00:00+05:30"
           },
           {
             "name": "end_date",
             "in": "query",
             "required": false,
-            "description": "Include refunds created on or before this date.",
+            "description": "Include refunds created on or before this date. A date (`YYYY-MM-DD`) includes the whole UTC day. A datetime is an exclusive upper bound, so pass the next local midnight (for example `2026-07-02T00:00:00+05:30`) to get exactly one local day. URL-encode `+` as `%2B`.",
             "schema": {
-              "type": "string",
-              "format": "date"
-            }
+              "type": "string"
+            },
+            "example": "2026-07-02T00:00:00+05:30"
           },
           {
             "name": "page_size",
