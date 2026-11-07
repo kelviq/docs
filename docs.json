@@ -182,7 +182,8 @@
               "settings/profile",
               "settings/members",
               "settings/customer-emails",
-              "settings/zapier"
+              "settings/zapier",
+              "settings/slack"
             ]
           },
           {
