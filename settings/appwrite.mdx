@@ -1,0 +1,81 @@
+---
+title: 'Appwrite'
+description: "Keep your Appwrite users' plan in sync as user labels"
+---
+
+Connect [Appwrite](https://appwrite.io) so each of your app's users always carries their current Kelviq plan as an Appwrite **user label**. When a customer subscribes, upgrades, pauses or cancels, Kelviq updates the labels on the matching Appwrite user within seconds. You then lock content with Appwrite permissions, without writing any billing code.
+
+For example, a customer on the **Pro** plan gets the labels `pro` and `subscriber`, so this row is readable only by paying Pro users:
+
+```js
+Permission.read(Role.label('pro'))
+```
+
+## Labels Kelviq manages
+
+| Label | When the user has it |
+| --- | --- |
+| The plan, for example `pro` | While their subscription to that plan is active or in trial |
+| `subscriber` | While they have any active or trialing subscription |
+| `trial` | While the subscription is in its trial |
+| `paused` | While the subscription is paused (the plan and `subscriber` labels are removed) |
+
+When the plan changes, Kelviq removes the old plan label and adds the new one. When the subscription ends, all of these labels are removed. **Labels you add yourself are never touched.**
+
+Appwrite labels can only contain letters and digits, so Kelviq turns the plan identifier into a label by lower-casing it and removing anything else. For example, `team-annual` becomes `teamannual`.
+
+<Note>
+  A subscription that is set to cancel at the end of the period keeps its labels until it actually ends, so the customer keeps access for the time they paid for.
+</Note>
+
+## Before you start
+
+1. **Decide how customers match users.** Kelviq finds the Appwrite user in one of two ways:
+   - **Customer ID = Appwrite user ID** (recommended): when you create a Kelviq customer, use the Appwrite user's ID (`$id`) as the `customerId`.
+   - **Email address**: Kelviq looks up the Appwrite user with the customer's email. Use this only if each email belongs to one user.
+2. **Create an API key.** In the Appwrite Console, open your project → **Overview → API keys**, click **Create API key**, and give it only the **users.read** and **users.write** scopes. Copy the secret.
+3. **Copy your project details.** In **Settings**, copy the **Project ID** and the **API Endpoint** (for example `https://fra.cloud.appwrite.io/v1`). Self-hosted Appwrite works too, as long as it has a public HTTPS address.
+
+## Connect Appwrite
+
+1. Open **Settings → Integrations**.
+2. On the **Appwrite** card, click **Configure Appwrite**.
+3. Enter the **API endpoint**, **Project ID** and **API key**.
+4. Choose how to **match Kelviq customers to Appwrite users**.
+5. Optionally, enter a **Name**, such as `Production app`. It's only used to label the connection in Kelviq.
+6. Keep the subscription events selected. Only subscription events change plan labels.
+7. Click **Connect Appwrite**.
+
+Kelviq checks that it can read your project's users before saving. Labels are updated on the next subscription event for each customer.
+
+<Note>
+  Connections are separate for sandbox and live. Connect your test Appwrite project while in [sandbox mode](/guides/sandbox), and your production project in live mode.
+</Note>
+
+## Manage a connection
+
+Open **Settings → Integrations → Configure Appwrite** to see your connected projects. For each one you can:
+
+- **Send test**: check that Kelviq can still reach your project with the API key. Nothing is changed.
+- **Edit events**: change which subscription events update labels, then click **Save events**.
+- **Disconnect**: stop updating labels. Labels already set stay as they are.
+
+Each connection is a Kelviq webhook endpoint, so it also appears under **Settings → Webhooks**, named `Appwrite: <name>`. There you can see every delivery. If no Appwrite user matches a customer, the delivery succeeds and its response says which user was missing, so you can fix the customer ID or email and resend it.
+
+## Troubleshooting
+
+Click **Send test** to check the connection. The error tells you what's wrong:
+
+| Error | What to do |
+| --- | --- |
+| This Appwrite API key is not valid for this project | Create a new API key in this project, then disconnect and connect again with it. |
+| This Appwrite API key is missing a scope | Edit the key in Appwrite and give it **users.read** and **users.write**. |
+| Appwrite could not find this project | Check the **Project ID**, and that the **API endpoint** is for the right region. |
+
+If a customer's labels didn't change, open **Settings → Webhooks**, find the delivery and read its response. `No Appwrite user with ID "…"` means the Kelviq customer ID isn't that user's Appwrite ID.
+
+If Appwrite is briefly unavailable or rate-limits your project, Kelviq retries the delivery automatically.
+
+## Prefer code?
+
+Use [webhooks](/guides/webhooks) to handle subscription events in your own backend or an Appwrite Function, or check access at runtime with [entitlements](/api-reference/entitlements/retrieve-customer-entitlements).
