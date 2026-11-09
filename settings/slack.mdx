@@ -1,0 +1,79 @@
+---
+title: 'Slack'
+description: 'Post a message to a Slack channel when something happens in Kelviq'
+---
+
+Connect Slack to get a message in a channel whenever a customer checks out, a subscription is cancelled, a payment fails, and more. Each message links straight to the customer or order in your Kelviq dashboard.
+
+You can connect as many channels as you like, each with its own set of events. For example, send sales to `#sales` and failed payments to `#billing`.
+
+## Before you start
+
+You need an **incoming webhook URL** for the Slack channel you want to post to. It looks like `https://hooks.slack.com/services/…`.
+
+To create one, follow Slack's guide to [creating an incoming webhook](https://api.slack.com/messaging/webhooks#create_a_webhook), pick your channel, and copy the URL. You may need permission from a Slack workspace admin to add an app.
+
+## Connect a Slack channel
+
+1. Open **Settings → Integrations**.
+2. On the **Slack** card, click **Configure Slack**.
+3. Paste your **Slack webhook URL**.
+4. Optionally, enter a **Channel name**, such as `#billing`. It's only used to label the connection in Kelviq.
+5. Choose the **Events to send**. These are selected by default:
+   - Checkout completed
+   - Subscription created
+   - Subscription cancelled
+   - Invoice payment failed
+   - Refund created
+6. Click **Connect Slack**.
+
+Kelviq posts a "Kelviq is connected" message to the channel to confirm the URL works. From then on, every selected event is posted to that channel.
+
+<Note>
+  Connections are separate for sandbox and live. If you connect Slack while in [sandbox mode](/guides/sandbox), only sandbox events are sent to that channel. Switch to live mode and connect again to get live events.
+</Note>
+
+## Manage a connection
+
+Open **Settings → Integrations → Configure Slack** to see your connected channels. For each one you can:
+
+- **Send test**: post a test message to check the channel is still reachable.
+- **Edit events**: change which events are posted, then click **Save events**.
+- **Disconnect**: stop sending messages to that channel.
+
+To post to another channel, click **Add another channel**.
+
+Each Slack connection is a Kelviq webhook endpoint, so it also appears under **Settings → Webhooks**, named `Slack: <channel name>`. There you can see every delivery and resend one that failed.
+
+## Events you can send
+
+You can send any [webhook event](/guides/webhooks#event-types) to Slack:
+
+| Category | Events |
+| --- | --- |
+| Checkout | Checkout completed |
+| Customers | Customer created, Customer updated |
+| Orders | Order created, Order updated, Order refunded |
+| Subscriptions | Subscription created, updated, paused, resumed, cancelled, plan changed, trial will end |
+| Invoices | Invoice created, Invoice paid, Invoice payment failed |
+| Refunds | Refund created, Refund updated |
+| Features | Feature usage alert |
+| Payment methods | Payment method created, updated, deleted |
+
+## Troubleshooting
+
+If messages stop arriving, open **Configure Slack** and click **Send test**. The error tells you what's wrong:
+
+| Error | What to do |
+| --- | --- |
+| This Slack webhook was removed or disabled in Slack | Create a new incoming webhook in Slack, then disconnect and connect again with the new URL. |
+| This Slack webhook URL is not valid | Copy the URL from Slack again and reconnect. |
+| The Slack channel for this webhook no longer exists | Create a webhook for another channel and reconnect. |
+| The Slack channel for this webhook is archived | Unarchive the channel in Slack, or connect a different channel. |
+
+If Slack itself is briefly unavailable, Kelviq retries the delivery automatically, so you won't miss the message.
+
+## Prefer code or other tools?
+
+- Use [Zapier](/settings/zapier) to send Kelviq events to thousands of other apps without code.
+- Use [webhooks](/guides/webhooks) to handle events in your own backend.
