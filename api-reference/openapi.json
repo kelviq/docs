@@ -5091,11 +5091,28 @@
             "type": "string",
             "example": "$"
           },
+          "startDate": {
+            "type": "string",
+            "format": "date",
+            "description": "Date the subscription started.",
+            "example": "2026-08-01"
+          },
+          "startDateTime": {
+            "type": "string",
+            "format": "date-time",
+            "nullable": true,
+            "description": "Exact instant the subscription started.",
+            "example": "2026-08-01T10:14:22Z"
+          },
           "nextInvoiceDate": {
             "type": "string",
             "format": "date-time",
             "nullable": true,
             "example": "2026-08-28T10:46:34Z"
+          },
+          "trialDaysRemaining": {
+            "type": "integer",
+            "example": 0
           }
         }
       },
@@ -5342,6 +5359,46 @@
             "type": "object",
             "description": "The raw event envelope sent to the destination. For `invoice.created`, `invoice.paid`, and `invoice.payment_failed`, `data.object.payment_link` contains a customer payment URL for the invoice.",
             "additionalProperties": true
+          },
+          "endpointName": {
+            "type": "string",
+            "nullable": true,
+            "example": "Slack alerts"
+          },
+          "attemptNumber": {
+            "type": "integer",
+            "description": "1 for the first delivery attempt; resends and automatic retries count up from there.",
+            "example": 3
+          },
+          "maxAttempts": {
+            "type": "integer",
+            "description": "Attempts Kelviq makes automatically: the first delivery plus 3 retries.",
+            "example": 4
+          },
+          "willRetry": {
+            "type": "boolean",
+            "description": "True only on the newest attempt of an event whose next automatic retry is still scheduled."
+          },
+          "nextRetryAt": {
+            "type": "string",
+            "format": "date-time",
+            "nullable": true,
+            "description": "When the next automatic attempt is due; set only when `willRetry` is true."
+          },
+          "durationMs": {
+            "type": "integer",
+            "nullable": true,
+            "description": "Round-trip time of this attempt in milliseconds; `null` when no response arrived.",
+            "example": 1240
+          },
+          "responseBody": {
+            "type": "string",
+            "nullable": true,
+            "description": "First 1000 characters of the destination's response, or the connection error."
+          },
+          "isTest": {
+            "type": "boolean",
+            "description": "True for deliveries made with **Send test event**; their payload also carries `\"test\": true`."
           }
         },
         "required": [
@@ -6395,6 +6452,17 @@
             "format": "uuid",
             "example": "2f6b9e2a-7c1a-4a3e-8b6e-8e6f9a2c1d4a"
           },
+          "name": {
+            "type": "string",
+            "maxLength": 100,
+            "description": "Display name. Optional on create: when omitted or blank it defaults to the URL's host, for example `api.acmecorp.com`.",
+            "example": "Production billing sync"
+          },
+          "description": {
+            "type": "string",
+            "description": "Free-text note shown in the dashboard.",
+            "example": "Sends billing events to our production API."
+          },
           "url": {
             "type": "string",
             "format": "uri",
@@ -6436,18 +6504,110 @@
           },
           "secret": {
             "type": "string",
-            "description": "Signing secret used to verify the `Kelviq-Signature` header on deliveries to this endpoint.",
+            "readOnly": true,
+            "description": "Signing secret used to verify the `webhook-signature` header on deliveries to this endpoint. `secretPreview` is a masked form of the same value for display."
+          },
+          "secretPreview": {
+            "type": "string",
+            "readOnly": true,
+            "description": "The secret's prefix and last four characters, for display.",
+            "example": "kq_whsec_\u2022\u2022\u2022\u2022pW6z"
+          },
+          "verifiedAt": {
+            "type": "string",
+            "format": "date-time",
+            "nullable": true,
+            "readOnly": true,
+            "description": "When **Verify endpoint** last got an answer from the URL (any HTTP status). Cleared when the URL is changed."
+          },
+          "createdOn": {
+            "type": "string",
+            "format": "date-time",
             "readOnly": true
+          },
+          "createdByName": {
+            "type": "string",
+            "nullable": true,
+            "readOnly": true,
+            "example": "Priya Shah"
+          },
+          "status": {
+            "type": "string",
+            "enum": [
+              "active",
+              "failing",
+              "disabled"
+            ],
+            "readOnly": true,
+            "description": "`disabled` when `enabled` is false; otherwise `failing` when the most recent delivery to this endpoint did not succeed (including one still being retried), else `active`. Test sends are not considered."
+          },
+          "deliveryCount": {
+            "type": "integer",
+            "readOnly": true,
+            "description": "Events delivered (or attempted) to this endpoint in the period selected with `start_date`/`end_date` on the list call, defaulting to the last 7 days. Test events are not counted.",
+            "example": 10763
+          },
+          "recentDeliveries": {
+            "type": "array",
+            "readOnly": true,
+            "items": {
+              "type": "boolean"
+            },
+            "description": "Outcome of the last 8 deliveries, oldest first (`true` = delivered). Test sends are not included.",
+            "example": [
+              true,
+              true,
+              true,
+              false
+            ]
+          },
+          "lastDelivery": {
+            "type": "object",
+            "nullable": true,
+            "readOnly": true,
+            "description": "The most recent delivery to this endpoint, or `null` before the first one.",
+            "properties": {
+              "eventId": {
+                "type": "string",
+                "format": "uuid"
+              },
+              "at": {
+                "type": "string",
+                "format": "date-time"
+              },
+              "isSuccess": {
+                "type": "boolean"
+              },
+              "statusCode": {
+                "type": "integer",
+                "nullable": true
+              },
+              "retrying": {
+                "type": "boolean",
+                "description": "True while an automatic retry is still scheduled."
+              }
+            }
           }
         }
       },
       "WebhookEndpointCreateRequest": {
         "type": "object",
         "properties": {
+          "name": {
+            "type": "string",
+            "maxLength": 100,
+            "description": "Display name. Optional on create: when omitted or blank it defaults to the URL's host, for example `api.acmecorp.com`.",
+            "example": "Production billing sync"
+          },
+          "description": {
+            "type": "string",
+            "description": "Free-text note shown in the dashboard.",
+            "example": "Sends billing events to our production API."
+          },
           "url": {
             "type": "string",
             "format": "uri",
-            "description": "Must be a public HTTPS/HTTP URL \u2014 URLs resolving to a private, loopback, link-local, or otherwise internal address are rejected."
+            "description": "Must be a public HTTPS/HTTP URL \u2014 a malformed URL, or one resolving to a private, loopback, link-local, or otherwise internal address, is rejected with 400. A host that does not resolve yet is accepted."
           },
           "events": {
             "type": "array",
@@ -6475,7 +6635,9 @@
                 "payment_method.updated",
                 "payment_method.deleted"
               ]
-            }
+            },
+            "minItems": 1,
+            "description": "Event types to subscribe to. At least one is required."
           },
           "enabled": {
             "type": "boolean",
@@ -6490,6 +6652,17 @@
       "WebhookEndpointUpdateRequest": {
         "type": "object",
         "properties": {
+          "name": {
+            "type": "string",
+            "maxLength": 100,
+            "description": "Display name. Optional on create: when omitted or blank it defaults to the URL's host, for example `api.acmecorp.com`.",
+            "example": "Production billing sync"
+          },
+          "description": {
+            "type": "string",
+            "description": "Free-text note shown in the dashboard.",
+            "example": "Sends billing events to our production API."
+          },
           "url": {
             "type": "string",
             "format": "uri"
@@ -6520,7 +6693,9 @@
                 "payment_method.updated",
                 "payment_method.deleted"
               ]
-            }
+            },
+            "minItems": 1,
+            "description": "Event types to subscribe to. At least one is required."
           },
           "enabled": {
             "type": "boolean"
@@ -7927,7 +8102,10 @@
                         "currency": "usd",
                         "interval": "month",
                         "currencySymbol": "$",
-                        "nextInvoiceDate": "2026-09-01T10:14:22Z"
+                        "startDate": "2026-08-01",
+                        "startDateTime": "2026-08-01T10:14:22Z",
+                        "nextInvoiceDate": "2026-09-01T10:14:22Z",
+                        "trialDaysRemaining": 0
                       },
                       "paymentId": null,
                       "paymentLink": "https://portal.kelviq.com/acme-inc/pay/aW5fMVJwb1pvU0JzdEN6eW9jUzdpUG1pdGgz",
@@ -8042,7 +8220,10 @@
                     "currency": "usd",
                     "interval": "month",
                     "currencySymbol": "$",
-                    "nextInvoiceDate": "2026-09-01T10:14:22Z"
+                    "startDate": "2026-08-01",
+                    "startDateTime": "2026-08-01T10:14:22Z",
+                    "nextInvoiceDate": "2026-09-01T10:14:22Z",
+                    "trialDaysRemaining": 0
                   },
                   "paymentId": null,
                   "paymentLink": "https://portal.kelviq.com/acme-inc/pay/aW5fMVJwb1pvU0JzdEN6eW9jUzdpUG1pdGgz",
@@ -8095,6 +8276,67 @@
           "content": "<Info>Click the base URL in the API playground and select the **Sandbox** host for test data or the **Production** host for live data. Use credentials from the same environment.</Info>"
         },
         "parameters": [
+          {
+            "name": "status",
+            "in": "query",
+            "required": false,
+            "description": "`delivered` (2xx) or `failed` attempts only.",
+            "schema": {
+              "type": "string",
+              "enum": [
+                "delivered",
+                "failed"
+              ]
+            }
+          },
+          {
+            "name": "endpoint",
+            "in": "query",
+            "required": false,
+            "description": "Attempts to one endpoint.",
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          },
+          {
+            "name": "event_type",
+            "in": "query",
+            "required": false,
+            "description": "Attempts for one event type.",
+            "schema": {
+              "type": "string"
+            },
+            "example": "invoice.payment_failed"
+          },
+          {
+            "name": "search",
+            "in": "query",
+            "required": false,
+            "description": "An event ID, or its leading characters, to find every attempt of that event.",
+            "schema": {
+              "type": "string"
+            },
+            "example": "5b274952"
+          },
+          {
+            "name": "test",
+            "in": "query",
+            "required": false,
+            "description": "`true` for test-event deliveries only, `false` to leave them out.",
+            "schema": {
+              "type": "boolean"
+            }
+          },
+          {
+            "name": "latest_only",
+            "in": "query",
+            "required": false,
+            "description": "`true` returns one row per event: its newest attempt.",
+            "schema": {
+              "type": "boolean"
+            }
+          },
           {
             "name": "start_date",
             "in": "query",
@@ -11826,6 +12068,57 @@
         },
         "parameters": [
           {
+            "name": "search",
+            "in": "query",
+            "required": false,
+            "description": "Case-insensitive match on the endpoint name or URL.",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "status",
+            "in": "query",
+            "required": false,
+            "description": "Only endpoints in this state.",
+            "schema": {
+              "type": "string",
+              "enum": [
+                "active",
+                "failing",
+                "disabled"
+              ]
+            }
+          },
+          {
+            "name": "ordering",
+            "in": "query",
+            "required": false,
+            "description": "`created_on` (default, newest first with `-`), `name` or `last_delivery`; prefix with `-` for descending.",
+            "schema": {
+              "type": "string"
+            },
+            "example": "-last_delivery"
+          },
+          {
+            "name": "start_date",
+            "in": "query",
+            "required": false,
+            "description": "Start of the period `deliveryCount` covers (default: 7 days ago). Same formats as the logs filters.",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "end_date",
+            "in": "query",
+            "required": false,
+            "description": "End of the period `deliveryCount` covers (default: now).",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
             "name": "page_size",
             "in": "query",
             "required": false,
@@ -11868,7 +12161,7 @@
           "Webhook Endpoints"
         ],
         "summary": "Create a webhook endpoint",
-        "description": "Registers a new destination URL and its event subscriptions. A signing secret is generated automatically and returned once in the response.",
+        "description": "Registers a new destination URL and its event subscriptions. A signing secret is generated automatically and returned in the response. `name` is optional and defaults to the URL's host.",
         "operationId": "createWebhookEndpoint",
         "x-mint": {
           "content": "<Info>Click the base URL in the API playground and select the **Sandbox** host for test data or the **Production** host for live data. Use credentials from the same environment.</Info>"

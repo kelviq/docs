@@ -9,6 +9,33 @@ import { ChangelogFilter } from "/snippets/changelog-filter.jsx";
 
 <ChangelogFilter products={["App","JS SDK","React SDK","Node SDK","Python SDK","JS Promotions UI","MCP Server","CLI","API"]} />
 
+<Update label="v1.26" description="November 9, 2026" tags={["API"]}>
+
+### Improvements
+
+#### Richer webhook endpoints
+
+[Webhook endpoints](/api-reference/webhook-endpoints/list-webhook-endpoints) accept an optional `name` (defaults to the URL's host) and `description` on create and update, and `events` must now contain at least one type. Each endpoint in a response carries `status` (`active`, `failing` or `disabled`), `deliveryCount` for the period given by `start_date` / `end_date` (default: last 7 days), `recentDeliveries` (outcome of the last eight), `lastDelivery`, `verifiedAt`, `secretPreview`, `createdOn` and `createdByName`. The list call takes `search`, `status` and `ordering` (`created_on`, `name` or `last_delivery`).
+
+#### Per-attempt webhook logs
+
+Each row in [List webhook logs](/api-reference/webhooks/list-webhook-logs) now describes one delivery attempt, with `attemptNumber`, `maxAttempts`, `willRetry`, `nextRetryAt`, `durationMs`, `responseBody`, `endpointName` and `isTest`. New filters: `status` (`delivered` or `failed`), `endpoint`, `event_type`, `search` (an event ID or its leading characters), `test`, and `latest_only` for one row per event.
+
+#### Subscription start date on orders and invoices
+
+The `subscription` summary on [orders](/api-reference/orders/list-orders) and [invoices](/api-reference/invoices/list-invoices) now includes `startDate`, `startDateTime` and `trialDaysRemaining`.
+
+```json
+"subscription": {
+  "startDate": "2026-08-01",
+  "startDateTime": "2026-08-01T10:14:22Z",
+  "nextInvoiceDate": "2026-08-28T10:46:34Z",
+  "trialDaysRemaining": 0
+}
+```
+
+</Update>
+
 <Update label="v1.25" description="November 3, 2026" tags={["API"]}>
 
 ### Improvements

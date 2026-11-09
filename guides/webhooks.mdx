@@ -19,20 +19,53 @@ A delivery is considered successful when your endpoint returns a `2xx` status co
 
 Go to **Settings → Webhooks** in the [Kelviq dashboard](https://app.kelviq.com/settings/webhooks/new) to create a webhook endpoint. You will specify:
 
-- **URL** — The public HTTPS URL Kelviq will POST events to.
-- **Events** — The subset of event types you want to subscribe to.
+- **URL** — The public HTTPS URL Kelviq will POST events to. A URL that points to a private or internal address is rejected.
+- **Events** — The subset of event types you want to subscribe to; at least one is required. The **Sample payload** panel shows the shape of any event before you subscribe.
+- **Name** *(optional)* — How the endpoint appears in the dashboard. It defaults to the URL's host, for example `api.acmecorp.com`.
+- **Description** *(optional)* — A note for your team.
 
 After creation, Kelviq generates a signing secret for the endpoint in the format `kq_whsec_<random>`. Store this secret securely — you will need it to verify signatures.
 
 <Warning>
-Your signing secret is shown only once. If you lose it, you must regenerate it from the dashboard.
+Treat your signing secret like a password: anyone who has it can forge deliveries. You can read it from the endpoint at any time, and regenerate it from the endpoint's settings if it leaks. Update your server first when you do: deliveries already in flight were signed with the old secret.
 </Warning>
+
+The same endpoints are available over the API with a server key: see [Webhook Endpoints](/api-reference/webhook-endpoints/list-webhook-endpoints).
+
+### Verify your endpoint
+
+**Verify endpoint**, on the form and on the endpoint page, sends one empty `POST` to your URL with no event and no signature, and waits up to 10 seconds, the same limit as real deliveries. It tells you whether the URL answers, not whether your handler is correct:
+
+| Your endpoint answered | Result |
+|------------------------|--------|
+| `2xx` | Reachable. |
+| `4xx` | Reachable. The probe is unsigned, so an endpoint that checks signatures is expected to reject it with `401` or `400`. A `404`, `405` or `410` is flagged, since it usually means a wrong path or a route that does not accept `POST`. |
+| `3xx` | Flagged. Kelviq never follows redirects, so use the final URL. |
+| `5xx`, no answer within 10 seconds, connection refused or DNS failure | Not reachable. Check your server, then verify again. |
+
+### Send a test event
+
+**Send test event** delivers a sample of the event type you pick through the normal signed delivery path, including retries, so it exercises your signature check and your handler end to end. Test deliveries are marked in the logs, and their envelope carries `"test": true` so your handler can skip side effects:
+
+```json
+{
+  "id": "…",
+  "type": "invoice.paid",
+  "created_at": "2026-10-26T06:00:00Z",
+  "test": true,
+  "data": { "object": { … } }
+}
+```
+
+Live events never carry the `test` field. Test deliveries appear in the logs only: they are left out of the delivery statistics and do not affect an endpoint's status or last delivery.
 
 ---
 
 ## Inspect and resend deliveries
 
-Open **Settings → Webhooks** and select an endpoint to view its delivery logs. Each delivery shows the event type, status, response code, and response body.
+Open **Settings → Webhooks** and select an endpoint to view its delivery logs, or use the **Logs** tab for every endpoint at once. Each delivery attempt shows the event type, status, response code, response time, and response body. A failed attempt that will be retried shows when the next attempt is due; a `4xx` is final and shows as not retried. Logs are kept for 30 days.
+
+The **Endpoints** tab summarises deliveries, success rate, failures and average response time for the selected period against the period before it, and flags any endpoint whose latest deliveries are failing. Every attempt is also available from [`GET /webhook/logs/`](/api-reference/webhooks/list-webhook-logs).
 
 To retry a delivery:
 
@@ -191,6 +224,7 @@ The request body is a JSON object with the following top-level fields:
 | `created_at` | `string` (ISO 8601) | UTC timestamp of when the event was created. |
 | `data.object` | `object` | The primary resource affected by the event. |
 | `data.previous_attributes` | `object` | *(Update events only)* The resource's changed attributes before the event. Omitted if not applicable. |
+| `test` | `boolean` | *(Test events only)* `true` when the delivery was triggered with **Send test event**. Absent on live events. |
 
 <Accordion title="Example: checkout.completed payload">
 ```json
