@@ -184,7 +184,8 @@
               "settings/customer-emails",
               "settings/zapier",
               "settings/slack",
-              "settings/discord"
+              "settings/discord",
+              "settings/resend"
             ]
           },
           {

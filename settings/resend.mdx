@@ -1,0 +1,92 @@
+---
+title: 'Resend'
+description: 'Email your team from your own Resend account when something happens in Kelviq'
+---
+
+Connect [Resend](https://resend.com) to get an email whenever a customer checks out, a subscription is cancelled, a payment fails, and more. Emails are sent from your own Resend account and domain, so they come from an address your team already trusts. Each email links straight to the customer or order in your Kelviq dashboard.
+
+You can set up several alerts, each with its own recipients and events. For example, send new sales to `sales@yourcompany.com` and failed payments to `finance@yourcompany.com`.
+
+## Before you start
+
+You need three things from Resend:
+
+1. **A verified domain.** In Resend, open **Domains**, add your domain and add the DNS records Resend shows you. See Resend's guide to [verifying a domain](https://resend.com/docs/dashboard/domains/introduction).
+2. **An API key.** In Resend, open **API Keys**, click **Create API Key**, choose **Sending access**, and limit it to your verified domain. Copy the key. It starts with `re_`, and Resend shows it only once.
+3. **A From address** on that domain, such as `alerts@yourcompany.com` or `Kelviq <alerts@yourcompany.com>`.
+
+<Tip>
+  Use a key with **Sending access** only. Kelviq only needs to send emails, and a sending key can't read or change anything else in your Resend account.
+</Tip>
+
+## Connect Resend
+
+1. Open **Settings → Integrations**.
+2. On the **Resend** card, click **Configure Resend**.
+3. Paste your **Resend API key**.
+4. Enter the **From** address.
+5. In **Send to**, enter who should get the alerts, separated by commas (up to 50 addresses).
+6. Optionally, enter a **Name**, such as `Billing team`. It's only used to label the alert in Kelviq.
+7. Choose the **Events to send**. These are selected by default:
+   - Checkout completed
+   - Subscription created
+   - Subscription cancelled
+   - Invoice payment failed
+   - Refund created
+8. Click **Connect Resend**.
+
+Kelviq sends a "Kelviq email alerts are connected" email to the recipients to confirm everything works. From then on, every selected event is emailed to them.
+
+<Note>
+  Alerts are separate for sandbox and live. If you connect Resend while in [sandbox mode](/guides/sandbox), only sandbox events are emailed, with `[Sandbox]` at the start of the subject. Switch to live mode and connect again to get live events.
+</Note>
+
+Kelviq never sends the same event twice. If a delivery is retried, Resend recognises it and doesn't send a second email.
+
+## Manage an alert
+
+Open **Settings → Integrations → Configure Resend** to see your alerts. For each one you can:
+
+- **Send test**: send a test email to check the alert still works.
+- **Edit events**: change which events are emailed, then click **Save events**.
+- **Disconnect**: stop sending these emails.
+
+To email a different group of people, click **Add another alert**.
+
+Each alert is a Kelviq webhook endpoint, so it also appears under **Settings → Webhooks**, named `Resend: <name>`. There you can see every delivery and resend one that failed. Your Resend API key is stored encrypted and is never shown.
+
+## Events you can send
+
+You can email any [webhook event](/guides/webhooks#event-types):
+
+| Category | Events |
+| --- | --- |
+| Checkout | Checkout completed |
+| Customers | Customer created, Customer updated |
+| Orders | Order created, Order updated, Order refunded |
+| Subscriptions | Subscription created, updated, paused, resumed, cancelled, plan changed, trial will end |
+| Invoices | Invoice created, Invoice paid, Invoice payment failed |
+| Refunds | Refund created, Refund updated |
+| Features | Feature usage alert |
+| Payment methods | Payment method created, updated, deleted |
+
+Emails count toward your Resend sending limits.
+
+## Troubleshooting
+
+If emails stop arriving, open **Configure Resend** and click **Send test**. The error tells you what's wrong:
+
+| Error | What to do |
+| --- | --- |
+| This Resend API key is not valid | Create a new API key in Resend, then disconnect and connect again with it. |
+| This Resend API key is not active | The key was disabled or deleted in Resend. Create a new one and reconnect. |
+| The From domain is not verified in Resend | Verify the domain in Resend → **Domains**, or reconnect with a From address on a verified domain. |
+| Resend only lets you send to your own email until you verify a domain | Verify a domain in Resend and use it in the From address. |
+| Your Resend monthly sending limit is used up | Upgrade your Resend plan. |
+
+If Resend is briefly unavailable, or you hit your daily or per-second limit, Kelviq retries the delivery automatically.
+
+## Prefer chat or code?
+
+- Use [Slack](/settings/slack) or [Discord](/settings/discord) to get the same alerts in a channel.
+- Use [webhooks](/guides/webhooks) to handle events in your own backend.
