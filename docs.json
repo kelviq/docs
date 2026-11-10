@@ -185,7 +185,8 @@
               "settings/zapier",
               "settings/slack",
               "settings/discord",
-              "settings/resend"
+              "settings/resend",
+              "settings/appwrite"
             ]
           },
           {
