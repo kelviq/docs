@@ -188,7 +188,8 @@
               "settings/resend",
               "settings/appwrite",
               "settings/windmill",
-              "settings/inngest"
+              "settings/inngest",
+              "settings/segment"
             ]
           },
           {

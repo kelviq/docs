@@ -1,0 +1,124 @@
+---
+title: 'Segment'
+description: 'Send Kelviq events to Segment and every tool you connect there'
+---
+
+Connect [Segment](https://segment.com) to send Kelviq billing events, such as checkouts, new subscriptions, failed payments and refunds, into your Segment workspace. From there, Segment forwards them to every destination you've connected: your data warehouse, product analytics, CRM, email tools and more. Kelviq verifies every event before it sends it.
+
+You can connect as many Segment sources as you like, each with its own events.
+
+## What Segment receives
+
+For each Kelviq event, Segment receives two calls:
+
+- An **Identify** call with the customer's `email` and `name`, so the person is up to date in Segment.
+- A **Track** call named after the event, in Segment's *Object Action* style.
+
+| Kelviq event | Segment Track event |
+| --- | --- |
+| `checkout.completed` | Checkout Completed |
+| `customer.created` / `customer.updated` | Customer Created / Customer Updated |
+| `order.created` / `order.updated` / `order.refunded` | Order Created / Order Updated / Order Refunded |
+| `subscription.created` / `subscription.updated` / `subscription.cancelled` | Subscription Created / Subscription Updated / Subscription Cancelled |
+| `subscription.paused` / `subscription.resumed` | Subscription Paused / Subscription Resumed |
+| `subscription.plan_changed` / `subscription.trial_will_end` | Subscription Plan Changed / Subscription Trial Will End |
+| `invoice.created` / `invoice.paid` / `invoice.payment_failed` | Invoice Created / Invoice Paid / Invoice Payment Failed |
+| `refund.created` / `refund.updated` | Refund Created / Refund Updated |
+| `feature.usage_alert` | Feature Usage Alert |
+| `payment_method.created` / `payment_method.updated` / `payment_method.deleted` | Payment Method Created / Payment Method Updated / Payment Method Deleted |
+
+**Who the event is about.** The Segment `userId` is the customer ID you gave Kelviq (`customer_id`), the same ID your own app uses. Segment joins Kelviq events to that person's other activity. If a customer has no `customer_id`, Kelviq sends `anonymousId: "kelviq:<Kelviq customer ID>"` instead.
+
+**Properties.** Each Track call has the fields you'll most likely chart or filter on, plus the full Kelviq object:
+
+```json
+{
+  "type": "track",
+  "userId": "user_123",
+  "event": "Subscription Created",
+  "timestamp": "2026-03-11T05:25:33Z",
+  "properties": {
+    "id": "a22f1b2a-…",
+    "status": "active",
+    "amount": 21.24,
+    "currency": "USD",
+    "plan": "pro",
+    "plan_name": "Pro",
+    "product": "Acme Analytics",
+    "recurrence": "1 month",
+    "kelviq": { "event_id": "3a7f1c2d-…", "event_type": "subscription.created", "environment": "live" },
+    "object": { "…": "the full Kelviq subscription" }
+  }
+}
+```
+
+Update events, such as `Subscription Plan Changed`, also include `previous_attributes`, with the fields that changed.
+
+<Note>
+  `amount` is a plain number in the event's currency. Kelviq doesn't set Segment's `revenue` property, so revenue isn't counted twice when, for example, both `Checkout Completed` and `Invoice Paid` are sent. Pick the event you want to treat as revenue in your destination.
+</Note>
+
+<Note>
+  Segment uses each event's `messageId` to drop duplicates. Kelviq sets it from the Kelviq event ID, so a retried event isn't counted twice.
+</Note>
+
+## Before you start
+
+1. **Sign in to Segment.** The free plan works.
+2. **Add an HTTP API source.** Go to **Connections → Sources → Add Source**, search for **HTTP API**, and add it. Name it `Kelviq`.
+3. **Copy its Write Key.** Open the source's **Settings → API Keys** and copy the **Write Key**.
+
+<Tip>
+  Use a source just for Kelviq. Its Debugger then shows only Kelviq events, and you can turn the source off at any time without affecting your other data.
+</Tip>
+
+## Connect Segment
+
+1. Open **Settings → Integrations**.
+2. On the **Segment** card, click **Configure Segment**.
+3. Paste the **Write Key**.
+4. Choose the **Workspace region**. Keep **US** unless your Segment workspace is hosted in the EU.
+5. Optionally, enter a **Name**, such as `Production source`. It's only used to label the connection in Kelviq.
+6. Choose the **Events to send**. These are selected by default:
+   - Checkout completed
+   - Subscription created
+   - Subscription cancelled
+   - Invoice payment failed
+   - Refund created
+7. Click **Connect Segment**.
+
+Kelviq sends one test event, **Kelviq Test**. Open your source's **Debugger** in Segment to see it. From then on, every selected event is sent to Segment.
+
+<Warning>
+  Segment accepts events even when the Write Key is wrong, so Kelviq can't tell you about a typo. If **Kelviq Test** doesn't appear in the Debugger within a minute, check the Write Key and the region, then disconnect and connect again.
+</Warning>
+
+<Note>
+  Connections are separate for sandbox and live. If you connect Segment while in [sandbox mode](/guides/sandbox), only sandbox events are sent, with `kelviq.environment` set to `sandbox`. Use a separate Segment source for sandbox, so test data stays out of your real reports.
+</Note>
+
+## Manage a connection
+
+Open **Settings → Integrations → Configure Segment** to see your connected sources. For each one you can:
+
+- **Send test**: send a **Kelviq Test** event to check the connection still works.
+- **Edit events**: change which events are sent, then click **Save events**.
+- **Disconnect**: stop sending events.
+
+To send events to another Segment source, click **Add another source**.
+
+Each connection is a Kelviq webhook endpoint, so it also appears under **Settings → Webhooks**, named `Segment: <name>`. There you can see every delivery and resend one that failed. Your Write Key is stored encrypted and is never shown.
+
+## Troubleshooting
+
+| Problem | What to do |
+| --- | --- |
+| Nothing appears in the Debugger | Check the Write Key belongs to an **HTTP API** source and that the region matches your workspace. Then disconnect and connect again. |
+| Segment rejected the event (too large or invalid) | Segment accepts up to 32 KB per event. Kelviq leaves out the full `object` for very large events, so this is rare. Contact Kelviq support with the event ID. |
+| Events arrive but not in a destination | Check the destination is connected to the **Kelviq** source in Segment, and look at its delivery overview there. |
+
+If Segment is briefly unavailable, Kelviq retries the delivery automatically.
+
+## Prefer code?
+
+Use [webhooks](/guides/webhooks) to receive the same events directly in your own backend.
