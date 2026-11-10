@@ -187,7 +187,8 @@
               "settings/discord",
               "settings/resend",
               "settings/appwrite",
-              "settings/windmill"
+              "settings/windmill",
+              "settings/inngest"
             ]
           },
           {
