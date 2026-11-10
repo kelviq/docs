@@ -1,0 +1,112 @@
+---
+title: 'Inngest'
+description: 'Run your Inngest functions when something happens in Kelviq'
+---
+
+Connect [Inngest](https://www.inngest.com) to send Kelviq events into your Inngest app, so your functions run every time a customer checks out, a subscription changes, a payment fails, and more. You write the logic as Inngest functions, with retries, steps and scheduling built in. Kelviq verifies every event before it sends it, so your functions can trust the data.
+
+You can connect as many Inngest apps or environments as you like, each with its own events.
+
+## What your function receives
+
+Each Kelviq event arrives in Inngest as one event named `kelviq/<event type>`, for example `kelviq/subscription.created` or `kelviq/invoice.payment_failed`. Use that name as your function's trigger.
+
+The event's `data` holds the Kelviq [webhook event](/guides/webhooks#payload-structure) plus the `environment` it came from:
+
+```json
+{
+  "name": "kelviq/subscription.created",
+  "id": "3a7f1c2d-8e4b-4a9f-b123-0e5d6c7a8b9e",
+  "data": {
+    "id": "3a7f1c2d-8e4b-4a9f-b123-0e5d6c7a8b9e",
+    "type": "subscription.created",
+    "created_at": "2026-03-11T05:25:33Z",
+    "environment": "live",
+    "object": { "id": "a22f1b2a-…", "status": "active", "plan": { "identifier": "pro" }, "customer": { "customer_id": "user_123", "email": "geo@example.com" } }
+  }
+}
+```
+
+Update events also include `data.previous_attributes`, with the fields that changed.
+
+A starter TypeScript function:
+
+```ts
+import { inngest } from './client';
+
+export const onNewSubscription = inngest.createFunction(
+  {
+    id: 'kelviq-new-subscription',
+    triggers: { event: 'kelviq/subscription.created' },
+  },
+  async ({ event, step }) => {
+    const subscription = event.data.object;
+
+    await step.run('turn-on-features', async () => {
+      // e.g. turn on features for subscription.customer.customer_id
+    });
+
+    return { customer: subscription.customer.customer_id };
+  },
+);
+```
+
+<Note>
+  The Inngest event `id` is the Kelviq event ID. If Kelviq delivers the same event again, for example when it retries, Inngest stores it but doesn't run your functions twice.
+</Note>
+
+## Before you start
+
+1. **Sign in to Inngest** at [app.inngest.com](https://app.inngest.com). The free plan works.
+2. **Create an Event Key.** Open **Manage → Event Keys** in the environment you want (usually **Production**), click **Create Event Key**, name it `Kelviq`, and copy the key.
+
+<Tip>
+  Use a separate Event Key just for Kelviq. You can then delete it at any time to stop Kelviq events, without affecting anything else that sends events to Inngest.
+</Tip>
+
+## Connect Inngest
+
+1. Open **Settings → Integrations**.
+2. On the **Inngest** card, click **Configure Inngest**.
+3. Paste the **Event Key**.
+4. Optionally, enter a **Name**, such as `Production app`. It's only used to label the connection in Kelviq.
+5. Choose the **Events to send**. These are selected by default:
+   - Checkout completed
+   - Subscription created
+   - Subscription cancelled
+   - Invoice payment failed
+   - Refund created
+6. Click **Connect Inngest**.
+
+Kelviq sends one test event, `kelviq/test`, to check the key works. You'll see it under **Events** in Inngest. From then on, every selected event is sent to Inngest.
+
+<Note>
+  Connections are separate for sandbox and live. If you connect Inngest while in [sandbox mode](/guides/sandbox), only sandbox events are sent, with `environment` set to `sandbox`. Switch to live mode and connect again for live events.
+</Note>
+
+## Manage a connection
+
+Open **Settings → Integrations → Configure Inngest** to see your connected apps. For each one you can:
+
+- **Send test**: send a `kelviq/test` event to check the connection still works.
+- **Edit events**: change which events are sent, then click **Save events**.
+- **Disconnect**: stop sending events.
+
+To send events to another Inngest app or environment, click **Add another app**.
+
+Each connection is a Kelviq webhook endpoint, so it also appears under **Settings → Webhooks**, named `Inngest: <name>`. There you can see every delivery and resend one that failed. Your Event Key is stored encrypted and is never shown.
+
+## Troubleshooting
+
+Click **Send test** to check the connection. The error tells you what's wrong:
+
+| Error | What to do |
+| --- | --- |
+| Inngest did not accept this Event Key | The key was deleted or mistyped. Copy a key from **Manage → Event Keys**, then disconnect and connect again with it. |
+| This event is bigger than your Inngest plan allows | The free plan accepts events up to 256 KB. Upgrade your Inngest plan, or turn off that event. |
+
+If events arrive but no function runs, check that your function's trigger matches the event name exactly (for example `kelviq/subscription.created`), and that your app is synced in Inngest. If Inngest is briefly unavailable, Kelviq retries the delivery automatically.
+
+## Prefer code?
+
+Use [webhooks](/guides/webhooks) to receive the same events directly in your own backend.
