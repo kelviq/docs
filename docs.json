@@ -198,7 +198,8 @@
               "settings/hubspot",
               "settings/posthog",
               "settings/mailchimp",
-              "settings/loops"
+              "settings/loops",
+              "settings/brevo"
             ]
           },
           {
