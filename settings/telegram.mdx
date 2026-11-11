@@ -1,0 +1,101 @@
+---
+title: 'Telegram'
+description: 'Get a Telegram message in your group or channel when something happens in Kelviq'
+---
+
+Connect [Telegram](https://telegram.org) to get a message from your own Telegram bot when a customer checks out, a subscription changes, a payment fails, and more. Each message shows the customer, plan, amount and dates, with a **View in Kelviq** button. Kelviq verifies every event before it sends it.
+
+You can connect as many groups or channels as you like, each with its own events.
+
+## Before you start
+
+Telegram bots are free. You need the Telegram app.
+
+### Create a bot
+
+1. In Telegram, open a chat with [@BotFather](https://t.me/BotFather), Telegram's official bot for making bots.
+2. Send `/newbot`, then choose a name (for example `Kelviq alerts`) and a username that ends in `bot` (for example `acme_kelviq_bot`).
+3. BotFather replies with a **token** like `123456789:AAH…`. Copy it. Anyone with the token can control your bot, so keep it private.
+
+### Add the bot to your chat
+
+- **Group:** open the group → **Add members** → search for your bot's username → add it.
+- **Channel:** open the channel → **Administrators** → **Add admin** → choose your bot and let it **post messages**.
+
+### Find the chat ID
+
+- **Public channel:** use its username, like `@acme_alerts`.
+- **Group or private channel:** after adding the bot, send any message in the chat. Then open this address in your browser, with your token in place of `<token>`:
+
+  ```
+  https://api.telegram.org/bot<token>/getUpdates
+  ```
+
+  Find `"chat":{"id":` in the page. The number after it, like `-1001234567890`, is the chat ID. Include the minus sign.
+
+<Tip>
+  Groups that grow (or turn on certain features) become supergroups and get a new ID starting with `-100`. Kelviq follows the change automatically.
+</Tip>
+
+## Connect Telegram
+
+1. Open **Settings → Integrations**.
+2. On the **Telegram** card, click **Configure Telegram**.
+3. Paste the **Bot token** and enter the **Chat ID**.
+4. Optionally, enter a **Chat name**, such as `Billing alerts`. It's only used to label the connection in Kelviq.
+5. Choose the **Events to send**. These are selected by default:
+   - Checkout completed
+   - Subscription created
+   - Subscription cancelled
+   - Invoice payment failed
+   - Refund created
+6. Click **Connect Telegram**.
+
+Kelviq sends a test message, **✅ Kelviq is connected**, to your chat. From then on, every selected event is posted there.
+
+<Note>
+  Connections are separate for sandbox and live. If you connect Telegram while in [sandbox mode](/guides/sandbox), only sandbox events are sent, marked **(sandbox)**.
+</Note>
+
+## What the messages look like
+
+Each message has a bold title, the details as a list, and buttons:
+
+> **💳 Checkout completed**
+> **Customer:** Geo Jacob (geojacob@example.com)
+> **Plan:** Exc Tax Plan · Acme Analytics
+> **Amount:** $10.00
+>
+> *checkout.completed · Kelviq*
+>
+> [ View in Kelviq ]
+
+Names, emails and other text from your customers are shown exactly as typed, so they can't change the message's formatting.
+
+## Manage a connection
+
+Open **Settings → Integrations → Configure Telegram** to see your connected chats. For each one you can:
+
+- **Send test**: post a test message to check the connection still works.
+- **Edit events**: change which events are sent, then click **Save events**.
+- **Disconnect**: stop sending messages.
+
+Each connection is a Kelviq webhook endpoint, so it also appears under **Settings → Webhooks**, named `Telegram: <name>`. There you can see every delivery and resend one that failed. Your bot token is stored encrypted and is never shown.
+
+## Troubleshooting
+
+Click **Send test** to check the connection. The error tells you what's wrong:
+
+| Error | What to do |
+| --- | --- |
+| Telegram did not accept this bot token | The token was mistyped or replaced. In @BotFather, send `/mybots` → your bot → **API Token**, then disconnect and connect again. |
+| Telegram can't find this chat | Add the bot to the group or channel first, and check the chat ID (including the minus sign). |
+| The bot is no longer in this chat | Someone removed the bot. Add it back. |
+| The bot can't post in this chat | In a channel, make the bot an administrator that can post messages. |
+| Telegram is rate limiting this bot | Telegram allows about 20 messages a minute in one group. Kelviq retries the rest automatically. |
+
+If Telegram is briefly unavailable, Kelviq retries the delivery automatically.
+
+## Prefer code?
+
+Use [webhooks](/guides/webhooks) to receive the same events in your own backend.
