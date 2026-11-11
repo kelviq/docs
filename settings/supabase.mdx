@@ -1,0 +1,121 @@
+---
+title: 'Supabase'
+description: "Keep each Supabase user's Kelviq plan in their app_metadata, to turn features on and off in your app and your RLS policies"
+---
+
+Connect [Supabase](https://supabase.com) to keep each user's plan in sync. When a subscription starts, changes, is paused or ends in Kelviq, Kelviq updates the Supabase Auth user's **app_metadata**. Users can't change app_metadata themselves, and Supabase includes it in the user's JWT, so you can check the plan in your app, on your server and in your Row Level Security policies. Kelviq verifies every event before it changes anything.
+
+## What Kelviq writes
+
+Kelviq writes one key, `kelviq`, in the user's app_metadata. Supabase's own keys (such as `provider`) and your other keys are kept.
+
+```json
+{
+  "provider": "email",
+  "providers": ["email"],
+  "kelviq": {
+    "plan": "pro",
+    "plan_name": "Pro",
+    "status": "active",
+    "subscription_id": "a22f1b2a-…",
+    "current_period_end": "2026-04-10T06:28:58Z",
+    "trial_end": null,
+    "customer_id": "1bb69d0f-…",
+    "environment": "live",
+    "updated_at": "2026-03-11T05:25:33Z"
+  }
+}
+```
+
+| Kelviq event | `plan` | `status` |
+| --- | --- | --- |
+| `subscription.created`, `subscription.updated`, `subscription.resumed` | The plan's identifier | `active`, `trialing` or `past_due` |
+| `subscription.plan_changed` | The new plan | `active` |
+| `subscription.paused` | `null` | `paused` |
+| `subscription.cancelled` | `null` | `cancelled` |
+
+`plan` is `null` whenever the user shouldn't have access, so checking `plan` is enough. If events arrive out of order, an older event never overwrites a newer one for the same subscription.
+
+Other events, such as invoices and refunds, don't change Supabase.
+
+## Use it in your app
+
+In the browser or on the server:
+
+```ts
+const { data: { user } } = await supabase.auth.getUser();
+const plan = user?.app_metadata?.kelviq?.plan;
+if (plan !== 'pro') showUpgrade();
+```
+
+In a Row Level Security policy, for example to let only Pro users read a table:
+
+```sql
+create policy "Pro users can read reports"
+on reports for select
+to authenticated
+using ( (auth.jwt() -> 'app_metadata' -> 'kelviq' ->> 'plan') = 'pro' );
+```
+
+<Note>
+  The JWT only gets the new plan when the session refreshes, which by default happens within an hour. To apply a change right away, call `supabase.auth.refreshSession()` in your app, for example after checkout.
+</Note>
+
+## Before you start
+
+1. **Sign in to Supabase** at [supabase.com/dashboard](https://supabase.com/dashboard). The free plan works.
+2. **Copy the Project URL.** Open **Project Settings → Data API** and copy the **Project URL**, like `https://abcdefghijklmnopqrst.supabase.co`.
+3. **Create a secret key.** Open **Project Settings → API Keys**, create a **secret key** named `Kelviq`, and copy it. It starts with `sb_secret_`. The publishable (anon) key can't change users.
+4. **Decide how to match users.** Kelviq finds the Supabase user in one of two ways:
+   - **Customer ID = Supabase user ID** (recommended): when you create a Kelviq customer, use the Supabase user ID (a UUID) as the customer ID. Matching is exact.
+   - **Email address**: Kelviq looks up the Supabase user with the customer's email. It must match exactly one user.
+
+<Warning>
+  A secret key can read and change everything in your project. Kelviq stores it encrypted and never shows it again. Use a key made just for Kelviq, so you can delete it at any time to disconnect.
+</Warning>
+
+## Connect Supabase
+
+1. Open **Settings → Integrations**.
+2. On the **Supabase** card, click **Configure Supabase**.
+3. Paste the **Project URL** and the **Secret key**.
+4. Choose how to **match Kelviq customers to Supabase users**.
+5. Optionally, enter a **Name**, such as `Production project`. It's only used to label the connection in Kelviq.
+6. The subscription events are selected. Keep them all.
+7. Click **Connect Supabase**.
+
+Kelviq checks the URL and key with Supabase without changing anything. From then on, every subscription change updates the Supabase user.
+
+<Note>
+  Connections are separate for sandbox and live. Connect a test Supabase project in [sandbox mode](/guides/sandbox), and your production project in live mode.
+</Note>
+
+## Manage a connection
+
+Open **Settings → Integrations → Configure Supabase** to see your connected projects. For each one you can:
+
+- **Send test**: check the URL and key still work. Nothing changes in Supabase.
+- **Edit events**: change which events are sent, then click **Save events**.
+- **Disconnect**: stop updating Supabase. The metadata already written stays.
+
+Each connection is a Kelviq webhook endpoint, so it also appears under **Settings → Webhooks**, named `Supabase: <name>`. There you can see every delivery and resend one that failed.
+
+## Troubleshooting
+
+The delivery's response in **Settings → Webhooks** says what happened:
+
+| Response | What to do |
+| --- | --- |
+| Supabase did not accept this secret key | The key was deleted or mistyped. Create a new secret key, then disconnect and connect again. |
+| This Supabase key can't change users | You pasted the publishable or anon key. Use a secret key (`sb_secret_…`). |
+| This Supabase project is paused | Free Supabase projects pause after a week without use. Restore the project in Supabase; Kelviq retries the delivery. |
+| Customer ID "…" is not a Supabase user ID | Create Kelviq customers with the Supabase user ID as the customer ID, or reconnect matching by email. |
+| No Supabase user with ID … / with email … | The customer isn't a user in this Supabase project. Check you connected the right project. |
+| More than one Supabase user has email … | Match by Customer ID instead. |
+| Supabase already has a newer update for this subscription | Nothing to do: an older event arrived late and was ignored. |
+
+If Supabase is briefly unavailable, Kelviq retries the delivery automatically.
+
+## Prefer code?
+
+Use [webhooks](/guides/webhooks) to receive subscription events in a Supabase Edge Function and update users yourself, or check access with [entitlements](/product-catalog/entitlements).

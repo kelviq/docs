@@ -192,7 +192,8 @@
               "settings/segment",
               "settings/woocommerce",
               "settings/fernand",
-              "settings/clerk"
+              "settings/clerk",
+              "settings/supabase"
             ]
           },
           {
