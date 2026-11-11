@@ -1,0 +1,87 @@
+---
+title: 'PostHog'
+description: 'Send Kelviq billing events to PostHog, on the same people as your product events'
+---
+
+Connect [PostHog](https://posthog.com) to send Kelviq billing events, such as checkouts, new subscriptions, plan changes, failed payments and refunds, into your PostHog project. Each event lands on the same person as their product events, so you can see how usage and revenue connect: build funnels from sign-up to purchase, cohorts by plan, or insights on churn. Kelviq verifies every event before it sends it.
+
+It works on PostHog's free plan.
+
+## What PostHog receives
+
+Each Kelviq event becomes one PostHog event named `kelviq_<event type>`:
+
+| Kelviq event | PostHog event |
+| --- | --- |
+| `checkout.completed` | `kelviq_checkout_completed` |
+| `customer.created` / `customer.updated` | `kelviq_customer_created` / `kelviq_customer_updated` |
+| `order.created` / `order.updated` / `order.refunded` | `kelviq_order_created` / `kelviq_order_updated` / `kelviq_order_refunded` |
+| `subscription.created`, `.updated`, `.cancelled`, `.paused`, `.resumed`, `.plan_changed`, `.trial_will_end` | `kelviq_subscription_created`, `kelviq_subscription_updated`, … |
+| `invoice.created` / `invoice.paid` / `invoice.payment_failed` | `kelviq_invoice_created` / `kelviq_invoice_paid` / `kelviq_invoice_payment_failed` |
+| `refund.created` / `refund.updated` | `kelviq_refund_created` / `kelviq_refund_updated` |
+| `feature.usage_alert` | `kelviq_feature_usage_alert` |
+| `payment_method.created` / `.updated` / `.deleted` | `kelviq_payment_method_created`, … |
+
+**Who the event is about.** The event's `distinct_id` is the customer ID you gave Kelviq (`customer_id`). If you use the same ID when you call `posthog.identify()` in your app, Kelviq events join that person's product events. Without a customer ID, Kelviq uses the customer's email.
+
+**Event properties.** Each event has the fields you'll most likely filter on, such as `amount`, `currency`, `plan`, `plan_name`, `product`, `status` and `recurrence`. It also has `kelviq_event_id`, `kelviq_event_type`, `kelviq_environment` and the full Kelviq `object`.
+
+**Person properties.** Kelviq sets `email`, `name` and `kelviq_customer_id` on the person. Subscription events also set `kelviq_plan` (the plan the person can use now, or empty once cancelled or paused) and `kelviq_status`. Use them in cohorts, for example *kelviq_plan = pro*.
+
+<Note>
+  PostHog keeps one copy of events with the same ID. Kelviq uses the Kelviq event ID, so a retried event isn't counted twice.
+</Note>
+
+## Before you start
+
+1. **Sign in to PostHog.** The free plan works.
+2. **Copy the Project API key.** Open **Project settings → General** and copy the **Project API key**. It starts with `phc_`. It's the same key your app uses with `posthog.init()`.
+3. **Note your region.** If you open PostHog at `us.posthog.com`, your region is **US**; at `eu.posthog.com`, it's **EU**.
+
+## Connect PostHog
+
+1. Open **Settings → Integrations**.
+2. On the **PostHog** card, click **Configure PostHog**.
+3. Paste the **Project API key** and choose the **Cloud region**.
+4. Optionally, enter a **Name**, such as `Production project`. It's only used to label the connection in Kelviq.
+5. Choose the **Events to send**. These are selected by default:
+   - Checkout completed
+   - Subscription created
+   - Subscription cancelled
+   - Invoice payment failed
+   - Refund created
+6. Click **Connect PostHog**.
+
+Kelviq sends one test event, `kelviq_test`. Open **Activity** in PostHog to see it. From then on, every selected event is sent to PostHog.
+
+<Warning>
+  PostHog accepts events even when the key or region is wrong, so Kelviq can't tell you about a mistake. If `kelviq_test` doesn't appear in **Activity** within a minute, check the key and the region, then disconnect and connect again.
+</Warning>
+
+<Note>
+  Connections are separate for sandbox and live. If you connect PostHog while in [sandbox mode](/guides/sandbox), only sandbox events are sent, with `kelviq_environment` set to `sandbox`. Use a separate PostHog project for sandbox, so test data stays out of your real insights.
+</Note>
+
+## Manage a connection
+
+Open **Settings → Integrations → Configure PostHog** to see your connected projects. For each one you can:
+
+- **Send test**: send a `kelviq_test` event.
+- **Edit events**: change which events are sent, then click **Save events**.
+- **Disconnect**: stop sending events.
+
+Each connection is a Kelviq webhook endpoint, so it also appears under **Settings → Webhooks**, named `PostHog: <name>`. There you can see every delivery and resend one that failed. Your key is stored encrypted.
+
+## Troubleshooting
+
+| Problem | What to do |
+| --- | --- |
+| Nothing appears in Activity | Check the Project API key (it starts with `phc_`) and the region, then disconnect and connect again. |
+| Kelviq events are on a different person | Use the same ID for `posthog.identify()` in your app and for the Kelviq customer ID. |
+| PostHog rejected the event as too large | Kelviq leaves out the full `object` for very large events, so this is rare. Contact Kelviq support with the event ID. |
+
+If PostHog is briefly unavailable, Kelviq retries the delivery automatically.
+
+## Prefer code?
+
+Use [webhooks](/guides/webhooks) to receive the same events in your own backend and send them to PostHog with its SDK.
