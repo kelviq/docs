@@ -1,0 +1,97 @@
+---
+title: 'Fernand'
+description: "See each customer's Kelviq plan, subscriptions and orders next to their support conversations in Fernand"
+---
+
+Connect [Fernand](https://getfernand.com) to see Kelviq billing data in the sidebar of every support conversation. When you open a conversation, Fernand shows who the customer is in Kelviq, their current plan, their subscriptions and their latest orders, with links to open them in Kelviq. You can answer billing questions without switching tabs.
+
+It uses Fernand's **Custom data** feature, which is available on every Fernand plan.
+
+## What the sidebar shows
+
+For the conversation's contact, Fernand shows:
+
+| Section | What you see |
+| --- | --- |
+| Customer | Name, status (**Paying**, **Trial**, **Past due**, **Cancelled**, **Customer** for one-time buyers, or **No purchases**), current plan, your customer ID, customer since, and a **View in Kelviq** button |
+| Subscriptions | Each subscription's plan and product, status, price, trial days left, and the renewal or end date |
+| Orders | The 5 most recent orders, with date, total and status. Click the date to open the order in Kelviq. |
+
+Kelviq looks up the contact by email. If the main contact isn't a Kelviq customer, it tries the conversation's other contacts. If nobody matches, the sidebar says so.
+
+## Before you start
+
+You need:
+
+- A Fernand account where you can open **Settings → Custom data**.
+- A Kelviq **Server API key**. Create one just for Fernand in **Settings → API keys**, so you can delete it at any time to disconnect.
+
+<Tip>
+  Connect in the same environment as your real customers: in live mode for live data. A connection made in [sandbox mode](/guides/sandbox) shows sandbox customers, marked **Sandbox** in the sidebar.
+</Tip>
+
+## Connect Fernand
+
+1. In Kelviq, open **Settings → Integrations** and click **Configure Fernand**.
+2. Paste the Server API key and click **Create connection**. Kelviq checks the key, then shows the endpoint URL, a header and a template.
+3. In Fernand, open **Settings → Custom data** (under **Workspace settings**).
+4. Paste the **Endpoint URL**.
+5. Click **Add headers** and add the header from Kelviq: name `X-Fernand-Key`, and the **Header value**.
+6. Replace the template with the **Template** from Kelviq, and click **Save template**.
+7. Enter the email of one of your Kelviq customers as the **Testing contact email**, and click **Fetch**. The preview shows their Kelviq data.
+8. Save.
+
+<Warning>
+  Copy the values before you close the dialog in Kelviq: the header value is shown only once. If you lose it, create a new connection.
+</Warning>
+
+Kelviq doesn't store your API key. It's encrypted inside the header value, which Fernand sends with every request. The endpoint URL is the same for everyone and reads nothing without it.
+
+## The template
+
+The template decides what the sidebar shows. You can change it in Fernand, for example to hide orders or rename labels. Fernand receives this data for each contact:
+
+```json
+{
+  "found": true,
+  "environment": "live",
+  "status": "Paying",
+  "color": "green",
+  "plan": "Pro",
+  "customer": {
+    "name": "Jane Doe",
+    "email": "jane@example.com",
+    "customer_id": "user_123",
+    "country": "DE",
+    "since": "2026-01-04",
+    "url": "https://app.kelviq.com/customers/a1b2c3d4-…"
+  },
+  "subscriptions": [
+    { "plan": "Pro", "product": "Acme Analytics", "status": "Active", "color": "green", "price": "29.00 USD / month", "renews_on": "2026-12-04", "ends_on": "", "trial_days_left": 0 }
+  ],
+  "orders": [
+    { "id": "ORD-20261104-ABC", "total": "29.00 USD", "status": "Complete", "color": "green", "date": "2026-11-04", "plan": "Pro", "url": "https://app.kelviq.com/orders/ORD-20261104-ABC" }
+  ],
+  "counts": { "subscriptions": 1, "active": 1, "orders": 1 }
+}
+```
+
+When the contact isn't a Kelviq customer, Fernand receives `{ "found": false, "email": "…" }`. When Kelviq can't answer, there's also an `error` with the reason, and the template shows it.
+
+## Disconnect
+
+Delete the API key in Kelviq **Settings → API keys**, and remove the Custom data endpoint in Fernand. To replace a connection, create a new one in Kelviq and paste the new values into Fernand.
+
+## Troubleshooting
+
+| Problem | What to do |
+| --- | --- |
+| Kelviq did not accept this API key | Use a Server API key from **Settings → API keys**, in the same environment (live or sandbox) you're in when you click **Create connection**. |
+| The sidebar says Kelviq did not accept the API key of this connection | The key was deleted. Create a new connection in Kelviq and paste the new values into Fernand. |
+| Fernand shows an error when you click **Fetch** | Check the header name is exactly `X-Fernand-Key` and the value was copied completely. |
+| "No Kelviq customer with …" | The contact's email doesn't match a customer in Kelviq, in this environment. Check the email on the customer in Kelviq. |
+| Kelviq did not answer in time | Fernand waits up to 3 seconds. Open the conversation again in a moment. |
+
+## Prefer code?
+
+Use the [Customers](/api-reference/customers/list-customers) and [Subscriptions](/api-reference/subscriptions/list-subscriptions) APIs to build your own Fernand endpoint.
