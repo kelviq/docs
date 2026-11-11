@@ -191,7 +191,8 @@
               "settings/inngest",
               "settings/segment",
               "settings/woocommerce",
-              "settings/fernand"
+              "settings/fernand",
+              "settings/clerk"
             ]
           },
           {

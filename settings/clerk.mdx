@@ -1,0 +1,108 @@
+---
+title: 'Clerk'
+description: "Keep each Clerk user's Kelviq plan in their metadata, to turn features on and off in your app"
+---
+
+Connect [Clerk](https://clerk.com) to keep each user's plan in sync. When a subscription starts, changes, is paused or ends in Kelviq, Kelviq updates the Clerk user's **public metadata**. Your app reads it from the Clerk user, in the browser or on the server, with no extra API call. Kelviq verifies every event before it changes anything.
+
+## What Kelviq writes
+
+Kelviq writes one key, `kelviq`, in the user's public metadata. Your other metadata is kept.
+
+```json
+{
+  "kelviq": {
+    "plan": "pro",
+    "plan_name": "Pro",
+    "status": "active",
+    "subscription_id": "a22f1b2a-…",
+    "current_period_end": "2026-04-10T06:28:58Z",
+    "trial_end": null,
+    "customer_id": "1bb69d0f-…",
+    "environment": "live",
+    "updated_at": "2026-03-11T05:25:33Z"
+  }
+}
+```
+
+| Kelviq event | `plan` | `status` |
+| --- | --- | --- |
+| `subscription.created`, `subscription.updated`, `subscription.resumed` | The plan's identifier | `active`, `trialing` or `past_due` |
+| `subscription.plan_changed` | The new plan | `active` |
+| `subscription.paused` | removed | `paused` |
+| `subscription.cancelled` | removed | `cancelled` |
+
+`plan` and `plan_name` are removed whenever the user shouldn't have access, so checking `plan` is enough. (Kelviq sends them as `null`, and Clerk removes keys set to `null`. `trial_end` is also only there during a trial.) If events arrive out of order, an older event never overwrites a newer one for the same subscription.
+
+Other events, such as invoices and refunds, don't change Clerk.
+
+## Use it in your app
+
+```tsx
+import { useUser } from '@clerk/clerk-react';
+
+function ProFeature() {
+  const { user } = useUser();
+  const plan = user?.publicMetadata?.kelviq?.plan;
+  if (plan !== 'pro') return <Upgrade />;
+  return <Dashboard />;
+}
+```
+
+On the server, read `user.publicMetadata.kelviq` from `currentUser()` or the Backend API.
+
+<Note>
+  Clerk only puts metadata in the session token when the token refreshes. If you read `sessionClaims` instead of the user, a new plan can take up to a minute to appear.
+</Note>
+
+## Before you start
+
+1. **Sign in to Clerk** at [dashboard.clerk.com](https://dashboard.clerk.com). The free plan works.
+2. **Copy the Secret Key.** In your application, open **Configure → API keys** and copy the **Secret Key**. It starts with `sk_live_` (production) or `sk_test_` (development).
+3. **Decide how to match users.** Kelviq finds the Clerk user in one of two ways:
+   - **Customer ID = Clerk user ID** (recommended): when you create a Kelviq customer, use the Clerk user ID (`user_…`) as the customer ID. Matching is exact.
+   - **Email address**: Kelviq looks up the Clerk user with the customer's email. It must match exactly one Clerk user.
+
+## Connect Clerk
+
+1. Open **Settings → Integrations**.
+2. On the **Clerk** card, click **Configure Clerk**.
+3. Paste the **Secret Key**.
+4. Choose how to **match Kelviq customers to Clerk users**.
+5. Optionally, enter a **Name**, such as `Production app`. It's only used to label the connection in Kelviq.
+6. The subscription events are selected. Keep them all.
+7. Click **Connect Clerk**.
+
+Kelviq checks the Secret Key with Clerk without changing anything. From then on, every subscription change updates the Clerk user.
+
+<Note>
+  Connections are separate for sandbox and live. Connect a Clerk development instance (`sk_test_…`) in [sandbox mode](/guides/sandbox), and your production instance (`sk_live_…`) in live mode.
+</Note>
+
+## Manage a connection
+
+Open **Settings → Integrations → Configure Clerk** to see your connected apps. For each one you can:
+
+- **Send test**: check the Secret Key still works. Nothing changes in Clerk.
+- **Edit events**: change which events are sent, then click **Save events**.
+- **Disconnect**: stop updating Clerk. The metadata already written stays.
+
+Each connection is a Kelviq webhook endpoint, so it also appears under **Settings → Webhooks**, named `Clerk: <name>`. There you can see every delivery and resend one that failed. Your Secret Key is stored encrypted and is never shown.
+
+## Troubleshooting
+
+The delivery's response in **Settings → Webhooks** says what happened:
+
+| Response | What to do |
+| --- | --- |
+| Clerk did not accept this Secret Key | Copy the Secret Key again from Clerk → Configure → API keys, then disconnect and connect again. |
+| Customer ID "…" is not a Clerk user ID | Create Kelviq customers with the Clerk user ID as the customer ID, or reconnect matching by email. |
+| No Clerk user with ID … / with email … | The customer isn't a user in this Clerk instance. Check you connected the right instance (development or production). |
+| More than one Clerk user has email … | Match by Customer ID instead. |
+| Clerk already has a newer update for this subscription | Nothing to do: an older event arrived late and was ignored. |
+
+If Clerk is briefly unavailable, Kelviq retries the delivery automatically.
+
+## Prefer code?
+
+Use [webhooks](/guides/webhooks) to receive subscription events in your own backend and update Clerk yourself, or check access with [entitlements](/product-catalog/entitlements).
