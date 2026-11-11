@@ -1,0 +1,96 @@
+---
+title: 'HubSpot'
+description: 'Keep your HubSpot contacts in sync with Kelviq plans, subscriptions and payments'
+---
+
+Connect [HubSpot](https://www.hubspot.com) to keep each Kelviq customer as a HubSpot contact, with their plan, subscription status, renewal date and payments. Your sales and success teams see billing next to everything else they know about the customer, can filter contacts by plan or status, and can start HubSpot workflows from them. Kelviq verifies every event before it changes anything.
+
+It works with every HubSpot plan, including the free CRM.
+
+## What Kelviq writes
+
+Kelviq finds the contact by **email** and creates it if it doesn't exist. It fills the contact's name and these properties, in a **Kelviq** property group that Kelviq creates for you:
+
+| Property | Set by | Example |
+| --- | --- | --- |
+| Kelviq plan | Subscription events (empty when paused or cancelled) | `pro` |
+| Kelviq plan name | Subscription events | `Pro` |
+| Kelviq subscription status | Subscription events | Active, Trialing, Past due, Paused, Cancelled |
+| Kelviq renews or ends on | Subscription events | Apr 10, 2026 |
+| Kelviq last payment | Checkout completed, Order created, Invoice paid | Apr 2, 2026 |
+| Kelviq last payment amount | The same events | `40` |
+| Kelviq currency | The same events | `USD` |
+| Kelviq last failed payment | Invoice payment failed | Aug 1, 2026 |
+| Kelviq last refund | Refund created, Order refunded | Apr 2, 2026 |
+| Kelviq customer ID | Every event | `user_123` |
+| Kelviq customer link | Every event | Opens the customer in Kelviq |
+| Kelviq last event | Every event | `invoice.paid` |
+
+If events arrive out of order, an older subscription event never overwrites the plan and status set by a newer one.
+
+## Ideas for workflows
+
+Because these are normal contact properties, you can use them anywhere in HubSpot:
+
+- **Win back cancelled customers:** a workflow that starts when *Kelviq subscription status* is *Cancelled*.
+- **Save failed payments:** a task for the account owner when *Kelviq last failed payment* is known and the status is *Past due*.
+- **Upsell:** a list of contacts whose *Kelviq plan* is `pro`.
+
+## Before you start
+
+### Create a Service Key
+
+HubSpot Service Keys are free on every HubSpot plan. You need to be a Super Admin, or have Developer tools access.
+
+1. In HubSpot, open **Settings → Integrations → Service Keys**. In some accounts it's under **Development → Keys → Service Keys**.
+2. Click **Create a service key** and name it `Kelviq`.
+3. Add these scopes:
+   - `crm.objects.contacts.read`
+   - `crm.objects.contacts.write`
+   - `crm.schemas.contacts.read`
+   - `crm.schemas.contacts.write`
+4. Click **Create** and copy the key.
+
+<Note>
+  HubSpot no longer lets you create new private apps. A private app access token you already have also works, if it has the same scopes.
+</Note>
+
+## Connect HubSpot
+
+1. Open **Settings → Integrations**.
+2. On the **HubSpot** card, click **Configure HubSpot**.
+3. Paste the **Service Key**.
+4. Optionally, enter a **Name**, such as `Our HubSpot`. It's only used to label the connection in Kelviq.
+5. Choose the **Events to send**. Customer, checkout, subscription, invoice and refund events are selected.
+6. Click **Connect HubSpot**.
+
+Kelviq checks the key and creates the Kelviq property group and properties in HubSpot. From then on, every selected event updates the customer's contact.
+
+<Note>
+  Connections are separate for sandbox and live. If you connect HubSpot while in [sandbox mode](/guides/sandbox), sandbox events update contacts too, with *Kelviq last event* ending in `(sandbox)`. Use a HubSpot test account for sandbox, so test customers stay out of your CRM.
+</Note>
+
+## Manage a connection
+
+Open **Settings → Integrations → Configure HubSpot** to see your connections. For each one you can:
+
+- **Send test**: check the key still works and that the Kelviq properties exist. No contact changes.
+- **Edit events**: change which events are sent, then click **Save events**.
+- **Disconnect**: stop updating HubSpot. Contacts and their Kelviq properties stay.
+
+Each connection is a Kelviq webhook endpoint, so it also appears under **Settings → Webhooks**, named `HubSpot: <name>`. There you can see every delivery and resend one that failed. Your key is stored encrypted and is never shown.
+
+## Troubleshooting
+
+| Error | What to do |
+| --- | --- |
+| HubSpot did not accept this key | The key was deleted or rotated. Create a new Service Key, then disconnect and connect again. |
+| This HubSpot key is missing a scope | Edit the Service Key in HubSpot and add the four scopes listed above. |
+| HubSpot is rate limiting this account | Kelviq retries automatically. |
+| … has no customer email to match a HubSpot contact | The Kelviq customer has no email, so there's no contact to update. Add an email to the customer in Kelviq. |
+
+If HubSpot is briefly unavailable, Kelviq retries the delivery automatically. If someone deletes the Kelviq properties in HubSpot, Kelviq creates them again on the next event.
+
+## Prefer code?
+
+Use [webhooks](/guides/webhooks) to receive the same events in your own backend and update HubSpot your own way.

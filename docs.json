@@ -194,7 +194,8 @@
               "settings/fernand",
               "settings/clerk",
               "settings/supabase",
-              "settings/telegram"
+              "settings/telegram",
+              "settings/hubspot"
             ]
           },
           {
