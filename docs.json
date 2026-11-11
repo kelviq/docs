@@ -196,7 +196,8 @@
               "settings/supabase",
               "settings/telegram",
               "settings/hubspot",
-              "settings/posthog"
+              "settings/posthog",
+              "settings/mailchimp"
             ]
           },
           {
