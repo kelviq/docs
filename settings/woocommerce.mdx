@@ -1,0 +1,93 @@
+---
+title: 'WooCommerce'
+description: 'Take payments in your WooCommerce store with Kelviq checkout'
+---
+
+Add Kelviq as a payment method in your [WooCommerce](https://woocommerce.com) store. Shoppers fill their cart as usual, pay on a secure Kelviq checkout, and come back to your store. Kelviq is the Merchant of Record: it takes the payment, charges the right sales tax or VAT for the shopper's country, and sends the invoice.
+
+<Warning>
+  Kelviq for WooCommerce is for digital products, software and subscriptions. Don't use it to sell physical goods.
+</Warning>
+
+## How it works
+
+1. The shopper places an order and chooses the Kelviq payment method.
+2. They're taken to Kelviq checkout to pay the order total, with cards, Apple Pay, Google Pay, PayPal and the other [payment methods](/checkout/payment-methods) you've turned on.
+3. Kelviq tells your store the payment succeeded, and the shopper returns to the order confirmation page. Before marking the order paid, the plugin checks the payment with the Kelviq API.
+
+Coupons are applied in WooCommerce, so the shopper pays the discounted total. Kelviq discount codes are turned off for these checkouts.
+
+## Before you start
+
+You need:
+
+- A WordPress site with WooCommerce 8.0 or later, reachable from the internet over **HTTPS**. Kelviq sends payment confirmations to your site, so it can't be a local or password-protected site.
+- A Kelviq **Server API key**, from **Settings → API keys**.
+- A **one-time plan** that WooCommerce orders are sold under:
+  1. Open **Products** and add a product, for example `WooCommerce store`.
+  2. Add a plan with a one-time price, for example `WooCommerce order`, and publish it. The price doesn't matter: the shopper always pays the order total.
+  3. Copy the plan's **identifier**, for example `woocommerce-order`.
+
+<Tip>
+  Set up everything in [sandbox mode](/guides/sandbox) first, with a sandbox API key and plan. You can then pay with [test cards](/guides/test-payments) before taking real payments.
+</Tip>
+
+## Install the plugin
+
+1. In Kelviq, open **Settings → Integrations**, click **Configure WooCommerce**, then **Download plugin**.
+2. In WordPress, open **Plugins → Add New Plugin → Upload Plugin**.
+3. Choose `kelviq-for-woocommerce.zip`, click **Install Now**, then **Activate**.
+
+## Connect it to Kelviq
+
+1. In WordPress, open **WooCommerce → Settings → Payments**, and click **Kelviq**.
+2. Tick **Enable Kelviq**.
+3. Choose the **Environment**: **Sandbox** for test payments or **Live** for real ones.
+4. Paste your **Server API key** for that environment.
+5. Enter the **Kelviq plan identifier**.
+6. Choose how **Tax** works:
+   - **My prices include tax** (default): the shopper pays exactly your price, and Kelviq takes the tax out of it.
+   - **Add tax on top of my prices**: Kelviq adds tax for the shopper's country at checkout.
+7. Optionally, change the **Title** and **Description** shoppers see at checkout.
+8. Click **Save changes**.
+
+The plugin checks your key and plan, then creates a webhook endpoint in Kelviq for your store, named `WooCommerce: <your site>`. You'll see **Kelviq is connected** at the top of the page.
+
+<Note>
+  Kelviq calculates tax, so turn off WooCommerce taxes in **WooCommerce → Settings → General** (untick **Enable tax rates and calculations**). Otherwise shoppers are charged tax twice.
+</Note>
+
+## Refunds
+
+- **From WooCommerce:** open the order, click **Refund**, enter the amount, and click the **Refund … via** button with your Kelviq title. The refund is made in Kelviq.
+- **From Kelviq:** refund the order in **Sales → Orders**. The refund also appears on the WooCommerce order. A full refund sets the order to **Refunded**.
+
+## Order details
+
+Each paid order shows:
+
+- The Kelviq order ID as the **Transaction ID**.
+- Order notes for each step, for example *Shopper sent to Kelviq checkout* and *Paid with Kelviq*.
+
+In Kelviq, each checkout has the WooCommerce order ID and number in its [metadata](/checkout/checkout-metadata) (`wc_order_id`, `wc_order_number`), so you can match orders in both places.
+
+## Troubleshooting
+
+Errors are shown at the top of the Kelviq settings page, and on the order as order notes. For more detail, tick **Debug log** and open **WooCommerce → Status → Logs** (source `kelviq`).
+
+| Problem | What to do |
+| --- | --- |
+| Kelviq did not accept the API key | Paste a Server API key from **Settings → API keys** for the environment you chose. A sandbox key doesn't work in Live, and the other way around. |
+| No plan "…" in this environment | Check the plan identifier in **Products**, and that the plan is published in the same environment as your key. |
+| Could not set up payment confirmations | Your site isn't reachable from the internet over HTTPS, for example it's a local site or behind a password. Put the site online, then click **Save changes** again. |
+| Kelviq doesn't show at checkout | Tick **Enable Kelviq**, and fill in the API key and plan identifier. |
+| We could not start the payment | The order note says why, for example a currency Kelviq doesn't support. |
+| Order stays "Pending payment" after paying | Open **Settings → Webhooks** in Kelviq, find `WooCommerce: <your site>`, and check its deliveries. Resend a failed one. The order is also confirmed when the shopper returns to your store. |
+
+## Disconnect
+
+Untick **Enable Kelviq** and save to stop offering it at checkout. When you delete the plugin, it also deletes its webhook endpoint in Kelviq.
+
+## Prefer code?
+
+Use the [checkout API](/api-reference/checkout/create-a-checkout-session) and [webhooks](/guides/webhooks) to build your own integration.

@@ -189,7 +189,8 @@
               "settings/appwrite",
               "settings/windmill",
               "settings/inngest",
-              "settings/segment"
+              "settings/segment",
+              "settings/woocommerce"
             ]
           },
           {
