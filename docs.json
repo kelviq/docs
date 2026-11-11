@@ -195,7 +195,8 @@
               "settings/clerk",
               "settings/supabase",
               "settings/telegram",
-              "settings/hubspot"
+              "settings/hubspot",
+              "settings/posthog"
             ]
           },
           {
