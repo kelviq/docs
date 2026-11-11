@@ -197,7 +197,8 @@
               "settings/telegram",
               "settings/hubspot",
               "settings/posthog",
-              "settings/mailchimp"
+              "settings/mailchimp",
+              "settings/loops"
             ]
           },
           {
