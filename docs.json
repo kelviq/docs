@@ -193,7 +193,8 @@
               "settings/woocommerce",
               "settings/fernand",
               "settings/clerk",
-              "settings/supabase"
+              "settings/supabase",
+              "settings/telegram"
             ]
           },
           {
