@@ -1,0 +1,76 @@
+---
+title: 'Notion'
+description: 'Keep a table of your customers in Notion, with their plan, status and latest Kelviq event'
+---
+
+Connect [Notion](https://www.notion.com) to keep a table of your customers in a Notion database: one row per customer, with their plan, status, customer ID, latest Kelviq event and a link to the customer in Kelviq. Your team can see who's on which plan, filter for cancelled or past-due customers, and add their own notes next to the billing data. Kelviq verifies every event before it changes anything.
+
+It works with Notion's free plan.
+
+## What Kelviq keeps in your database
+
+For each event, Kelviq finds the row whose **Email** is the customer's email, or adds a new row, and fills these columns:
+
+| Column | Type | Value |
+| --- | --- | --- |
+| Title column (for example **Name**) | Title | The customer's name, or their email |
+| **Email** | Email | The customer's email. Kelviq uses it to find the row. |
+| **Plan** | Select | The plan the customer can use now, like `pro`. Empty when cancelled or paused. |
+| **Status** | Select | `active`, `trialing`, `past_due`, `paused` or `cancelled` |
+| **Customer ID** | Text | Your customer ID in Kelviq |
+| **Last event** | Text | The latest Kelviq event, like `invoice.payment_failed` |
+| **Last event at** | Date | When that event happened |
+| **Kelviq link** | URL | The customer's page in Kelviq |
+
+Kelviq adds the columns that are missing when you connect. **Plan** and **Status** change only on subscription events. Your own columns are never changed, so you can add notes, owners or tags next to Kelviq's.
+
+## Before you start
+
+1. **Create a Notion integration.** Open [notion.so/profile/integrations](https://www.notion.so/profile/integrations) and click **New integration**. Name it `Kelviq`, choose your workspace, keep the type **Internal** and click **Save**.
+2. **Check its capabilities.** On the integration's **Capabilities** tab, make sure **Read content**, **Update content** and **Insert content** are on.
+3. **Copy the secret.** On the **Configuration** tab, click **Show** next to **Internal Integration Secret** and copy it. It starts with `ntn_`.
+4. **Create a database.** In Notion, create a new page with a **Table** database, for example named `Customers`. You can also use an existing database.
+5. **Share the database with the integration.** Open the database as a full page, click **•••** at the top right, then **Connections**, find `Kelviq` and confirm.
+6. **Copy the database link.** Click **Share → Copy link**.
+
+## Connect Notion
+
+1. Open **Settings → Integrations**.
+2. On the **Notion** card, click **Configure Notion**.
+3. Paste the **Internal Integration Secret** and the **Database link**.
+4. Optionally, enter a **Name**, such as `Customers database`. It's only used to label the connection in Kelviq.
+5. Choose the **Events to send**.
+6. Click **Connect Notion**.
+
+Kelviq checks the secret and the sharing, and adds its columns to the database, without adding any row. From then on, each selected event adds or updates the customer's row.
+
+<Note>
+  Connections are separate for sandbox and live. If you connect Notion while in [sandbox mode](/guides/sandbox), only sandbox events are sent, and the **Kelviq link** opens the customer in sandbox. Use a separate database for sandbox, so test customers stay out of your real table.
+</Note>
+
+## Manage a connection
+
+Open **Settings → Integrations → Configure Notion** to see your connections. For each one you can:
+
+- **Send test**: check the secret and the sharing still work. No row is created.
+- **Edit events**: change which events are sent, then click **Save events**.
+- **Disconnect**: stop updating Notion. The rows stay in your database.
+
+Each connection is a Kelviq webhook endpoint, so it also appears under **Settings → Webhooks**, named `Notion: <name>`. There you can see every delivery and resend one that failed. Your secret is stored encrypted and is never shown.
+
+## Troubleshooting
+
+| Error | What to do |
+| --- | --- |
+| Notion can't find the database, or it isn't shared with your integration | Open the database, click **••• → Connections** and add your integration. Check that the link is to the database itself, not to a page around it. |
+| Notion did not accept this integration secret | The secret was reset or mistyped. Copy it again from [notion.so/profile/integrations](https://www.notion.so/profile/integrations), then disconnect and connect again. |
+| Notion refused: … | Turn on **Read**, **Update** and **Insert content** in the integration's **Capabilities**. |
+| The Notion column "…" must be of type … | Your database already has a column with that name but another type. Rename or delete it, then click **Send test**. |
+| This Notion link is not a database | Open the database as a full page, then use **Share → Copy link**. |
+| … has no customer email for a Notion row | The Kelviq customer has no email. |
+
+If Notion is briefly unavailable or rate limits your integration, Kelviq retries the delivery automatically.
+
+## Prefer code?
+
+Use [webhooks](/guides/webhooks) to receive the same events in your own backend and update Notion your own way.
