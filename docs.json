@@ -199,7 +199,8 @@
               "settings/posthog",
               "settings/mailchimp",
               "settings/loops",
-              "settings/brevo"
+              "settings/brevo",
+              "settings/kit"
             ]
           },
           {
