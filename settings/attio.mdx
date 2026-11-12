@@ -1,0 +1,71 @@
+---
+title: 'Attio'
+description: 'Keep your customers as People in Attio, with their Kelviq plan, status and latest event'
+---
+
+Connect [Attio](https://attio.com) to keep each Kelviq customer as a Person in your Attio workspace, with their plan, status, customer ID and latest Kelviq event. Your team sees billing next to every relationship, and can filter, build lists and views, and run workflows on it: for example a task for the account owner when a payment fails. Kelviq verifies every event before it changes anything.
+
+It works with Attio's free plan.
+
+## What Kelviq keeps in Attio
+
+For each event, Kelviq finds the Person with the customer's email, or creates one, sets their name, and fills these attributes on **People**:
+
+| Attribute | Type | Value |
+| --- | --- | --- |
+| **Kelviq plan** (`kelviq_plan`) | Text | The plan the customer can use now, like `pro`. Empty when cancelled or paused. |
+| **Kelviq status** (`kelviq_status`) | Text | `active`, `trialing`, `past_due`, `paused` or `cancelled` |
+| **Kelviq customer ID** (`kelviq_customer_id`) | Text | Your customer ID in Kelviq |
+| **Kelviq last event** (`kelviq_last_event`) | Text | The latest Kelviq event, like `invoice.payment_failed` |
+| **Kelviq last event at** (`kelviq_last_event_at`) | Timestamp | When that event happened |
+| **Kelviq link** (`kelviq_link`) | Text | The customer's page in Kelviq |
+
+Kelviq adds these attributes to People when you connect. **Kelviq plan** and **Kelviq status** change only on subscription events. Other attributes and your team's notes are never changed.
+
+## Before you start
+
+1. **Sign in to Attio** as a workspace admin. The free plan works.
+2. **Create an integration.** Open **Workspace settings → Developers** and click **New integration**. Name it `Kelviq`.
+3. **Set the scopes.** On the integration's **Scopes** tab, set **Records** to **Read-write** (`record_permission:read-write`) and **Object configuration** to **Read-write** (`object_configuration:read-write`).
+4. **Copy the access token** from the integration's page.
+
+## Connect Attio
+
+1. Open **Settings → Integrations**.
+2. On the **Attio** card, click **Configure Attio**.
+3. Paste the **Access token**.
+4. Optionally, enter a **Name**, such as `Our Attio workspace`. It's only used to label the connection in Kelviq.
+5. Choose the **Events to send**.
+6. Click **Connect Attio**.
+
+Kelviq checks the token and its scopes, and adds the Kelviq attributes to People, without creating anyone. From then on, each selected event adds or updates the customer's Person.
+
+<Note>
+  Connections are separate for sandbox and live. If you connect Attio while in [sandbox mode](/guides/sandbox), only sandbox events are sent, and **Kelviq link** opens the customer in sandbox. Use a separate Attio workspace for sandbox, so test customers stay out of your real CRM.
+</Note>
+
+## Manage a connection
+
+Open **Settings → Integrations → Configure Attio** to see your connections. For each one you can:
+
+- **Send test**: check the token and its scopes still work. No Person is created.
+- **Edit events**: change which events are sent, then click **Save events**.
+- **Disconnect**: stop updating Attio. People and their values stay in Attio.
+
+Each connection is a Kelviq webhook endpoint, so it also appears under **Settings → Webhooks**, named `Attio: <name>`. There you can see every delivery and resend one that failed. Your token is stored encrypted and is never shown.
+
+## Troubleshooting
+
+| Error | What to do |
+| --- | --- |
+| Attio did not accept this access token | The token was deleted or mistyped. Copy it again from **Workspace settings → Developers**, then disconnect and connect again. |
+| This Attio token is missing permissions | Set **Records** and **Object configuration** to **Read-write** on the integration's **Scopes** tab. |
+| The Attio attribute … is archived | Restore the attribute in Attio, then click **Send test**. |
+| The Attio attribute … must be of type … | People already has an attribute with that API slug but another type. Change its API slug in Attio, then click **Send test**. |
+| … has no customer email for an Attio person | The Kelviq customer has no email. |
+
+If Attio is briefly unavailable or rate limits your workspace, Kelviq retries the delivery automatically.
+
+## Prefer code?
+
+Use [webhooks](/guides/webhooks) to receive the same events in your own backend and update Attio your own way.
