@@ -1,0 +1,79 @@
+---
+title: 'Mixpanel'
+description: 'Send Kelviq billing events to Mixpanel, on the same users as your product events'
+---
+
+Connect [Mixpanel](https://mixpanel.com) to send Kelviq billing events, such as checkouts, new subscriptions, plan changes, failed payments and refunds, into your Mixpanel project. Each event lands on the same user as their product events, so you can see how usage and revenue connect: build funnels from sign-up to purchase, cohorts by plan, or reports on churn. Kelviq verifies every event before it sends it.
+
+It works on Mixpanel's free plan.
+
+## What Mixpanel receives
+
+Each Kelviq event becomes one Mixpanel event named `kelviq_<event type>`:
+
+| Kelviq event | Mixpanel event |
+| --- | --- |
+| `checkout.completed` | `kelviq_checkout_completed` |
+| `customer.created` / `customer.updated` | `kelviq_customer_created` / `kelviq_customer_updated` |
+| `order.created` / `order.updated` / `order.refunded` | `kelviq_order_created` / `kelviq_order_updated` / `kelviq_order_refunded` |
+| `subscription.created`, `.updated`, `.cancelled`, `.paused`, `.resumed`, `.plan_changed`, `.trial_will_end` | `kelviq_subscription_created`, `kelviq_subscription_updated`, … |
+| `invoice.created` / `invoice.paid` / `invoice.payment_failed` | `kelviq_invoice_created` / `kelviq_invoice_paid` / `kelviq_invoice_payment_failed` |
+| `refund.created` / `refund.updated` | `kelviq_refund_created` / `kelviq_refund_updated` |
+| `feature.usage_alert` | `kelviq_feature_usage_alert` |
+| `payment_method.created` / `.updated` / `.deleted` | `kelviq_payment_method_created`, … |
+
+**Who the event is about.** The event's `distinct_id` is the customer ID you gave Kelviq (`customer_id`). If you use the same ID when you call `mixpanel.identify()` in your app, Kelviq events join that user's product events. Without a customer ID, Kelviq uses the customer's email.
+
+**Event properties.** Each event has the fields you'll most likely filter on, such as `amount`, `currency`, `plan`, `plan_name`, `product`, `status` and `recurrence`, plus `previous_plan` on plan changes. It also has `kelviq_event_id`, `kelviq_event_type` and `kelviq_environment`. The event time is the time of the Kelviq event.
+
+**User profile properties.** Kelviq sets `$email`, `$name` and `kelviq_customer_id` on the user's profile. Subscription events also set `kelviq_plan` (the plan the user can use now, or empty once cancelled or paused) and `kelviq_status`. Use them in cohorts, for example *kelviq_plan = pro*.
+
+<Note>
+  Mixpanel keeps one copy of events with the same `$insert_id`. Kelviq uses the Kelviq event ID, so a retried event isn't counted twice.
+</Note>
+
+## Before you start
+
+1. **Sign in to Mixpanel.** The free plan works.
+2. **Copy the Project Token.** Open **Project settings → Overview → Access Keys** and copy the **Project Token** (32 letters and digits). It's the same token your app uses with `mixpanel.init()`.
+3. **Note the data residency.** In **Project settings → Overview**, check **Data Residency**: **US** (most projects), **EU** or **India**.
+
+## Connect Mixpanel
+
+1. Open **Settings → Integrations**.
+2. On the **Mixpanel** card, click **Configure Mixpanel**.
+3. Paste the **Project token** and choose the **Data residency**.
+4. Optionally, enter a **Name**, such as `Production project`. It's only used to label the connection in Kelviq.
+5. Choose the **Events to send**.
+6. Click **Connect Mixpanel**.
+
+Kelviq sends one test event, `kelviq_test`, and tells you if Mixpanel doesn't accept the token. From then on, every selected event is sent to Mixpanel.
+
+<Note>
+  Connections are separate for sandbox and live. If you connect Mixpanel while in [sandbox mode](/guides/sandbox), only sandbox events are sent, with `kelviq_environment` set to `sandbox`. Use a separate Mixpanel project for sandbox, so test data stays out of your real reports.
+</Note>
+
+## Manage a connection
+
+Open **Settings → Integrations → Configure Mixpanel** to see your connected projects. For each one you can:
+
+- **Send test**: send a `kelviq_test` event.
+- **Edit events**: change which events are sent, then click **Save events**.
+- **Disconnect**: stop sending events.
+
+Each connection is a Kelviq webhook endpoint, so it also appears under **Settings → Webhooks**, named `Mixpanel: <name>`. There you can see every delivery and resend one that failed. Your token is stored encrypted.
+
+## Troubleshooting
+
+| Error | What to do |
+| --- | --- |
+| Mixpanel did not accept this Project Token | Copy the token again from **Project settings → Overview → Access Keys**, check the data residency, then disconnect and connect again. |
+| Mixpanel says this project is in another data region | Disconnect and connect again with the right **Data residency**. |
+| Mixpanel rejected the event: … | Mixpanel's own message says which property it didn't accept. |
+| Kelviq events are on a different user | Use the same ID for `mixpanel.identify()` in your app and for the Kelviq customer ID. |
+
+If Mixpanel is briefly unavailable or rate limits your project, Kelviq retries the delivery automatically.
+
+## Prefer code?
+
+Use [webhooks](/guides/webhooks) to receive the same events in your own backend and send them to Mixpanel your own way.

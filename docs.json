@@ -200,7 +200,8 @@
               "settings/mailchimp",
               "settings/loops",
               "settings/brevo",
-              "settings/kit"
+              "settings/kit",
+              "settings/mixpanel"
             ]
           },
           {
