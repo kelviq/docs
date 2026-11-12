@@ -202,7 +202,8 @@
               "settings/brevo",
               "settings/kit",
               "settings/mixpanel",
-              "settings/notion"
+              "settings/notion",
+              "settings/airtable"
             ]
           },
           {
