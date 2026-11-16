@@ -83,7 +83,7 @@ Live events never carry the `test` field. Test deliveries appear in the logs onl
 
 ## Inspect and resend deliveries
 
-Open **Settings → Webhooks** and select an endpoint to view its **Delivery log**, or use the **Logs** tab for every endpoint at once. **View in Logs** on the endpoint page opens the **Logs** tab filtered to that endpoint. Each delivery attempt shows the event type, status, response code, response time, and response body. A failed attempt that will be retried shows when the next attempt is due; a `4xx` is final and shows as not retried. Logs are kept for 30 days.
+Open **Settings → Webhooks** and select an endpoint to view its **Delivery log**, or use the **Logs** tab for every endpoint at once. **View in Logs** on the endpoint page opens the **Logs** tab filtered to that endpoint. Each delivery attempt shows the event type, status, response code, response time, and response body. A failed attempt that will be retried shows when the next attempt is due; a `4xx` other than `429` is final and shows as not retried. Logs are kept for 30 days.
 
 <Frame>
   <img src="/images/webhooks/logs.webp" alt="The Logs tab with filters for status, endpoint, event and time range, and delivered, failed and test deliveries" />

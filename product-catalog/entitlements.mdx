@@ -23,7 +23,7 @@ For SDK installation and API reference, see:
 Traditional SaaS applications check access like this:
 
 ```javascript
-// ❌ The old way - hardcoded, brittle, requires code changes
+// The old way - hardcoded, brittle, requires code changes
 if (user.plan === 'pro' || user.plan === 'enterprise') {
   showAdvancedAnalytics();
 }
@@ -46,7 +46,7 @@ This approach has serious limitations:
 With Kelviq, you check features directly:
 
 ```javascript
-// ✅ The Kelviq way - flexible, decoupled, no code changes needed
+// The Kelviq way - flexible, decoupled, no code changes needed
 const hasAnalytics = await client.entitlements.hasAccess({
   customerId: "cust_123",
   featureId: "advanced-analytics"
@@ -180,7 +180,7 @@ Usage-based features with limits and tracking.
 
 ### Customizable Features
 
-Dynamic values that aren't simple on/off or numeric limits.
+A number or setting stored per plan, such as max projects or upload size. Kelviq stores the value and doesn't count usage against it.
 <Frame>
       <img src="/images/customizable.webp" alt="A Customizable feature, Max projects, set to 100" />
 </Frame>

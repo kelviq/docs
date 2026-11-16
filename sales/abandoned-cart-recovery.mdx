@@ -3,7 +3,7 @@ title: 'Abandoned cart recovery'
 description: 'Automatically remind customers who start checkout but do not pay'
 ---
 
-Abandoned cart recovery emails customers who start a checkout but do not complete payment. Kelviq detects the abandoned checkout, sends up to three reminder emails over three days, and expires the checkout after four. You do not need to build anything: detection, scheduling, and deduplication are handled for you.
+Abandoned cart recovery emails customers who start a checkout but do not complete payment. Kelviq detects the abandoned checkout, sends up to three reminder emails over three days, and expires an unpaid checkout after four days. You do not need to build anything: detection, scheduling, and deduplication are handled for you.
 
 The feature is on by default for every organization. You can turn it off in **Settings → Customer emails**.
 
@@ -27,13 +27,14 @@ A reminder also needs somewhere to go: the customer must have an email address, 
 
 ## Reminder schedule
 
-Timings are counted from when the customer leaves checkout. They match **Settings → Customer emails → Abandoned checkout recovery**.
+Timings are counted from when the checkout was created. A reminder is held back while the customer is still active: nothing is sent within 30 minutes of their last activity.
 
-| Email | Sent |
+| Step | When |
 | --- | --- |
-| First reminder | 1 hour after the customer leaves checkout |
+| Checkout marked as abandoned, first reminder sent | 1 hour after the checkout was created |
 | Second reminder | 24 hours after |
 | Final reminder | 3 days after |
+| Checkout expires | 4 days after |
 
 The background jobs that send these run hourly, so an email can arrive up to an hour after its nominal time.
 
@@ -53,7 +54,7 @@ Four days after creation, an unpaid checkout expires:
 * The recovery link in earlier emails stops working.
 * No further reminders are sent.
 
-Completed, closed, or expired checkouts never receive reminders.
+Successful, closed, or expired checkouts never receive reminders.
 
 ## Offer a discount in the final reminder
 
@@ -65,7 +66,7 @@ In **Settings → Customer emails**, open the **Abandoned checkout recovery** se
 
 ## Turning it off and on
 
-Use the switch on the **Abandoned checkout recovery** section in **Settings &rarr; Customer emails** to control the feature for your whole organization.
+Use the switch on the **Abandoned checkout recovery** section in **Settings → Customer emails** to control the feature for your whole organization.
 
 * Turning it off stops future reminder emails. Emails that were already sent cannot be recalled.
 * Turning it back on resumes eligible reminders for checkouts that have not yet expired.

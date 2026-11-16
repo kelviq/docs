@@ -10,9 +10,9 @@ The examples use the default look. You can change the logo, colors, and which se
 | Example | What changes at checkout | Button |
 | --- | --- | --- |
 | [Plan picker](#plan-picker) | Customer chooses from several plans | **Subscribe** |
-| [Single plan](#single-plan) | Price shown at the top, no plan list | **Subscribe** |
+| [Single plan](#single-plan) | Only that plan is listed, already selected | **Subscribe** |
 | [Free plan](#free-plan) | Name and email only, no payment fields | **Get it for Free** |
-| [Free trial](#free-trial) | Shows the first charge date, nothing due today | **Start 7-day Trial** |
+| [Free trial](#free-trial) | Total after the trial, nothing due today | **Start 7-day Trial** |
 | [More billing periods](#more-billing-periods) | Extra tabs for 3 and 6 months | **Subscribe** |
 | [One-time payment](#one-time-payment) | No billing period, one charge | **Pay Now** |
 | [Included usage with overage](#included-usage-with-overage) | Base fee today, overage billed later | **Subscribe** |
@@ -76,7 +76,7 @@ A [free plan](/product-catalog/free-and-trials#free-plans) asks for a name and e
 
 ## Free trial
 
-When the plan has a [trial period](/product-catalog/free-and-trials), checkout collects the card but charges nothing today. The summary shows **Total after trial** and **Total due today**, and the text under the button gives the date of the first charge.
+When the plan has a [trial period](/product-catalog/free-and-trials), checkout collects the card but charges nothing today. The summary shows **Total after trial** and **Total due today**. The date of the first charge is shown under the button.
 
 <Frame>
   <img className="block dark:hidden" src="/images/checkout-examples/free-trial-light.webp" alt="StudyPal Premium checkout totals with the price after the trial and nothing due today" />
@@ -87,7 +87,7 @@ When the plan has a [trial period](/product-catalog/free-and-trials), checkout c
 
 The trial comes from the plan settings, not from the link.
 
-The price is in rupees because this plan uses [location-based pricing](/product-catalog/location-based-pricing) and the screenshot was taken from India.
+The price is in rupees because this plan uses [price localization](/product-catalog/location-based-pricing) and the screenshot was taken from India.
 
 ## More billing periods
 
@@ -102,7 +102,7 @@ A plan can be sold monthly, every 3 months, every 6 months, and yearly. Checkout
 
 ## One-time payment
 
-For a [one-time](/product-catalog/one-time-payments) plan there's no billing-period toggle, the summary says **One-time payment**, and the button reads **Pay Now**.
+For a [one-time](/product-catalog/one-time-payments) plan the summary says **One-time payment**. There's no billing-period toggle, and the button reads **Pay Now**.
 
 <Frame>
   <img className="block dark:hidden" src="/images/checkout-examples/one-time-light.webp" alt="PixelGallery JS Hobby license summary, one-time payment of $48" />
@@ -181,7 +181,7 @@ You can also remove the **Add promotion code** field, so customers aren't tempte
 
 ## Per-seat plan
 
-A per-seat plan charges for each seat the customer buys. The seat count comes from your app, so this checkout is created with the [Checkout API](/api-reference/checkout/create-a-checkout-session) rather than a static link. This example offers TeamBoard Basic and Business for 5 seats, with Business selected: \$16 a seat, \$80 a month, after a 14-day trial.
+A per-seat plan charges for each seat the customer buys. The seat count comes from your app, so this checkout is created with the [Checkout API](/api-reference/checkout/create-a-checkout-session) rather than a static link. This example is TeamBoard Business for 5 seats at \$16 a seat: the summary shows 5 seats (\$80), \$80 after the 14-day trial and \$0 due today.
 
 <Frame>
   <img className="block dark:hidden" src="/images/checkout-examples/per-seat-light.webp" alt="TeamBoard Business checkout with 5 seats for $80, $80 after the trial and $0 due today" />
@@ -205,15 +205,15 @@ The response has a `checkoutUrl` to send the customer to. See [Seat-based pricin
 Add `customer_id` to the link for a customer your app already knows, and checkout fills in their name and email. The purchase is attached to that customer record.
 
 <Frame>
-  <img className="block dark:hidden" src="/images/checkout-examples/prefilled-customer-light.webp" alt="VoiceForge AI Pro checkout with the email and name already filled in" />
-  <img className="hidden dark:block" src="/images/checkout-examples/prefilled-customer-dark.webp" alt="VoiceForge AI Pro checkout with the email and name already filled in" />
+  <img className="block dark:hidden" src="/images/checkout-examples/prefilled-customer-light.webp" alt="VoiceForge AI Pro checkout with the email and name filled in from the customer record, and a test card typed in" />
+  <img className="hidden dark:block" src="/images/checkout-examples/prefilled-customer-dark.webp" alt="VoiceForge AI Pro checkout with the email and name filled in from the customer record, and a test card typed in" />
 </Frame>
 
 [See example →](https://www.kelviq.com/sandbox/buy/f60cea73-579b-4932-8d85-02b79710e9dc/?enabled=voice-pro&plan_identifier=voice-pro&charge_period=MONTHLY&customer_id=cust_demo_jane)
 
 ## Business purchase
 
-Every checkout has an **I'm purchasing as a business** box. Ticking it adds fields for the company name, address, and tax ID, which then appear on the invoice.
+Every paid checkout has an **I'm purchasing as a business** box. Ticking it adds fields for the company name, address, and tax ID, which then appear on the invoice.
 
 <Frame>
   <img className="block dark:hidden" src="/images/checkout-examples/business-purchase-light.webp" alt="VoiceForge AI Pro checkout with the business purchase fields open" />

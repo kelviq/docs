@@ -162,6 +162,7 @@ Static checkout links use snake_case query parameters. The Checkout API and back
 | `discount_code` | `discountCode` |
 | `customer_id` | `customerId` |
 | `success_url` | `successUrl` |
+| `custom_fields` | `customFields` |
 
 Do not put camelCase names into the URL. For example, `successUrl` belongs in an API request; `success_url` belongs in a static checkout URL.
 
@@ -176,7 +177,7 @@ Use the Checkout API or a backend SDK when you need per-session options that are
 - a locked email or default billing country; or
 - checkout metadata for webhook correlation.
 
-The API creates a short-lived checkout session and returns `checkoutUrl` and `checkoutSessionId`. Keep the server API key on your backend.
+The API creates a checkout session that expires after four days and returns `checkoutUrl` and `checkoutSessionId`. Keep the server API key on your backend.
 
 [Create a checkout session with the API →](/api-reference/checkout/create-a-checkout-session)
 

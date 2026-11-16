@@ -12,7 +12,7 @@ Kelviq's checkout system:
 - **Many payment methods** - Cards, wallets, bank payments, and local methods
 - **Highly configurable** - Control plans, pricing, trial periods, and more
 - **Multi-currency ready** - Support customers worldwide
-- **Easy to embed** - Generate links for any product and plans, or [embed checkout on your own site](/checkout/embed-checkout)
+- **Easy to embed** - Generate links for any product and its plans, or [embed checkout on your own site](/checkout/embed-checkout)
 
 ## Generating Checkout Links
 
@@ -175,9 +175,9 @@ Offer free trial periods before charging customers.
 When a customer starts a trial:
 
 ```
-Timeline:
+Timeline (30-day trial):
 Day 0: Customer signs up, trial begins
-Days 1-30: Customer has full access, no charge
+Days 1-29: Customer has full access, no charge
 Day 30: Trial ends, first billing occurs
 Day 31+: Regular subscription
 ```
@@ -279,7 +279,7 @@ Customer at checkout:
 4. Complete payment
 ```
 
-Discount codes are applied automatically if the customer enters a valid code.
+A valid code is applied as soon as the customer enters it.
 
 [See API and static-link examples for applying a discount code →](/checkout/apply-a-discount-code)
 
@@ -403,7 +403,7 @@ Yes. Kelviq supports UPI AutoPay for recurring subscriptions. Eligible customers
 
 ### Multi-Currency Support
 
-Prices are stored per currency. When customers checkout:
+Prices are stored per currency. When customers check out:
 
 ```
 Customer from EU viewing checkout:
@@ -438,7 +438,7 @@ Plan: Professional
 └─ Brazil: R$99
 ```
 
-You set each amount yourself. See [Location-based pricing](/product-catalog/location-based-pricing). To give a percentage off by country instead, use [Promotions](/promotions/overview).
+You set each amount yourself. See [Price localization](/product-catalog/location-based-pricing). To give a percentage off by country instead, use [Promotions](/promotions/overview).
 
 ## Testing Checkout
 
