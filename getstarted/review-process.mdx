@@ -3,7 +3,7 @@ title: 'Review Process'
 sidebarTitle: 'Review process'
 ---
 
-Kelviq is the seller of record for every sale, so we check each business before it takes live payments. You can build and test in sandbox right away. Most reviews finish within 24 hours.
+Kelviq is the seller of record for every sale, so we check each business before it takes live payments. You can build and test in sandbox right away. A review usually takes 1–2 business days.
 
 This guide outlines what we support, what we prohibit, and how our review process works.
 
@@ -134,22 +134,29 @@ You can integrate and test in sandbox right away. Taking live payments needs app
 
 ### Step 1: Business Verification
 
-Open **Settings → Business details** in the Kelviq dashboard.
+Open **Settings → Business details** in the Kelviq dashboard, or click **Verify** (or **Continue**, once you've started) next to **Verify your business** on Home.
 
-Fill in your business details: logo, country, website, a support email that buyers will see, a short overview of what you sell, your estimated monthly revenue, and your social profiles. Kelviq places the country from your organization profile first in the country selector. Check it before you save.
+**Your details** is a checklist of seven required items and one optional one, with a counter of how many required items are left:
+
+| Item | What to give |
+| --- | --- |
+| **Publish a plan** | Ticked once any plan is published. Reviewers look at what you sell, so **Submit for review** stays off until you publish one. |
+| **Logo** | PNG, up to 2 MB. It shows on checkout and receipts; you can change it later in **Checkout design**. |
+| **Business country** | Where your business is registered. Kelviq places the country from your organization profile first, so check it. |
+| **Website** | Where customers find your product. Reviewers check it. |
+| **Support email** | Shown to buyers on receipts and checkout. Use an inbox you check. |
+| **What you sell** | Pick a category (Software / SaaS, Digital downloads, E-books or courses, and others) and describe what the product does, who it's for and what buyers get, in at least 100 characters. Reviewers read this first. |
+| **Expected monthly sales** | A rough estimate is fine. |
+| **Social profiles** | Optional. An X, LinkedIn or other public profile helps reviewers confirm who you are. Only reviewers see it. |
 
 <Frame>
-  <img src="/images/review-process/business-verification-form.webp" alt="The Business verification form in Settings" />
+  <img src="/images/review-process/business-details.webp" alt="Business details: the Your details checklist at 5 of 7, with Publish a plan, Business country, Website, Support email and What you sell done, Logo and Expected monthly sales left, and Submit for review" />
 </Frame>
 
-Click **Save details**. The page then shows that your details are under review, and you can carry on creating products and testing in sandbox while you wait.
-
-<Frame>
-  <img src="/images/review-process/business-verification-reviewing.webp" alt="Business verification page showing that the details are under review" />
-</Frame>
+When nothing required is left, click **Submit for review**. You can keep creating products and testing in sandbox while you wait.
 
 **What happens next:**
-- Most reviews are completed within **24 hours**.
+- A review usually takes **1–2 business days**.
 - If we need more information, we'll reach out to you via email.
 - Once your verification is approved, you'll receive a confirmation email.
 
@@ -157,10 +164,16 @@ Click **Save details**. The page then shows that your details are under review, 
 
 After your business is verified, you need to set up payouts to receive money from your sales. We partner with **Stripe** to enable secure payouts.
 
-Navigate to the **Payouts** section in your dashboard, or go directly to [app.kelviq.com/payout](https://app.kelviq.com/payout).
+Navigate to the **Payouts** section in your dashboard, or go directly to [app.kelviq.com/payout](https://app.kelviq.com/payout). Until your business is approved, the page shows a preview behind a card with your next step, such as **Publish your plan** or **Verify your business**. After you submit your details, the card reads **We’re reviewing your business details**.
 
 <Frame>
-  <img src="/images/review-process/payouts-setup.png" alt="Payouts setup page" />
+  <img src="/images/review-process/payouts-locked.webp" alt="Payouts before approval: a faded preview of the Payouts page behind the Verify your business card" />
+</Frame>
+
+Once you're approved, the page lets you set up payouts:
+
+<Frame>
+  <img src="/images/payout-setup-cta.webp" alt="The Set up payouts card explaining Stripe Connect, with Set up payouts and Need Help?" />
 </Frame>
 
 Click the **Set up payouts** button. You'll be redirected to Stripe to complete a quick setup:

@@ -7,9 +7,8 @@ description: 'Generate and manage license keys for your products'
 
 License keys allow you to generate unique activation keys for each customer purchase. This guide covers how to enable and configure licenses on your plans, manage them from orders, and how your customers can activate and validate licenses using the API.
 
----
 <Frame>
-      <img src="/images/accessing-key.webp" />
+      <img src="/images/accessing-key.webp" alt="A plan page with the License keys card highlighted and its switch turned on" />
 </Frame>
 
 ## 1. Enabling Licenses on a Plan
@@ -17,7 +16,7 @@ License keys allow you to generate unique activation keys for each customer purc
 License keys are configured at the **plan level**. When enabled, every order placed for that plan will automatically generate a unique license key for the customer.
 ### How to Enable Licenses
 <Frame>
-      <img src="/images/enable-key.webp" />
+      <img src="/images/enable-key.webp" alt="The License keys section on a plan, with the switch turned on" />
 </Frame>
 
 1. Go to **Product catalog → Products** → Select your product → Select the plan you want to configure
@@ -28,11 +27,11 @@ License keys are configured at the **plan level**. When enabled, every order pla
 
 Once enabled, you can configure the following settings:
 
-#### Activation Limit
+#### Activation limit
 
 Control how many times a single license key can be activated across different devices.
 <Frame>
-      <img src="/images/set-limit.webp" />
+      <img src="/images/set-limit.webp" alt="Activation limit turned on and set to 3" />
 </Frame>
 | Setting | Description |
 |---------|-------------|
@@ -41,11 +40,11 @@ Control how many times a single license key can be activated across different de
 
 > **Use case**: Set a limit of 3 if you want customers to use the license on up to 3 computers.
 
-#### License Expiry
+#### License expiry
 
 Define how long the license key remains valid after purchase.
 <Frame>
-      <img src="/images/set-duration.webp" />
+      <img src="/images/set-duration.webp" alt="License expiry turned on and set to 1 Year" />
 </Frame>
 | Setting | Description |
 |---------|-------------|
@@ -54,7 +53,11 @@ Define how long the license key remains valid after purchase.
 
 When expiry is enabled, you can set:
 - **Duration value**: A number (e.g., 1, 6, 12)
-- **Duration unit**: Days, Months, or Years
+- **Duration unit**: Day, Month, or Year
+
+<Frame>
+  <img src="/images/product-catalog/license-expiry-unit-menu.webp" alt="The License expiry unit list open with Day, Month and Year" />
+</Frame>
 
 > **Example**: Setting duration to `12 Months` means the license expires 12 months after the purchase date.
 
@@ -66,34 +69,34 @@ After configuring the settings, click **Save Changes**. All future orders for th
 
 ## 2. Managing licenses from an order
 
-Once a customer places an order for a plan with licenses enabled, you can manage their license from the order. Go to **Sales → Orders**, click the customer, and open the **License** tab.
+Once a customer places an order for a plan with licenses enabled, you can manage their license from the order. Go to **Sales → Orders**, open the order, and open the **License** tab.
 
 <Frame>
-      <img src="/images/managing-licenses-from-order-details.webp" />
+      <img src="/images/managing-licenses-from-order-details.webp" alt="The Orders list with a Pixel UI Kit Lifetime license order highlighted" />
 </Frame>
 
 ### Viewing License Information
 
 The **License** tab displays:
 <Frame>
-      <img src="/images/license-tab.webp" />
+      <img src="/images/license-tab.webp" alt="An order with the License tab open, showing the key, Expires on Nov 16, 2027 and Active 0/5" />
 </Frame>
 
-- **License Key**: The unique key assigned to this order
-- **Expiry Date**: When the license expires (or "Never expires")
-- **Activation Status**: Active count vs. limit (e.g., "2/5 activations" or "3/Unlimited")
-- **License Status**: Active or Deactivated
+- **License key**: The unique key assigned to this order
+- **Expires on**: When the license expires (or "Never expires")
+- **Active**: Active count vs. limit (e.g., "Active 2/5" or "Active 3/Unlimited")
+- **Deactivated**: Shown when the license has been deactivated
 
 ### Available Actions
 
 Click the **⋯** menu button on the license card to access these options:
 <Frame>
-      <img src="/images/available-actions.webp" />
+      <img src="/images/available-actions.webp" alt="The license menu open with Regenerate key, Edit activation limit, Manage expiry and Deactivate" />
 </Frame>
 
-#### 🔄 Regenerate Key
+#### Regenerate key
 <Frame>
-      <img src="/images/regenerat-key.webp" />
+      <img src="/images/regenerat-key.webp" alt="The Regenerate license key dialog with the current key and Generate new key" />
 </Frame>
 Creates a brand new license key and invalidates the old one.
 
@@ -101,12 +104,12 @@ Creates a brand new license key and invalidates the old one.
 - Customer must use the new key for future activations
 - Existing activations will stop working
 
-> ⚠️ **Warning**: This action cannot be undone. Use when a key has been compromised or shared inappropriately.
+> **Warning**: This action cannot be undone. Use when a key has been compromised or shared inappropriately.
 
-#### ✏️ Edit Activation Limit
+#### Edit activation limit
 
 <Frame>
-      <img src="/images/edit-activation-limit-1.webp" />
+      <img src="/images/edit-activation-limit-1.webp" alt="The Edit activation limit dialog with the limit set to 5" />
 </Frame>
 Modify how many devices can use this specific license.
 
@@ -116,9 +119,9 @@ Modify how many devices can use this specific license.
 
 > **Use case**: Upgrade a customer from 3 seats to 10 seats without issuing a new license.
 
-#### 📅 Manage Expiry
+#### Manage expiry
 <Frame>
-      <img src="/images/manage-expiry.webp" />
+      <img src="/images/manage-expiry.webp" alt="The Manage expiry dialog with License expiry on and the date set to Nov 16, 2027" />
 </Frame>
 Update the license expiration date.
 
@@ -128,7 +131,7 @@ Update the license expiration date.
 
 > **Use case**: Extend a license by 3 months as a courtesy for a loyal customer.
 
-#### ⛔ Deactivate License
+#### Deactivate
 
 Permanently disable the entire license.
 
@@ -136,18 +139,22 @@ Permanently disable the entire license.
 - Customers will no longer be able to activate or validate the key
 - The license key becomes invalid
 
-> ⚠️ **Warning**: This action cannot be undone. Use for refunds or policy violations.
+<Frame>
+  <img src="/images/product-catalog/deactivate-license.webp" alt="The Deactivate key confirmation dialog with Cancel and Deactivate key" />
+</Frame>
+
+> **Warning**: This action cannot be undone. Use for refunds or policy violations.
 
 ### Viewing Active Activations
 
-Click on the license card to view the **License Details** page, which shows:
+Click the license card to open the **License details** page, which shows:
 
 - All instances where the license is currently activated
 - Instance name or ID
 - Last seen timestamp (when the license was last validated)
 - Activation metadata (device info, if provided)
 
-#### Revoking Individual Activations
+#### Revoking individual activations
 <Frame>
       <img src="/images/revoke-license.webp" />
 </Frame>
@@ -220,7 +227,7 @@ Activates a license key on a specific device/instance.
 - Fails if activation limit is reached
 - Succeeds and increments the activation count
 
-📖 **Full documentation**: [Activate License API](https://docs.kelviq.com/api-reference/license/activate-license)
+**Full documentation**: [Activate License API](https://docs.kelviq.com/api-reference/license/activate-license)
 
 ---
 
@@ -250,7 +257,7 @@ Checks if a license is valid and currently active.
 - Activation count and limit
 - License metadata
 
-📖 **Full documentation**: [Validate License API](https://docs.kelviq.com/api-reference/license/validate-license)
+**Full documentation**: [Validate License API](https://docs.kelviq.com/api-reference/license/validate-license)
 
 ---
 
@@ -278,7 +285,7 @@ Removes an activation from a specific device/instance.
 - Only deactivates the specific instance, not the entire license
 - The license can be re-activated on the same or different device
 
-📖 **Full documentation**: [Deactivate License API](https://docs.kelviq.com/api-reference/license/deactivate-license)
+**Full documentation**: [Deactivate License API](https://docs.kelviq.com/api-reference/license/deactivate-license)
 
 ---
 

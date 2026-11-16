@@ -17,19 +17,23 @@ Kelviq marks a checkout as abandoned when all of the following are true:
 
 Recent customer activity delays the marking, so a customer who is still filling in payment details is not emailed.
 
+When a checkout is marked as abandoned, **Checkout session abandoned** is added to its timeline in [Checkout sessions](/sales/checkout-sessions#session-details).
+
+<Frame>
+  <img src="/images/sales/abandoned-checkout-timeline.webp" alt="A checkout session timeline: Checkout started, a discount code applied, two plan changes, then Checkout session abandoned, Customer left without completing payment" style={{ maxWidth: "620px" }} />
+</Frame>
+
 A reminder also needs somewhere to go: the customer must have an email address, taken from the linked customer record or the email entered during checkout.
 
 ## Reminder schedule
 
-All timings are measured from when the checkout session was created.
+Timings are counted from when the customer leaves checkout. They match **Settings → Customer emails → Abandoned checkout recovery**.
 
-| Event | When |
+| Email | Sent |
 | --- | --- |
-| Checkout marked as abandoned | After 1 hour |
-| First reminder email | After 24 hours |
-| Second reminder email | After 48 hours |
-| Final reminder email | After 72 hours |
-| Checkout expires | After 4 days |
+| First reminder | 1 hour after the customer leaves checkout |
+| Second reminder | 24 hours after |
+| Final reminder | 3 days after |
 
 The background jobs that send these run hourly, so an email can arrive up to an hour after its nominal time.
 
@@ -53,11 +57,15 @@ Completed, closed, or expired checkouts never receive reminders.
 
 ## Offer a discount in the final reminder
 
-Turn on **Offer a discount in the final reminder** in **Settings → Customer emails** and enter a percentage. The final reminder then offers that much off the checkout total. Only one discount can be active per product, so the offer isn't sent if another discount already applies to the checkout.
+In **Settings → Customer emails**, open the **Abandoned checkout recovery** section, turn on **Offer a discount in the final reminder**, enter a percentage and press Enter. The **Final reminder** row then shows the discount, for example **15% off**. The final reminder then offers that much off the checkout total. Only one discount can be active per product, so the offer isn't sent if another discount already applies to the checkout.
+
+<Frame>
+  <img src="/images/sales/abandoned-checkout-discount.webp" alt="Abandoned checkout recovery in Settings → Customer emails: the section switch, Offer a discount in the final reminder set to 15%, and the three reminders, with 15% off on the final one" style={{ maxWidth: "620px" }} />
+</Frame>
 
 ## Turning it off and on
 
-Use the **Abandoned cart recovery** toggle in **Settings &rarr; Customer emails** to control the feature for your whole organization.
+Use the switch on the **Abandoned checkout recovery** section in **Settings &rarr; Customer emails** to control the feature for your whole organization.
 
 * Turning it off stops future reminder emails. Emails that were already sent cannot be recalled.
 * Turning it back on resumes eligible reminders for checkouts that have not yet expired.

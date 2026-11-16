@@ -25,19 +25,19 @@ Pay as you go supports **Flat**, **Package**, **Tiered**, and **Volume** pricing
 ## Configure the plan
 
 1. Open the product and edit its plan.
-2. In the plan's billing periods, keep **Monthly** enabled and turn off every other period.
-3. Open **Usage charges** and select the Meter feature you want to bill for. If the list is empty, [create a Meter feature](/product-catalog/create-a-feature) from **Product catalog → Features** first.
+2. In **Billing cycle**, keep **Monthly** enabled and turn off every other period.
+3. Open **Usage charges** and, in **Metered feature**, select the Meter feature you want to bill for. If the list is empty, [create a Meter feature](/product-catalog/create-a-feature) from **Product catalog → Features** first.
 4. For **Billing model**, choose **Pay-as-you-go**.
 
 <Frame>
-  <img src="/images/select-billing-model-payg.webp" alt="Selecting Pay-as-you-go as the billing model in Kelviq" />
+  <img src="/images/select-billing-model-payg.webp" alt="The Billing model list open with Pay-as-you-go selected" />
 </Frame>
 
-5. Choose a pricing model and enter its rates.
-6. Add [usage alerts](/product-catalog/usage-alerts) if you want to notify your application when usage crosses a threshold.
+5. Choose a **Pricing model** and enter its rates.
+6. Click **More options** to add [usage alerts](/product-catalog/usage-alerts) if you want to notify your application when usage crosses a threshold.
 7. Save the plan. If you edited a published plan, publish the new version before testing it.
 
-When you select Pay as you go, Kelviq keeps Monthly as the plan's only billing period. Usage reset and credit rollover controls are removed because there is no prepaid balance to reset or carry into the next period.
+When you select **Pay-as-you-go**, Kelviq keeps Monthly as the plan's only billing period. Usage reset and credit rollover controls are removed because there is no prepaid balance to reset or carry into the next period.
 
 ## Choose a pricing model
 
@@ -45,9 +45,9 @@ The billing model controls *when* the customer pays. The pricing model controls 
 
 | Pricing model | How it bills | Example |
 | --- | --- | --- |
-| Flat | Uses one rate for every unit | $0.001 per API call |
-| Package | Bills in blocks of units | $2 per 10,000 tokens |
-| Tiered | Applies each rate only to the units inside that tier | First 100,000 tokens free, then $0.0002 per token |
+| Flat | Uses one rate for every unit | \$0.001 per API call |
+| Package | Bills in blocks of units | \$2 per 10,000 tokens |
+| Tiered | Applies each rate only to the units inside that tier | First 100,000 tokens free, then \$0.0002 per token |
 | Volume | Uses the rate for the customer's final usage band across all units | \$0.01 per request, or \$0.007 for all requests after 100,000 |
 
 See [Usage-based pricing](/product-catalog/usage-based-billing) for the full calculation rules and examples for each model.
@@ -63,6 +63,10 @@ Additional usage: $0.0002 per token
 ```
 
 If the customer uses 120,000 tokens, the first 100,000 fall into a zero-priced tier. The remaining 20,000 tokens cost \$4, so the period total is \$24 before tax.
+
+<Frame>
+  <img src="/images/product-catalog/payg-tiered-usage-charge.webp" alt="A Pay-as-you-go Tiered usage charge for API calls: 1 to 100000 at USD 0, then USD 0.0002 per unit" />
+</Frame>
 
 ## Report usage from your backend
 
@@ -165,9 +169,9 @@ See [Sandbox](/guides/sandbox) for environment setup and test-payment details.
 
 Remove every billing period except Monthly. A plan with both Monthly and Yearly pricing is not eligible, even if you only enter a usage rate under Monthly.
 
-### Stair-step cannot be selected
+### Stair-step shows an error
 
-Stair-step pricing is not available with Pay as you go. Choose Flat, Package, Tiered, or Volume. If you need fixed usage bands, use an advance commitment instead.
+Stair-step is listed under **Pricing model**, but Pay-as-you-go doesn't support it. If you pick it, the billing model shows "Pay-as-you-go is not supported with the Stair-step pricing model." Choose Flat, Package, Tiered, or Volume. If you need fixed usage bands, use an advance commitment instead.
 
 ### Reported usage does not appear
 

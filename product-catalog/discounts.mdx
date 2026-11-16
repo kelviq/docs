@@ -3,14 +3,14 @@ title: 'Discounts'
 description: 'Create coupons and promotional codes'
 ---
 
-You can manage all your coupons from the **Product Catalog**.
+You can manage all your coupons from the **Product catalog**.
 
-Navigate to **Product Catalog > Discounts** to see a list of every active and expired code.
+Go to **Product catalog → Discounts** to see a list of every active and inactive code.
 
 You can create two types of discounts:
 
-* **Percentage** — Reduces an eligible price by a percentage, such as 20%.
-* **Fixed amount** — Subtracts a specific amount in a selected currency, such as USD 10 or INR 500.
+* **By percentage** — Reduces an eligible price by a percentage, such as 20%.
+* **By fixed amount** — Subtracts a specific amount in a selected currency, such as USD 10 or INR 500.
 
 For a fixed-amount discount, select the currency next to the amount. Kelviq places the currency from your organization profile first in the list, but you should still review the selection before creating the discount.
 
@@ -18,12 +18,12 @@ For a fixed-amount discount, select the currency next to the amount. Kelviq plac
 
 <Steps>
   <Step title="Start creation">
-    Click **+ Create discount** in the top right corner.
+    Click **Create discount** in the top right corner. The **Add discount** panel opens.
   </Step>
   <Step title="Define value">
-    Choose the discount type (Percentage or Fixed amount) and enter the value.
-    * **Name:** The internal name for your reference.
-    * **Discount code:** The text the customer enters at checkout. You can type your own or click the **refresh icon** to auto-generate a secure random code.
+    Choose the discount type (**By percentage** or **By fixed amount**) and enter the **Percentage off** or **Amount off**.
+    * **Discount name:** Appears on your customer's invoice.
+    * **Checkout discount code:** The text the customer enters at checkout. You can type your own or click the **refresh icon** to auto-generate a random code. Only uppercase letters (A-Z) and numbers (0-9), up to 32 characters.
   </Step>
   <Step title="Configure rules">
     Set the duration, limits, and product scope (detailed below).
@@ -34,7 +34,7 @@ For a fixed-amount discount, select the currency next to the amount. Kelviq plac
 </Steps>
 
 <Frame>
-  <img src="/images/create-discount-modal.webp" alt="Discount creation modal showing percentage and code options" />
+  <img src="/images/create-discount-modal.webp" alt="The Add discount panel: USD 10 off, Partner credit, code PARTNER10, 3 months, expires Dec 31, 2026, 100 redemptions, limited to Acme Analytics" />
 </Frame>
 
 ## Configuration options
@@ -48,16 +48,16 @@ Recurring discount settings are enabled by default. Choose how long the discount
 * Select **Discount applies forever** to apply it to every eligible recurring invoice.
 * Turn off **Recurring discount** when the code should apply only to the initial purchase.
 
-### Usage & expiry
+### Usage and expiry limits
 Control the scarcity of the coupon.
-* **Redemption limit:** Set a total number of times this code can be used (e.g. "First 100 users").
-* **Expiry date:** Set a hard deadline when the code stops working.
+* **Set an expiration date for the discount:** Pick a **Redeem by** date after which the code stops working.
+* **Limit the number of times this discount can be redeemed:** Set a total number of redemptions (e.g. "First 100 users"). The limit applies across all customers, not per customer.
 
 ### Product restrictions
 By default, a discount applies to the entire catalog. To restrict it:
 
 1. Enable **Limit discount to selected products**.
-2. Select a product in every restriction row you add.
+2. Select a product in every row. Click **Add product** to add another row.
 3. Optionally select a specific plan price. Choose **Applies to all plans** to include every price under that product.
 
 Kelviq will not create the discount while a restriction row has no product selected.
@@ -73,8 +73,14 @@ Customers can enter a code themselves, or you can pre-apply one through the Chec
 The main discounts tab shows the status of every code you have created.
 
 <Frame>
-  <img src="/images/discounts-list.webp" alt="List of active and expired discounts" />
+  <img src="/images/discounts-list.webp" alt="Discounts list with Active and Inactive codes, uses left and expiry dates" />
 </Frame>
 
 * **Active:** The code is live and redeemable.
-* **Expired:** The code has passed its end date or hit its usage limit.
+* **Inactive:** The code is turned off. Use the row menu to **Activate** or **Deactivate** a code.
+
+<Frame>
+  <img src="/images/product-catalog/discount-row-menu.webp" alt="The discount row menu open with Deactivate and Delete" />
+</Frame>
+
+The list also shows **Uses left** and **Expires on** for each code.

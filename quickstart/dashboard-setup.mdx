@@ -14,35 +14,50 @@ This defines your pricing and what each plan includes.
 ## Create a product
 
 1. In the sidebar, go to **Product catalog → Products** and click **Create product**
-2. Enter a product name (e.g., "Design Course", "Pro Plan", "Premium Templates")
-3. Click **Save** — you'll be redirected to the product page  
+2. Enter a **Product name** (e.g., "Design Course", "Premium Templates")
+3. Pick a **Product type**. It decides how tax is calculated at checkout.
+4. Optionally add cover images and a description. They show on checkout and in the customer portal.
+5. Click **Create**. You land on the product page.
+
+<Frame>
+  <img src="/images/dashboard-setup/create-product.webp" alt="The Create product dialog filled in for Acme Forms, with Product type, a cover image and a description" />
+</Frame>
 
 ---
 
 ## Create a plan
 
-From the product page:  
+From the product page:
 
-1. Click **Create plan**  
-2. Enter a plan name (e.g., “Basic Plan”)  
-3. Click **Save** — you’ll be redirected to the plan details page  
+1. Click **Create plan**
+2. Enter a **Plan name** (e.g., "Pro"). The **Identifier** fills in from the name; it's the ID your code and checkout links use.
+3. Optionally add a **Description**. Customers see it on checkout and invoices.
+4. Click **Create plan**. You land on the plan page, where the plan stays a **Draft** until you publish it.
+
+<Frame>
+  <img src="/images/dashboard-setup/create-plan.webp" alt="The Create plan dialog with Plan name, Identifier and Description" />
+</Frame>
 
 ---
 
 ## Add pricing to the plan
 
-From the plan page, click the **Price** section to configure pricing:
+On the plan page, click **Set price** in the **Price** section. The price editor opens in place:
 
-1. Select billing cycles: **Monthly**, **3 Months**, **6 Months**, **Yearly**, **28 Days** (when enabled), or **One Time**
-2. Enter prices for each selected billing cycle
-3. (Optional) Enable **Free trial** and set the trial period in days
+1. Under **Base price**, select billing periods, such as **Monthly**, **Yearly**, **3 months**, **6 months**, or **One time**. You see only the periods enabled for your organization. Turn on **Free plan** for a plan with no price.
+2. Enter a price for each selected period
+3. (Optional) Turn on **Free trial** and set the trial length in days
 4. Click **Save**
+
+<Frame>
+  <img src="/images/dashboard-setup/price-editor.webp" alt="The price editor with Monthly and Yearly selected, USD 15 and USD 150, and a 7-day free trial" />
+</Frame>
 
 ### Usage-based pricing
 
 To charge for consumption, such as compute or agent runs:
 
-1. In the Price section, add a usage charge
+1. In the price editor, open **Usage charges**
 2. Pick the Meter feature to bill, such as AI tokens or workflow executions
 3. Set the price per unit
 4. Keep a flat base price too if you want hybrid pricing
@@ -55,7 +70,7 @@ To offer localized prices in different currencies:
 
 1. In the price editor, expand **Price localization**
 2. Under **Choose a currency**, select a currency (e.g., Indian Rupee, Euro) and click **Add localized price**
-3. Enter the price for each billing cycle in that currency, then click **Save** in that currency's panel
+3. Enter the price for each billing cycle in that currency, then click **Add** in that currency's panel
 4. Click **Save** at the bottom of the price editor
 
 This allows you to set specific prices for different markets rather than relying on automatic currency conversion.
@@ -86,11 +101,17 @@ You can use these keys to validate customers in your application.
 
 ## Add features and limits
 
-Click the **Features & limits** section to configure feature access and usage quotas for this plan.
+Click **Manage** in the **Features & limits** section to configure feature access and usage quotas for this plan.
 
-1. Click **Add feature**
-2. A modal will open where you can create or select features
-3. Configure the feature value for this plan
+1. Under **Available features**, click **+** next to a feature
+2. Set its value for this plan (for a Boolean, keep **Allow access** on) and click **Add**
+3. The feature moves to **Selected features**. Click it there to change its value or remove it.
+
+<Frame>
+  <img src="/images/features-kelviq-dashboard.webp" alt="The Manage features &amp; limits dialog, with available features on the left and five selected features on the right" />
+</Frame>
+
+Create features first in **Product catalog → Features**.
 
 ### Feature types
 
@@ -111,7 +132,17 @@ Once added, features appear in the plan's feature list. You can reorder or remov
 
 ## Publish the plan
 
-Click **Publish** on the plan page. Plans stay drafts until you publish them, and customers can only buy published plans.
+Click **Publish** on the plan page, then **Publish** again to confirm. Plans stay drafts until you publish them, and customers can only buy published plans.
+
+<Frame>
+  <img src="/images/dashboard-setup/plan-page-publish.webp" alt="A draft Enterprise plan with a price and the Publish button highlighted" />
+</Frame>
+
+The first time you publish a plan, a **[plan name] is live** dialog gives you the checkout link (**Copy link**), **Customize checkout**, and **Integrate with your app**, which opens [Integrate with your app](/quickstart/integrate-with-your-app). In production, it also points you to **Verify your business** if you haven't yet.
+
+<Frame>
+  <img src="/images/dashboard-setup/plan-is-live.webp" alt="The Basic is live dialog with the checkout link, Customize checkout, Integrate with your app and Verify your business" />
+</Frame>
 
 ---
 

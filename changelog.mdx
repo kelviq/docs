@@ -9,6 +9,57 @@ import { ChangelogFilter } from "/snippets/changelog-filter.jsx";
 
 <ChangelogFilter products={["App","JS SDK","React SDK","Node SDK","Python SDK","JS Promotions UI","MCP Server","CLI","API"]} />
 
+<Update label="v1.27" description="November 13, 2026" tags={["App"]}>
+
+## Analytics, from the moment you sign in
+
+Your numbers now greet you. **Home** opens on the cards that matter: what's ready to pay out, gross volume, upcoming renewals, subscriptions at risk, your top customers, revenue by product, MRR, active trials and orders. Click **View details** on any card to dig in.
+
+<Frame>
+  <img src="/images/analytics/home-overview.webp" alt="Home cards: Available to payout, Gross volume, Upcoming renewals, At risk, Top customers, Revenue by product, MRR, Active trials and Orders" />
+</Frame>
+
+The numbers you check before a board call now live where you get paid. Open **Analytics** in the sidebar for seven tabs: **Revenue**, **Subscriptions**, **Customers**, **Trials**, **Churn**, **Success rate** and **Recovery**. Each card shows the value for the range, the change against the previous period and a chart, and **View details** opens the metric with a day-by-day table.
+
+One filter bar applies to every card: a date range with presets from today to year to date, daily, weekly or monthly buckets, products, countries, and a comparison with the previous period or the previous year. **Reset** puts the defaults back, and **Auto**, **Line** and **Bar** switch the chart type.
+
+Two things to try:
+
+* **Copy link** at the top right gives you a URL that opens with your tab and filters already set, for a Slack channel or a weekly doc.
+* Hit a milestone? The share icon on any card turns the chart into a post-ready image in one of eight themes.
+
+<Frame>
+  <img width="480" src="/images/analytics/share-milestone-image.webp" alt="A milestone image: Gross volume for November 2026 on a dark green card with the Kelviq logo" />
+</Frame>
+
+Read [Analytics](/analytics/overview) for what every metric means.
+
+## Webhooks 2.0
+
+Webhooks you can trust before you ship them. Every endpoint now has its own page with delivery stats, a live delivery log and its settings in one place.
+
+<Frame>
+  <img src="/images/webhooks/endpoint-page.webp" alt="An endpoint page with delivery stats, the delivery log, the signing secret and its events" />
+</Frame>
+
+* **Verify endpoint** checks that your URL answers before you save it.
+* **Sample payloads** show the exact shape of every event while you pick them.
+* **Send test event** fires a signed sample through the real delivery path, retries included, marked `"test": true`.
+* **Logs** filter by status, endpoint, event and time. Open any delivery to see every attempt and the response, then **Copy as cURL** or **Resend**.
+* Pause an endpoint with **Receiving events** without losing its logs.
+
+Read [Webhooks](/guides/webhooks).
+
+## Search everything
+
+Press **⌘K** (**Ctrl K** on Windows) anywhere in the dashboard to jump straight to a product, customer, order, subscription, discount or checkout.
+
+<Frame>
+  <img width="480" src="/images/changelog/2026-11-13-search.webp" alt="The search dialog showing results for acme" />
+</Frame>
+
+</Update>
+
 <Update label="v1.26" description="November 9, 2026" tags={["API"]}>
 
 ### Improvements

@@ -47,22 +47,26 @@ Use a Meter feature rather than a Customizable feature. Kelviq can attach a pric
 ## Add the seat price to a plan
 
 1. Open the product and edit the plan you want to sell.
-2. Make the plan **Paid** and select its billing periods, such as Monthly and Yearly.
+2. Click **Set price** in the **Price** section (or the edit icon if the plan already has a price). Leave **Free plan** turned off and select its billing periods, such as **Monthly** and **Yearly**.
 3. Enter the plan's base price. Use this for the fixed part of the subscription, if any.
 4. Open **Usage charges**.
 
 <Frame>
-  <img src="/images/usage-pricing-card.webp" alt="Usage charges section for API requests or seats in Kelviq" />
+  <img src="/images/seat-based/seat-usage-charge.webp" alt="Usage charges with Team seats selected, Advance commitment, Flat pricing, USD 12 a month and USD 120 a year" />
 </Frame>
 
 5. Select the `seats` feature.
 6. For **Billing model**, choose **Advance commitment**. The customer is purchasing the seats before using them.
 7. For **Pricing model**, choose **Flat** for a standard per-seat price.
 8. Enter the price per unit for every billing period. For example, use `$12` under Monthly and `$120` under Yearly.
-9. Save the price and publish the plan.
+9. Click **Save**, then publish the plan.
 
 <Frame>
-  <img src="/images/select-billing-model-advance.webp" alt="Advance commitment and Pay-as-you-go billing model options in Kelviq" />
+  <img src="/images/select-billing-model-advance.webp" alt="The Billing model menu with Pay-as-you-go and Advance commitment, Advance commitment selected" />
+</Frame>
+
+<Frame>
+  <img src="/images/seat-based/seat-price-saved-editor.webp" alt="The price editor with a USD 99 monthly and USD 990 yearly base price and a Team seats usage charge of $12 a month and $120 a year per unit" />
 </Frame>
 
 The seat rate belongs under Usage charges even though this is not usage billed in arrears. **Advance commitment** is what makes the selected quantity an upfront seat purchase.
@@ -74,7 +78,7 @@ Most teams start with one price per seat. You can also sell seats in packages, l
 | Pricing model | Seat calculation | Example |
 | --- | --- | --- |
 | Flat | Every seat has the same price | 8 seats × \$12 = \$96 |
-| Package | Seats are sold in fixed-size packs | $50 for each block of 5 seats |
+| Package | Seats are sold in fixed-size packs | \$50 for each block of 5 seats |
 | Tiered | Each range of seats uses its own rate | Seats 1–10 at \$15, then seats 11–25 at \$12 |
 | Volume | The final seat count sets the rate for every seat | 1–10 seats at \$15 each; 11+ seats at \$12 each |
 | Stair-step | The seat count selects one fixed charge | \$100 for up to 10 seats; \$220 for up to 25 |
@@ -200,7 +204,7 @@ Choose one source of truth for billing.
 | Purchased seats | Checkout and subscription updates | At the start of the billing period |
 | Active seats | Usage reported by your backend | At the end of each monthly period |
 
-For active-seat billing, configure the Seats feature as Pay as you go and send the current active-seat total with `SET`. Do not send both a purchased quantity and usage reports for the same seat charge, or the two models will conflict.
+For active-seat billing, configure the Seats feature as **Pay-as-you-go** and send the current active-seat total with `SET`. Do not send both a purchased quantity and usage reports for the same seat charge, or the two models will conflict.
 
 ## Seats are not license activations
 

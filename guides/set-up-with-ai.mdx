@@ -3,12 +3,12 @@ title: "Set up with AI"
 description: "Hand billing to your AI coding agent with a prompt generated from your Kelviq account"
 ---
 
-**Settings → Set up with AI** writes a prompt for your coding agent. Paste it into Claude Code, Codex, VS Code, Windsurf, Cursor, Lovable, Replit, Bolt, Emergent, or any agent that can edit files and run commands, and the agent integrates Kelviq into your app.
+**Settings → Set up with AI** (or **Set up with AI** on Home) writes a prompt for your coding agent. Paste it into Claude Code, Codex, VS Code, Devin Windsurf, Cursor, Lovable, Replit, Bolt, Emergent, or any agent that can edit files and run commands, and the agent integrates Kelviq into your app.
 
 It asks before changing anything in Kelviq and never needs your keys in the chat. Start in sandbox: your agent builds and tests with test cards, and when everything works, one command copies your catalog to production.
 
 <Frame>
-  <img src="/images/set-up-with-ai-integrate.webp" alt="The Set up with AI page" />
+  <img src="/images/set-up-with-ai-integrate.webp" alt="The Set up with AI page in production with Integrate with my app selected: Switch to sandbox, Step 1 with the keys for your .env file, Step 2 for your requirements, and the agents it works with" />
 </Frame>
 
 ## Two ways to start
@@ -18,14 +18,14 @@ It asks before changing anything in Kelviq and never needs your keys in the chat
 **Set up everything** is for a new product. The agent reads your app and your requirements, proposes plans, prices, limits, license keys and discount codes, and shows you what it will create. Nothing is created in Kelviq until you approve. It then builds the integration the same way.
 
 <Frame>
-  <img src="/images/set-up-with-ai-everything.webp" alt="The Set up everything path, with approval steps before anything is created" />
+  <img src="/images/set-up-with-ai-everything.webp" alt="Set up everything selected, with the You approve steps in What your agent does before anything is created" />
 </Frame>
 
 ## Steps
 
 1. **Add your keys to the project.** Click **Copy for your .env file** and paste the block into your project's `.env.local` or `.env`, or into your app builder's secrets. The agent reads the keys from the file. Don't paste them into the chat.
-2. **Describe what you want (optional).** Plain language is fine: "one plan at $9/month with license keys, up to 3 devices per key, no free plan". Or add a common request, such as a monthly and yearly toggle or an upgrade button in settings. The agent follows these on top of its defaults and asks if something conflicts.
-3. **Give the prompt to your agent.** Click **Copy prompt**, open your agent in your app's project, and paste it as the first message.
+2. **Describe what you want (optional).** Plain language is fine: "one plan at \$9/month with license keys, up to 3 devices per key, no free plan". Or add a common request, such as a monthly and yearly toggle or an upgrade button in settings. The agent follows these on top of its defaults and asks if something conflicts.
+3. **Give this prompt to your agent.** Click **Copy prompt**, open your agent in your app's project, and paste it as the first message.
 
 The agent checks your keys with the Kelviq CLI without printing them and builds the app. In sandbox, it ends with a test purchase you can try with a [test card](/guides/sandbox).
 

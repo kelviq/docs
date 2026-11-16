@@ -17,37 +17,37 @@ The portal uses passwordless, secure access.
     When a customer completes a purchase, they get access immediately.
   </Step>
   <Step title="Login">
-    Customers enter their email address on your portal login page.
+    Customers enter the email they used at checkout and click **Send access code**.
   </Step>
   <Step title="Secure entry">
-    We send a one-time access code to their email. They enter this code to log in. No passwords to remember.
+    We email them a one-time access code. They enter it and click **Sign in**. No passwords to remember.
   </Step>
 </Steps>
 
 <Frame>
-  <img src="/images/portal-login.webp" />
+  <img src="/images/portal-login.webp" alt="The customer portal sign-in page with an email field and a Send access code button" />
 </Frame>
 
-## My orders
+## My Orders
 
 This is the home screen. It lists everything the customer owns. They can click on a specific product to see details.
 
 <Frame>
-  <img src="/images/orders-list.webp" />
+  <img src="/images/orders-list.webp" alt="My Orders with three products: Pixel UI Kit, Acme API on trial, and Acme Analytics" />
 </Frame>
 
 ### Product details
-Inside a specific product, customers find their deliverables.
+Each product has three tabs: **Overview**, **Invoices**, and **Settings**. **Overview** holds the customer's deliverables.
 
 * **Digital downloads**
   Access files, e-books, or software binaries.
 * **External links**
   Private links to Discord servers or Notion templates.
-* **License management**
-  View license keys. If you enforce seat limits, customers can see active devices and revoke licenses to free up seats for new team members.
+* **License key**
+  View and copy their license key.
 
 <Frame>
-  <img src="/images/product-downloads.webp" />
+  <img src="/images/product-downloads.webp" alt="The Overview tab of a Pixel UI Kit order with three downloads, two links, and a license key" />
 </Frame>
 
 {/* 
@@ -61,39 +61,35 @@ For metered products, customers see real-time data. They can track API calls, st
 
 ## Subscription management
 
-Customers have control over their lifecycle without contacting you.
-
-* **Change plans**
-  Upgrade to a higher tier or downgrade.
-* **Pause and cancel**
-  Pause a subscription temporarily or stop it entirely. With [retention offers](/customer-portal/retention) on, customers see an offer before they cancel.
-* **Payment methods**
-  Update credit card details or switch methods for future renewals.
+Customers have control over their lifecycle without contacting you. They manage a subscription from the product's **Settings** tab.
 
 <Frame>
-  <img src="/images/update-payment-modal.webp" />
+  <img src="/images/customer-portal/subscription-settings.webp" alt="The Settings tab of an Acme Analytics subscription with the current Pro plan, Change plan, and Cancel subscription under Danger zone" />
+</Frame>
+
+* **Change plans**
+  Click **Change plan** to upgrade to a higher tier or downgrade.
+* **Cancel**
+  Click **Cancel subscription** under **Danger zone**. With [retention offers](/customer-portal/retention) on, customers see an offer first, such as a pause. A paused subscription shows **Resume subscription**.
+* **Payment methods**
+  In **Billing settings**, customers add cards, set a default and remove cards. Each product or subscription shows the card it's billed to. See [Managing payment methods](/customer-portal/managing-payment-methods).
+
+<Frame>
+  <img src="/images/update-payment-modal.webp" alt="Saved payment methods in Billing settings, with a default Visa card and a Mastercard" />
+</Frame>
+
+## Invoices
+
+The product's **Invoices** tab lists its invoices. Customers can download each invoice as a PDF, and click **Pay now** on an unpaid one.
+
+<Frame>
+  <img src="/images/invoices-tab.webp" alt="The Invoices tab of an Acme Analytics subscription with a paid invoice and download and edit actions" />
 </Frame>
 
 ## Billing settings
 
-This section handles compliance and admin tasks.
-
-### Invoices and receipts
-Customers can view their full payment history. They can download PDF invoices and receipts for their own accounting.
+**Billing settings** in the portal sidebar lists each customer record with its products and subscriptions, the payment method each one uses, and the record's **Saved payment methods**.
 
 <Frame>
-  <img src="/images/invoices-tab.webp" />
-</Frame>
-
-### Account details
-This is where they manage the legal side of the account.
-* **Tax IDs**
-  Update billing addresses and VAT/Tax IDs.
-* **Refund status**
-  Track the status of partial or full refunds.
-* **Account transfer**
-  Transfer ownership of the account and subscription to a different email address.
-
-<Frame>
-  <img src="/images/billing-settings.webp" />
+  <img src="/images/billing-settings.webp" alt="Billing settings with a customer record, its Acme Analytics subscription, saved payment methods, and billing details" />
 </Frame>

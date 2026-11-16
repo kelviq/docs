@@ -31,12 +31,12 @@ By default, checkout follows the light or dark setting on the customer's device,
 <Tabs>
   <Tab title="Light">
     <Frame>
-      <img src="/images/checkout-examples/pricing-table-light.webp" alt="VoiceForge AI checkout in light mode" />
+      <img src="/images/checkout-examples/pricing-table-light.webp" alt="VoiceForge AI plan list in light mode" />
     </Frame>
   </Tab>
   <Tab title="Dark">
     <Frame>
-      <img src="/images/checkout-examples/pricing-table-dark.webp" alt="VoiceForge AI checkout in dark mode" />
+      <img src="/images/checkout-examples/pricing-table-dark.webp" alt="VoiceForge AI plan list in dark mode" />
     </Frame>
   </Tab>
 </Tabs>
@@ -46,8 +46,8 @@ By default, checkout follows the light or dark setting on the customer's device,
 List several plans in the link and checkout shows them as a list the customer can choose from. You also pick which plan is selected when the page opens. This is the usual link behind a **Buy** button on a pricing page.
 
 <Frame>
-  <img className="block dark:hidden" src="/images/checkout-examples/pricing-table-light.webp" alt="Checkout with five VoiceForge AI plans, Creator selected, Monthly and Yearly tabs" />
-  <img className="hidden dark:block" src="/images/checkout-examples/pricing-table-dark.webp" alt="Checkout with five VoiceForge AI plans, Creator selected, Monthly and Yearly tabs" />
+  <img className="block dark:hidden" src="/images/checkout-examples/pricing-table-light.webp" alt="Checkout plan list with five VoiceForge AI plans, Creator selected" />
+  <img className="hidden dark:block" src="/images/checkout-examples/pricing-table-dark.webp" alt="Checkout plan list with five VoiceForge AI plans, Creator selected" />
 </Frame>
 
 [See example →](https://www.kelviq.com/sandbox/buy/f60cea73-579b-4932-8d85-02b79710e9dc/?enabled=voice-starter,voice-creator,voice-pro,voice-scale,voice-business&plan_identifier=voice-creator&charge_period=MONTHLY)
@@ -68,8 +68,8 @@ Put only one plan in the link and checkout shows just that plan, already selecte
 A [free plan](/product-catalog/free-and-trials#free-plans) asks for a name and email only. There are no card or address fields, and the button reads **Get it for Free**. The customer still gets a subscription and the plan's entitlements.
 
 <Frame>
-  <img className="block dark:hidden" src="/images/checkout-examples/free-plan-light.webp" alt="Free forever checkout for Context API with name and email fields" />
-  <img className="hidden dark:block" src="/images/checkout-examples/free-plan-dark.webp" alt="Free forever checkout for Context API with name and email fields" />
+  <img className="block dark:hidden" src="/images/checkout-examples/free-plan-light.webp" alt="Context API free plan form with name and email fields and a Get it for Free button" />
+  <img className="hidden dark:block" src="/images/checkout-examples/free-plan-dark.webp" alt="Context API free plan form with name and email fields and a Get it for Free button" />
 </Frame>
 
 [See example →](https://www.kelviq.com/sandbox/buy/574a07ca-b9ef-4700-9907-deb64bd7f7e3/?enabled=ctx-free&plan_identifier=ctx-free&charge_period=MONTHLY)
@@ -79,8 +79,8 @@ A [free plan](/product-catalog/free-and-trials#free-plans) asks for a name and e
 When the plan has a [trial period](/product-catalog/free-and-trials), checkout collects the card but charges nothing today. The summary shows **Total after trial** and **Total due today**, and the text under the button gives the date of the first charge.
 
 <Frame>
-  <img className="block dark:hidden" src="/images/checkout-examples/free-trial-light.webp" alt="StudyPal Premium checkout with a Start 7-day Trial button and the first charge date" />
-  <img className="hidden dark:block" src="/images/checkout-examples/free-trial-dark.webp" alt="StudyPal Premium checkout with a Start 7-day Trial button and the first charge date" />
+  <img className="block dark:hidden" src="/images/checkout-examples/free-trial-light.webp" alt="StudyPal Premium checkout totals with the price after the trial and nothing due today" />
+  <img className="hidden dark:block" src="/images/checkout-examples/free-trial-dark.webp" alt="StudyPal Premium checkout totals with the price after the trial and nothing due today" />
 </Frame>
 
 [See example →](https://www.kelviq.com/sandbox/buy/dfb9c6d9-d195-4176-8bf3-036e42345c3d/?enabled=sp-premium&plan_identifier=sp-premium&charge_period=MONTHLY)
@@ -105,8 +105,8 @@ A plan can be sold monthly, every 3 months, every 6 months, and yearly. Checkout
 For a [one-time](/product-catalog/one-time-payments) plan there's no billing-period toggle, the summary says **One-time payment**, and the button reads **Pay Now**.
 
 <Frame>
-  <img className="block dark:hidden" src="/images/checkout-examples/one-time-light.webp" alt="One-time checkout for the PixelGallery JS Hobby license at $48" />
-  <img className="hidden dark:block" src="/images/checkout-examples/one-time-dark.webp" alt="One-time checkout for the PixelGallery JS Hobby license at $48" />
+  <img className="block dark:hidden" src="/images/checkout-examples/one-time-light.webp" alt="PixelGallery JS Hobby license summary, one-time payment of $48" />
+  <img className="hidden dark:block" src="/images/checkout-examples/one-time-dark.webp" alt="PixelGallery JS Hobby license summary, one-time payment of $48" />
 </Frame>
 
 [See example →](https://www.kelviq.com/sandbox/buy/83cd7be6-8459-4099-bee7-47bbf74c6813/?enabled=pg-hobby&plan_identifier=pg-hobby&charge_period=ONE_TIME)
@@ -184,8 +184,8 @@ You can also remove the **Add promotion code** field, so customers aren't tempte
 A per-seat plan charges for each seat the customer buys. The seat count comes from your app, so this checkout is created with the [Checkout API](/api-reference/checkout/create-a-checkout-session) rather than a static link. This example offers TeamBoard Basic and Business for 5 seats, with Business selected: \$16 a seat, \$80 a month, after a 14-day trial.
 
 <Frame>
-  <img className="block dark:hidden" src="/images/checkout-examples/per-seat-light.webp" alt="TeamBoard checkout with Basic and Business plans, Business selected with 5 seats at $80 a month" />
-  <img className="hidden dark:block" src="/images/checkout-examples/per-seat-dark.webp" alt="TeamBoard checkout with Basic and Business plans, Business selected with 5 seats at $80 a month" />
+  <img className="block dark:hidden" src="/images/checkout-examples/per-seat-light.webp" alt="TeamBoard Business checkout with 5 seats for $80, $80 after the trial and $0 due today" />
+  <img className="hidden dark:block" src="/images/checkout-examples/per-seat-dark.webp" alt="TeamBoard Business checkout with 5 seats for $80, $80 after the trial and $0 due today" />
 </Frame>
 
 ```json

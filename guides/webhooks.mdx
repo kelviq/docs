@@ -17,24 +17,28 @@ A delivery is considered successful when your endpoint returns a `2xx` status co
 
 ## Registering an Endpoint
 
-Go to **Settings → Webhooks** in the [Kelviq dashboard](https://app.kelviq.com/settings/webhooks/new) to create a webhook endpoint. You will specify:
+Go to **Settings → Webhooks** in the [Kelviq dashboard](https://app.kelviq.com/settings/webhooks/new) and click **Add endpoint**. You will specify:
 
-- **URL** — The public HTTPS URL Kelviq will POST events to. A URL that points to a private or internal address is rejected.
+- **Endpoint URL** — The public HTTPS URL Kelviq will POST events to. A URL that points to a private or internal address is rejected.
 - **Events** — The subset of event types you want to subscribe to; at least one is required. The **Sample payload** panel shows the shape of any event before you subscribe.
-- **Name** *(optional)* — How the endpoint appears in the dashboard. It defaults to the URL's host, for example `api.acmecorp.com`.
+- **Name** — How the endpoint appears in the dashboard. Required in the dashboard; over the API it is optional and defaults to the URL's host, for example `api.acmecorp.com`.
 - **Description** *(optional)* — A note for your team.
 
-After creation, Kelviq generates a signing secret for the endpoint in the format `kq_whsec_<random>`. Store this secret securely — you will need it to verify signatures.
+<Frame>
+  <img src="/images/webhooks/add-webhook.webp" alt="Add endpoint: Name, Endpoint URL with a reachable Verify endpoint result, Description, three events ticked, and the Sample payload panel" />
+</Frame>
+
+When you click **Add endpoint**, Kelviq generates a signing secret for the endpoint in the format `kq_whsec_<random>` and shows it in the **Endpoint added** dialog. Store this secret securely — you will need it to verify signatures.
 
 <Warning>
-Treat your signing secret like a password: anyone who has it can forge deliveries. You can read it from the endpoint at any time, and regenerate it from the endpoint's settings if it leaks. Update your server first when you do: deliveries already in flight were signed with the old secret.
+Treat your signing secret like a password: anyone who has it can forge deliveries. You can read it from the endpoint page at any time with **Reveal secret** or **Copy secret**, and click **Regenerate** in the endpoint's settings if it leaks. The old secret stops working straight away, and deliveries already in flight were signed with it, so update your server with the new secret at once.
 </Warning>
 
 The same endpoints are available over the API with a server key: see [Webhook Endpoints](/api-reference/webhook-endpoints/list-webhook-endpoints).
 
 ### Verify your endpoint
 
-**Verify endpoint**, on the form and on the endpoint page, sends one empty `POST` to your URL with no event and no signature, and waits up to 10 seconds, the same limit as real deliveries. It tells you whether the URL answers, not whether your handler is correct:
+**Verify endpoint**, on the form and in the **Endpoints** tab checklist, sends one empty `POST` to your URL with no event and no signature, and waits up to 10 seconds, the same limit as real deliveries. It tells you whether the URL answers, not whether your handler is correct:
 
 | Your endpoint answered | Result |
 |------------------------|--------|
@@ -42,6 +46,18 @@ The same endpoints are available over the API with a server key: see [Webhook En
 | `4xx` | Reachable. The probe is unsigned, so an endpoint that checks signatures is expected to reject it with `401` or `400`. A `404`, `405` or `410` is flagged, since it usually means a wrong path or a route that does not accept `POST`. |
 | `3xx` | Flagged. Kelviq never follows redirects, so use the final URL. |
 | `5xx`, no answer within 10 seconds, connection refused or DNS failure | Not reachable. Check your server, then verify again. |
+
+After you save, the endpoint page shows its delivery stats, the delivery log, and its settings: **Receiving events** (turn off to pause deliveries), the signing secret, the events it listens to, and its endpoint ID.
+
+<Frame>
+  <img src="/images/webhooks/endpoint-page.webp" alt="An endpoint page: Delivered, Failed, Success rate and Avg. response cards for the last 7 days, the Delivery log, and Settings with Receiving events, the signing secret, events and endpoint ID" />
+</Frame>
+
+Until your first live event arrives, the **Endpoints** tab shows a short checklist: **Endpoint added**, **Verify endpoint**, **Send a test event**, then **Receive a live event**.
+
+<Frame>
+  <img src="/images/webhooks/webhooks-checklist.webp" alt="The Waiting for your first event checklist with Endpoint added, Verify endpoint and Send a test event done, and Receive a live event still to go" />
+</Frame>
 
 ### Send a test event
 
@@ -57,15 +73,33 @@ The same endpoints are available over the API with a server key: see [Webhook En
 }
 ```
 
+<Frame>
+  <img src="/images/webhooks/send-test-event.webp" alt="The Send test event dialog for an endpoint, with the event type and its sample payload" style={{ maxWidth: "520px" }} />
+</Frame>
+
 Live events never carry the `test` field. Test deliveries appear in the logs only: they are left out of the delivery statistics and do not affect an endpoint's status or last delivery.
 
 ---
 
 ## Inspect and resend deliveries
 
-Open **Settings → Webhooks** and select an endpoint to view its delivery logs, or use the **Logs** tab for every endpoint at once. Each delivery attempt shows the event type, status, response code, response time, and response body. A failed attempt that will be retried shows when the next attempt is due; a `4xx` is final and shows as not retried. Logs are kept for 30 days.
+Open **Settings → Webhooks** and select an endpoint to view its **Delivery log**, or use the **Logs** tab for every endpoint at once. **View in Logs** on the endpoint page opens the **Logs** tab filtered to that endpoint. Each delivery attempt shows the event type, status, response code, response time, and response body. A failed attempt that will be retried shows when the next attempt is due; a `4xx` is final and shows as not retried. Logs are kept for 30 days.
+
+<Frame>
+  <img src="/images/webhooks/logs.webp" alt="The Logs tab with filters for status, endpoint, event and time range, and delivered, failed and test deliveries" />
+</Frame>
+
+Click a delivery to open it. The drawer shows the event ID, endpoint, response time, each attempt, the response body and the payload, with **Copy as cURL** to replay it from your terminal and **Resend**.
+
+<Frame>
+  <img src="/images/webhooks/delivery-drawer.webp" alt="A failed delivery opened from Logs: event ID, endpoint, response time, four attempts, response body, payload, Copy as cURL and Resend" />
+</Frame>
 
 The **Endpoints** tab summarises deliveries, success rate, failures and average response time for the selected period against the period before it, and flags any endpoint whose latest deliveries are failing. Every attempt is also available from [`GET /webhook/logs/`](/api-reference/webhooks/list-webhook-logs).
+
+<Frame>
+  <img src="/images/webhooks/webhooks-endpoints.webp" alt="The Endpoints tab: Deliveries, Success rate, Failed and Avg. response cards for the last 7 days above the endpoint list" />
+</Frame>
 
 To retry a delivery:
 
