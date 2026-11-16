@@ -181,9 +181,15 @@
             "pages": [
               "settings/profile",
               "settings/members",
-              "settings/customer-emails",
-              "settings/zapier",
-              "settings/woocommerce"
+              "settings/customer-emails"
+            ]
+          },
+          {
+            "group": "Integrations",
+            "icon": "/icons/plug-connect.svg",
+            "pages": [
+              "integrations/zapier",
+              "integrations/woocommerce"
             ]
           },
           {
@@ -367,6 +373,14 @@
     {
       "source": "/api-reference/frontend-integration/:slug*",
       "destination": "/frontend-integration/:slug*"
+    },
+    {
+      "source": "/settings/zapier",
+      "destination": "/integrations/zapier"
+    },
+    {
+      "source": "/settings/woocommerce",
+      "destination": "/integrations/woocommerce"
     }
   ],
   "logo": {
