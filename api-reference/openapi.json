@@ -3890,10 +3890,13 @@
             "type": "string",
             "enum": [
               "ONE_TIME",
-              "DAILY",
               "MONTHLY",
-              "QUARTERLY",
-              "YEARLY"
+              "YEARLY",
+              "WEEKLY",
+              "DAILY",
+              "TWENTY_EIGHT_DAYS",
+              "THREE_MONTHS",
+              "SIX_MONTHS"
             ],
             "example": "MONTHLY"
           },
