@@ -198,7 +198,13 @@
             "pages": [
               "guides/sandbox",
               "guides/test-payments",
-              "guides/migrate-from-cashfree",
+              {
+                "group": "Migrate to Kelviq",
+                "pages": [
+                  "guides/migrate-from-lemon-squeezy",
+                  "guides/migrate-from-cashfree"
+                ]
+              },
               "guides/subscription-integration",
               "guides/subscription-integration-for-nextjs",
               "guides/webhooks"
