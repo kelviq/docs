@@ -99,6 +99,10 @@
     {
       "name": "Checkout Session Events",
       "description": "Timeline events for a specific checkout session."
+    },
+    {
+      "name": "Imports",
+      "description": "Bring an existing store from another platform into your Kelviq organization."
     }
   ],
   "components": {
@@ -6984,6 +6988,157 @@
             }
           }
         }
+      },
+      "LemonSqueezyImportRequest": {
+        "type": "object",
+        "required": [
+          "apiKey",
+          "storeId"
+        ],
+        "properties": {
+          "apiKey": {
+            "type": "string",
+            "description": "Your Lemon Squeezy API key. Used for this import only. It is never returned in a response or included in the report email."
+          },
+          "storeId": {
+            "type": "string",
+            "pattern": "^[0-9]+$",
+            "description": "The Lemon Squeezy store to import, as a string of digits. A key can reach several stores; one store is imported per request.",
+            "example": "12345"
+          },
+          "reportEmail": {
+            "type": "string",
+            "format": "email",
+            "description": "Where the summary email is sent. Defaults to the organization owner's email."
+          },
+          "dryRun": {
+            "type": "boolean",
+            "default": false,
+            "description": "Run the whole import and save nothing. The report email shows what a real run would do."
+          },
+          "orderType": {
+            "type": "string",
+            "enum": [
+              "all",
+              "one_time",
+              "subscription"
+            ],
+            "default": "all",
+            "description": "Which sales to import. `all` imports every order and every subscription renewal. `one_time` imports only orders that did not start a subscription. `subscription` imports only orders that started a subscription, plus their renewals. License keys follow their orders. Products, plans, customers, files and discounts are imported whichever value is sent."
+          },
+          "only": {
+            "type": "array",
+            "items": {
+              "type": "string",
+              "enum": [
+                "store",
+                "products",
+                "customers",
+                "files",
+                "orders",
+                "renewals",
+                "discounts",
+                "licenses"
+              ]
+            },
+            "description": "Run only these steps. Defaults to every step."
+          },
+          "skip": {
+            "type": "array",
+            "items": {
+              "type": "string",
+              "enum": [
+                "store",
+                "products",
+                "customers",
+                "files",
+                "orders",
+                "renewals",
+                "discounts",
+                "licenses"
+              ]
+            },
+            "description": "Leave these steps out."
+          },
+          "publishPlan": {
+            "type": "boolean",
+            "default": true,
+            "description": "Publish each imported plan so it can be sold straight away, including a plan an earlier import left as a draft. When `false`, plans arrive as drafts to review and publish."
+          },
+          "publishDiscount": {
+            "type": "boolean",
+            "default": true,
+            "description": "Make each imported discount code usable at checkout, including a code an earlier import left switched off. A code limited to plans that are not published stays off. When `false`, codes arrive switched off."
+          },
+          "overwriteProfile": {
+            "type": "boolean",
+            "default": false,
+            "description": "Overwrite the organization name and business profile fields that are already filled in. When `false`, only blank fields are filled."
+          },
+          "skipAnalytics": {
+            "type": "boolean",
+            "default": false,
+            "description": "Do not add the imported sales to revenue analytics."
+          }
+        }
+      },
+      "LemonSqueezyImportQueued": {
+        "type": "object",
+        "properties": {
+          "status": {
+            "type": "string",
+            "enum": [
+              "queued"
+            ],
+            "description": "Always `queued`. Nothing has been imported yet."
+          },
+          "taskId": {
+            "type": "string",
+            "format": "uuid",
+            "description": "A reference for support. It cannot be used to query progress."
+          },
+          "storeId": {
+            "type": "string"
+          },
+          "storeName": {
+            "type": "string",
+            "nullable": true,
+            "description": "The store's name from Lemon Squeezy. `null` if Lemon Squeezy could not be reached during the check; the import is still queued."
+          },
+          "steps": {
+            "type": "array",
+            "items": {
+              "type": "string",
+              "enum": [
+                "store",
+                "products",
+                "customers",
+                "files",
+                "orders",
+                "renewals",
+                "discounts",
+                "licenses"
+              ]
+            },
+            "description": "The steps that will run, after `only` and `skip` are applied."
+          },
+          "orderType": {
+            "type": "string",
+            "enum": [
+              "all",
+              "one_time",
+              "subscription"
+            ]
+          },
+          "dryRun": {
+            "type": "boolean"
+          },
+          "reportEmail": {
+            "type": "string",
+            "format": "email",
+            "description": "The address the summary will be sent to."
+          }
+        }
       }
     }
   },
@@ -12600,6 +12755,191 @@
           },
           "404": {
             "description": "Webhook endpoint not found."
+          }
+        }
+      }
+    },
+    "/integrations/lemon-squeezy/migrate/": {
+      "post": {
+        "tags": [
+          "Imports"
+        ],
+        "summary": "Start a Lemon Squeezy import",
+        "description": "Queues an import of a Lemon Squeezy store into your Kelviq organization: business profile, products and plans, customers, files, orders, renewals, discount codes, and license keys.\n\nThe import runs in the background. This request returns as soon as the job is queued, and a summary email is sent to the organization owner (or `reportEmail`) when the import ends. There is no status endpoint; the email is the only completion signal.\n\nAuthenticate with a Server API Key that was created by the organization **owner**. A key created by any other team member is refused with `403`.\n\nRunning the import again is safe: records already imported are skipped, new ones are added, and refunds made since are picked up. Subscriptions are imported as history. They keep renewing on Lemon Squeezy, and Kelviq does not charge them. Customers are not emailed and no webhooks fire for imported records.\n\nSee [Migrate from Lemon Squeezy](/guides/migrate-from-lemon-squeezy) for the full walkthrough.",
+        "operationId": "startLemonSqueezyImport",
+        "x-mint": {
+          "content": "<Info>Click the base URL in the API playground and select the **Sandbox** host for test data or the **Production** host for live data. Use credentials from the same environment.</Info>"
+        },
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/LemonSqueezyImportRequest"
+              },
+              "examples": {
+                "full": {
+                  "summary": "Full import with defaults",
+                  "value": {
+                    "apiKey": "<lemon squeezy api key>",
+                    "storeId": "12345"
+                  }
+                },
+                "dryRun": {
+                  "summary": "Dry run, report to another address",
+                  "value": {
+                    "apiKey": "<lemon squeezy api key>",
+                    "storeId": "12345",
+                    "dryRun": true,
+                    "reportEmail": "ops@example.com"
+                  }
+                },
+                "rerun": {
+                  "summary": "Pick up new sales and refunds",
+                  "value": {
+                    "apiKey": "<lemon squeezy api key>",
+                    "storeId": "12345",
+                    "only": [
+                      "orders",
+                      "renewals"
+                    ]
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "202": {
+            "description": "The import is queued. Nothing has been imported yet.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/LemonSqueezyImportQueued"
+                },
+                "example": {
+                  "status": "queued",
+                  "taskId": "6f1c2f0e-8d3a-4a57-9b1e-2c1d5e7a9f10",
+                  "storeId": "12345",
+                  "storeName": "Acme Apps",
+                  "steps": [
+                    "store",
+                    "products",
+                    "customers",
+                    "files",
+                    "orders",
+                    "renewals",
+                    "discounts",
+                    "licenses"
+                  ],
+                  "orderType": "all",
+                  "dryRun": false,
+                  "reportEmail": "owner@example.com"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "A field is missing or invalid, `only` and `skip` leave no step to run, Lemon Squeezy rejected the key or the store id, or the organization has no owner (returned under `error`). Read whichever key is present: field names, `nonFieldErrors`, or `error`. Errors inside `only` and `skip` are keyed by the position of the bad item.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object"
+                },
+                "examples": {
+                  "fields": {
+                    "summary": "Field validation",
+                    "value": {
+                      "apiKey": [
+                        "This field is required."
+                      ],
+                      "storeId": [
+                        "This value does not match the required pattern."
+                      ],
+                      "only": {
+                        "0": [
+                          "\"x\" is not a valid choice."
+                        ]
+                      }
+                    }
+                  },
+                  "noSteps": {
+                    "summary": "No step left to run",
+                    "value": {
+                      "nonFieldErrors": [
+                        "only / skip leave no step to run."
+                      ]
+                    }
+                  },
+                  "rejected": {
+                    "summary": "Lemon Squeezy rejected the request",
+                    "value": {
+                      "error": "Lemon Squeezy rejected the API key or the store id."
+                    }
+                  },
+                  "storeNotFound": {
+                    "summary": "Store not found for this key",
+                    "value": {
+                      "error": "Lemon Squeezy store 9 was not found for this API key."
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "The `Authorization` header is missing, the key is not a valid Server API Key, or the key was not created by the organization owner. A missing or wrong key returns `403`, not `401`.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object"
+                },
+                "examples": {
+                  "notOwner": {
+                    "summary": "Key not created by the owner",
+                    "value": {
+                      "detail": "Use a server key created by the organization owner."
+                    }
+                  },
+                  "invalid": {
+                    "summary": "Invalid key",
+                    "value": {
+                      "detail": "Invalid Bearer Token"
+                    }
+                  },
+                  "missing": {
+                    "summary": "No Authorization header",
+                    "value": {
+                      "detail": "Authentication credentials were not provided."
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "An import is already running for the organization. If no report arrives and requests keep returning `409`, contact [hi@kelviq.com](mailto:hi@kelviq.com) with the `taskId` from the `202` response.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object"
+                },
+                "examples": {
+                  "running": {
+                    "summary": "Already running",
+                    "value": {
+                      "error": "A Lemon Squeezy import is already running for this organization. Its summary will be emailed when it finishes."
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "429": {
+            "description": "Organization rate limit exceeded."
+          },
+          "503": {
+            "description": "The import could not be queued. Try again."
           }
         }
       }

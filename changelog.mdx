@@ -9,6 +9,59 @@ import { ChangelogFilter } from "/snippets/changelog-filter.jsx";
 
 <ChangelogFilter products={["App","JS SDK","React SDK","Node SDK","Python SDK","JS Promotions UI","MCP Server","CLI","API"]} />
 
+<Update label="v1.27" description="November 20, 2026" tags={["API"]}>
+
+### New Features
+
+#### Import a Lemon Squeezy store
+
+One request brings a Lemon Squeezy store into your Kelviq organization: business profile, products and plans, customers, files, orders, renewals, discount codes, and license keys with their activations.
+
+- [Start a Lemon Squeezy import](/api-reference/imports/start-a-lemon-squeezy-import) queues the import and returns `202`. It runs in the background and emails a report to the organization owner when it ends.
+- Set `dryRun` to `true` to go through the whole import, save nothing, and get the same report.
+- Imported plans are published and discount codes work at checkout as soon as the import finishes. Send `publishPlan: false` or `publishDiscount: false` to keep them as drafts and switched off.
+- Running it again only adds what is new and picks up refunds made since.
+- Subscriptions are imported as history. They keep renewing on Lemon Squeezy, and Kelviq does not charge them.
+
+```json
+{
+  "apiKey": "<lemon squeezy api key>",
+  "storeId": "12345",
+  "dryRun": true,
+  ...
+}
+```
+
+Authenticate with a Server API Key created by the organization owner. The [migration guide](/guides/migrate-from-lemon-squeezy) walks through the whole move.
+
+</Update>
+
+<Update label="v0.5.0" description="November 20, 2026" tags={["CLI"]}>
+
+### New Features
+
+#### Import a store from the terminal
+
+- `kelviq import lemon-squeezy --store <id> --dry-run` previews an import of your Lemon Squeezy store: nothing is saved and a report is emailed. Without `--dry-run`, the command restates the environment, store, steps, order type and publish choices, asks, and starts the import.
+- `--only` and `--skip` choose the steps and `--orders` chooses which sales. Imported plans are published and discount codes work at checkout straight away; `--no-publish-plans` and `--no-publish-discounts` keep them as drafts and switched off.
+- The Lemon Squeezy key is read from `LEMONSQUEEZY_API_KEY` in your shell or env file, or typed at a masked prompt in an interactive terminal. It is never taken as a flag and never printed.
+- `kelviq import` on its own lists the available sources.
+
+See the [command reference](/cli/commands#kelviq-import).
+
+</Update>
+
+<Update label="v1.3.0" description="November 20, 2026" tags={["MCP Server"]}>
+
+### New Features
+
+- `import_start` starts a store import from your AI assistant. Lemon Squeezy is supported, and `storeId` is required for it. `dryRun` is required, so the assistant always chooses between a preview and a real run. The tool is annotated as destructive, so clients confirm it, and its result names the environment and notes that there is nothing to poll. The server reads the Lemon Squeezy key from `LEMONSQUEEZY_API_KEY` in its environment, which keeps it out of the conversation. 57 → 58 tools.
+- `checkout_create_session` accepts `customFields`, the identifiers of the [custom fields](/checkout/custom-fields) to collect at checkout.
+- `webhook_endpoint_create` and `webhook_endpoint_update` accept `name` and `description`.
+- Validation errors from the API now show the field and the reason in the tool result.
+
+</Update>
+
 <Update label="v1.26" description="November 9, 2026" tags={["API"]}>
 
 ### Improvements
@@ -158,10 +211,6 @@ Pause with `pauseMonths` (1 to 12), a `resumesAt` date, or neither for an open-e
 #### Retention settings
 
 `GET` and `PATCH /api/v1/organizations/retention-settings/` read and update the offers, the reason-to-offer map, written feedback, and the resume and repeat policies. The customer portal API gains `…/retention/` to load the offers for a subscription and `…/retention/accept/` to accept one. The cancel endpoint accepts an optional `offerType` to record an offer the customer declined.
-
-#### SDKs
-
-`entitlements.invalidateCache` (Node) and `entitlements.invalidate_cache` (Python) drop a customer's cached entitlements, for use in `subscription.paused` and `subscription.cancelled` handlers.
 
 See [Pause a subscription](/product-catalog/subscriptions#pause-a-subscription) and [Retention offers](/customer-portal/retention).
 

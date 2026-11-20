@@ -198,7 +198,7 @@ if (currentProjectCount >= maxProjects) {
 }
 ```
 
-The Node SDK caches entitlements for 60 seconds. If you handle subscription webhooks, call `client.entitlements.invalidateCache({ customerId })` there to drop the cache early.
+The Node SDK caches entitlements for 60 seconds, so a plan change can take up to a minute to show on the server. Lower `cacheTtlMs` or set `enableCache: false` on the client if you need it sooner.
 
 ---
 

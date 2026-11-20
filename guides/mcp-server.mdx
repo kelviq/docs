@@ -9,11 +9,11 @@ description: "Control Kelviq from Claude, Cursor, and any AI assistant that spea
 Instead of asking your assistant to "write me a curl command," you describe the outcome ("create a Pro plan under product X and publish it") and it does the work in a single turn.
 
 <Tip>
-**Using Claude Code?** The fastest install is the [Agent Toolkit](/guides/agent-toolkit) plugin — two commands set up this MCP server *and* five Kelviq skills that teach Claude the workflows. This page covers manual setup for every MCP client.
+**Using Claude Code?** The fastest install is the [Agent Toolkit](/guides/agent-toolkit) plugin — two commands set up this MCP server *and* six Kelviq skills that teach Claude the workflows. This page covers manual setup for every MCP client.
 </Tip>
 
 <Info>
-**57 tools** spanning connection checks, customers, checkout, subscriptions, discounts, webhooks, entitlements, licenses, usage, offerings, promotions, the customer portal, and full catalog management (products, plans, features) — plus a resource for every docs page and the full OpenAPI spec, and **3 guided prompts** for the most common workflows. Every tool carries [MCP safety annotations](https://modelcontextprotocol.io/docs/concepts/tools#tool-annotations), so clients can auto-approve read-only calls while confirming destructive ones.
+**58 tools** spanning connection checks, customers, checkout, subscriptions, discounts, webhooks, store imports, entitlements, licenses, usage, offerings, promotions, the customer portal, and full catalog management (products, plans, features) — plus a resource for every docs page and the full OpenAPI spec, and **3 guided prompts** for the most common workflows. Every tool carries [MCP safety annotations](https://modelcontextprotocol.io/docs/concepts/tools#tool-annotations), so clients can auto-approve read-only calls while confirming destructive ones.
 </Info>
 
 
@@ -70,7 +70,7 @@ claude mcp add kelviq \
 The `--` separator is required so that `claude` doesn't intercept `-y` as one of its own flags. Put all `--env` arguments **before** the `--`.
 </Note>
 
-Verify the connection with `/mcp` inside a Claude Code session — you should see `kelviq ✓ Connected, 57 tools`.
+Verify the connection with `/mcp` inside a Claude Code session — you should see `kelviq ✓ Connected, 58 tools`.
 </Tab>
 
 <Tab title="Claude Desktop">
@@ -234,6 +234,7 @@ Your AI client should pick the right tool, call it, and show the result inline. 
 |----------|----------|---------|---------|
 | `KELVIQ_SERVER_API_KEY` | Yes, for all API tools | — | Server API key (Bearer token for the core API) |
 | `KELVIQ_CLIENT_API_KEY` | Only for `promotion_get` | — | Client API key (Bearer token for the edge host) |
+| `LEMONSQUEEZY_API_KEY` | Only for `import_start` with the `lemon-squeezy` source | — | Your Lemon Squeezy API key. Set it where `KELVIQ_SERVER_API_KEY` is set, then restart the client. The server reads it from here so it never passes through the conversation. |
 | `KELVIQ_ENV` | No | `sandbox` | `sandbox` or `production`. Set to `production` to work with live data — switches both API hosts automatically. Use a key from the same environment: keys only work against their own environment. |
 | `KELVIQ_BASE_URL` | No | per `KELVIQ_ENV` | Advanced: override the core API host |
 | `KELVIQ_EDGE_URL` | No | per `KELVIQ_ENV` | Advanced: override the edge host (entitlements + promotions) |
@@ -318,6 +319,16 @@ Wherever a tool takes a product or feature reference (`plan_create`, `plan_entit
 | `webhook_log_list` | Delivery attempts from the last 30 days, with status codes and retries. |
 
 Signing secrets are hidden in webhook tool results. Pass `revealSecret: true` only when you need the value — your app reads the secret from its env file, so it rarely needs to appear in a conversation.
+
+### Imports
+
+| Tool | Description |
+|------|-------------|
+| `import_start` | Start an import of an existing store into your organization. `source` picks the platform (`lemon-squeezy`), and `dryRun` is required: `true` saves nothing and emails a report of what a real run would do. `storeId` is required for Lemon Squeezy. The import runs in the background and the report arrives by email, so the tool returns `queued`, not a finished import. The result names the environment the import was queued in and carries a note that there is nothing to poll. |
+
+`import_start` is annotated as destructive, because a real run publishes the imported plans, so clients ask you to confirm it.
+
+The source platform's key comes from the server's environment, not from a tool argument. Set `LEMONSQUEEZY_API_KEY` where `KELVIQ_SERVER_API_KEY` is set, then restart the client. The Kelviq key must be a Server API Key created by the organization owner. See [Migrate from Lemon Squeezy](/guides/migrate-from-lemon-squeezy).
 
 ### Catalog: Products
 
@@ -423,6 +434,12 @@ Calls: `license_activate` → `license_validate`.
 > *Show me all subscriptions for customer `acme-42` and tell me which features they have access to.*
 
 Calls: `subscription_list` → `entitlements_get`.
+</Accordion>
+
+<Accordion title="Import a Lemon Squeezy store">
+> *Do a dry run of importing my Lemon Squeezy store 12345 into Kelviq.*
+
+Calls: `import_start` with `dryRun: true`. Read the emailed report, then ask for the real import. A real run publishes the imported plans and switches on the discount codes.
 </Accordion>
 
 <Accordion title="Documentation lookup">
