@@ -1,6 +1,6 @@
 ---
 title: "Migrate from Lemon Squeezy"
-sidebarTitle: "Lemon Squeezy"
+sidebarTitle: "Migrate from Lemon Squeezy"
 description: "Import your Lemon Squeezy store into Kelviq, start selling on Kelviq, and plan what happens to your existing subscribers."
 keywords: ['Lemon Squeezy', 'migration', 'import', 'migrate', 'switch to Kelviq']
 ---
@@ -11,22 +11,23 @@ Kelviq imports your Lemon Squeezy store for you. Your products, plans, customers
 
 ## Four ways to move
 
-Each one runs the same import on Kelviq's servers and ends with the same report in your inbox. Pick whichever suits you.
+Each one runs the same import on Kelviq's servers and ends with the same report in your inbox. Run it yourself, or have our team do it.
 
-<CardGroup cols={2}>
+<CardGroup cols={3}>
   <Card title="CLI" icon="terminal" href="#run-the-import">
-    One command in your terminal: `kelviq import lemon-squeezy --store 12345`
+    One command in your terminal.
   </Card>
   <Card title="AI agent" icon="wand-magic-sparkles" href="#run-the-import">
-    One sentence to your coding agent: *"Import my Lemon Squeezy store into Kelviq."* It can add the Kelviq code to your app as well.
+    One sentence to your coding agent.
   </Card>
   <Card title="API" icon="code" href="#run-the-import">
-    One `POST` request from your backend or terminal.
-  </Card>
-  <Card title="Done for you" icon="headset" href="#have-kelviq-run-it-for-you">
-    Share a Lemon Squeezy API key made for the move, and our team imports and sets up your store.
+    One `POST` request from your backend.
   </Card>
 </CardGroup>
+
+<Card title="Done for you, by a dedicated person on our team" icon="headset" href="#have-kelviq-run-it-for-you" horizontal>
+  One person at Kelviq runs the import, checks it against your Lemon Squeezy store with you, and stays your contact until the move is done.
+</Card>
 
 Whichever you pick, start with a dry run: the whole import is rehearsed, nothing is saved, and the report shows what a real run would do. The rest of this guide covers what the import brings over, how to run it, and how to move your app.
 
@@ -226,15 +227,15 @@ The import runs in the background and can take from a few seconds to more than a
 
 ## Have Kelviq run it for you
 
-If you would rather not run anything yourself, our team does the import with you.
+If you would rather not run anything yourself, a dedicated person on the Kelviq team does the migration with you. You deal with the same person from your first email to the final check.
 
 1. **Create your Kelviq organization** at [app.kelviq.com](https://app.kelviq.com).
 2. **Create a Lemon Squeezy API key just for the move.** In your Lemon Squeezy dashboard, go to **Settings → API** and create a new key. Do not reuse the key your app runs on.
 3. **Share the key and your store id** with us at [hi@kelviq.com](mailto:hi@kelviq.com), from the email address on your Kelviq account.
-4. **We do the rest.** We do a dry run and send you the report. Once you approve it, we run the import, then check your plans, discount codes and license keys against your Lemon Squeezy store with you.
+4. **Your migration contact does the rest.** They do a dry run and send you the report. Once you approve it, they run the import, then check your plans, discount codes and license keys against your Lemon Squeezy store with you.
 5. **Delete the key** in Lemon Squeezy as soon as we confirm the import is finished, so it only lives as long as the move does.
 
-Adding Kelviq checkout and webhooks to your app is still a change in your code. We help you through [those steps](#2-add-the-kelviq-equivalent-of-each-lemon-squeezy-call) too.
+Adding Kelviq checkout and webhooks to your app is still a change in your code. The same person helps you through [those steps](#2-add-the-kelviq-equivalent-of-each-lemon-squeezy-call) too.
 
 ---
 
