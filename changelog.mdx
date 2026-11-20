@@ -212,10 +212,6 @@ Pause with `pauseMonths` (1 to 12), a `resumesAt` date, or neither for an open-e
 
 `GET` and `PATCH /api/v1/organizations/retention-settings/` read and update the offers, the reason-to-offer map, written feedback, and the resume and repeat policies. The customer portal API gains `…/retention/` to load the offers for a subscription and `…/retention/accept/` to accept one. The cancel endpoint accepts an optional `offerType` to record an offer the customer declined.
 
-#### SDKs
-
-`entitlements.invalidateCache` (Node) and `entitlements.invalidate_cache` (Python) drop a customer's cached entitlements, for use in `subscription.paused` and `subscription.cancelled` handlers.
-
 See [Pause a subscription](/product-catalog/subscriptions#pause-a-subscription) and [Retention offers](/customer-portal/retention).
 
 </Update>
