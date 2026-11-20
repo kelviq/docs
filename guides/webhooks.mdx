@@ -209,7 +209,7 @@ Do not provision the new plan from the update API response alone. Read the lates
 
 ### Pauses and resumes
 
-A pause sends `subscription.paused` with `status: "paused"`, `paused_at`, and `pause_resumes_at`, which is `null` for an open-ended pause. Treat it like a cancellation for access: entitlement checks already return `false` for a paused customer, so clear any cached result when the event arrives (`client.entitlements.invalidateCache` in Node, `client.entitlements.invalidate_cache` in Python).
+A pause sends `subscription.paused` with `status: "paused"`, `paused_at`, and `pause_resumes_at`, which is `null` for an open-ended pause. Treat it like a cancellation for access: entitlement checks already return `false` for a paused customer, so if you keep your own cache of entitlement results, clear it when the event arrives. The SDKs' built-in cache refreshes within 60 seconds by default.
 
 The subscription is quiet until it resumes. Renewals that fall inside the pause are skipped without `subscription.updated` or invoice events. `subscription.resumed` arrives when billing starts again, at the scheduled date or after a resume call, with `status: "active"` and a new billing period. Usage counters are reset at that point.
 

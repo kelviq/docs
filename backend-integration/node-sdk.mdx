@@ -84,11 +84,7 @@ const client = new Kelviq({
 
 Set `enableCache: false` to disable caching.
 
-To drop a customer's cached entitlements before the window expires, for example in a `subscription.paused`, `subscription.resumed`, or `subscription.cancelled` webhook handler:
-
-```typescript
-await client.entitlements.invalidateCache({ customerId });
-```
+A change such as a pause, a resume or a cancellation can take up to the cache window to show on the server. Lower `cacheTtlMs`, or set `enableCache: false`, if your app needs it sooner.
 
 ### Share the cache across instances
 

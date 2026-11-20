@@ -4,9 +4,9 @@ sidebarTitle: 'Agent toolkit'
 description: "Install Kelviq into Claude Code with one plugin — or add the Kelviq skills to any of 70+ AI coding agents."
 ---
 
-The [Kelviq Agent Toolkit](https://github.com/kelviq/agent-toolkit) packages everything an AI coding agent needs to work with Kelviq — the full [MCP server](/guides/mcp-server) plus five **Agent Skills** that teach the agent Kelviq's workflows — behind a single install.
+The [Kelviq Agent Toolkit](https://github.com/kelviq/agent-toolkit) packages everything an AI coding agent needs to work with Kelviq — the full [MCP server](/guides/mcp-server) plus six **Agent Skills** that teach the agent Kelviq's workflows — behind a single install.
 
-Skills are the missing half of tool access. The MCP server gives your agent 57 typed tools, but tools alone don't tell it that a new plan sits in DRAFT until published, that checkout is the default way to charge a customer, or that a retried usage report can double-count. The skills carry exactly that working knowledge, and they load automatically whenever a task looks Kelviq-shaped.
+Skills are the missing half of tool access. The MCP server gives your agent 58 typed tools, but tools alone don't tell it that a new plan sits in DRAFT until published, that checkout is the default way to charge a customer, or that a retried usage report can double-count. The skills carry exactly that working knowledge, and they load automatically whenever a task looks Kelviq-shaped.
 
 <Note>
 The bundled MCP server is always the latest published `@kelviq/mcp-server`, so server updates need no toolkit update.
@@ -23,7 +23,7 @@ Two commands, in any Claude Code session:
 /plugin install kelviq@kelviq
 ```
 
-This installs the full bundle: the MCP server is configured for you (no `claude mcp add`, no `--` separator gotchas) and all five skills are available immediately.
+This installs the full bundle: the MCP server is configured for you (no `claude mcp add`, no `--` separator gotchas) and all six skills are available immediately.
 
 The server reads your API keys from environment variables. It uses your **sandbox** environment unless `KELVIQ_ENV=production`, so start with sandbox keys. Set them in your shell profile before starting Claude Code:
 
@@ -34,7 +34,7 @@ export KELVIQ_CLIENT_API_KEY="<your-sandbox-client-key>"   # only needed for pro
 
 Get keys at [app.kelviq.com/settings/api-keys](https://app.kelviq.com/settings/api-keys).
 
-**Verify**: run `/mcp` — you should see `kelviq ✓ Connected, 57 tools`. Then ask something Kelviq-shaped ("set up a Pro plan for my product") and watch the relevant skill activate.
+**Verify**: run `/mcp` — you should see `kelviq ✓ Connected, 58 tools`. Then ask something Kelviq-shaped ("set up a Pro plan for my product") and watch the relevant skill activate.
 
 <Tip>
 No keys yet? Install anyway. The docs tools (`docs_search`, `docs_read`) work without any credentials, so your agent can answer Kelviq questions from the documentation immediately. API tools return a clear `Configuration error` until a key is set.
@@ -44,7 +44,7 @@ No keys yet? Install anyway. The docs tools (`docs_search`, `docs_read`) work wi
 
 ## Install — any other agent
 
-The five skills are also published through the open skills ecosystem, installable into 70+ agents (Cursor, Codex, GitHub Copilot, OpenCode, Zed, and more):
+The six skills are also published through the open skills ecosystem, installable into 70+ agents (Cursor, Codex, GitHub Copilot, OpenCode, Zed, and more):
 
 ```bash
 npx skills add kelviq/agent-toolkit
@@ -62,7 +62,7 @@ This path installs **skills only** — it doesn't configure an MCP server for yo
 
 ---
 
-## The five skills
+## The six skills
 
 | Skill | What it teaches |
 |---|---|
@@ -71,6 +71,7 @@ This path installs **skills only** — it doesn't configure an MCP server for yo
 | `setup-payments` | Selling plans and managing subscribers: checkout sessions, subscriptions, trials, upgrades, cancellation, and authenticated customer portal links. |
 | `usage-based-billing` | Enforcing what was sold: runtime entitlement checks served from the edge, safe usage reporting for Meter features, and the license key lifecycle. |
 | `pricing-as-code` | The [Kelviq CLI](/cli/overview) workflow: pull the live catalog into `kelviq.config.ts`, edit in git, preview the diff, apply, and promote sandbox to production. |
+| `migrate-to-kelviq` | Moving an app from another platform. Lemon Squeezy is supported: dry-run the store import, read the report, run it with your approval, then add Kelviq checkout, webhook, license and portal code beside the old platform's. |
 
 ### `kelviq` — the hub
 
@@ -98,13 +99,17 @@ Runtime enforcement. Entitlement checks via the edge-served `entitlements_get` (
 
 Wraps the [Kelviq CLI](/cli/overview) loop for agents: `kelviq pull` → edit `kelviq.config.ts` in a branch → `kelviq push --dry-run` → review → apply → `kelviq promote` from sandbox to production. The skill has a built-in safety rule: an agent may run dry-runs and show you diffs freely, but **applying a real change always requires your explicit approval** — it will never chain a dry-run into an unattended `--yes`.
 
+### `migrate-to-kelviq`
+
+Walks an agent through a move from another platform. It first lists every place your app talks to the old platform and shows you before changing anything. It then previews the [store import](/guides/migrate-from-lemon-squeezy) with a dry run, reads the emailed report with you, and starts the real import only on your say-so. After that it adds Kelviq checkout, webhook, license and customer portal code, and leaves the old platform's code in place for subscribers who still renew there. The source platform's key stays in your env file and never enters the conversation.
+
 ---
 
 ## Skills, prompts, and tools — how they fit
 
 The toolkit layers three things, each doing what it's best at:
 
-1. **Tools** (from the MCP server) do the work — 57 typed API calls, each carrying [safety annotations](https://modelcontextprotocol.io/docs/concepts/tools#tool-annotations) so clients can auto-approve reads and confirm destructive writes.
+1. **Tools** (from the MCP server) do the work — 58 typed API calls, each carrying [safety annotations](https://modelcontextprotocol.io/docs/concepts/tools#tool-annotations) so clients can auto-approve reads and confirm destructive writes.
 2. **Skills** (from this toolkit) supply the judgment — which tool, in what order, with which confirmations. They activate automatically based on what you ask.
 3. **Prompts** (from the MCP server) are guided, step-by-step flows you invoke explicitly — `setup_product`, `launch_plan`, and `diagnose_customer`. The skills route to them rather than duplicating them.
 

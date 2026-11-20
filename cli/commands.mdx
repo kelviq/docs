@@ -6,7 +6,7 @@ icon: 'square-terminal'
 
 All commands support `--help`. The CLI targets your **sandbox** environment unless you pass `--prod` — see [Environments & authentication](/cli/environments).
 
-Every command reads `KELVIQ_*` variables from `.env.local` and then `.env` in the working directory before it runs, so a project's env file works without exporting anything. A variable already set in your shell always wins. Two global flags control this:
+Every command reads `KELVIQ_*` variables from `.env.local` and then `.env` in the working directory before it runs, so a project's env file works without exporting anything. [`kelviq import`](#kelviq-import) also reads its source's own variables from those files. A variable already set in your shell always wins. Two global flags control this:
 
 | Flag | Description |
 |---|---|
@@ -362,3 +362,56 @@ Discount codes need a Merchant of Record organization.
 ### kelviq discount list
 
 Lists codes with amount, duration and state. `--search <text>` filters by name or code; `--prod` and `--json` as above.
+
+---
+
+## kelviq import
+
+Brings an existing store from another platform into your Kelviq organization. Lemon Squeezy is supported. The import runs on Kelviq's servers: the command starts it and returns, and a report is emailed when it finishes. There is no progress to poll.
+
+```shell
+kelviq import                                      # list the available sources
+kelviq import lemon-squeezy --store 12345 --dry-run   # preview: saves nothing, emails a report
+kelviq import lemon-squeezy --store 12345             # confirm, then start the import
+kelviq import lemon-squeezy --store 12345             # run it again to catch up: only what is new is added
+kelviq import lemon-squeezy --store 12345 --only orders,renewals   # quicker catch-up for stores without license keys
+```
+
+These flags apply to every source:
+
+| Flag | Description |
+|---|---|
+| `--dry-run` | Run the whole import and save nothing. The report shows what a real run would do. Needs no confirmation and no `--yes`. |
+| `--only <steps>` | Comma-separated steps to run. Defaults to every step. |
+| `--skip <steps>` | Comma-separated steps to leave out. |
+| `--no-publish-plans` | Import plans as drafts to review and publish yourself. Without it, each imported plan is published and can be sold straight away. |
+| `--no-publish-discounts` | Leave imported discount codes switched off. Without it, they work at checkout straight away. |
+| `--report-email <address>` | Where the report is sent. Defaults to the organization owner. |
+| `--prod` | Import into production instead of sandbox. |
+| `--yes` | Skip the confirmation prompt. Required for a real run in a non-interactive session. |
+| `--json` | Print one JSON document on stdout: `{ environment, source, import }` when the import is queued, or `{ error }` when it is not. The summary and prompts go to stderr. |
+
+Before it sends anything, the command prints a summary on stderr: the environment, the source, the store, where the key came from, the steps, the order type, whether plans and discount codes are published, and the report address. A real run then asks before it starts; in a non-interactive session it refuses without `--yes`. Production is labelled `PRODUCTION (live data)` in the summary and in the prompt.
+
+If the API host is not Kelviq's own, for example because an env file in the working directory sets `KELVIQ_BASE_URL`, the summary shows the host and the command asks for confirmation even for a dry run.
+
+The command only reports that an import started when the API confirms it was queued. Pressing Ctrl-C at the key prompt cancels without starting anything.
+
+The Kelviq key must be a Server API Key created by the organization **owner**; a key created by another team member is refused. Only one import runs per organization at a time.
+
+Running an import again is safe: records already imported are skipped, new ones are added, and refunds made since are picked up. It also publishes plans an earlier run left as drafts and switches on discount codes that are still off, unless you pass `--no-publish-plans` or `--no-publish-discounts` again.
+
+### kelviq import lemon-squeezy
+
+| Flag | Description |
+|---|---|
+| `--store <id>` | The Lemon Squeezy store to import, a number. Read from `LEMONSQUEEZY_STORE_ID` when omitted, and prompted for in an interactive terminal. One store per run. |
+| `--orders <all\|one-time\|subscription>` | Which sales to import. Default `all`. License keys follow their orders. |
+| `--overwrite-profile` | Overwrite the organization name and business profile fields that are already filled in. Without it, only blank fields are filled. |
+| `--skip-analytics` | Don't add the imported sales to revenue analytics. |
+
+The Lemon Squeezy API key is read from `LEMONSQUEEZY_API_KEY`, in your shell or in `.env.local` / `.env`. When it isn't set, an interactive terminal prompts for it with masked input. Anywhere else, the command stops and names the variable to set. There is no flag for the key, and it is never printed, including in `--json` output and error messages.
+
+Steps, in the order they run: `store`, `products`, `customers`, `files`, `orders`, `renewals`, `discounts`, `licenses`. `orders` needs `products`, and `renewals` and `licenses` need `orders`; these may have run in an earlier import.
+
+Subscriptions are imported as history. They keep renewing on Lemon Squeezy until it stops processing payments on March 31, 2027, and Kelviq does not charge them. See [Migrate from Lemon Squeezy](/guides/migrate-from-lemon-squeezy) for the full walkthrough.

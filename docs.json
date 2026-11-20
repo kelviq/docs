@@ -41,7 +41,8 @@
               "getstarted/fees",
               "quickstart/core-concepts",
               "quickstart/dashboard-setup",
-              "quickstart/integrate-with-your-app"
+              "quickstart/integrate-with-your-app",
+              "guides/migrate-from-lemon-squeezy"
             ]
           },
           {
