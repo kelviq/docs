@@ -216,7 +216,13 @@
               "guides/subscription-integration-for-nextjs",
               "guides/webhooks",
               "guides/sandbox",
-              "guides/test-payments"
+              "guides/test-payments",
+              {
+                "group": "Migrate to Kelviq",
+                "pages": [
+                  "guides/migrate-from-cashfree"
+                ]
+              }
             ]
           },
           {
