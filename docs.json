@@ -195,6 +195,7 @@
             "icon": "/icons/gear.svg",
             "pages": [
               "settings/members",
+              "settings/notifications",
               "settings/profile"
             ]
           },
