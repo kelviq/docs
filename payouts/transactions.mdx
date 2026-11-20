@@ -6,17 +6,16 @@ description: 'Audit individual payments, fees, and net earnings'
 The **Transactions** tab shows successful payments, refunds, and failed payments. Use it to see what the customer paid, the fees and tax deducted, and the amount added to your balance.
 
 <Frame>
-  <img src="/images/payout-transactions-list.webp" alt="List of individual transactions with status filters" />
+  <img src="/images/payout-transactions-list.webp" alt="The Transactions tab: Transaction ID, customer, type, date with when funds are available, gross, fee, tax, net and status, with search, status and date filters" />
 </Frame>
 
 ## Filtering
 
-You can filter the list by status to find specific issues.
+Each row shows the transaction ID, customer, type, date, gross, fee, tax, net, and status. Filter the list by status to find specific issues:
 
-* **Success:** Completed payments.
+* **Success:** Completed payments. Shown as **Succeeded**, or **Refunded** or **Disputed** if the money was later returned or charged back.
+* **Failure:** Declined cards or failed transfers. Shown as **Failed**.
 * **Pending:** Payments that have not finished processing.
-* **Refunded:** Money returned to customers.
-* **Failed:** Declined cards or failed transfers.
 
 The search field also matches payment method types. Search for `upi`, `card`, `link`, `amazon_pay`, or `sepa_debit` to see payments made through that method.
 
@@ -25,10 +24,14 @@ The search field also matches payment method types. Search for `upi`, `card`, `l
 Click a transaction row to open its details.
 
 * **Gross total:** The full amount charged to the customer, including tax.
-* **Fee:** The combined transaction fees deducted by Kelviq.
+* **Total fees:** The combined transaction fees deducted by Kelviq, itemized line by line.
 * **Tax:** Tax collected for the transaction and excluded from your net earnings.
 * **Net earnings:** The amount added to your Kelviq balance after transaction fees and tax. There's no payout fee, so nothing more is deducted when the balance is sent to your bank.
-* **Payment details:** The card or method used.
+* **Payment and availability:** The payment method and date.
+
+<Frame>
+  <img src="/images/payouts/transaction-details.webp" alt="Transaction details for a $238.80 subscription payment: base processing and subscription payment fees itemized, tax, Total fees of $9 and Net earnings of $229.80" style={{ maxWidth: "560px" }} />
+</Frame>
 
 For a successful transaction:
 
@@ -49,7 +52,7 @@ The **Fee** column shows one combined amount. Depending on the transaction, that
 
 Recurring and international-card fees are added to the base rate when they apply. For example, an international subscription payment processed after the &#36;5,000 threshold is charged 5.7% + &#36;0.40: 3.5% base, 0.7% recurring, and 1.5% international.
 
-### Example from the transaction list
+### Example
 
 For a &#36;57.60 domestic, one-time payment processed after the &#36;5,000 threshold:
 

@@ -20,9 +20,13 @@ This separation prevents development activity from changing live customer or bil
 ## Get started
 
 1. Sign in to the [Kelviq dashboard](https://app.kelviq.com).
-2. Open the organization dropdown and click **Enter sandbox**.
+2. Click **Sandbox** in the **Sandbox | Live** switch at the top of the sidebar. A yellow **Sandbox mode** strip runs across the top of the dashboard while you're in it. Click **Live** to go back.
 3. Create the products, plans, prices, and other test data you need.
 4. Open **Settings → API keys** and copy the sandbox key required by your integration.
+
+<Frame>
+  <img src="/images/sandbox/sandbox-live-switch.webp" alt="Sandbox selected in the Sandbox and Live switch at the top of the sidebar, with the yellow Sandbox mode strip across the top of the dashboard" />
+</Frame>
 
 <Warning>
 Never use a production Server API Key in test code. Store Server API Keys in environment variables and use Client API Keys only in supported browser integrations.
@@ -113,7 +117,7 @@ After Daily billing is enabled, use it to test a renewal without waiting for a m
 
 1. Enter Sandbox mode in the Kelviq dashboard.
 2. Open the test plan you want to use.
-3. Under **Billing cycles**, select **Daily** and enter a test price.
+3. Under **Billing cycle**, select **Daily** and enter a test price.
 4. Publish the plan.
 5. Start a subscription with a sandbox test card.
 6. After the next billing cycle, check the order, invoice, subscription status, and entitlements in Sandbox mode.

@@ -1,12 +1,12 @@
 ---
-title: 'Features & limits (Entitlements)'
-sidebarTitle: 'Features & limits (Entitlements)'
-description: 'Entitlements decide which features and limits each customer gets'
+title: 'Entitlements'
+sidebarTitle: 'Entitlements'
+description: 'Which features and limits each customer gets. In the dashboard, these are Features & limits on each plan.'
 keywords: ['entitlements', 'entitlement', 'feature access', 'feature flags', 'usage limits']
 ---
 Check features, not plans. Your code asks whether a customer has a feature, and Kelviq answers from their plan. You can change plans, prices, and custom deals without changing code. In the API and SDKs, a feature on a plan is called an entitlement.
 <Frame>
-      <img src="/images/features-limits-enttilements.webp" />
+      <img src="/images/features-limits-enttilements.webp" alt="The Features &amp; limits section of a plan, listing eight features and their values" />
 </Frame>
 <Info>
 For SDK installation and API reference, see:
@@ -23,7 +23,7 @@ For SDK installation and API reference, see:
 Traditional SaaS applications check access like this:
 
 ```javascript
-// ❌ The old way - hardcoded, brittle, requires code changes
+// The old way - hardcoded, brittle, requires code changes
 if (user.plan === 'pro' || user.plan === 'enterprise') {
   showAdvancedAnalytics();
 }
@@ -46,7 +46,7 @@ This approach has serious limitations:
 With Kelviq, you check features directly:
 
 ```javascript
-// ✅ The Kelviq way - flexible, decoupled, no code changes needed
+// The Kelviq way - flexible, decoupled, no code changes needed
 const hasAnalytics = await client.entitlements.hasAccess({
   customerId: "cust_123",
   featureId: "advanced-analytics"
@@ -69,7 +69,7 @@ Now you can:
 
 ### The Flow
 <Frame>
-      <img src="/images/features-kelviq-dashboard.webp" />
+      <img src="/images/features-kelviq-dashboard.webp" alt="The Manage features &amp; limits dialog, with available features on the left and the plan's selected features on the right" />
 </Frame>
 
 1) Setup plans and features on Kelviq Dashboard 
@@ -127,7 +127,7 @@ Kelviq supports three types of features to cover all access control scenarios.
 
 Simple on/off access control.
 <Frame>
-      <img src="/images/boolean.webp" />
+      <img src="/images/boolean.webp" alt="A Boolean feature, Priority support, with Allow access turned on" />
 </Frame>
 
 **Use for:**
@@ -148,7 +148,7 @@ Simple on/off access control.
 
 Usage-based features with limits and tracking.
 <Frame>
-      <img src="/images/raw-meter(empty-state).webp" />
+      <img src="/images/raw-meter(empty-state).webp" alt="A Meter feature, API calls, with Value, Usage reset, Usage reset time, Hard limit, Credit rollover and Usage alerts" />
 </Frame>
 **Use for:**
 - API calls, requests, or operations
@@ -161,13 +161,14 @@ Usage-based features with limits and tracking.
 
 | Option | Description |
 |--------|-------------|
-| **Limit** | Maximum usage allowed (or unlimited) |
-| **Reset Period** | When usage resets (monthly, weekly, daily, never) |
-| **Hard Limit** | Block access when limit reached |
-| **Soft Limit** | Allow overages but notify/warn |
-| **Rollover** | Carry unused quota to next period |
+| **Value** | Maximum usage allowed. Leave empty for unlimited |
+| **Usage reset** | When usage resets (Never, Every hour, Every day, Every week, Every month, Every year) |
+| **Usage reset time** | When in the period the reset happens, such as Subscription start date |
+| **Hard limit (disable usage at zero balance)** | Block access when the limit is reached. Leave it off for a soft limit that allows overages |
+| **Credit rollover** | Carry unused quota to the next period |
+| **Usage alerts** | Send an alert when usage crosses a threshold |
 <Frame>
-      <img src="/images/aggregate-meter.webp" />
+      <img src="/images/aggregate-meter.webp" alt="A Meter feature, Image generations, set to 10000 every month" />
 </Frame>
 **Example configuration:**
 
@@ -179,9 +180,9 @@ Usage-based features with limits and tracking.
 
 ### Customizable Features
 
-Dynamic values that aren't simple on/off or numeric limits.
+A number or setting stored per plan, such as max projects or upload size. Kelviq stores the value and doesn't count usage against it.
 <Frame>
-      <img src="/images/customizable.webp" />
+      <img src="/images/customizable.webp" alt="A Customizable feature, Max projects, set to 100" />
 </Frame>
 
 **Use for:**
@@ -195,7 +196,7 @@ Dynamic values that aren't simple on/off or numeric limits.
 
 Choose the right enforcement strategy for each feature. [How usage limits work](/product-catalog/usage-limits) walks through resets, overage, and what happens at the limit.
 <Frame>
-      <img src="/images/hard-limit.webp" />
+      <img src="/images/hard-limit.webp" alt="The Hard limit switch turned on for the AI credits Meter feature" />
 </Frame>
 
 ### Hard Limits
@@ -346,7 +347,7 @@ The sandbox environment is completely separate from production. Use different AP
 
 ## Manage feature definitions
 
-Open **Product Catalog → Features** to create and manage reusable feature definitions. See [Create a feature in Kelviq](/product-catalog/create-a-feature) for the complete dashboard and API workflows.
+Open **Product catalog → Features** to create and manage reusable feature definitions. See [Create a feature in Kelviq](/product-catalog/create-a-feature) for the complete dashboard and API workflows.
 
 * Use the row action menu to edit a feature name.
 * Metered values, percentages, and rollover limits use numeric inputs.
@@ -364,7 +365,7 @@ In the Kelviq dashboard:
 
 1. Navigate to **Customers**
 2. Select a customer
-3. View their **Features** section
+3. Open the **Entitlements** tab
 
 You'll see:
 - All entitled features
@@ -385,10 +386,10 @@ Sometimes you need to give a specific customer different access than their plan 
 **To override:**
 
 1. Go to the customer's detail page
-2. Find the feature in the Features section
+2. On the **Entitlements** tab, find the feature
 3. Click the menu (⋯) → **Override usage**
 4. Set the new value
-5. Save
+5. Click **Save updates**
 
 Overrides are:
 - Per-customer (don't affect the plan)
@@ -400,7 +401,7 @@ Overrides are:
 For meter features, you can reset a customer's usage:
 
 1. Go to the customer's detail page
-2. Find the Meter feature
+2. On the **Entitlements** tab, find the Meter feature
 3. Click the menu (⋯) → **Reset usage**
 
 This sets their current usage back to 0, giving them their full quota again.
@@ -428,8 +429,8 @@ When you set up inheritance:
 
 | Icon | Meaning |
 |------|---------|
-| 🔗 Inherited | Value comes from parent plan, stays in sync |
-| ⚡ Overridden | Value was customized, no longer syncs with parent |
+| Inherited | Value comes from parent plan, stays in sync. The tooltip shows **Inherited from** and the parent plan name |
+| Overridden | Value was customized, no longer syncs with parent |
 
 ### Use Cases
 

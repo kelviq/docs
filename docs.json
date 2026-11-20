@@ -83,10 +83,8 @@
             "pages": [
               "product-catalog/products",
               "product-catalog/plans",
-              "product-catalog/create-a-feature",
-              "product-catalog/entitlements",
               {
-                "group": "Pricing models",
+                "group": "Pricing",
                 "pages": [
                   "product-catalog/one-time-payments",
                   "product-catalog/subscriptions",
@@ -99,14 +97,16 @@
                 ]
               },
               {
-                "group": "Usage and billing",
+                "group": "Features & limits",
                 "pages": [
+                  "product-catalog/entitlements",
+                  "product-catalog/create-a-feature",
                   "product-catalog/usage-limits",
                   "product-catalog/usage-alerts"
                 ]
               },
               {
-                "group": "What customers get",
+                "group": "Delivered after purchase",
                 "pages": [
                   "product-catalog/digital-downloads",
                   "product-catalog/license-keys",
@@ -122,19 +122,46 @@
             "icon": "/icons/credit-card.svg",
             "pages": [
               "checkout/checkout-configuration",
+              "checkout/checkout-examples",
+              "checkout/static-checkout-url",
               "checkout/checkout-design",
+              "checkout/custom-fields",
+              "checkout/apply-a-discount-code",
               {
                 "group": "Payment methods",
                 "pages": [
                   "checkout/payment-methods",
-                  "checkout/payment-methods/upi"
+                  "checkout/payment-methods/upi",
+                  "checkout/payment-methods/korea"
                 ]
               },
-              "checkout/custom-fields",
-              "checkout/static-checkout-url",
-              "checkout/checkout-examples",
-              "checkout/apply-a-discount-code",
               "checkout/checkout-metadata"
+            ]
+          },
+          {
+            "group": "Sales",
+            "icon": "/icons/receipt.svg",
+            "pages": [
+              "sales/orders",
+              "sales/checkout-sessions",
+              "sales/abandoned-cart-recovery",
+              "sales/create-a-one-time-charge"
+            ]
+          },
+          {
+            "group": "Customers",
+            "icon": "/icons/user.svg",
+            "pages": [
+              "customers-management/overview",
+              "settings/customer-emails",
+              "customer-portal/retention",
+              {
+                "group": "Customer portal",
+                "pages": [
+                  "customer-portal/overview",
+                  "customer-portal/managing-payment-methods"
+                ]
+              }
             ]
           },
           {
@@ -148,26 +175,6 @@
             ]
           },
           {
-            "group": "Sales",
-            "icon": "/icons/receipt.svg",
-            "pages": [
-              "sales/orders",
-              "sales/create-a-one-time-charge",
-              "sales/checkout-sessions",
-              "sales/abandoned-cart-recovery",
-              "customers-management/overview"
-            ]
-          },
-          {
-            "group": "Customer portal",
-            "icon": "/icons/user.svg",
-            "pages": [
-              "customer-portal/overview",
-              "customer-portal/retention",
-              "customer-portal/managing-payment-methods"
-            ]
-          },
-          {
             "group": "Payouts",
             "icon": "/icons/wallet.svg",
             "pages": [
@@ -177,12 +184,20 @@
             ]
           },
           {
-            "group": "Settings",
+            "group": "Analytics",
+            "icon": "/icons/chart-bar-trend-up.svg",
+            "pages": [
+              "home",
+              "analytics/overview"
+            ]
+          },
+          {
+            "group": "Account",
             "icon": "/icons/gear.svg",
             "pages": [
-              "settings/profile",
               "settings/members",
-              "settings/customer-emails"
+              "settings/notifications",
+              "settings/profile"
             ]
           },
           {
@@ -197,6 +212,9 @@
             "group": "Guides",
             "icon": "/icons/book-open.svg",
             "pages": [
+              "guides/subscription-integration",
+              "guides/subscription-integration-for-nextjs",
+              "guides/webhooks",
               "guides/sandbox",
               "guides/test-payments",
               {
@@ -204,10 +222,7 @@
                 "pages": [
                   "guides/migrate-from-cashfree"
                 ]
-              },
-              "guides/subscription-integration",
-              "guides/subscription-integration-for-nextjs",
-              "guides/webhooks"
+              }
             ]
           },
           {

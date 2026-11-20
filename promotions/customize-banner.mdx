@@ -5,34 +5,38 @@ description: 'Adjust the appearance and behavior of the Promotions UI banner to 
 
 Open a promotion and go to the **Customize banner** tab to control how the discount banner looks and behaves on your site.
 
-## Appearance
+<Frame>
+  <img src="/images/promotions/customize-banner.webp" alt="The Customize banner tab with a sample banner, Banner styling fields, and the banner copy" />
+</Frame>
 
-* **Country message** — the text displayed to visitors. Use `{discount}` as a placeholder for the discount percentage and `{country}` for the visitor's country name.
-  Example: *"You qualify for a {discount}% discount in {country}."*
+## Banner styling
 
-* **Background color** — the banner's background color. Accepts any hex value.
-
-* **Background transparency** — opacity of the background, from 0 (fully transparent) to 100 (fully opaque).
+* **Background color** — the banner's background color.
 
 * **Font color** — the main text color.
 
-* **Highlight font color** — the color used for emphasized text (e.g. the discount percentage).
+* **Border radius** — corner rounding of the banner, in pixels.
 
 * **Font size** — text size in pixels.
 
-* **Border radius** — corner rounding of the banner container, in pixels.
+* **Add Close Icon** — when on, a close button lets visitors dismiss the banner.
 
-## Behavior
+* **Banner placement** — **Top** or **Bottom**.
 
-* **Placement** — choose whether the banner appears at the **top** or **bottom** of the viewport.
+* **Banner container** — the CSS selector of the element to place the banner in, such as `#container`, `.container`, or `body`.
 
-* **Close icon** — when enabled, a close button lets visitors dismiss the banner.
+Turn off the switch next to **Banner styling** to render the banner without Kelviq styles and style it with your own CSS. The styling fields above are disabled while it's off.
 
-* **Unstyled mode** — when enabled, all styling controls are disabled and the banner renders without any Kelviq styles. Use this if you want to apply your own CSS from scratch.
+## Banner copy
 
-  <Note>
-    Enabling unstyled mode will override all appearance settings above. You will need to style the banner entirely with your own CSS.
-  </Note>
+**Copy for purchasing power parity banner** is the text visitors see. You can use these placeholders:
+
+* `{country_flag}` — the visitor's country flag
+* `{country}` — the visitor's country name
+* `{coupon_code}` — the discount code
+* `{discount_percentage}` — the discount percentage
+
+You can also add custom styles with a `<style>` tag.
 
 ## Save changes
 
