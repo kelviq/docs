@@ -517,6 +517,13 @@
               "order_ref": "ABC-123",
               "source": "pricing_page"
             }
+          },
+          "customization": {
+            "type": "object",
+            "additionalProperties": true,
+            "nullable": true,
+            "description": "Optional free-form object of checkout page customizations (colors, fonts, layout). Stored on the session and returned as `customization` in checkout session responses.",
+            "example": {}
           }
         }
       },
@@ -1026,6 +1033,26 @@
             "nullable": true,
             "description": "The IP Address of the customer, used for location-based pricing.",
             "example": "103.154.35.20"
+          },
+          "cancelUrl": {
+            "type": "string",
+            "format": "url",
+            "nullable": true,
+            "description": "The URL to which the user will be redirected if the payment is cancelled.",
+            "example": "https://kelviq.com/checkout/cancel"
+          },
+          "trialPeriod": {
+            "type": "integer",
+            "minimum": 1,
+            "nullable": true,
+            "description": "The number of trial days to apply. When provided, this overrides the trial period configured on the selected plan.",
+            "example": 14
+          },
+          "currencyCode": {
+            "type": "string",
+            "nullable": true,
+            "description": "The currency to bill the subscription in (e.g. 'USD'). Honoured for server API keys only.",
+            "example": "USD"
           }
         }
       },
@@ -1227,6 +1254,20 @@
             "nullable": true,
             "description": "The IP Address of the customer, used for location-based pricing.",
             "example": "103.154.35.20"
+          },
+          "successUrl": {
+            "type": "string",
+            "format": "url",
+            "nullable": true,
+            "description": "The URL to which the user will be redirected after a successful subscription creation. Optional.",
+            "example": "https://kelviq.com/subscription/success"
+          },
+          "cancelUrl": {
+            "type": "string",
+            "format": "url",
+            "nullable": true,
+            "description": "The URL to which the user will be redirected if the payment is cancelled.",
+            "example": "https://kelviq.com/checkout/cancel"
           }
         }
       },
@@ -1386,6 +1427,11 @@
             ],
             "description": "Dictates how the usage is updated. SET replaces, DELTA increments.",
             "example": "SET"
+          },
+          "resourceId": {
+            "type": "string",
+            "description": "Optional. The resource (product instance) this usage belongs to, for customers holding several instances of a product.",
+            "example": "workspace_42"
           }
         }
       },
@@ -2659,7 +2705,25 @@
             "type": "string"
           },
           "product": {
-            "type": "string"
+            "type": "object",
+            "properties": {
+              "name": {
+                "type": "string",
+                "description": "The name of the product.",
+                "example": "Invoice Test"
+              },
+              "id": {
+                "type": "string",
+                "format": "uuid",
+                "description": "The unique identifier of the product.",
+                "example": "88e437b8-6017-405b-9328-e0f4e140bb79"
+              },
+              "identifier": {
+                "type": "string",
+                "description": "The identifier of the product.",
+                "example": "invoice-test"
+              }
+            }
           },
           "plan": {
             "$ref": "#/components/schemas/SubscriptionPlan"
@@ -2694,6 +2758,13 @@
           "recurrenceType": {
             "type": "string",
             "nullable": true
+          },
+          "nextInvoiceDate": {
+            "type": "string",
+            "format": "date-time",
+            "nullable": true,
+            "description": "When the next invoice will be issued.",
+            "example": "2026-08-28T10:46:34Z"
           },
           "files": {
             "type": "array",
@@ -2752,6 +2823,18 @@
             "nullable": true,
             "description": "Optional free-form cancellation comment."
           },
+          "pausedAt": {
+            "type": "string",
+            "format": "date-time",
+            "nullable": true,
+            "description": "When the subscription was paused; null if it is not paused."
+          },
+          "pauseResumesAt": {
+            "type": "string",
+            "format": "date-time",
+            "nullable": true,
+            "description": "When a paused subscription is scheduled to resume."
+          },
           "createdOn": {
             "type": "string",
             "format": "date-time",
@@ -2761,6 +2844,66 @@
             "type": "string",
             "format": "date-time",
             "example": "2026-08-01T10:15:00Z"
+          },
+          "discount": {
+            "type": "object",
+            "nullable": true,
+            "additionalProperties": true,
+            "description": "The discount in force and what it does to the price over time; null when there is none. Returned on the detail endpoint only, not on list rows.",
+            "properties": {
+              "code": {
+                "type": "string",
+                "example": "WELCOME20"
+              },
+              "name": {
+                "type": "string",
+                "example": "Welcome offer"
+              },
+              "label": {
+                "type": "string",
+                "description": "Short display label, e.g. `20% off`.",
+                "example": "20% off"
+              },
+              "discountType": {
+                "type": "string",
+                "example": "PERCENTAGE"
+              },
+              "percentageOff": {
+                "type": "integer",
+                "nullable": true,
+                "example": 20
+              },
+              "amountOff": {
+                "type": "string",
+                "nullable": true,
+                "example": null
+              },
+              "duration": {
+                "type": "string",
+                "example": "REPEATING"
+              },
+              "durationInMonths": {
+                "type": "integer",
+                "nullable": true,
+                "example": 3
+              },
+              "billingCycles": {
+                "type": "integer",
+                "nullable": true,
+                "description": "Number of payments the discount applies to.",
+                "example": 3
+              },
+              "durationText": {
+                "type": "string",
+                "description": "Human-readable duration; null for a one-time purchase.",
+                "nullable": true
+              },
+              "interval": {
+                "type": "string",
+                "nullable": true,
+                "example": "month"
+              }
+            }
           }
         }
       },
@@ -3660,10 +3803,12 @@
             "example": "Pro tier billed monthly."
           },
           "product": {
-            "type": "string",
-            "format": "uuid",
-            "description": "UUID of the parent product.",
-            "example": "0d65f7c0-7e91-4f56-9b32-13a9a6a7c1de"
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/Product"
+              }
+            ],
+            "description": "The parent product, returned as a full product object. (When creating a plan, pass the product UUID instead.)"
           },
           "metadata": {
             "type": "object",
@@ -3903,7 +4048,7 @@
           "priceData": {
             "type": "object",
             "additionalProperties": true,
-            "description": "For FLAT/PACKAGE: `{ amount, block_size? }`. For TIERED/VOLUME/STAIRSTEP: `{ currency }`.",
+            "description": "Depends on the parent `priceModel`. `FLAT`: exactly `{ amount }`. `PACKAGE`: exactly `{ amount, blockSize }`, where `blockSize` is an integer of 2 or more. `TIERED` / `VOLUME` / `STAIRSTEP`: leave empty and send `tiers` instead. Any other key is rejected.",
             "example": {
               "amount": 29.99
             }
@@ -3951,11 +4096,17 @@
         "description": "Pricing for one feature (or the plan itself if `feature` is null).",
         "properties": {
           "feature": {
-            "type": "string",
-            "format": "uuid",
             "nullable": true,
-            "description": "Feature UUID this pricing applies to. Required for non-FLAT models.",
-            "example": "3a3e92ab-90a3-4f43-8e87-9d4c8c5a9c01"
+            "description": "The feature this pricing is for; null for the plan's base price. In requests pass the feature UUID. Responses return the full feature object.",
+            "oneOf": [
+              {
+                "type": "string",
+                "format": "uuid"
+              },
+              {
+                "$ref": "#/components/schemas/CatalogFeature"
+              }
+            ]
           },
           "priceModel": {
             "type": "string",
@@ -3972,10 +4123,11 @@
             "type": "string",
             "enum": [
               "NEVER",
+              "EVERY_HOUR",
               "EVERY_DAY",
+              "EVERY_WEEK",
               "EVERY_28_DAYS",
               "EVERY_MONTH",
-              "EVERY_QUARTER",
               "EVERY_YEAR"
             ],
             "example": "EVERY_MONTH"
@@ -3983,7 +4135,8 @@
           "resetTime": {
             "type": "string",
             "nullable": true,
-            "example": "BEGINNING_OF_PERIOD"
+            "example": "START_DAY_OF_MONTH",
+            "description": "When in the period usage resets. Depends on `reset`: for `EVERY_WEEK` one of `SUBSCRIPTION_START_DAY`, `SUNDAY`, `MONDAY`, `TUESDAY`, `WEDNESDAY`, `THURSDAY`, `FRIDAY`, `SATURDAY`; for `EVERY_MONTH` one of `START_DAY_OF_MONTH`, `SUBSCRIPTION_START_DATE`."
           },
           "hasUnlimitedUsage": {
             "type": "boolean",
@@ -4005,7 +4158,7 @@
           },
           "usageAlerts": {
             "type": "object",
-            "description": "Optional usage-alert configuration. `thresholdType` is `PERCENTAGE` (thresholds are 1-100) or `BALANCE` (thresholds are absolute usage values).",
+            "description": "Optional usage-alert configuration. `thresholdType` is `PERCENTAGE` (thresholds are 1-100) or `BALANCE` (thresholds are absolute usage values). Thresholds must be positive integers.",
             "properties": {
               "enabled": {
                 "type": "boolean",
@@ -4014,7 +4167,8 @@
               "thresholds": {
                 "type": "array",
                 "items": {
-                  "type": "number"
+                  "type": "integer",
+                  "minimum": 1
                 },
                 "example": [
                   75,
@@ -4045,7 +4199,11 @@
               "$ref": "#/components/schemas/PlanCharge"
             }
           }
-        }
+        },
+        "required": [
+          "priceModel",
+          "charges"
+        ]
       },
       "PlanPrice": {
         "type": "object",
@@ -4117,7 +4275,8 @@
           },
           "currency": {
             "type": "string",
-            "example": "USD"
+            "example": "USD",
+            "description": "ISO currency code. Required when `priceType` is `PAID`."
           },
           "freeTrial": {
             "type": "boolean",
@@ -4191,10 +4350,11 @@
             "type": "string",
             "enum": [
               "NEVER",
+              "EVERY_HOUR",
               "EVERY_DAY",
+              "EVERY_WEEK",
               "EVERY_28_DAYS",
               "EVERY_MONTH",
-              "EVERY_QUARTER",
               "EVERY_YEAR"
             ],
             "example": "EVERY_MONTH"
@@ -4202,7 +4362,8 @@
           "resetTime": {
             "type": "string",
             "nullable": true,
-            "example": "BEGINNING_OF_PERIOD"
+            "example": "START_DAY_OF_MONTH",
+            "description": "When in the period usage resets. Depends on `reset`: for `EVERY_WEEK` one of `SUBSCRIPTION_START_DAY`, `SUNDAY`, `MONDAY`, `TUESDAY`, `WEDNESDAY`, `THURSDAY`, `FRIDAY`, `SATURDAY`; for `EVERY_MONTH` one of `START_DAY_OF_MONTH`, `SUBSCRIPTION_START_DATE`."
           },
           "rollover": {
             "type": "object",
@@ -4211,7 +4372,7 @@
           },
           "usageAlerts": {
             "type": "object",
-            "description": "Optional usage-alert configuration for this entitlement. `thresholdType` is `PERCENTAGE` (thresholds are 1-100) or `BALANCE` (thresholds are absolute usage values).",
+            "description": "Optional usage-alert configuration for this entitlement. `thresholdType` is `PERCENTAGE` (thresholds are 1-100) or `BALANCE` (thresholds are absolute usage values). Thresholds must be positive integers.",
             "properties": {
               "enabled": {
                 "type": "boolean",
@@ -4220,7 +4381,8 @@
               "thresholds": {
                 "type": "array",
                 "items": {
-                  "type": "number"
+                  "type": "integer",
+                  "minimum": 1
                 },
                 "example": [
                   75,
@@ -4456,31 +4618,6 @@
             "type": "array",
             "items": {
               "$ref": "#/components/schemas/PlanPrice"
-            }
-          }
-        }
-      },
-      "PaginatedPlanFeatureEntitlements": {
-        "type": "object",
-        "properties": {
-          "count": {
-            "type": "integer",
-            "example": 2
-          },
-          "next": {
-            "type": "string",
-            "nullable": true,
-            "example": null
-          },
-          "previous": {
-            "type": "string",
-            "nullable": true,
-            "example": null
-          },
-          "results": {
-            "type": "array",
-            "items": {
-              "$ref": "#/components/schemas/PlanFeatureEntitlement"
             }
           }
         }
@@ -4963,8 +5100,10 @@
         "description": "A single entry in an order's timeline.",
         "properties": {
           "id": {
-            "type": "integer",
-            "example": 4821
+            "type": "string",
+            "format": "uuid",
+            "description": "Unique identifier of the event.",
+            "example": "7c1f2a9e-3b64-4d0a-9f1e-2a6b8c4d5e70"
           },
           "order": {
             "type": "string",
@@ -4974,6 +5113,10 @@
           "title": {
             "type": "string",
             "example": "Order completed"
+          },
+          "displayText": {
+            "type": "string",
+            "description": "Human-readable description of the event."
           },
           "code": {
             "type": "string",
@@ -5116,6 +5259,47 @@
           "trialDaysRemaining": {
             "type": "integer",
             "example": 0
+          }
+        }
+      },
+      "InvoiceSubscriptionSummary": {
+        "type": "object",
+        "description": "Summary of the subscription linked to this invoice. An empty object (`{}`) when the invoice has no linked subscription.",
+        "properties": {
+          "id": {
+            "type": "string",
+            "format": "uuid",
+            "example": "09d706ca-58f3-4fb2-818f-5b8623d67e6e"
+          },
+          "status": {
+            "type": "string",
+            "example": "active"
+          },
+          "amount": {
+            "type": "string",
+            "description": "Decimal amount, serialized as a string (e.g. `\"261.00\"`), not a JSON number.",
+            "nullable": true,
+            "example": "261.00"
+          },
+          "currency": {
+            "type": "string",
+            "nullable": true,
+            "example": "usd"
+          },
+          "interval": {
+            "type": "string",
+            "description": "Billing interval, e.g. `month` or `year`.",
+            "example": "month"
+          },
+          "currencySymbol": {
+            "type": "string",
+            "example": "$"
+          },
+          "nextInvoiceDate": {
+            "type": "string",
+            "format": "date-time",
+            "nullable": true,
+            "example": "2026-08-28T10:46:34Z"
           }
         }
       },
@@ -5275,6 +5459,66 @@
           },
           "paymentMethod": {
             "$ref": "#/components/schemas/OrderPaymentMethod"
+          },
+          "discount": {
+            "type": "object",
+            "nullable": true,
+            "additionalProperties": true,
+            "description": "The discount in force and what it does to the price over time; null when there is none. Returned on the detail endpoint only, not on list rows.",
+            "properties": {
+              "code": {
+                "type": "string",
+                "example": "WELCOME20"
+              },
+              "name": {
+                "type": "string",
+                "example": "Welcome offer"
+              },
+              "label": {
+                "type": "string",
+                "description": "Short display label, e.g. `20% off`.",
+                "example": "20% off"
+              },
+              "discountType": {
+                "type": "string",
+                "example": "PERCENTAGE"
+              },
+              "percentageOff": {
+                "type": "integer",
+                "nullable": true,
+                "example": 20
+              },
+              "amountOff": {
+                "type": "string",
+                "nullable": true,
+                "example": null
+              },
+              "duration": {
+                "type": "string",
+                "example": "REPEATING"
+              },
+              "durationInMonths": {
+                "type": "integer",
+                "nullable": true,
+                "example": 3
+              },
+              "billingCycles": {
+                "type": "integer",
+                "nullable": true,
+                "description": "Number of payments the discount applies to.",
+                "example": 3
+              },
+              "durationText": {
+                "type": "string",
+                "description": "Human-readable duration; null for a one-time purchase.",
+                "nullable": true
+              },
+              "interval": {
+                "type": "string",
+                "nullable": true,
+                "example": "month"
+              }
+            }
           }
         }
       },
@@ -5751,12 +5995,18 @@
         "description": "A single entry in a checkout session's timeline.",
         "properties": {
           "id": {
-            "type": "integer",
-            "example": 913
+            "type": "string",
+            "format": "uuid",
+            "description": "Unique identifier of the event.",
+            "example": "b2e4c6a8-1d3f-4a5b-8c7d-9e0f1a2b3c4d"
           },
           "title": {
             "type": "string",
             "example": "Checkout session created"
+          },
+          "displayText": {
+            "type": "string",
+            "description": "Human-readable description of the event."
           },
           "code": {
             "type": "string",
@@ -6052,7 +6302,7 @@
             }
           },
           "subscription": {
-            "$ref": "#/components/schemas/OrderSubscriptionSummary"
+            "$ref": "#/components/schemas/InvoiceSubscriptionSummary"
           },
           "paymentId": {
             "type": "string",
@@ -6406,6 +6656,12 @@
               "$ref": "#/components/schemas/DiscountAppliesToRequestItem"
             },
             "description": "Restrict the discount to specific products/plans. Omit to apply to all products."
+          },
+          "isActive": {
+            "type": "boolean",
+            "default": true,
+            "description": "Whether the discount can be redeemed. Pass `false` to create it disabled.",
+            "example": true
           }
         },
         "required": [
@@ -6966,7 +7222,7 @@
           }
         },
         "responses": {
-          "201": {
+          "200": {
             "description": "Checkout Session Created",
             "content": {
               "application/json": {
@@ -7651,7 +7907,7 @@
           }
         },
         "responses": {
-          "200": {
+          "201": {
             "description": "Usage reported successfully.",
             "content": {
               "application/json": {
@@ -8798,7 +9054,11 @@
                       "recurrence": "month",
                       "currency": "usd",
                       "status": "active",
-                      "product": "Aphelo",
+                      "product": {
+                        "name": "Aphelo",
+                        "id": "88e437b8-6017-405b-9328-e0f4e140bb79",
+                        "identifier": "aphelo"
+                      },
                       "plan": {
                         "name": "Premium",
                         "identifier": "premium1"
@@ -9017,7 +9277,11 @@
                   "recurrence": "month",
                   "currency": "usd",
                   "status": "active",
-                  "product": "Aphelo",
+                  "product": {
+                    "name": "Aphelo",
+                    "id": "88e437b8-6017-405b-9328-e0f4e140bb79",
+                    "identifier": "aphelo"
+                  },
                   "plan": {
                     "name": "Premium",
                     "identifier": "premium1"
@@ -9883,16 +10147,16 @@
               }
             }
           },
-          "404": {
-            "description": "Product not found.",
+          "400": {
+            "description": "The request could not be processed, including when the product does not exist.",
             "content": {
               "application/json": {
                 "schema": {
                   "$ref": "#/components/schemas/ErrorResponse"
                 },
                 "example": {
-                  "status": "Not found",
-                  "message": "Product does not exist"
+                  "status": "Bad request",
+                  "message": "Something went wrong"
                 }
               }
             }
@@ -9980,8 +10244,8 @@
           "401": {
             "description": "Unauthorized \u2014 missing or invalid API key"
           },
-          "404": {
-            "description": "Promotion not found"
+          "400": {
+            "description": "Promotion not found, inactive, or not available for this visitor. The body is `{ \"detail\": \"...\" }`."
           }
         }
       }
@@ -10290,7 +10554,7 @@
           "Products"
         ],
         "summary": "Archive a product",
-        "description": "Soft-deletes (archives) the product. Already-archived products return 400.",
+        "description": "Soft-deletes (archives) the product. Already-archived products return 404.",
         "operationId": "deleteCatalogProduct",
         "x-mint": {
           "content": "<Info>Click the base URL in the API playground and select the **Sandbox** host for test data or the **Production** host for live data. Use credentials from the same environment.</Info>"
@@ -10314,8 +10578,8 @@
               }
             }
           },
-          "400": {
-            "description": "Already archived."
+          "404": {
+            "description": "Product not found. An already-archived product also returns 404."
           },
           "401": {
             "description": "Unauthorized \u2014 missing or invalid API key"
@@ -10688,8 +10952,8 @@
               }
             }
           },
-          "400": {
-            "description": "Already archived."
+          "404": {
+            "description": "Feature not found. An already-archived feature also returns 404."
           },
           "401": {
             "description": "Unauthorized \u2014 missing or invalid API key"
@@ -10734,6 +10998,16 @@
               "type": "integer",
               "minimum": 1,
               "maximum": 100
+            }
+          },
+          {
+            "name": "product_id",
+            "in": "query",
+            "required": false,
+            "description": "Only return plans that belong to this product.",
+            "schema": {
+              "type": "string",
+              "format": "uuid"
             }
           }
         ],
@@ -10922,8 +11196,8 @@
               }
             }
           },
-          "400": {
-            "description": "Already archived."
+          "404": {
+            "description": "Plan not found. An already-archived plan also returns 404."
           },
           "401": {
             "description": "Unauthorized \u2014 missing or invalid API key"
@@ -11199,11 +11473,14 @@
         ],
         "responses": {
           "200": {
-            "description": "Paginated list of entitlements.",
+            "description": "List of the plan's entitlements. The response is a plain array; it is not paginated.",
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/PaginatedPlanFeatureEntitlements"
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/PlanFeatureEntitlement"
+                  }
                 }
               }
             }
@@ -11244,7 +11521,16 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/CatalogPlan"
+                  "type": "object",
+                  "properties": {
+                    "planEntitlements": {
+                      "type": "array",
+                      "items": {
+                        "$ref": "#/components/schemas/PlanFeatureEntitlement"
+                      },
+                      "description": "The entitlements that were added."
+                    }
+                  }
                 }
               }
             }
@@ -11479,7 +11765,7 @@
           "Plan Files"
         ],
         "summary": "Download a plan file",
-        "description": "Public download endpoint for a plan file. Responds with a 302 redirect to a short-lived forced-download URL on the storage backend. Returns 404 if the file does not exist.",
+        "description": "Download endpoint for a plan file. Call it with the `downloadUrl` returned on the file, which already carries the required `token`. Responds with a 302 redirect to a short-lived forced-download URL on the storage backend. Returns 403 if the token is missing, invalid or older than 24 hours, and 404 if the file does not exist.",
         "operationId": "downloadCatalogPlanFile",
         "x-mint": {
           "content": "<Info>Click the base URL in the API playground and select the **Sandbox** host for test data or the **Production** host for live data. Use credentials from the same environment.</Info>"
@@ -11498,10 +11784,24 @@
               }
             }
           },
+          "403": {
+            "description": "The token is missing, invalid or has expired."
+          },
           "404": {
             "description": "Plan file not found."
           }
-        }
+        },
+        "parameters": [
+          {
+            "name": "token",
+            "in": "query",
+            "required": true,
+            "description": "Signed token from the file's `downloadUrl`. Valid for 24 hours; fetch the plan or subscription again for a fresh link.",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ]
       }
     },
     "/media/": {
@@ -12030,7 +12330,7 @@
           "Discounts"
         ],
         "summary": "Delete a discount",
-        "description": "Soft-deletes (archives) the discount. Already-archived discounts return 400.",
+        "description": "Soft-deletes (archives) the discount. Already-archived discounts return 404.",
         "operationId": "deleteDiscount",
         "x-mint": {
           "content": "<Info>Click the base URL in the API playground and select the **Sandbox** host for test data or the **Production** host for live data. Use credentials from the same environment.</Info>"
@@ -12049,8 +12349,8 @@
               }
             }
           },
-          "400": {
-            "description": "This discount is already deleted."
+          "404": {
+            "description": "Discount not found. An already-archived discount also returns 404."
           },
           "401": {
             "description": "Unauthorized \u2014 missing or invalid API key."
