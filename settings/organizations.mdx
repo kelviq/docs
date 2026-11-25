@@ -1,35 +1,39 @@
 ---
 title: 'Organizations'
-description: 'Create more than one organization for another product or brand, and switch between them'
+description: 'Give each product or brand its own organization, and switch between them from the sidebar'
 ---
 
-An organization is where your products, customers, API keys and settings live. If you run more than one product or brand, give each one its own organization under your account. Each has its own products, customers and API keys, so nothing is shared by accident.
-
-Open **Settings → Organizations** to see the organizations you manage and to create a new one.
+An organization holds one business in Kelviq: its products, customers, API keys and settings. When you launch a second product or brand, create a new organization for it instead of mixing both in one catalog.
 
 ## Create an organization
 
-1. Open **Settings → Organizations** and click **Create organization**. You can also click **Create organization** in the organization switcher in the sidebar.
-2. Enter the **Organization name**, for example "Acme Mobile". Customers see this name on checkout, receipts and emails. It can be up to 200 characters.
+1. Open **Settings → Organizations** and click **Create organization**. The same button is in the organization switcher in the sidebar.
+2. Enter the **Organization name**, for example "Acme Mobile". Customers see this name on checkout, receipts and emails.
 3. Click **Create**.
 
-Kelviq switches you straight into the new organization. You are now looking at an empty organization: add its products, plans and checkout design as you did for your first one.
+Kelviq opens the new organization right away. It starts empty, so add its products, plans and checkout design the way you did for your first one.
 
-A few things to know:
-
-* **Only the owner can create organizations.** If you are not the owner, the dialog tells you to ask the owner. A member who owns an organization of their own can create one from anywhere; it is created under the organization they own, not the one they are viewing.
-* **Live mode only.** Organizations are created in live mode. In sandbox you can see the list but not create.
-* **It starts under your organization.** The list shows your organization first, followed by the ones created under it, and the same list appears wherever you open the page.
+| | |
+| --- | --- |
+| **Who can create** | The owner of an organization. Members who aren't owners are asked to contact the owner. A member who owns an organization of their own can create one, and it's created under the organization they own. |
+| **Where** | Live mode only. In sandbox you can see the list but not create. |
+| **Name** | Up to 200 characters. |
 
 ## Switch between organizations
 
-Click **Switch** next to an organization in the list, or pick one in the organization switcher at the top of the sidebar. The list marks the one you are in as **Current**.
+Pick an organization in the switcher at the top of the sidebar, or click **Switch** next to it in **Settings → Organizations**. The one you're in is marked **Current**.
 
-## What a created organization shares with its parent
+The list shows your organization first, then every organization created under it.
 
-A created organization is its own store, with two exceptions that save you doing the work twice:
+## What a new organization shares
 
-* **Payouts.** Add the new organization's business details, and once they are approved, click **Use [parent]'s payout account** on its **Payouts** page. Its payouts then go to the same bank account as the parent. A **Pending review** badge shows while the details are in review.
-* **Members.** The parent organization appears in **Settings → Members** as the owner, marked "[parent] (owner)". That row can't be edited or removed from inside the created organization.
+Products, customers, API keys and settings are separate. Two things carry over from the organization it was created under:
 
-Read [Payouts](/payouts/overview) for how payouts work and [Members](/settings/members) to invite your team.
+| | How it works |
+| --- | --- |
+| **Payout account** | Add the new organization's business details. Once they're approved, open its **Payouts** page and click **Use [parent]'s payout account**. Its payouts then go to the same bank account. |
+| **Owner** | **Settings → Members** shows the parent organization as the owner, as "[parent] (owner)". That row can't be edited or removed. |
+
+<Card title="Next: invite your team" icon="users" href="/settings/members" horizontal>
+  Add members to the new organization.
+</Card>
