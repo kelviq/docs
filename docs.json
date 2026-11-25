@@ -197,6 +197,7 @@
             "pages": [
               "settings/members",
               "settings/notifications",
+              "settings/organizations",
               "settings/profile"
             ]
           },
