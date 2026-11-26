@@ -1,0 +1,78 @@
+---
+title: 'Airtable'
+description: 'Keep a table of your customers in Airtable, with their plan, status and latest Kelviq event'
+---
+
+Connect [Airtable](https://airtable.com) to keep a table of your customers in an Airtable base: one row per customer, with their plan, status, customer ID, latest Kelviq event and a link to the customer in Kelviq. Your team can filter, group and build views and interfaces on billing data, next to their own columns. Kelviq verifies every event before it changes anything.
+
+It works with Airtable's free plan.
+
+<Note>
+  Airtable's free plan allows **1,000 API calls a month** per workspace. Kelviq uses one call per event, so the free plan covers about 1,000 events a month. Choose only the events you need, or use a paid Airtable plan (Team allows 100,000 calls a month).
+</Note>
+
+## What Kelviq keeps in your table
+
+For each event, Kelviq finds the row whose **Email** is the customer's email, or adds a new row, and fills these columns:
+
+| Column | Type | Value |
+| --- | --- | --- |
+| **Name** | Single line text | The customer's name, or their email |
+| **Email** | Email | The customer's email. Kelviq uses it to find the row. |
+| **Plan** | Single select | The plan the customer can use now, like `pro`. Empty when cancelled or paused. |
+| **Status** | Single select | `active`, `trialing`, `past_due`, `paused` or `cancelled` |
+| **Customer ID** | Single line text | Your customer ID in Kelviq |
+| **Last event** | Single line text | The latest Kelviq event, like `invoice.payment_failed` |
+| **Last event at** | Date and time (UTC) | When that event happened |
+| **Kelviq link** | URL | The customer's page in Kelviq |
+
+Kelviq adds the columns that are missing when you connect, and new plan names as choices in **Plan**. **Plan** and **Status** change only on subscription events. Your own columns are never changed.
+
+## Before you start
+
+1. **Create a base and a table.** In Airtable, create a base (for example `Billing`) with a table named `Customers`. Keep its first column named **Name**.
+2. **Create a personal access token.** Open [airtable.com/create/tokens](https://airtable.com/create/tokens) and click **Create token**. Name it `Kelviq`.
+3. **Add the scopes** `data.records:write`, `schema.bases:read` and `schema.bases:write`.
+4. **Add the base** under **Access**, then click **Create token** and copy it. It starts with `pat`.
+5. **Copy the table link.** Open the `Customers` table and copy the address from your browser. It looks like `https://airtable.com/app…/tbl…/viw…`.
+
+## Connect Airtable
+
+1. Open **Settings → Integrations**.
+2. On the **Airtable** card, click **Configure Airtable**.
+3. Paste the **Personal access token** and the **Table link**.
+4. Optionally, enter a **Name**, such as `Customers table`. It's only used to label the connection in Kelviq.
+5. Choose the **Events to send**.
+6. Click **Connect Airtable**.
+
+Kelviq checks the token and the table, and adds its columns, without adding any row. From then on, each selected event adds or updates the customer's row.
+
+<Note>
+  Connections are separate for sandbox and live. If you connect Airtable while in [sandbox mode](/guides/sandbox), only sandbox events are sent, and the **Kelviq link** opens the customer in sandbox. Use a separate table for sandbox, so test customers stay out of your real table.
+</Note>
+
+## Manage a connection
+
+Open **Settings → Integrations → Configure Airtable** to see your connections. For each one you can:
+
+- **Send test**: check the token and the table still work. No row is created.
+- **Edit events**: change which events are sent, then click **Save events**.
+- **Disconnect**: stop updating Airtable. The rows stay in your table.
+
+Each connection is a Kelviq webhook endpoint, so it also appears under **Settings → Webhooks**, named `Airtable: <name>`. There you can see every delivery and resend one that failed. Your token is stored encrypted and is never shown.
+
+## Troubleshooting
+
+| Error | What to do |
+| --- | --- |
+| Airtable can't find the table, or the token can't use it | Check that the token has the scopes `data.records:write`, `schema.bases:read` and `schema.bases:write`, and that the base is added under **Access**. |
+| Airtable did not accept this token | The token was deleted or mistyped. Create a new one at [airtable.com/create/tokens](https://airtable.com/create/tokens), then disconnect and connect again. |
+| The Airtable column "…" must be of type … | Your table already has a column with that name but another type. Rename or delete it, then click **Send test**. |
+| This Airtable workspace used up its monthly API calls | The free plan's 1,000 calls a month are used up. Kelviq retries; upgrade the Airtable plan, or send fewer events. |
+| … has no customer email for an Airtable row | The Kelviq customer has no email. |
+
+If Airtable is briefly unavailable or rate limits your base, Kelviq retries the delivery automatically.
+
+## Prefer code?
+
+Use [webhooks](/guides/webhooks) to receive the same events in your own backend and update Airtable your own way.
