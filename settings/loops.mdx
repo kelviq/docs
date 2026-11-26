@@ -1,0 +1,93 @@
+---
+title: 'Loops'
+description: 'Start your Loops emails from Kelviq events, and keep each contact’s plan and status'
+---
+
+Connect [Loops](https://loops.so) to send Kelviq events, such as checkouts, new subscriptions, plan changes, failed payments and refunds, to Loops. Each event can start a Loop: for example a welcome series when someone subscribes, or a reminder when a payment fails. Kelviq also keeps each contact's plan and status up to date, so you can use them in audiences. Kelviq verifies every event before it sends it.
+
+It works with Loops' free plan.
+
+## What Loops receives
+
+Each Kelviq event becomes a Loops event named `kelviq_<event type>`, on the contact with the customer's email. Loops creates the contact if it doesn't exist yet.
+
+| Kelviq event | Loops event |
+| --- | --- |
+| `checkout.completed` | `kelviq_checkout_completed` |
+| `subscription.created` | `kelviq_subscription_created` |
+| `subscription.plan_changed` | `kelviq_subscription_plan_changed` |
+| `subscription.cancelled` | `kelviq_subscription_cancelled` |
+| `subscription.trial_will_end` | `kelviq_subscription_trial_will_end` |
+| `invoice.payment_failed` | `kelviq_invoice_payment_failed` |
+| `refund.created` | `kelviq_refund_created` |
+| Any other Kelviq event | `kelviq_` + the event type, with dots and underscores as `_` |
+
+**Event properties** you can use in emails: `amount`, `currency`, `plan`, `planName`, `product`, `status`, `recurrence`, `kelviqEventId` and `kelviqEnvironment`, when the event has them.
+
+**Contact properties** Kelviq keeps up to date:
+
+| Property | Value |
+| --- | --- |
+| `firstName`, `lastName` | From the customer's name in Kelviq |
+| `kelviqCustomerId` | Your customer ID in Kelviq |
+| `kelviqPlan` | The plan the customer can use now, like `pro` (empty when cancelled or paused) |
+| `kelviqStatus` | `active`, `trialing`, `past_due`, `paused` or `cancelled` |
+
+Kelviq creates the three `kelviq…` contact properties in Loops for you.
+
+<Note>
+  Loops ignores an event it already received. Kelviq uses the Kelviq event ID, so a retried event never starts a Loop twice.
+</Note>
+
+## Before you start
+
+1. **Sign in to Loops** at [app.loops.so](https://app.loops.so). The free plan works.
+2. **Create an API key.** Open **Settings → API**, click **Generate key**, name it `Kelviq` and copy it.
+
+## Connect Loops
+
+1. Open **Settings → Integrations**.
+2. On the **Loops** card, click **Configure Loops**.
+3. Paste the **API key**.
+4. Optionally, enter a **Name**, such as `Our Loops team`. It's only used to label the connection in Kelviq.
+5. Choose the **Events to send**. Checkout, subscription, failed payment and refund events are selected.
+6. Click **Connect Loops**.
+
+Kelviq checks the key and adds the Kelviq contact properties to Loops.
+
+## Start a Loop from a Kelviq event
+
+1. In Loops, open **Loops → New**.
+2. Choose **Event received** as the trigger, and enter the event name, for example `kelviq_invoice_payment_failed`.
+3. Add your emails. Use `{eventProperties.amount}` and the other event properties in the text.
+4. Start the Loop.
+
+Kelviq's events appear in Loops after the first time each one is sent. To see them sooner, click **Send test** in Kelviq, or wait for the first real event.
+
+<Note>
+  Connections are separate for sandbox and live. If you connect Loops while in [sandbox mode](/guides/sandbox), only sandbox events are sent, with `kelviqEnvironment` set to `sandbox`. Use a separate Loops team for sandbox, so test contacts don't get your real emails.
+</Note>
+
+## Manage a connection
+
+Open **Settings → Integrations → Configure Loops** to see your connections. For each one you can:
+
+- **Send test**: check the key still works. No contact or event is created.
+- **Edit events**: change which events are sent, then click **Save events**.
+- **Disconnect**: stop sending events.
+
+Each connection is a Kelviq webhook endpoint, so it also appears under **Settings → Webhooks**, named `Loops: <name>`. There you can see every delivery and resend one that failed. Your API key is stored encrypted and is never shown.
+
+## Troubleshooting
+
+| Error | What to do |
+| --- | --- |
+| Loops did not accept this API key | The key was deleted or mistyped. Generate a new key in **Settings → API**, then disconnect and connect again. |
+| … has no customer email for a Loops contact | The Kelviq customer has no email. |
+| Loops returned an error: … | Loops' own message says what's wrong, for example an email address it can't accept. |
+
+If Loops is briefly unavailable or rate limits your team, Kelviq retries the delivery automatically.
+
+## Prefer code?
+
+Use [webhooks](/guides/webhooks) to receive the same events in your own backend and send them to Loops your own way.
