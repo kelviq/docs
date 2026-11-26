@@ -201,7 +201,10 @@
               "settings/loops",
               "settings/brevo",
               "settings/kit",
-              "settings/mixpanel"
+              "settings/mixpanel",
+              "settings/notion",
+              "settings/airtable",
+              "settings/attio"
             ]
           },
           {
