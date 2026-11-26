@@ -192,7 +192,19 @@
               "settings/segment",
               "settings/woocommerce",
               "settings/fernand",
-              "settings/clerk"
+              "settings/clerk",
+              "settings/supabase",
+              "settings/telegram",
+              "settings/hubspot",
+              "settings/posthog",
+              "settings/mailchimp",
+              "settings/loops",
+              "settings/brevo",
+              "settings/kit",
+              "settings/mixpanel",
+              "settings/notion",
+              "settings/airtable",
+              "settings/attio"
             ]
           },
           {

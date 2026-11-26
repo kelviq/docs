@@ -1,0 +1,94 @@
+---
+title: 'Kit'
+description: 'Keep your customers as Kit subscribers, tagged with their Kelviq plan and status'
+---
+
+Connect [Kit](https://kit.com) (formerly ConvertKit) to keep each Kelviq customer as a Kit subscriber, tagged with their plan and status: active, on a trial, cancelled, with a failed payment, and more. Start Kit automations when a tag is added, for example a win-back sequence for cancelled customers or a reminder when a payment fails, and send broadcasts to exactly the right people. Kelviq verifies every event before it changes anything.
+
+It works with Kit's free plan.
+
+## What Kelviq does
+
+For each event, Kelviq adds the customer to Kit if they aren't there yet, with their first name, and then sets their tags:
+
+| Tag | Added when | Removed when |
+| --- | --- | --- |
+| `kelviq-customer` | Any event about the customer | Never |
+| `kelviq-active` | A subscription starts, resumes or changes | It's paused or cancelled |
+| `kelviq-plan-<plan>`, like `kelviq-plan-pro` | A subscription is on that plan | The plan changes, or it's cancelled |
+| `kelviq-trial` | A subscription is trialing | The trial ends |
+| `kelviq-trial-ending` | A trial is about to end | Never |
+| `kelviq-paused` | A subscription is paused | It resumes |
+| `kelviq-cancelled` | A subscription is cancelled | A new subscription starts |
+| `kelviq-payment-failed` | An invoice payment fails | An invoice is paid |
+| `kelviq-purchased` | A checkout completes | Never |
+| `kelviq-refunded` | A refund is made | Never |
+| `kelviq-usage-alert` | A feature usage alert | Never |
+
+Kelviq creates the tags in Kit the first time it needs them. Your own tags on the same people are never changed.
+
+Kelviq also keeps three **custom fields** up to date, which you can use in emails and filters:
+
+| Custom field | Value |
+| --- | --- |
+| `kelviq_plan` | The plan the customer can use now, like `pro` (empty when cancelled or paused) |
+| `kelviq_status` | `active`, `trialing`, `past_due`, `paused` or `cancelled` |
+| `kelviq_customer_id` | Your customer ID in Kelviq |
+
+<Warning>
+  Kit adds new people as **active subscribers**, so they can get your broadcasts. If your customers didn't agree to marketing emails, send broadcasts only to a segment that leaves out the `kelviq-customer` tag, and use the Kelviq tags only for automations about their account.
+</Warning>
+
+## Before you start
+
+1. **Sign in to Kit** at [app.kit.com](https://app.kit.com). The free plan works.
+2. **Create an API key.** Open **Settings → Developer** ([direct link](https://app.kit.com/account_settings/developer_settings)), click **Add a new key**, name it `Kelviq` and copy it. You can't see it again later.
+
+<Note>
+  Use a **V4** API key from the Developer page. The older **V3** API key and API secret don't work.
+</Note>
+
+## Connect Kit
+
+1. Open **Settings → Integrations**.
+2. On the **Kit** card, click **Configure Kit**.
+3. Paste the **API key**.
+4. Optionally, enter a **Name**, such as `Our Kit account`. It's only used to label the connection in Kelviq.
+5. Choose the **Events to send**. Checkout, subscription, invoice and refund events are selected.
+6. Click **Connect Kit**.
+
+Kelviq checks the key and adds the three custom fields, without adding any subscriber.
+
+## Start an automation from a tag
+
+1. In Kit, open **Automate → Visual automations → New automation**.
+2. Choose the entry point **Is added to a tag**, and pick a Kelviq tag, for example `kelviq-payment-failed`. If the tag isn't there yet, it appears after the first event that uses it.
+3. Add your emails and other steps, then publish the automation.
+
+<Note>
+  Connections are separate for sandbox and live. If you connect Kit while in [sandbox mode](/guides/sandbox), only sandbox events are sent. Use a separate Kit account for sandbox, so test customers don't get your real emails.
+</Note>
+
+## Manage a connection
+
+Open **Settings → Integrations → Configure Kit** to see your connections. For each one you can:
+
+- **Send test**: check the key still works. No subscriber or tag is created.
+- **Edit events**: change which events are sent, then click **Save events**.
+- **Disconnect**: stop updating Kit. Subscribers and tags stay in Kit.
+
+Each connection is a Kelviq webhook endpoint, so it also appears under **Settings → Webhooks**, named `Kit: <name>`. There you can see every delivery and resend one that failed. Your API key is stored encrypted and is never shown.
+
+## Troubleshooting
+
+| Error | What to do |
+| --- | --- |
+| Kit did not accept this API key | The key was deleted, mistyped or is an old V3 key. Create a new key in **Settings → Developer**, then disconnect and connect again. |
+| … has no customer email for a Kit subscriber | The Kelviq customer has no email. |
+| Kit returned an error: … | Kit's own message says what's wrong, for example an email address it can't accept. |
+
+If Kit is briefly unavailable or rate limits your account, Kelviq retries the delivery automatically.
+
+## Prefer code?
+
+Use [webhooks](/guides/webhooks) to receive the same events in your own backend and update Kit your own way.
