@@ -1,0 +1,478 @@
+---
+title: "Migrate from Lemon Squeezy"
+sidebarTitle: "Migrate from Lemon Squeezy"
+description: "Import your Lemon Squeezy store into Kelviq, start selling on Kelviq, and plan what happens to your existing subscribers."
+keywords: ['Lemon Squeezy', 'migration', 'import', 'migrate', 'switch to Kelviq']
+---
+
+Kelviq imports your Lemon Squeezy store for you. Your products, plans, customers, order history, discount codes, files, and license keys arrive in your Kelviq organization. Your plans are published and your discount codes work at checkout, so they are ready to sell as soon as the import finishes. A report is emailed to you at the end.
+
+<Tip>
+Import by January 31, 2027 and you pay 2.9% + 40¢ on your first &#36;50,000 in sales. See the [special offer](#special-offer).
+</Tip>
+
+<Frame>
+  <video
+    controls
+    preload="metadata"
+    poster="/images/guides/migrate-from-lemon-squeezy-cover.webp"
+    src="/videos/migrate-from-lemon-squeezy.mp4"
+    style={{ width: "100%", aspectRatio: "16 / 9" }}
+  >
+    Your browser does not support the video tag.
+  </video>
+</Frame>
+
+---
+
+## Four ways to move
+
+Each one runs the same import on Kelviq's servers and ends with the same report in your inbox. Run it yourself, or have our team do it.
+
+<CardGroup cols={3}>
+  <Card title="CLI" icon="terminal" href="#run-the-import">
+    One command in your terminal.
+  </Card>
+  <Card title="AI agent" icon="wand-magic-sparkles" href="#run-the-import">
+    One sentence to your coding agent.
+  </Card>
+  <Card title="API" icon="code" href="#run-the-import">
+    One `POST` request from your backend.
+  </Card>
+</CardGroup>
+
+<Card title="Done for you, by a dedicated person on our team" icon="headset" href="#have-kelviq-run-it-for-you" horizontal>
+  One person at Kelviq runs the import, checks it against your Lemon Squeezy store with you, and stays your contact until the move is done.
+</Card>
+
+Whichever you pick, start with a dry run: the whole import is rehearsed, nothing is saved, and the report shows what a real run would do. The rest of this guide covers what the import brings over, how to run it, and how to move your app.
+
+---
+
+## Special offer
+
+Lemon Squeezy charged 5% + 50¢ per transaction. Move your store to Kelviq and you pay 2.9% + 40¢ on your first &#36;50,000 in sales. On that volume you keep over &#36;1,000 more. Other organizations get this rate on their first &#36;5,000.
+
+| | |
+| --- | --- |
+| **Rate** | 2.9% + 40¢ per transaction on your first &#36;50,000 in sales. |
+| **Who gets it** | Any organization that imports a Lemon Squeezy store with past orders into production. |
+| **Import by** | January 31, 2027. |
+| **Time to use it** | Six months on Kelviq. After that, or once you pass &#36;50,000, the standard 3.5% + 40¢ applies. |
+
+- **Nothing to claim.** The import is the proof. We apply the rate to your organization once your production import finishes, and confirm it by email.
+- **A dry run is free.** It rehearses the whole import, saves nothing, and does not start the six months. Neither does a sandbox import.
+- **Lemon Squeezy keeps running.** The import does not change your store there and does not email your customers. You switch your checkout when you are ready.
+- **Kelviq can run it for you.** A dedicated person on our team [does the import with you](#have-kelviq-run-it-for-you), at no charge.
+
+Start with a [dry run](#run-the-import).
+
+---
+
+## Where your existing customers stand
+
+The move happens on two tracks, and you can start the first one today.
+
+| | What happens |
+| --- | --- |
+| **New sales** | Go through Kelviq as soon as your app points at Kelviq checkout. The import publishes your plans. |
+| **Existing subscriptions** | Are imported as history. They keep renewing on Lemon Squeezy until it stops processing payments on March 31, 2027. Kelviq does not charge them. |
+
+Your customers are not emailed during the import, and no webhooks fire for imported records. Nothing changes for a buyer until you change your app.
+
+To keep those subscribers paying after March 31, 2027, do one of two things: have Kelviq move them (write to [hi@kelviq.com](mailto:hi@kelviq.com)), or have them subscribe again on Kelviq before their last Lemon Squeezy renewal.
+
+<Note>
+To move active subscriptions and saved cards so that renewals continue on Kelviq, write to [hi@kelviq.com](mailto:hi@kelviq.com) before you choose a destination in Lemon Squeezy's migration form. Lemon Squeezy only lets subscriptions paid by card move to another provider.
+</Note>
+
+---
+
+## Key dates
+
+These dates are Lemon Squeezy's published schedule, plus the last day to qualify for Kelviq's [special offer](#special-offer).
+
+| Date | What happens |
+| --- | --- |
+| November 16, 2026 | Lemon Squeezy stopped accepting new stores. |
+| Mid-January 2027 | Lemon Squeezy's recommended latest date to start moving. |
+| January 31, 2027 | Last day to import your store and get Kelviq's special offer. |
+| March 31, 2027 | Lemon Squeezy stops processing payments, including subscription renewals. |
+Export anything you want to keep from Lemon Squeezy before March 31, 2027. The import below copies your sales history into Kelviq, so it is worth running well ahead of that date. Allow time for Kelviq's [business review](/getstarted/review-process) as well: it has to finish before you can take live payments.
+
+---
+
+## What the import brings over
+
+The import runs as eight steps, in this order. You can run all of them or pick a subset.
+
+| Step | What arrives in Kelviq |
+| --- | --- |
+| `store` | Your organization name, and the website, logo and country on your business profile. Fields you have already filled in are left alone. |
+| `products` | Your products, and one [plan](/product-catalog/plans) for each Lemon Squeezy variant, with its price, trial, license settings and links. |
+| `customers` | Your customers. One whose email already exists in your organization is linked, not duplicated. |
+| `files` | Each variant's downloadable files, attached to its plan as [digital downloads](/product-catalog/digital-downloads). |
+| `orders` | Orders with their invoices, and the subscription record behind each paid order. |
+| `renewals` | Subscription renewal payments, as renewal orders with invoices. |
+| `discounts` | [Discount codes](/product-catalog/discounts) with their limits and redemption counts. |
+| `licenses` | [License keys](/product-catalog/license-keys) and their activations. |
+
+Later steps build on earlier ones: `orders` needs `products`, and `renewals` and `licenses` need `orders`. A license key is imported only if its order was.
+
+Not part of the import: affiliate programs, email subscriber lists, and storefront pages.
+
+---
+
+## Before you start
+
+You need four things. If [our team runs the import for you](#have-kelviq-run-it-for-you), you only need the first and the third.
+
+1. **A Kelviq organization.** Create one at [app.kelviq.com](https://app.kelviq.com). The person who creates it is its owner.
+2. **A Kelviq Server API Key created by the organization owner.** Create it under **Settings → API keys** while signed in as the owner. A server key created by another team member, a Client API Key, or a dashboard session is refused with `403`. Sandbox and production each have their own keys.
+3. **A Lemon Squeezy API key.** Create one in your Lemon Squeezy dashboard under **Settings → API**.
+4. **Your Lemon Squeezy store id.** It is the number shown next to your store under **Settings → Stores**. One store is imported per run. A single Lemon Squeezy API key can reach several stores, so repeat the run with each store's id.
+
+<Warning>
+Both keys are secrets. Keep them in an env file or your shell, never in source control or a chat window.
+</Warning>
+
+---
+
+## The path, start to finish
+
+Kelviq keeps [sandbox and production](/guides/sandbox) separate. Each has its own data and its own keys, and nothing imported into one appears in the other. A dry run previews only the environment it ran in. The import goes into sandbox unless you choose production, so rehearse the whole move in sandbox, then repeat it in production.
+
+### In sandbox
+
+1. [Do a dry run](#run-the-import). Nothing is saved.
+2. [Read the report](#read-the-report) that is emailed to you.
+3. Run the real import. It publishes your plans and switches on your discount codes.
+4. [Review your plans and discount codes](#1-review-your-plans-and-discount-codes).
+5. [Add Kelviq to your app](#2-add-the-kelviq-equivalent-of-each-lemon-squeezy-call) with sandbox keys.
+6. [Test payments](#4-test-before-you-go-live) end to end.
+
+### In production
+
+1. Complete the [business review](/getstarted/review-process).
+2. Store a production key with `kelviq login --prod`.
+3. Do a dry run with `--prod` and read its report.
+4. Run the real import with `--prod`. Your plans are live as soon as it finishes.
+5. Review your plans and discount codes.
+6. Register your webhook endpoint with `--prod`.
+7. Switch your app to production keys. See [Prepare for production](/guides/sandbox#prepare-for-production).
+
+Sales keep arriving on Lemon Squeezy while you switch. [Run the import again](#5-run-the-import-again-to-catch-up) to bring them in.
+
+---
+
+## Run the import
+
+Start with a dry run. It goes through the whole import, saves nothing, and emails you a report of what a real run would do. The examples below import into sandbox.
+
+<Tabs>
+
+<Tab title="CLI">
+
+Install the [Kelviq CLI](/cli/overview) and store your Kelviq key with `kelviq login`. To import into production, store a production key as well with `kelviq login --prod`.
+
+The command needs your Lemon Squeezy API key. Give it either way:
+
+* **From an env file.** The command reads `LEMONSQUEEZY_API_KEY` from `.env.local` or `.env` in the folder you run it from. Many apps already have it there.
+* **At the prompt.** Run the command without the variable set and paste the key when asked. The input is masked.
+
+Kelviq uses the key for this import only. It is never returned in a response or included in the report email.
+
+Preview the import:
+
+```bash
+kelviq import lemon-squeezy --store 12345 --dry-run
+```
+
+When the report looks right, run it for real. The command shows what it is about to do and asks before it starts:
+
+```bash
+kelviq import lemon-squeezy --store 12345
+```
+
+Add `--prod` to either command to import into production. The Lemon Squeezy key is never taken as a flag and never printed. See the [command reference](/cli/commands#kelviq-import) for every option.
+
+</Tab>
+
+<Tab title="AI agent">
+
+With the [Agent Toolkit](/guides/agent-toolkit) or the [MCP server](/guides/mcp-server) installed, set `LEMONSQUEEZY_API_KEY` in the same place as `KELVIQ_SERVER_API_KEY`:
+
+* your shell profile, if your client reads keys from the shell
+* the `env` block of the server entry in your MCP client's config, otherwise
+
+Restart the client so the server picks up the key. Then ask your agent:
+
+> *Do a dry run of importing my Lemon Squeezy store 12345 into Kelviq.*
+
+The agent calls the `import_start` tool. The server reads the Lemon Squeezy key from its environment, so the key never appears in the conversation. Imports go to sandbox unless the server runs with `KELVIQ_ENV=production` and a production key. The tool's result names the environment and reminds the assistant that there is nothing to poll.
+
+Once you have read the report, tell the agent to run the real import. With the toolkit's `migrate-to-kelviq` skill, the agent can also find the Lemon Squeezy calls in your codebase and add their Kelviq equivalents.
+
+</Tab>
+
+<Tab title="API">
+
+Call [Start a Lemon Squeezy import](/api-reference/imports/start-a-lemon-squeezy-import) from a backend or your terminal:
+
+```bash
+curl -X POST "https://sandboxapi.kelviq.com/api/v1/integrations/lemon-squeezy/migrate/" \
+  -H "Authorization: Bearer $KELVIQ_SERVER_API_KEY" \
+  -H "Content-Type: application/json" \
+  -d '{"apiKey": "'"$LEMONSQUEEZY_API_KEY"'", "storeId": "12345", "dryRun": true}'
+```
+
+A `202` response means the import is queued:
+
+```json
+{
+  "status": "queued",
+  "taskId": "6f1c2f0e-8d3a-4a57-9b1e-2c1d5e7a9f10",
+  "storeName": "Acme Apps",
+  "steps": ["store", "products", "customers", "files", "orders", "renewals", "discounts", "licenses"],
+  "dryRun": true,
+  "reportEmail": "owner@example.com",
+  ...
+}
+```
+
+This request imports into sandbox, so it needs a sandbox key. To import into production, use `https://api.kelviq.com/api/v1` with a production key.
+
+</Tab>
+
+</Tabs>
+
+The import runs in the background and can take from a few seconds to more than an hour for a large store. There is no progress to check; the report email tells you when it is done.
+
+### Choose what to import
+
+| Option | CLI flag | API field | Effect |
+| --- | --- | --- | --- |
+| Preview only | `--dry-run` | `dryRun` | Saves nothing and emails the report. |
+| Pick steps | `--only`, `--skip` | `only`, `skip` | Run some steps, or leave some out. |
+| Pick sales | `--orders` | `orderType` | All sales, one-time purchases only, or subscriptions only. |
+| Keep plans as drafts | `--no-publish-plans` | `publishPlan: false` | Plans arrive as drafts for you to review and publish. Without it, each plan is published and can be sold straight away. |
+| Keep discount codes off | `--no-publish-discounts` | `publishDiscount: false` | Codes arrive switched off. Without it, they work at checkout straight away. |
+| Send the report elsewhere | `--report-email` | `reportEmail` | Defaults to the organization owner. |
+
+---
+
+## Have Kelviq run it for you
+
+If you would rather not run anything yourself, a dedicated person on the Kelviq team does the migration with you. You deal with the same person from your first email to the final check.
+
+1. **Create your Kelviq organization** at [app.kelviq.com](https://app.kelviq.com).
+2. **Create a Lemon Squeezy API key just for the move.** In your Lemon Squeezy dashboard, go to **Settings → API** and create a new key. Do not reuse the key your app runs on.
+3. **Share the key and your store id** with us at [hi@kelviq.com](mailto:hi@kelviq.com), from the email address on your Kelviq account.
+4. **Your migration contact does the rest.** They do a dry run and send you the report. Once you approve it, they run the import, then check your plans, discount codes and license keys against your Lemon Squeezy store with you.
+5. **Delete the key** in Lemon Squeezy as soon as we confirm the import is finished, so it only lives as long as the move does.
+
+Adding Kelviq checkout and webhooks to your app is still a change in your code. The same person helps you through [those steps](#2-add-the-kelviq-equivalent-of-each-lemon-squeezy-call) too.
+
+---
+
+## Read the report
+
+One email arrives when the import ends, whether it succeeded or stopped.
+
+| Subject | Meaning |
+| --- | --- |
+| Lemon Squeezy import finished | Everything was imported. |
+| Lemon Squeezy import finished with failures | The import completed, but some records could not be imported. They are listed, and retried the next time you run it. |
+| Lemon Squeezy import failed | The import stopped part-way. The email names the step and the error. Everything imported before that point is kept. |
+
+A dry run adds "(dry run, nothing saved)" to the subject.
+
+The report contains:
+
+* the store and the organization it went into
+* a count for each record type, for example "Orders: 1,204 created, 3 skipped"
+* the totals charged, tax and refunds from Lemon Squeezy, to compare with Kelviq's gross volume
+* up to 50 warnings for anything that was skipped or imported differently
+* the start time, the duration and the steps that ran
+
+---
+
+## After the import
+
+### 1. Review your plans and discount codes
+
+The import publishes each plan, so it can be bought as soon as your app points at it, and your discount codes work at checkout. Open **Product Catalog → Products** in the dashboard and check each plan's price and settings against its variant in Lemon Squeezy. `kelviq status` lists every plan with its price and entitlement counts.
+
+Then read the report's warnings. Two cases need you:
+
+* **A plan that could not be published** stays a draft and is named in the report. Publish it in the dashboard.
+* **A discount code limited to plans that are not published** stays switched off. Publish those plans, then run the import again to switch the code on.
+
+To review everything before it can be bought, import with `--no-publish-plans` and `--no-publish-discounts` (`publishPlan: false` and `publishDiscount: false` in the API). When you are ready, run the import again without them: it publishes the plans it left as drafts and switches on the codes.
+
+### 2. Add the Kelviq equivalent of each Lemon Squeezy call
+
+Existing subscribers still use the Lemon Squeezy calls in your app, so add the Kelviq ones beside them.
+
+| In Lemon Squeezy | In Kelviq |
+| --- | --- |
+| Store | Organization |
+| Product | [Product](/product-catalog/products) |
+| Variant | [Plan](/product-catalog/plans) |
+| Checkout link | A [checkout session](/backend-integration/node-sdk#checkout) created with `client.checkout.createSession`, or a [static checkout URL](/checkout/static-checkout-url) |
+| Webhook with an `X-Signature` header | A [Kelviq webhook](/guides/webhooks), verified with `validateEvent` ([Node](/backend-integration/node-sdk#webhooks)) or `validate_event` ([Python](/backend-integration/python-sdk#webhooks)) |
+| License API (`activate`, `validate`, `deactivate`) | From your backend, `client.license.activate`, `client.license.validate` and `client.license.deactivate`. In an app you ship to customers, the [license endpoints](/product-catalog/license-keys#authentication) with a **Client API Key**, never a server key |
+| Customer portal URL | A [portal session](/backend-integration/node-sdk#portal) from `client.portal.createSession`; append the returned `token` to `customerPortalUrl` to build the link you send the customer |
+| Discount code | [Discount code](/product-catalog/discounts) |
+
+Copies of your app that are already installed keep calling Lemon Squeezy's license API until your users update. Ship the license change well before March 31, 2027.
+
+Creating a checkout and verifying a webhook look like this in Node. `body` is the raw request body, and `client` is your [Kelviq client](/backend-integration/node-sdk#configuring-the-client).
+
+<CodeGroup>
+
+```typescript Lemon Squeezy
+import crypto from "node:crypto";
+import { createCheckout } from "@lemonsqueezy/lemonsqueezy.js";
+
+// Create a checkout
+const { data } = await createCheckout(storeId, variantId, {
+  productOptions: { redirectUrl: "https://yourwebsite.com/checkout/success" },
+});
+const checkoutUrl = data?.data.attributes.url;
+
+// Verify a webhook
+const digest = crypto
+  .createHmac("sha256", process.env.LEMONSQUEEZY_WEBHOOK_SECRET!)
+  .update(body)
+  .digest("hex");
+const signature = request.headers.get("X-Signature") ?? "";
+const valid =
+  digest.length === signature.length &&
+  crypto.timingSafeEqual(Buffer.from(digest), Buffer.from(signature));
+```
+
+```typescript Kelviq
+import { CHARGE_PERIOD_CHOICES, validateEvent } from "@kelviq/node-sdk";
+
+// Create a checkout
+const response = await client.checkout.createSession({
+  planIdentifier: "plan-pro-monthly",
+  chargePeriod: CHARGE_PERIOD_CHOICES.MONTHLY,
+  successUrl: "https://yourwebsite.com/checkout/success",
+  customerId: "cust_789",
+});
+const checkoutUrl = response.checkoutUrl;
+
+// Verify a webhook. validateEvent throws WebhookVerificationError if the signature is invalid
+const event = validateEvent(
+  body,
+  Object.fromEntries(request.headers),
+  process.env.KELVIQ_WEBHOOK_SECRET!,
+);
+```
+
+</CodeGroup>
+
+Webhook events map as follows.
+
+| Lemon Squeezy event | Kelviq event |
+| --- | --- |
+| `order_created` | `checkout.completed`, `order.created` |
+| `order_refunded` | `order.refunded` |
+| `subscription_created` | `subscription.created` |
+| `subscription_updated` | `subscription.updated`, `subscription.plan_changed` |
+| `subscription_cancelled` | `subscription.updated` (the end date is set while the period runs out) |
+| `subscription_resumed` | `subscription.updated` (a scheduled cancellation was undone). Not Kelviq's `subscription.resumed`, which is for pauses |
+| `subscription_expired` | `subscription.cancelled` |
+| `subscription_paused`, `subscription_unpaused` | `subscription.paused`, `subscription.resumed` |
+| `subscription_payment_success`, `subscription_payment_recovered` | `invoice.paid` |
+| `subscription_payment_failed` | `invoice.payment_failed` |
+| `subscription_payment_refunded` | `order.refunded`, `refund.created` |
+| `license_key_created` | No separate event. The key is issued with the order (`order.created`) |
+
+Register your endpoint and write its signing secret into your env file in one command. List every event your handler uses:
+
+```bash
+kelviq webhook add https://app.example.com/api/kelviq/webhooks --events checkout.completed,order.refunded,subscription.created,subscription.updated,subscription.cancelled,invoice.paid,invoice.payment_failed --write-secret .env.local
+```
+
+### 3. Keep the Lemon Squeezy path running
+
+Existing subscribers still renew on Lemon Squeezy. Keep your Lemon Squeezy webhook handler, its signing secret, and the Lemon Squeezy portal link those subscribers use. Record which platform each subscription bills on, so that portal and cancel actions go to the right one. Remove the Lemon Squeezy path only when no subscription is billing there any more.
+
+### 4. Test before you go live
+
+Run a purchase end to end in sandbox with the cards in [Test payments](/guides/test-payments), and confirm your app grants access from the Kelviq webhook.
+
+### 5. Run the import again to catch up
+
+Sales and refunds keep happening on Lemon Squeezy while you switch. Run the full import again; it only adds what is new, including license keys issued since. Records that were already imported are skipped, and refunds made since the last run are picked up.
+
+If you imported with `--no-publish-plans` or `--no-publish-discounts` and want to keep reviewing, pass them again. Without them, the catch-up run publishes the plans and switches on the codes.
+
+```bash
+kelviq import lemon-squeezy --store 12345
+```
+
+If you sell no license keys, `--only orders,renewals` is quicker:
+
+```bash
+kelviq import lemon-squeezy --store 12345 --only orders,renewals
+```
+
+---
+
+## Common questions
+
+<AccordionGroup>
+
+<Accordion title="The import was rejected. What do I check?">
+A `400` with `Lemon Squeezy rejected the API key or the store id.` or `Lemon Squeezy store 12345 was not found for this API key.` means the Lemon Squeezy key or the store id is wrong. Check both. To list the store ids your key can reach, run this in a shell where `LEMONSQUEEZY_API_KEY` is set:
+
+```bash
+curl -s -H "Authorization: Bearer $LEMONSQUEEZY_API_KEY" -H "Accept: application/vnd.api+json" https://api.lemonsqueezy.com/v1/stores
+```
+</Accordion>
+
+<Accordion title="It says an import is already running. What do I do?">
+Only one import runs per organization at a time, and a second request is refused with `409`. Wait for the report from the first.
+</Accordion>
+
+<Accordion title="The report email did not arrive. What happened?">
+Large stores can take over an hour, so allow time first. No report is sent in two cases:
+
+* You started a second import while one was running. Only the first one reports.
+* The import could not start within 24 hours.
+
+After 24 hours, run the import again. If that returns `409` and still no report arrives, contact [hi@kelviq.com](mailto:hi@kelviq.com) with the `taskId` from the response. Support can clear a run that stopped.
+</Accordion>
+
+<Accordion title="My discount codes are not working at checkout. Why?">
+Codes work at checkout as soon as the import finishes, with two exceptions: a code limited to plans that are not published, and every code if you imported with `--no-publish-discounts`. The report names each code that is waiting on a plan. Publish the plans it is limited to, then run the import again; it switches on the codes that are still off.
+</Accordion>
+
+<Accordion title="I got a 403. What does it mean?">
+Read the `detail` in the response.
+
+| `detail` | What to do |
+| --- | --- |
+| `Use a server key created by the organization owner.` | Have the organization owner create the Server API Key, and use that one. |
+| `Invalid Bearer Token` | The Kelviq key is wrong, or it belongs to the other environment. A sandbox key only works against sandbox, and a production key against production. |
+</Accordion>
+
+<Accordion title="Do imported sales show up in my analytics?">
+Yes, imported sales are added to revenue analytics. Pass `--skip-analytics` (`skipAnalytics` in the API) to leave them out.
+</Accordion>
+
+</AccordionGroup>
+
+---
+
+## Related
+
+* [Start a Lemon Squeezy import](/api-reference/imports/start-a-lemon-squeezy-import) is the API reference for the import.
+* [Kelviq CLI commands](/cli/commands#kelviq-import) lists every `kelviq import` option.
+* [Agent Toolkit](/guides/agent-toolkit) covers the skill that helps an AI agent move your app's code.
+* [Webhooks](/guides/webhooks) lists every Kelviq event and how to verify it.
+* [Sandbox](/guides/sandbox) explains environments and keys.

@@ -8,11 +8,11 @@ Subscriptions are the default for traditional SaaS products. You charge customer
 ## Set up recurring billing
 
 <Frame>
-  <img src="/images/subscription-pricing.webp" />
+  <img src="/images/subscription-pricing.webp" alt="Base price with Monthly, Yearly and 3 months selected and a USD price for each" />
 </Frame>
 
-1. Open a draft plan and make sure it is set to **Paid**.
-2. Under **Billing cycles**, select the recurring intervals you want to offer, such as **28 days**, **Monthly**, **3 Months**, **6 Months**, or **Yearly**.
+1. Open a draft plan, click **Set price** in the **Price** section, and leave **Free plan** turned off.
+2. Under **Base price**, select the recurring intervals you want to offer, such as **28 days**, **Monthly**, **3 months**, **6 months**, or **Yearly**.
 3. Enter the price for each interval.
 4. Click **Save**.
 
@@ -26,7 +26,7 @@ You can enable multiple intervals on one plan. Customers choose among the enable
 
 Kelviq handles recurring payments automatically. This includes:
 
-* Charging the saved payment method at the end of each billing cycle
+* Charging the saved payment method at each renewal
 * Sending receipts and tax invoices
 * Retrying failed card payments
 * Applying prorated charges when a customer changes plans during a billing cycle
@@ -126,7 +126,7 @@ On resume, entitlements come back with usage reset to zero and a fresh period.
 
 The subscription has `status: "paused"`, `pausedAt`, and `pauseResumesAt` (`null` for an open-ended pause). Kelviq sends `subscription.paused` and `subscription.resumed` [webhooks](/guides/webhooks), whichever surface the change came from. Webhook payloads use snake_case, so the same fields arrive there as `paused_at` and `pause_resumes_at`. Renewals that would fall inside the pause are skipped silently, so a paused subscription sends no other events until it resumes.
 
-If you cache entitlement checks, clear them when you receive `subscription.paused`, otherwise the customer keeps access until the cache expires. Both SDKs have a call for it: `client.entitlements.invalidateCache({ customerId })` in Node and `client.entitlements.invalidate_cache(customerId=...)` in Python.
+If you cache entitlement checks, the customer keeps access until the cache expires. The Kelviq SDKs cache entitlements for 60 seconds by default: lower the window (`cacheTtlMs` in Node, `cache_ttl` in Python) or turn caching off if a pause has to take effect sooner. If you keep your own cache, clear it when you receive `subscription.paused`.
 
 ### Retention offers
 

@@ -6,7 +6,7 @@ description: Set up lead magnets and trial periods
 You do not always need to charge upfront. Kelviq lets you offer completely free plans or time restricted trials to help acquire users.
 
 <Frame>
-  <img src="/images/configure-price-plain.webp" />
+  <img src="/images/free-paid.webp" alt="Base price with the Free plan switch highlighted" />
 </Frame>
 
 ## Free plans
@@ -14,12 +14,12 @@ You do not always need to charge upfront. Kelviq lets you offer completely free 
 Use a free plan to offer a permanent zero cost tier. This is perfect for open source products, lead magnets, or a basic hobby tier where you want to gather signups without requiring a credit card.
 
 <Frame>
-  <img src="/images/free-paid.webp" />
+  <img src="/images/free-and-trials/free-plan-on.webp" alt="Base price with Free plan turned on: Customers will not be charged for this plan" />
 </Frame>
 
-1. Open your draft plan
-2. Toggle the switch in the top right from Paid to Free
-3. Save your changes
+1. Open your draft plan and click **Set price** in the **Price** section (or the edit icon if the plan already has a price).
+2. Turn on **Free plan** at the top right of **Base price**. You can only mark a plan as free while it's in draft.
+3. Click **Save**.
 
 Users who select this plan bypass the payment step entirely. They still get access to the customer portal and any deliverables or entitlements attached to the plan.
 
@@ -32,7 +32,7 @@ Entitlement checks return `false` for a customer Kelviq has never seen, so a fre
 
 Keep that order, and enrol at signup, before the customer reaches checkout. Creating a subscription for a customer Kelviq has not seen fails with `Subscription requires a customer with a valid email address` — and the failed attempt still registers the customer, without an email. Creating a checkout session with a `customerId` registers the customer the same way. From then on `POST /customers/` answers `Customer already exists`, and the portal refuses that customer too. Recover by patching the email onto the existing record with `PATCH /customers/{customerId}/`, after which the subscription call succeeds. Treat `Customer already exists` as a signal to patch rather than an error to surface.
 
-Enrolling this way also records a $0 order for the plan.
+Enrolling this way also records a \$0 order for the plan.
 
 Check for an existing subscription first, with `customer_id` on `GET /subscriptions/`. Creating a second subscription for the same customer is allowed: the new one becomes `active` and the previous one becomes `superseded`. Nothing breaks, but enrolling on every visit churns through subscription records for no reason.
 
@@ -45,12 +45,12 @@ Free trials let customers test a paid plan for a specific number of days before 
 </Note>
 
 <Frame>
-  <img src="/images/billing-cycle.webp" />
+  <img src="/images/billing-cycle.webp" alt="The price editor with recurring billing periods selected and Free trial turned on for 14 days" />
 </Frame>
 
 1. Open a paid plan draft.
 2. Enable at least one recurring billing cycle, such as **28 days**, **Monthly**, or **Yearly**.
-3. Enable **Free trial**.
+3. Turn on **Free trial**.
 4. Enter the number of days the trial should last.
 
 If you later disable the final recurring billing cycle and leave only one-time pricing, Kelviq removes the trial from the one-time offer.

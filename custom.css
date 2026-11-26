@@ -104,9 +104,11 @@ img.sidebar-group-icon { object-position: -9999px 0; -webkit-mask-size: contain;
 html.dark img.sidebar-group-icon { background-color: rgb(140 135 132); }
 img.sidebar-group-icon[src$="/icons/book-open.svg"] { -webkit-mask-image: url(/icons/book-open.svg); mask-image: url(/icons/book-open.svg); }
 img.sidebar-group-icon[src$="/icons/box.svg"] { -webkit-mask-image: url(/icons/box.svg); mask-image: url(/icons/box.svg); }
+img.sidebar-group-icon[src$="/icons/chart-bar-trend-up.svg"] { -webkit-mask-image: url(/icons/chart-bar-trend-up.svg); mask-image: url(/icons/chart-bar-trend-up.svg); }
 img.sidebar-group-icon[src$="/icons/credit-card.svg"] { -webkit-mask-image: url(/icons/credit-card.svg); mask-image: url(/icons/credit-card.svg); }
 img.sidebar-group-icon[src$="/icons/gavel.svg"] { -webkit-mask-image: url(/icons/gavel.svg); mask-image: url(/icons/gavel.svg); }
 img.sidebar-group-icon[src$="/icons/gear.svg"] { -webkit-mask-image: url(/icons/gear.svg); mask-image: url(/icons/gear.svg); }
+img.sidebar-group-icon[src$="/icons/plug-connect.svg"] { -webkit-mask-image: url(/icons/plug-connect.svg); mask-image: url(/icons/plug-connect.svg); }
 img.sidebar-group-icon[src$="/icons/receipt.svg"] { -webkit-mask-image: url(/icons/receipt.svg); mask-image: url(/icons/receipt.svg); }
 img.sidebar-group-icon[src$="/icons/rocket.svg"] { -webkit-mask-image: url(/icons/rocket.svg); mask-image: url(/icons/rocket.svg); }
 img.sidebar-group-icon[src$="/icons/shield-check.svg"] { -webkit-mask-image: url(/icons/shield-check.svg); mask-image: url(/icons/shield-check.svg); }
@@ -168,3 +170,11 @@ img.kq-art { display: block !important; width: 100% !important; height: auto !im
 .dark .kq-card p, .dark .kq-section-title { color: rgb(156 150 147); }
 .dark img.kq-art { background: rgb(255 255 255 / 0.03); border-color: rgb(255 255 255 / 0.06); }
 .dark .kq-ico { background-color: rgb(var(--primary-light)); }
+
+/* Columns: keep the same gap between rows as between columns (Mintlify leaves row-gap at 0) */
+.columns { row-gap: 16px; }
+/* Two images in a row: Mintlify gives Frame wrappers no margin, so back-to-back frames touch */
+:not(.columns) > div:has(> .frame) + div:has(> .frame) { margin-top: 16px; }
+/* A Frame directly followed by a Columns grid */
+div:has(> .frame) + .columns { margin-top: 16px; }
+.columns + div:has(> .frame) { margin-top: 16px; }

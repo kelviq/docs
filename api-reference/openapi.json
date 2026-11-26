@@ -99,6 +99,10 @@
     {
       "name": "Checkout Session Events",
       "description": "Timeline events for a specific checkout session."
+    },
+    {
+      "name": "Imports",
+      "description": "Bring an existing store from another platform into your Kelviq organization."
     }
   ],
   "components": {
@@ -517,6 +521,13 @@
               "order_ref": "ABC-123",
               "source": "pricing_page"
             }
+          },
+          "customization": {
+            "type": "object",
+            "additionalProperties": true,
+            "nullable": true,
+            "description": "Optional free-form object of checkout page customizations (colors, fonts, layout). Stored on the session and returned as `customization` in checkout session responses.",
+            "example": {}
           }
         }
       },
@@ -1026,6 +1037,26 @@
             "nullable": true,
             "description": "The IP Address of the customer, used for location-based pricing.",
             "example": "103.154.35.20"
+          },
+          "cancelUrl": {
+            "type": "string",
+            "format": "url",
+            "nullable": true,
+            "description": "The URL to which the user will be redirected if the payment is cancelled.",
+            "example": "https://kelviq.com/checkout/cancel"
+          },
+          "trialPeriod": {
+            "type": "integer",
+            "minimum": 1,
+            "nullable": true,
+            "description": "The number of trial days to apply. When provided, this overrides the trial period configured on the selected plan.",
+            "example": 14
+          },
+          "currencyCode": {
+            "type": "string",
+            "nullable": true,
+            "description": "The currency to bill the subscription in (e.g. 'USD'). Honoured for server API keys only.",
+            "example": "USD"
           }
         }
       },
@@ -1227,6 +1258,20 @@
             "nullable": true,
             "description": "The IP Address of the customer, used for location-based pricing.",
             "example": "103.154.35.20"
+          },
+          "successUrl": {
+            "type": "string",
+            "format": "url",
+            "nullable": true,
+            "description": "The URL to which the user will be redirected after a successful subscription creation. Optional.",
+            "example": "https://kelviq.com/subscription/success"
+          },
+          "cancelUrl": {
+            "type": "string",
+            "format": "url",
+            "nullable": true,
+            "description": "The URL to which the user will be redirected if the payment is cancelled.",
+            "example": "https://kelviq.com/checkout/cancel"
           }
         }
       },
@@ -1386,6 +1431,11 @@
             ],
             "description": "Dictates how the usage is updated. SET replaces, DELTA increments.",
             "example": "SET"
+          },
+          "resourceId": {
+            "type": "string",
+            "description": "Optional. The resource (product instance) this usage belongs to, for customers holding several instances of a product.",
+            "example": "workspace_42"
           }
         }
       },
@@ -2659,7 +2709,25 @@
             "type": "string"
           },
           "product": {
-            "type": "string"
+            "type": "object",
+            "properties": {
+              "name": {
+                "type": "string",
+                "description": "The name of the product.",
+                "example": "Invoice Test"
+              },
+              "id": {
+                "type": "string",
+                "format": "uuid",
+                "description": "The unique identifier of the product.",
+                "example": "88e437b8-6017-405b-9328-e0f4e140bb79"
+              },
+              "identifier": {
+                "type": "string",
+                "description": "The identifier of the product.",
+                "example": "invoice-test"
+              }
+            }
           },
           "plan": {
             "$ref": "#/components/schemas/SubscriptionPlan"
@@ -2694,6 +2762,13 @@
           "recurrenceType": {
             "type": "string",
             "nullable": true
+          },
+          "nextInvoiceDate": {
+            "type": "string",
+            "format": "date-time",
+            "nullable": true,
+            "description": "When the next invoice will be issued.",
+            "example": "2026-08-28T10:46:34Z"
           },
           "files": {
             "type": "array",
@@ -2752,6 +2827,18 @@
             "nullable": true,
             "description": "Optional free-form cancellation comment."
           },
+          "pausedAt": {
+            "type": "string",
+            "format": "date-time",
+            "nullable": true,
+            "description": "When the subscription was paused; null if it is not paused."
+          },
+          "pauseResumesAt": {
+            "type": "string",
+            "format": "date-time",
+            "nullable": true,
+            "description": "When a paused subscription is scheduled to resume."
+          },
           "createdOn": {
             "type": "string",
             "format": "date-time",
@@ -2761,6 +2848,66 @@
             "type": "string",
             "format": "date-time",
             "example": "2026-08-01T10:15:00Z"
+          },
+          "discount": {
+            "type": "object",
+            "nullable": true,
+            "additionalProperties": true,
+            "description": "The discount in force and what it does to the price over time; null when there is none. Returned on the detail endpoint only, not on list rows.",
+            "properties": {
+              "code": {
+                "type": "string",
+                "example": "WELCOME20"
+              },
+              "name": {
+                "type": "string",
+                "example": "Welcome offer"
+              },
+              "label": {
+                "type": "string",
+                "description": "Short display label, e.g. `20% off`.",
+                "example": "20% off"
+              },
+              "discountType": {
+                "type": "string",
+                "example": "PERCENTAGE"
+              },
+              "percentageOff": {
+                "type": "integer",
+                "nullable": true,
+                "example": 20
+              },
+              "amountOff": {
+                "type": "string",
+                "nullable": true,
+                "example": null
+              },
+              "duration": {
+                "type": "string",
+                "example": "REPEATING"
+              },
+              "durationInMonths": {
+                "type": "integer",
+                "nullable": true,
+                "example": 3
+              },
+              "billingCycles": {
+                "type": "integer",
+                "nullable": true,
+                "description": "Number of payments the discount applies to.",
+                "example": 3
+              },
+              "durationText": {
+                "type": "string",
+                "description": "Human-readable duration; null for a one-time purchase.",
+                "nullable": true
+              },
+              "interval": {
+                "type": "string",
+                "nullable": true,
+                "example": "month"
+              }
+            }
           }
         }
       },
@@ -3660,10 +3807,12 @@
             "example": "Pro tier billed monthly."
           },
           "product": {
-            "type": "string",
-            "format": "uuid",
-            "description": "UUID of the parent product.",
-            "example": "0d65f7c0-7e91-4f56-9b32-13a9a6a7c1de"
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/Product"
+              }
+            ],
+            "description": "The parent product, returned as a full product object. (When creating a plan, pass the product UUID instead.)"
           },
           "metadata": {
             "type": "object",
@@ -3890,17 +4039,20 @@
             "type": "string",
             "enum": [
               "ONE_TIME",
-              "DAILY",
               "MONTHLY",
-              "QUARTERLY",
-              "YEARLY"
+              "YEARLY",
+              "WEEKLY",
+              "DAILY",
+              "TWENTY_EIGHT_DAYS",
+              "THREE_MONTHS",
+              "SIX_MONTHS"
             ],
             "example": "MONTHLY"
           },
           "priceData": {
             "type": "object",
             "additionalProperties": true,
-            "description": "For FLAT/PACKAGE: `{ amount, block_size? }`. For TIERED/VOLUME/STAIRSTEP: `{ currency }`.",
+            "description": "Depends on the parent `priceModel`. `FLAT`: exactly `{ amount }`. `PACKAGE`: exactly `{ amount, blockSize }`, where `blockSize` is an integer of 2 or more. `TIERED` / `VOLUME` / `STAIRSTEP`: leave empty and send `tiers` instead. Any other key is rejected.",
             "example": {
               "amount": 29.99
             }
@@ -3948,11 +4100,17 @@
         "description": "Pricing for one feature (or the plan itself if `feature` is null).",
         "properties": {
           "feature": {
-            "type": "string",
-            "format": "uuid",
             "nullable": true,
-            "description": "Feature UUID this pricing applies to. Required for non-FLAT models.",
-            "example": "3a3e92ab-90a3-4f43-8e87-9d4c8c5a9c01"
+            "description": "The feature this pricing is for; null for the plan's base price. In requests pass the feature UUID. Responses return the full feature object.",
+            "oneOf": [
+              {
+                "type": "string",
+                "format": "uuid"
+              },
+              {
+                "$ref": "#/components/schemas/CatalogFeature"
+              }
+            ]
           },
           "priceModel": {
             "type": "string",
@@ -3969,10 +4127,11 @@
             "type": "string",
             "enum": [
               "NEVER",
+              "EVERY_HOUR",
               "EVERY_DAY",
+              "EVERY_WEEK",
               "EVERY_28_DAYS",
               "EVERY_MONTH",
-              "EVERY_QUARTER",
               "EVERY_YEAR"
             ],
             "example": "EVERY_MONTH"
@@ -3980,7 +4139,8 @@
           "resetTime": {
             "type": "string",
             "nullable": true,
-            "example": "BEGINNING_OF_PERIOD"
+            "example": "START_DAY_OF_MONTH",
+            "description": "When in the period usage resets. Depends on `reset`: for `EVERY_WEEK` one of `SUBSCRIPTION_START_DAY`, `SUNDAY`, `MONDAY`, `TUESDAY`, `WEDNESDAY`, `THURSDAY`, `FRIDAY`, `SATURDAY`; for `EVERY_MONTH` one of `START_DAY_OF_MONTH`, `SUBSCRIPTION_START_DATE`."
           },
           "hasUnlimitedUsage": {
             "type": "boolean",
@@ -4002,7 +4162,7 @@
           },
           "usageAlerts": {
             "type": "object",
-            "description": "Optional usage-alert configuration. `thresholdType` is `PERCENTAGE` (thresholds are 1-100) or `BALANCE` (thresholds are absolute usage values).",
+            "description": "Optional usage-alert configuration. `thresholdType` is `PERCENTAGE` (thresholds are 1-100) or `BALANCE` (thresholds are absolute usage values). Thresholds must be positive integers.",
             "properties": {
               "enabled": {
                 "type": "boolean",
@@ -4011,7 +4171,8 @@
               "thresholds": {
                 "type": "array",
                 "items": {
-                  "type": "number"
+                  "type": "integer",
+                  "minimum": 1
                 },
                 "example": [
                   75,
@@ -4042,7 +4203,11 @@
               "$ref": "#/components/schemas/PlanCharge"
             }
           }
-        }
+        },
+        "required": [
+          "priceModel",
+          "charges"
+        ]
       },
       "PlanPrice": {
         "type": "object",
@@ -4114,7 +4279,8 @@
           },
           "currency": {
             "type": "string",
-            "example": "USD"
+            "example": "USD",
+            "description": "ISO currency code. Required when `priceType` is `PAID`."
           },
           "freeTrial": {
             "type": "boolean",
@@ -4188,10 +4354,11 @@
             "type": "string",
             "enum": [
               "NEVER",
+              "EVERY_HOUR",
               "EVERY_DAY",
+              "EVERY_WEEK",
               "EVERY_28_DAYS",
               "EVERY_MONTH",
-              "EVERY_QUARTER",
               "EVERY_YEAR"
             ],
             "example": "EVERY_MONTH"
@@ -4199,7 +4366,8 @@
           "resetTime": {
             "type": "string",
             "nullable": true,
-            "example": "BEGINNING_OF_PERIOD"
+            "example": "START_DAY_OF_MONTH",
+            "description": "When in the period usage resets. Depends on `reset`: for `EVERY_WEEK` one of `SUBSCRIPTION_START_DAY`, `SUNDAY`, `MONDAY`, `TUESDAY`, `WEDNESDAY`, `THURSDAY`, `FRIDAY`, `SATURDAY`; for `EVERY_MONTH` one of `START_DAY_OF_MONTH`, `SUBSCRIPTION_START_DATE`."
           },
           "rollover": {
             "type": "object",
@@ -4208,7 +4376,7 @@
           },
           "usageAlerts": {
             "type": "object",
-            "description": "Optional usage-alert configuration for this entitlement. `thresholdType` is `PERCENTAGE` (thresholds are 1-100) or `BALANCE` (thresholds are absolute usage values).",
+            "description": "Optional usage-alert configuration for this entitlement. `thresholdType` is `PERCENTAGE` (thresholds are 1-100) or `BALANCE` (thresholds are absolute usage values). Thresholds must be positive integers.",
             "properties": {
               "enabled": {
                 "type": "boolean",
@@ -4217,7 +4385,8 @@
               "thresholds": {
                 "type": "array",
                 "items": {
-                  "type": "number"
+                  "type": "integer",
+                  "minimum": 1
                 },
                 "example": [
                   75,
@@ -4453,31 +4622,6 @@
             "type": "array",
             "items": {
               "$ref": "#/components/schemas/PlanPrice"
-            }
-          }
-        }
-      },
-      "PaginatedPlanFeatureEntitlements": {
-        "type": "object",
-        "properties": {
-          "count": {
-            "type": "integer",
-            "example": 2
-          },
-          "next": {
-            "type": "string",
-            "nullable": true,
-            "example": null
-          },
-          "previous": {
-            "type": "string",
-            "nullable": true,
-            "example": null
-          },
-          "results": {
-            "type": "array",
-            "items": {
-              "$ref": "#/components/schemas/PlanFeatureEntitlement"
             }
           }
         }
@@ -4960,8 +5104,10 @@
         "description": "A single entry in an order's timeline.",
         "properties": {
           "id": {
-            "type": "integer",
-            "example": 4821
+            "type": "string",
+            "format": "uuid",
+            "description": "Unique identifier of the event.",
+            "example": "7c1f2a9e-3b64-4d0a-9f1e-2a6b8c4d5e70"
           },
           "order": {
             "type": "string",
@@ -4971,6 +5117,10 @@
           "title": {
             "type": "string",
             "example": "Order completed"
+          },
+          "displayText": {
+            "type": "string",
+            "description": "Human-readable description of the event."
           },
           "code": {
             "type": "string",
@@ -5061,6 +5211,64 @@
       "OrderSubscriptionSummary": {
         "type": "object",
         "description": "Summary of the subscription linked to this order. An empty object (`{}`) when the order has no linked subscription.",
+        "properties": {
+          "id": {
+            "type": "string",
+            "format": "uuid",
+            "example": "09d706ca-58f3-4fb2-818f-5b8623d67e6e"
+          },
+          "status": {
+            "type": "string",
+            "example": "active"
+          },
+          "amount": {
+            "type": "string",
+            "description": "Decimal amount, serialized as a string (e.g. `\"261.00\"`), not a JSON number.",
+            "nullable": true,
+            "example": "261.00"
+          },
+          "currency": {
+            "type": "string",
+            "nullable": true,
+            "example": "usd"
+          },
+          "interval": {
+            "type": "string",
+            "description": "Billing interval, e.g. `month` or `year`.",
+            "example": "month"
+          },
+          "currencySymbol": {
+            "type": "string",
+            "example": "$"
+          },
+          "startDate": {
+            "type": "string",
+            "format": "date",
+            "description": "Date the subscription started.",
+            "example": "2026-08-01"
+          },
+          "startDateTime": {
+            "type": "string",
+            "format": "date-time",
+            "nullable": true,
+            "description": "Exact instant the subscription started.",
+            "example": "2026-08-01T10:14:22Z"
+          },
+          "nextInvoiceDate": {
+            "type": "string",
+            "format": "date-time",
+            "nullable": true,
+            "example": "2026-08-28T10:46:34Z"
+          },
+          "trialDaysRemaining": {
+            "type": "integer",
+            "example": 0
+          }
+        }
+      },
+      "InvoiceSubscriptionSummary": {
+        "type": "object",
+        "description": "Summary of the subscription linked to this invoice. An empty object (`{}`) when the invoice has no linked subscription.",
         "properties": {
           "id": {
             "type": "string",
@@ -5255,6 +5463,66 @@
           },
           "paymentMethod": {
             "$ref": "#/components/schemas/OrderPaymentMethod"
+          },
+          "discount": {
+            "type": "object",
+            "nullable": true,
+            "additionalProperties": true,
+            "description": "The discount in force and what it does to the price over time; null when there is none. Returned on the detail endpoint only, not on list rows.",
+            "properties": {
+              "code": {
+                "type": "string",
+                "example": "WELCOME20"
+              },
+              "name": {
+                "type": "string",
+                "example": "Welcome offer"
+              },
+              "label": {
+                "type": "string",
+                "description": "Short display label, e.g. `20% off`.",
+                "example": "20% off"
+              },
+              "discountType": {
+                "type": "string",
+                "example": "PERCENTAGE"
+              },
+              "percentageOff": {
+                "type": "integer",
+                "nullable": true,
+                "example": 20
+              },
+              "amountOff": {
+                "type": "string",
+                "nullable": true,
+                "example": null
+              },
+              "duration": {
+                "type": "string",
+                "example": "REPEATING"
+              },
+              "durationInMonths": {
+                "type": "integer",
+                "nullable": true,
+                "example": 3
+              },
+              "billingCycles": {
+                "type": "integer",
+                "nullable": true,
+                "description": "Number of payments the discount applies to.",
+                "example": 3
+              },
+              "durationText": {
+                "type": "string",
+                "description": "Human-readable duration; null for a one-time purchase.",
+                "nullable": true
+              },
+              "interval": {
+                "type": "string",
+                "nullable": true,
+                "example": "month"
+              }
+            }
           }
         }
       },
@@ -5342,6 +5610,46 @@
             "type": "object",
             "description": "The raw event envelope sent to the destination. For `invoice.created`, `invoice.paid`, and `invoice.payment_failed`, `data.object.payment_link` contains a customer payment URL for the invoice.",
             "additionalProperties": true
+          },
+          "endpointName": {
+            "type": "string",
+            "nullable": true,
+            "example": "Slack alerts"
+          },
+          "attemptNumber": {
+            "type": "integer",
+            "description": "1 for the first delivery attempt; resends and automatic retries count up from there.",
+            "example": 3
+          },
+          "maxAttempts": {
+            "type": "integer",
+            "description": "Attempts Kelviq makes automatically: the first delivery plus 3 retries.",
+            "example": 4
+          },
+          "willRetry": {
+            "type": "boolean",
+            "description": "True only on the newest attempt of an event whose next automatic retry is still scheduled."
+          },
+          "nextRetryAt": {
+            "type": "string",
+            "format": "date-time",
+            "nullable": true,
+            "description": "When the next automatic attempt is due; set only when `willRetry` is true."
+          },
+          "durationMs": {
+            "type": "integer",
+            "nullable": true,
+            "description": "Round-trip time of this attempt in milliseconds; `null` when no response arrived.",
+            "example": 1240
+          },
+          "responseBody": {
+            "type": "string",
+            "nullable": true,
+            "description": "First 1000 characters of the destination's response, or the connection error."
+          },
+          "isTest": {
+            "type": "boolean",
+            "description": "True for deliveries made with **Send test event**; their payload also carries `\"test\": true`."
           }
         },
         "required": [
@@ -5691,12 +5999,18 @@
         "description": "A single entry in a checkout session's timeline.",
         "properties": {
           "id": {
-            "type": "integer",
-            "example": 913
+            "type": "string",
+            "format": "uuid",
+            "description": "Unique identifier of the event.",
+            "example": "b2e4c6a8-1d3f-4a5b-8c7d-9e0f1a2b3c4d"
           },
           "title": {
             "type": "string",
             "example": "Checkout session created"
+          },
+          "displayText": {
+            "type": "string",
+            "description": "Human-readable description of the event."
           },
           "code": {
             "type": "string",
@@ -5992,7 +6306,7 @@
             }
           },
           "subscription": {
-            "$ref": "#/components/schemas/OrderSubscriptionSummary"
+            "$ref": "#/components/schemas/InvoiceSubscriptionSummary"
           },
           "paymentId": {
             "type": "string",
@@ -6346,6 +6660,12 @@
               "$ref": "#/components/schemas/DiscountAppliesToRequestItem"
             },
             "description": "Restrict the discount to specific products/plans. Omit to apply to all products."
+          },
+          "isActive": {
+            "type": "boolean",
+            "default": true,
+            "description": "Whether the discount can be redeemed. Pass `false` to create it disabled.",
+            "example": true
           }
         },
         "required": [
@@ -6395,6 +6715,17 @@
             "format": "uuid",
             "example": "2f6b9e2a-7c1a-4a3e-8b6e-8e6f9a2c1d4a"
           },
+          "name": {
+            "type": "string",
+            "maxLength": 100,
+            "description": "Display name. Optional on create: when omitted or blank it defaults to the URL's host, for example `api.acmecorp.com`.",
+            "example": "Production billing sync"
+          },
+          "description": {
+            "type": "string",
+            "description": "Free-text note shown in the dashboard.",
+            "example": "Sends billing events to our production API."
+          },
           "url": {
             "type": "string",
             "format": "uri",
@@ -6436,18 +6767,110 @@
           },
           "secret": {
             "type": "string",
-            "description": "Signing secret used to verify the `Kelviq-Signature` header on deliveries to this endpoint.",
+            "readOnly": true,
+            "description": "Signing secret used to verify the `webhook-signature` header on deliveries to this endpoint. `secretPreview` is a masked form of the same value for display."
+          },
+          "secretPreview": {
+            "type": "string",
+            "readOnly": true,
+            "description": "The secret's prefix and last four characters, for display.",
+            "example": "kq_whsec_\u2022\u2022\u2022\u2022pW6z"
+          },
+          "verifiedAt": {
+            "type": "string",
+            "format": "date-time",
+            "nullable": true,
+            "readOnly": true,
+            "description": "When **Verify endpoint** last got an answer from the URL (any HTTP status). Cleared when the URL is changed."
+          },
+          "createdOn": {
+            "type": "string",
+            "format": "date-time",
             "readOnly": true
+          },
+          "createdByName": {
+            "type": "string",
+            "nullable": true,
+            "readOnly": true,
+            "example": "Priya Shah"
+          },
+          "status": {
+            "type": "string",
+            "enum": [
+              "active",
+              "failing",
+              "disabled"
+            ],
+            "readOnly": true,
+            "description": "`disabled` when `enabled` is false; otherwise `failing` when the most recent delivery to this endpoint did not succeed (including one still being retried), else `active`. Test sends are not considered."
+          },
+          "deliveryCount": {
+            "type": "integer",
+            "readOnly": true,
+            "description": "Events delivered (or attempted) to this endpoint in the period selected with `start_date`/`end_date` on the list call, defaulting to the last 7 days. Test events are not counted.",
+            "example": 10763
+          },
+          "recentDeliveries": {
+            "type": "array",
+            "readOnly": true,
+            "items": {
+              "type": "boolean"
+            },
+            "description": "Outcome of the last 8 deliveries, oldest first (`true` = delivered). Test sends are not included.",
+            "example": [
+              true,
+              true,
+              true,
+              false
+            ]
+          },
+          "lastDelivery": {
+            "type": "object",
+            "nullable": true,
+            "readOnly": true,
+            "description": "The most recent delivery to this endpoint, or `null` before the first one.",
+            "properties": {
+              "eventId": {
+                "type": "string",
+                "format": "uuid"
+              },
+              "at": {
+                "type": "string",
+                "format": "date-time"
+              },
+              "isSuccess": {
+                "type": "boolean"
+              },
+              "statusCode": {
+                "type": "integer",
+                "nullable": true
+              },
+              "retrying": {
+                "type": "boolean",
+                "description": "True while an automatic retry is still scheduled."
+              }
+            }
           }
         }
       },
       "WebhookEndpointCreateRequest": {
         "type": "object",
         "properties": {
+          "name": {
+            "type": "string",
+            "maxLength": 100,
+            "description": "Display name. Optional on create: when omitted or blank it defaults to the URL's host, for example `api.acmecorp.com`.",
+            "example": "Production billing sync"
+          },
+          "description": {
+            "type": "string",
+            "description": "Free-text note shown in the dashboard.",
+            "example": "Sends billing events to our production API."
+          },
           "url": {
             "type": "string",
             "format": "uri",
-            "description": "Must be a public HTTPS/HTTP URL \u2014 URLs resolving to a private, loopback, link-local, or otherwise internal address are rejected."
+            "description": "Must be a public HTTPS/HTTP URL \u2014 a malformed URL, or one resolving to a private, loopback, link-local, or otherwise internal address, is rejected with 400. A host that does not resolve yet is accepted."
           },
           "events": {
             "type": "array",
@@ -6475,7 +6898,9 @@
                 "payment_method.updated",
                 "payment_method.deleted"
               ]
-            }
+            },
+            "minItems": 1,
+            "description": "Event types to subscribe to. At least one is required."
           },
           "enabled": {
             "type": "boolean",
@@ -6490,6 +6915,17 @@
       "WebhookEndpointUpdateRequest": {
         "type": "object",
         "properties": {
+          "name": {
+            "type": "string",
+            "maxLength": 100,
+            "description": "Display name. Optional on create: when omitted or blank it defaults to the URL's host, for example `api.acmecorp.com`.",
+            "example": "Production billing sync"
+          },
+          "description": {
+            "type": "string",
+            "description": "Free-text note shown in the dashboard.",
+            "example": "Sends billing events to our production API."
+          },
           "url": {
             "type": "string",
             "format": "uri"
@@ -6520,7 +6956,9 @@
                 "payment_method.updated",
                 "payment_method.deleted"
               ]
-            }
+            },
+            "minItems": 1,
+            "description": "Event types to subscribe to. At least one is required."
           },
           "enabled": {
             "type": "boolean"
@@ -6548,6 +6986,157 @@
             "items": {
               "$ref": "#/components/schemas/WebhookEndpoint"
             }
+          }
+        }
+      },
+      "LemonSqueezyImportRequest": {
+        "type": "object",
+        "required": [
+          "apiKey",
+          "storeId"
+        ],
+        "properties": {
+          "apiKey": {
+            "type": "string",
+            "description": "Your Lemon Squeezy API key. Used for this import only. It is never returned in a response or included in the report email."
+          },
+          "storeId": {
+            "type": "string",
+            "pattern": "^[0-9]+$",
+            "description": "The Lemon Squeezy store to import, as a string of digits. A key can reach several stores; one store is imported per request.",
+            "example": "12345"
+          },
+          "reportEmail": {
+            "type": "string",
+            "format": "email",
+            "description": "Where the summary email is sent. Defaults to the organization owner's email."
+          },
+          "dryRun": {
+            "type": "boolean",
+            "default": false,
+            "description": "Run the whole import and save nothing. The report email shows what a real run would do."
+          },
+          "orderType": {
+            "type": "string",
+            "enum": [
+              "all",
+              "one_time",
+              "subscription"
+            ],
+            "default": "all",
+            "description": "Which sales to import. `all` imports every order and every subscription renewal. `one_time` imports only orders that did not start a subscription. `subscription` imports only orders that started a subscription, plus their renewals. License keys follow their orders. Products, plans, customers, files and discounts are imported whichever value is sent."
+          },
+          "only": {
+            "type": "array",
+            "items": {
+              "type": "string",
+              "enum": [
+                "store",
+                "products",
+                "customers",
+                "files",
+                "orders",
+                "renewals",
+                "discounts",
+                "licenses"
+              ]
+            },
+            "description": "Run only these steps. Defaults to every step."
+          },
+          "skip": {
+            "type": "array",
+            "items": {
+              "type": "string",
+              "enum": [
+                "store",
+                "products",
+                "customers",
+                "files",
+                "orders",
+                "renewals",
+                "discounts",
+                "licenses"
+              ]
+            },
+            "description": "Leave these steps out."
+          },
+          "publishPlan": {
+            "type": "boolean",
+            "default": true,
+            "description": "Publish each imported plan so it can be sold straight away, including a plan an earlier import left as a draft. When `false`, plans arrive as drafts to review and publish."
+          },
+          "publishDiscount": {
+            "type": "boolean",
+            "default": true,
+            "description": "Make each imported discount code usable at checkout, including a code an earlier import left switched off. A code limited to plans that are not published stays off. When `false`, codes arrive switched off."
+          },
+          "overwriteProfile": {
+            "type": "boolean",
+            "default": false,
+            "description": "Overwrite the organization name and business profile fields that are already filled in. When `false`, only blank fields are filled."
+          },
+          "skipAnalytics": {
+            "type": "boolean",
+            "default": false,
+            "description": "Do not add the imported sales to revenue analytics."
+          }
+        }
+      },
+      "LemonSqueezyImportQueued": {
+        "type": "object",
+        "properties": {
+          "status": {
+            "type": "string",
+            "enum": [
+              "queued"
+            ],
+            "description": "Always `queued`. Nothing has been imported yet."
+          },
+          "taskId": {
+            "type": "string",
+            "format": "uuid",
+            "description": "A reference for support. It cannot be used to query progress."
+          },
+          "storeId": {
+            "type": "string"
+          },
+          "storeName": {
+            "type": "string",
+            "nullable": true,
+            "description": "The store's name from Lemon Squeezy. `null` if Lemon Squeezy could not be reached during the check; the import is still queued."
+          },
+          "steps": {
+            "type": "array",
+            "items": {
+              "type": "string",
+              "enum": [
+                "store",
+                "products",
+                "customers",
+                "files",
+                "orders",
+                "renewals",
+                "discounts",
+                "licenses"
+              ]
+            },
+            "description": "The steps that will run, after `only` and `skip` are applied."
+          },
+          "orderType": {
+            "type": "string",
+            "enum": [
+              "all",
+              "one_time",
+              "subscription"
+            ]
+          },
+          "dryRun": {
+            "type": "boolean"
+          },
+          "reportEmail": {
+            "type": "string",
+            "format": "email",
+            "description": "The address the summary will be sent to."
           }
         }
       }
@@ -6788,7 +7377,7 @@
           }
         },
         "responses": {
-          "201": {
+          "200": {
             "description": "Checkout Session Created",
             "content": {
               "application/json": {
@@ -7473,7 +8062,7 @@
           }
         },
         "responses": {
-          "200": {
+          "201": {
             "description": "Usage reported successfully.",
             "content": {
               "application/json": {
@@ -7927,7 +8516,10 @@
                         "currency": "usd",
                         "interval": "month",
                         "currencySymbol": "$",
-                        "nextInvoiceDate": "2026-09-01T10:14:22Z"
+                        "startDate": "2026-08-01",
+                        "startDateTime": "2026-08-01T10:14:22Z",
+                        "nextInvoiceDate": "2026-09-01T10:14:22Z",
+                        "trialDaysRemaining": 0
                       },
                       "paymentId": null,
                       "paymentLink": "https://portal.kelviq.com/acme-inc/pay/aW5fMVJwb1pvU0JzdEN6eW9jUzdpUG1pdGgz",
@@ -8042,7 +8634,10 @@
                     "currency": "usd",
                     "interval": "month",
                     "currencySymbol": "$",
-                    "nextInvoiceDate": "2026-09-01T10:14:22Z"
+                    "startDate": "2026-08-01",
+                    "startDateTime": "2026-08-01T10:14:22Z",
+                    "nextInvoiceDate": "2026-09-01T10:14:22Z",
+                    "trialDaysRemaining": 0
                   },
                   "paymentId": null,
                   "paymentLink": "https://portal.kelviq.com/acme-inc/pay/aW5fMVJwb1pvU0JzdEN6eW9jUzdpUG1pdGgz",
@@ -8095,6 +8690,67 @@
           "content": "<Info>Click the base URL in the API playground and select the **Sandbox** host for test data or the **Production** host for live data. Use credentials from the same environment.</Info>"
         },
         "parameters": [
+          {
+            "name": "status",
+            "in": "query",
+            "required": false,
+            "description": "`delivered` (2xx) or `failed` attempts only.",
+            "schema": {
+              "type": "string",
+              "enum": [
+                "delivered",
+                "failed"
+              ]
+            }
+          },
+          {
+            "name": "endpoint",
+            "in": "query",
+            "required": false,
+            "description": "Attempts to one endpoint.",
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          },
+          {
+            "name": "event_type",
+            "in": "query",
+            "required": false,
+            "description": "Attempts for one event type.",
+            "schema": {
+              "type": "string"
+            },
+            "example": "invoice.payment_failed"
+          },
+          {
+            "name": "search",
+            "in": "query",
+            "required": false,
+            "description": "An event ID, or its leading characters, to find every attempt of that event.",
+            "schema": {
+              "type": "string"
+            },
+            "example": "5b274952"
+          },
+          {
+            "name": "test",
+            "in": "query",
+            "required": false,
+            "description": "`true` for test-event deliveries only, `false` to leave them out.",
+            "schema": {
+              "type": "boolean"
+            }
+          },
+          {
+            "name": "latest_only",
+            "in": "query",
+            "required": false,
+            "description": "`true` returns one row per event: its newest attempt.",
+            "schema": {
+              "type": "boolean"
+            }
+          },
           {
             "name": "start_date",
             "in": "query",
@@ -8553,7 +9209,11 @@
                       "recurrence": "month",
                       "currency": "usd",
                       "status": "active",
-                      "product": "Aphelo",
+                      "product": {
+                        "name": "Aphelo",
+                        "id": "88e437b8-6017-405b-9328-e0f4e140bb79",
+                        "identifier": "aphelo"
+                      },
                       "plan": {
                         "name": "Premium",
                         "identifier": "premium1"
@@ -8772,7 +9432,11 @@
                   "recurrence": "month",
                   "currency": "usd",
                   "status": "active",
-                  "product": "Aphelo",
+                  "product": {
+                    "name": "Aphelo",
+                    "id": "88e437b8-6017-405b-9328-e0f4e140bb79",
+                    "identifier": "aphelo"
+                  },
                   "plan": {
                     "name": "Premium",
                     "identifier": "premium1"
@@ -9638,16 +10302,16 @@
               }
             }
           },
-          "404": {
-            "description": "Product not found.",
+          "400": {
+            "description": "The request could not be processed, including when the product does not exist.",
             "content": {
               "application/json": {
                 "schema": {
                   "$ref": "#/components/schemas/ErrorResponse"
                 },
                 "example": {
-                  "status": "Not found",
-                  "message": "Product does not exist"
+                  "status": "Bad request",
+                  "message": "Something went wrong"
                 }
               }
             }
@@ -9735,8 +10399,8 @@
           "401": {
             "description": "Unauthorized \u2014 missing or invalid API key"
           },
-          "404": {
-            "description": "Promotion not found"
+          "400": {
+            "description": "Promotion not found, inactive, or not available for this visitor. The body is `{ \"detail\": \"...\" }`."
           }
         }
       }
@@ -10045,7 +10709,7 @@
           "Products"
         ],
         "summary": "Archive a product",
-        "description": "Soft-deletes (archives) the product. Already-archived products return 400.",
+        "description": "Soft-deletes (archives) the product. Already-archived products return 404.",
         "operationId": "deleteCatalogProduct",
         "x-mint": {
           "content": "<Info>Click the base URL in the API playground and select the **Sandbox** host for test data or the **Production** host for live data. Use credentials from the same environment.</Info>"
@@ -10069,8 +10733,8 @@
               }
             }
           },
-          "400": {
-            "description": "Already archived."
+          "404": {
+            "description": "Product not found. An already-archived product also returns 404."
           },
           "401": {
             "description": "Unauthorized \u2014 missing or invalid API key"
@@ -10443,8 +11107,8 @@
               }
             }
           },
-          "400": {
-            "description": "Already archived."
+          "404": {
+            "description": "Feature not found. An already-archived feature also returns 404."
           },
           "401": {
             "description": "Unauthorized \u2014 missing or invalid API key"
@@ -10489,6 +11153,16 @@
               "type": "integer",
               "minimum": 1,
               "maximum": 100
+            }
+          },
+          {
+            "name": "product_id",
+            "in": "query",
+            "required": false,
+            "description": "Only return plans that belong to this product.",
+            "schema": {
+              "type": "string",
+              "format": "uuid"
             }
           }
         ],
@@ -10677,8 +11351,8 @@
               }
             }
           },
-          "400": {
-            "description": "Already archived."
+          "404": {
+            "description": "Plan not found. An already-archived plan also returns 404."
           },
           "401": {
             "description": "Unauthorized \u2014 missing or invalid API key"
@@ -10954,11 +11628,14 @@
         ],
         "responses": {
           "200": {
-            "description": "Paginated list of entitlements.",
+            "description": "List of the plan's entitlements. The response is a plain array; it is not paginated.",
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/PaginatedPlanFeatureEntitlements"
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/PlanFeatureEntitlement"
+                  }
                 }
               }
             }
@@ -10999,7 +11676,16 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/CatalogPlan"
+                  "type": "object",
+                  "properties": {
+                    "planEntitlements": {
+                      "type": "array",
+                      "items": {
+                        "$ref": "#/components/schemas/PlanFeatureEntitlement"
+                      },
+                      "description": "The entitlements that were added."
+                    }
+                  }
                 }
               }
             }
@@ -11234,7 +11920,7 @@
           "Plan Files"
         ],
         "summary": "Download a plan file",
-        "description": "Public download endpoint for a plan file. Responds with a 302 redirect to a short-lived forced-download URL on the storage backend. Returns 404 if the file does not exist.",
+        "description": "Download endpoint for a plan file. Call it with the `downloadUrl` returned on the file, which already carries the required `token`. Responds with a 302 redirect to a short-lived forced-download URL on the storage backend. Returns 403 if the token is missing, invalid or older than 24 hours, and 404 if the file does not exist.",
         "operationId": "downloadCatalogPlanFile",
         "x-mint": {
           "content": "<Info>Click the base URL in the API playground and select the **Sandbox** host for test data or the **Production** host for live data. Use credentials from the same environment.</Info>"
@@ -11253,10 +11939,24 @@
               }
             }
           },
+          "403": {
+            "description": "The token is missing, invalid or has expired."
+          },
           "404": {
             "description": "Plan file not found."
           }
-        }
+        },
+        "parameters": [
+          {
+            "name": "token",
+            "in": "query",
+            "required": true,
+            "description": "Signed token from the file's `downloadUrl`. Valid for 24 hours; fetch the plan or subscription again for a fresh link.",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ]
       }
     },
     "/media/": {
@@ -11785,7 +12485,7 @@
           "Discounts"
         ],
         "summary": "Delete a discount",
-        "description": "Soft-deletes (archives) the discount. Already-archived discounts return 400.",
+        "description": "Soft-deletes (archives) the discount. Already-archived discounts return 404.",
         "operationId": "deleteDiscount",
         "x-mint": {
           "content": "<Info>Click the base URL in the API playground and select the **Sandbox** host for test data or the **Production** host for live data. Use credentials from the same environment.</Info>"
@@ -11804,8 +12504,8 @@
               }
             }
           },
-          "400": {
-            "description": "This discount is already deleted."
+          "404": {
+            "description": "Discount not found. An already-archived discount also returns 404."
           },
           "401": {
             "description": "Unauthorized \u2014 missing or invalid API key."
@@ -11825,6 +12525,57 @@
           "content": "<Info>Click the base URL in the API playground and select the **Sandbox** host for test data or the **Production** host for live data. Use credentials from the same environment.</Info>"
         },
         "parameters": [
+          {
+            "name": "search",
+            "in": "query",
+            "required": false,
+            "description": "Case-insensitive match on the endpoint name or URL.",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "status",
+            "in": "query",
+            "required": false,
+            "description": "Only endpoints in this state.",
+            "schema": {
+              "type": "string",
+              "enum": [
+                "active",
+                "failing",
+                "disabled"
+              ]
+            }
+          },
+          {
+            "name": "ordering",
+            "in": "query",
+            "required": false,
+            "description": "`created_on` (default, newest first with `-`), `name` or `last_delivery`; prefix with `-` for descending.",
+            "schema": {
+              "type": "string"
+            },
+            "example": "-last_delivery"
+          },
+          {
+            "name": "start_date",
+            "in": "query",
+            "required": false,
+            "description": "Start of the period `deliveryCount` covers (default: 7 days ago). Same formats as the logs filters.",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "end_date",
+            "in": "query",
+            "required": false,
+            "description": "End of the period `deliveryCount` covers (default: now).",
+            "schema": {
+              "type": "string"
+            }
+          },
           {
             "name": "page_size",
             "in": "query",
@@ -11868,7 +12619,7 @@
           "Webhook Endpoints"
         ],
         "summary": "Create a webhook endpoint",
-        "description": "Registers a new destination URL and its event subscriptions. A signing secret is generated automatically and returned once in the response.",
+        "description": "Registers a new destination URL and its event subscriptions. A signing secret is generated automatically and returned in the response. `name` is optional and defaults to the URL's host.",
         "operationId": "createWebhookEndpoint",
         "x-mint": {
           "content": "<Info>Click the base URL in the API playground and select the **Sandbox** host for test data or the **Production** host for live data. Use credentials from the same environment.</Info>"
@@ -12004,6 +12755,191 @@
           },
           "404": {
             "description": "Webhook endpoint not found."
+          }
+        }
+      }
+    },
+    "/integrations/lemon-squeezy/migrate/": {
+      "post": {
+        "tags": [
+          "Imports"
+        ],
+        "summary": "Start a Lemon Squeezy import",
+        "description": "Queues an import of a Lemon Squeezy store into your Kelviq organization: business profile, products and plans, customers, files, orders, renewals, discount codes, and license keys.\n\nThe import runs in the background. This request returns as soon as the job is queued, and a summary email is sent to the organization owner (or `reportEmail`) when the import ends. There is no status endpoint; the email is the only completion signal.\n\nAuthenticate with a Server API Key that was created by the organization **owner**. A key created by any other team member is refused with `403`.\n\nRunning the import again is safe: records already imported are skipped, new ones are added, and refunds made since are picked up. Subscriptions are imported as history. They keep renewing on Lemon Squeezy, and Kelviq does not charge them. Customers are not emailed and no webhooks fire for imported records.\n\nSee [Migrate from Lemon Squeezy](/guides/migrate-from-lemon-squeezy) for the full walkthrough.",
+        "operationId": "startLemonSqueezyImport",
+        "x-mint": {
+          "content": "<Info>Click the base URL in the API playground and select the **Sandbox** host for test data or the **Production** host for live data. Use credentials from the same environment.</Info>"
+        },
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/LemonSqueezyImportRequest"
+              },
+              "examples": {
+                "full": {
+                  "summary": "Full import with defaults",
+                  "value": {
+                    "apiKey": "<lemon squeezy api key>",
+                    "storeId": "12345"
+                  }
+                },
+                "dryRun": {
+                  "summary": "Dry run, report to another address",
+                  "value": {
+                    "apiKey": "<lemon squeezy api key>",
+                    "storeId": "12345",
+                    "dryRun": true,
+                    "reportEmail": "ops@example.com"
+                  }
+                },
+                "rerun": {
+                  "summary": "Pick up new sales and refunds",
+                  "value": {
+                    "apiKey": "<lemon squeezy api key>",
+                    "storeId": "12345",
+                    "only": [
+                      "orders",
+                      "renewals"
+                    ]
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "202": {
+            "description": "The import is queued. Nothing has been imported yet.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/LemonSqueezyImportQueued"
+                },
+                "example": {
+                  "status": "queued",
+                  "taskId": "6f1c2f0e-8d3a-4a57-9b1e-2c1d5e7a9f10",
+                  "storeId": "12345",
+                  "storeName": "Acme Apps",
+                  "steps": [
+                    "store",
+                    "products",
+                    "customers",
+                    "files",
+                    "orders",
+                    "renewals",
+                    "discounts",
+                    "licenses"
+                  ],
+                  "orderType": "all",
+                  "dryRun": false,
+                  "reportEmail": "owner@example.com"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "A field is missing or invalid, `only` and `skip` leave no step to run, Lemon Squeezy rejected the key or the store id, or the organization has no owner (returned under `error`). Read whichever key is present: field names, `nonFieldErrors`, or `error`. Errors inside `only` and `skip` are keyed by the position of the bad item.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object"
+                },
+                "examples": {
+                  "fields": {
+                    "summary": "Field validation",
+                    "value": {
+                      "apiKey": [
+                        "This field is required."
+                      ],
+                      "storeId": [
+                        "This value does not match the required pattern."
+                      ],
+                      "only": {
+                        "0": [
+                          "\"x\" is not a valid choice."
+                        ]
+                      }
+                    }
+                  },
+                  "noSteps": {
+                    "summary": "No step left to run",
+                    "value": {
+                      "nonFieldErrors": [
+                        "only / skip leave no step to run."
+                      ]
+                    }
+                  },
+                  "rejected": {
+                    "summary": "Lemon Squeezy rejected the request",
+                    "value": {
+                      "error": "Lemon Squeezy rejected the API key or the store id."
+                    }
+                  },
+                  "storeNotFound": {
+                    "summary": "Store not found for this key",
+                    "value": {
+                      "error": "Lemon Squeezy store 9 was not found for this API key."
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "The `Authorization` header is missing, the key is not a valid Server API Key, or the key was not created by the organization owner. A missing or wrong key returns `403`, not `401`.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object"
+                },
+                "examples": {
+                  "notOwner": {
+                    "summary": "Key not created by the owner",
+                    "value": {
+                      "detail": "Use a server key created by the organization owner."
+                    }
+                  },
+                  "invalid": {
+                    "summary": "Invalid key",
+                    "value": {
+                      "detail": "Invalid Bearer Token"
+                    }
+                  },
+                  "missing": {
+                    "summary": "No Authorization header",
+                    "value": {
+                      "detail": "Authentication credentials were not provided."
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "An import is already running for the organization. If no report arrives and requests keep returning `409`, contact [hi@kelviq.com](mailto:hi@kelviq.com) with the `taskId` from the `202` response.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object"
+                },
+                "examples": {
+                  "running": {
+                    "summary": "Already running",
+                    "value": {
+                      "error": "A Lemon Squeezy import is already running for this organization. Its summary will be emailed when it finishes."
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "429": {
+            "description": "Organization rate limit exceeded."
+          },
+          "503": {
+            "description": "The import could not be queued. Try again."
           }
         }
       }

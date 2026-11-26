@@ -9,6 +9,153 @@ import { ChangelogFilter } from "/snippets/changelog-filter.jsx";
 
 <ChangelogFilter products={["App","JS SDK","React SDK","Node SDK","Python SDK","JS Promotions UI","MCP Server","CLI","API"]} />
 
+<Update label="v1.29" description="November 20, 2026" tags={["App"]}>
+
+## Choose the emails Kelviq sends you
+
+Get an email when a sale comes in, a customer cancels, a renewal fails or a payout is on its way. Open **Settings → Notifications** to pick which ones you get. The emails go to the organization owner.
+
+<Frame>
+  <img width="560" src="/images/settings/notifications.webp" alt="Settings → Notifications with switches for Sales, Subscriptions, Failed payments and disputes, and Payouts and verification emails" />
+</Frame>
+
+New sales, SEPA payments, resolved disputes and payouts are on by default. Renewal payments, cancellations and failed payments are off until you turn them on. New disputes and business verification are always sent, so you never miss an evidence deadline.
+
+Read [Notifications](/settings/notifications).
+
+</Update>
+
+<Update label="v1.28" description="November 20, 2026" tags={["API"]}>
+
+### New Features
+
+#### Import a Lemon Squeezy store
+
+One request brings a Lemon Squeezy store into your Kelviq organization: business profile, products and plans, customers, files, orders, renewals, discount codes, and license keys with their activations.
+
+- [Start a Lemon Squeezy import](/api-reference/imports/start-a-lemon-squeezy-import) queues the import and returns `202`. It runs in the background and emails a report to the organization owner when it ends.
+- Set `dryRun` to `true` to go through the whole import, save nothing, and get the same report.
+- Imported plans are published and discount codes work at checkout as soon as the import finishes. Send `publishPlan: false` or `publishDiscount: false` to keep them as drafts and switched off.
+- Running it again only adds what is new and picks up refunds made since.
+- Subscriptions are imported as history. They keep renewing on Lemon Squeezy, and Kelviq does not charge them.
+
+```json
+{
+  "apiKey": "<lemon squeezy api key>",
+  "storeId": "12345",
+  "dryRun": true,
+  ...
+}
+```
+
+Authenticate with a Server API Key created by the organization owner. The [migration guide](/guides/migrate-from-lemon-squeezy) walks through the whole move.
+
+</Update>
+
+<Update label="v0.5.0" description="November 20, 2026" tags={["CLI"]}>
+
+### New Features
+
+#### Import a store from the terminal
+
+- `kelviq import lemon-squeezy --store <id> --dry-run` previews an import of your Lemon Squeezy store: nothing is saved and a report is emailed. Without `--dry-run`, the command restates the environment, store, steps, order type and publish choices, asks, and starts the import.
+- `--only` and `--skip` choose the steps and `--orders` chooses which sales. Imported plans are published and discount codes work at checkout straight away; `--no-publish-plans` and `--no-publish-discounts` keep them as drafts and switched off.
+- The Lemon Squeezy key is read from `LEMONSQUEEZY_API_KEY` in your shell or env file, or typed at a masked prompt in an interactive terminal. It is never taken as a flag and never printed.
+- `kelviq import` on its own lists the available sources.
+
+See the [command reference](/cli/commands#kelviq-import).
+
+</Update>
+
+<Update label="v1.3.0" description="November 20, 2026" tags={["MCP Server"]}>
+
+### New Features
+
+- `import_start` starts a store import from your AI assistant. Lemon Squeezy is supported, and `storeId` is required for it. `dryRun` is required, so the assistant always chooses between a preview and a real run. The tool is annotated as destructive, so clients confirm it, and its result names the environment and notes that there is nothing to poll. The server reads the Lemon Squeezy key from `LEMONSQUEEZY_API_KEY` in its environment, which keeps it out of the conversation. 57 → 58 tools.
+- `checkout_create_session` accepts `customFields`, the identifiers of the [custom fields](/checkout/custom-fields) to collect at checkout.
+- `webhook_endpoint_create` and `webhook_endpoint_update` accept `name` and `description`.
+- Validation errors from the API now show the field and the reason in the tool result.
+
+</Update>
+
+<Update label="v1.27" description="November 13, 2026" tags={["App"]}>
+
+## Analytics, from the moment you sign in
+
+Your numbers now greet you. **Home** opens on the cards that matter: what's ready to pay out, gross volume, upcoming renewals, subscriptions at risk, your top customers, revenue by product, MRR, active trials and orders. Click **View details** on any card to dig in.
+
+<Frame>
+  <img src="/images/analytics/home-overview.webp" alt="Home cards: Available to payout, Gross volume, Upcoming renewals, At risk, Top customers, Revenue by product, MRR, Active trials and Orders" />
+</Frame>
+
+The numbers you check before a board call now live where you get paid. Open **Analytics** in the sidebar for seven tabs: **Revenue**, **Subscriptions**, **Customers**, **Trials**, **Churn**, **Success rate** and **Recovery**. Each card shows the value for the range, the change against the previous period and a chart, and **View details** opens the metric with a day-by-day table.
+
+One filter bar applies to every card: a date range with presets from today to year to date, daily, weekly or monthly buckets, products, countries, and a comparison with the previous period or the previous year. **Reset** puts the defaults back, and **Auto**, **Line** and **Bar** switch the chart type.
+
+Two things to try:
+
+* **Copy link** at the top right gives you a URL that opens with your tab and filters already set, for a Slack channel or a weekly doc.
+* Hit a milestone? The share icon on any card turns the chart into a post-ready image in one of eight themes.
+
+<Frame>
+  <img width="480" src="/images/analytics/share-milestone-image.webp" alt="A milestone image: Gross volume for November 2026 on a dark green card with the Kelviq logo" />
+</Frame>
+
+Read [Analytics](/analytics/overview) for what every metric means.
+
+## Webhooks 2.0
+
+Webhooks you can trust before you ship them. Every endpoint now has its own page with delivery stats, a live delivery log and its settings in one place.
+
+<Frame>
+  <img src="/images/webhooks/endpoint-page.webp" alt="An endpoint page with delivery stats, the delivery log, the signing secret and its events" />
+</Frame>
+
+* **Verify endpoint** checks that your URL answers before you save it.
+* **Sample payloads** show the exact shape of every event while you pick them.
+* **Send test event** fires a signed sample through the real delivery path, retries included, marked `"test": true`.
+* **Logs** filter by status, endpoint, event and time. Open any delivery to see every attempt and the response, then **Copy as cURL** or **Resend**.
+* Pause an endpoint with **Receiving events** without losing its logs.
+
+Read [Webhooks](/guides/webhooks).
+
+## Search everything
+
+Press **⌘K** (**Ctrl K** on Windows) anywhere in the dashboard to jump straight to a product, customer, order, subscription, discount or checkout.
+
+<Frame>
+  <img width="480" src="/images/changelog/2026-11-13-search.webp" alt="The search dialog showing results for acme" />
+</Frame>
+
+</Update>
+
+<Update label="v1.26" description="November 9, 2026" tags={["API"]}>
+
+### Improvements
+
+#### Richer webhook endpoints
+
+[Webhook endpoints](/api-reference/webhook-endpoints/list-webhook-endpoints) accept an optional `name` (defaults to the URL's host) and `description` on create and update, and `events` must now contain at least one type. Each endpoint in a response carries `status` (`active`, `failing` or `disabled`), `deliveryCount` for the period given by `start_date` / `end_date` (default: last 7 days), `recentDeliveries` (outcome of the last eight), `lastDelivery`, `verifiedAt`, `secretPreview`, `createdOn` and `createdByName`. The list call takes `search`, `status` and `ordering` (`created_on`, `name` or `last_delivery`).
+
+#### Per-attempt webhook logs
+
+Each row in [List webhook logs](/api-reference/webhooks/list-webhook-logs) now describes one delivery attempt, with `attemptNumber`, `maxAttempts`, `willRetry`, `nextRetryAt`, `durationMs`, `responseBody`, `endpointName` and `isTest`. New filters: `status` (`delivered` or `failed`), `endpoint`, `event_type`, `search` (an event ID or its leading characters), `test`, and `latest_only` for one row per event.
+
+#### Subscription start date on orders and invoices
+
+The `subscription` summary on [orders](/api-reference/orders/list-orders) and [invoices](/api-reference/invoices/list-invoices) now includes `startDate`, `startDateTime` and `trialDaysRemaining`.
+
+```json
+"subscription": {
+  "startDate": "2026-08-01",
+  "startDateTime": "2026-08-01T10:14:22Z",
+  "nextInvoiceDate": "2026-08-28T10:46:34Z",
+  "trialDaysRemaining": 0
+}
+```
+
+</Update>
+
 <Update label="v1.25" description="November 3, 2026" tags={["API"]}>
 
 ### Improvements
@@ -131,10 +278,6 @@ Pause with `pauseMonths` (1 to 12), a `resumesAt` date, or neither for an open-e
 #### Retention settings
 
 `GET` and `PATCH /api/v1/organizations/retention-settings/` read and update the offers, the reason-to-offer map, written feedback, and the resume and repeat policies. The customer portal API gains `…/retention/` to load the offers for a subscription and `…/retention/accept/` to accept one. The cancel endpoint accepts an optional `offerType` to record an offer the customer declined.
-
-#### SDKs
-
-`entitlements.invalidateCache` (Node) and `entitlements.invalidate_cache` (Python) drop a customer's cached entitlements, for use in `subscription.paused` and `subscription.cancelled` handlers.
 
 See [Pause a subscription](/product-catalog/subscriptions#pause-a-subscription) and [Retention offers](/customer-portal/retention).
 

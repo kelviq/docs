@@ -1,6 +1,6 @@
 ---
-title: 'Overview'
-sidebarTitle: 'Customers'
+title: 'Customers'
+sidebarTitle: 'Overview'
 description: 'View and manage customer details, subscriptions, and entitlements.'
 ---
 
@@ -16,7 +16,7 @@ You can do a few things here.
 * **Manage a customer** by clicking their row to see details.
 
 <Frame>
-  <img src="/images/customers-list.webp" />
+  <img src="/images/customers/customers-list.webp" alt="The Customers list with each customer's name and email, ID, status and subscription count, with search and New customer" />
 </Frame>
 
 ## Add a new customer
@@ -24,14 +24,14 @@ You can do a few things here.
 You can create records manually.
 
 <Steps>
-  <Step title="Open the modal">
-    Click **+ New customer** in the top right of the list page.
+  <Step title="Open the dialog">
+    Click **New customer** in the top right of the list page.
   </Step>
   <Step title="Fill in details">
     You need to provide a few key pieces of info.
     * **Customer name** is required. Use the person's full name or company name.
     * **Identifier** is the unique ID the API uses. We auto-generate this based on the name, but you can edit it. Use the ID from your own database so the API and your app match.
-    * **Email address** is optional.
+    * **Email ID** is required.
   </Step>
   <Step title="Create">
     Click **Create** to finish.
@@ -39,7 +39,7 @@ You can create records manually.
 </Steps>
 
 <Frame>
-  <img src="/images/create-customer-modal.webp" />
+  <img src="/images/customers/create-customer.webp" alt="The Add new customer dialog filled in: Customer name, the Identifier generated from it, and Email ID" />
 </Frame>
 
 <Note>
@@ -50,75 +50,108 @@ You can create records manually.
 
 ## Manage existing customers
 
-You can edit details or revoke access from the list view.
+You can edit or delete a customer from the list view.
 
 ### Edit a customer
 Click the **three dots** on the right side of the customer row and select **Edit**.
 
 <Frame>
-  <img src="/images/edit-customer.webp" />
+  <img src="/images/customers/customer-row-menu.webp" alt="The ⋯ menu on a Customers list row with Edit and Delete" />
 </Frame>
 
-You can update the **Customer name** and **Email address**. The Identifier is fixed after creation and cannot be changed.
+You can update the **Customer name** and **Email ID**. The Identifier is fixed after creation and cannot be changed.
 
 
-### Archive a customer
-Archiving makes a customer inactive and revokes their access. Click the **three dots** and select **Archive**.
+### Delete a customer
+Click the **three dots** and select **Delete**, then click **Delete** in the confirmation. The customer loses access to all features.
 
-<Frame>
-  <img src="/images/archive-customer.webp" />
-</Frame>
-You will see a confirmation warning. Click **Confirm** to proceed.
-
-Kelviq archives customers; it does not hard-delete them. The archived record keeps its Identifier, so that value cannot be reused. To create another customer with the same email address, use a new Identifier.
+Kelviq archives the record rather than erasing it. The archived record keeps its Identifier, so that value cannot be reused. To create another customer with the same email address, use a new Identifier.
 
 <Note>
-  To archive a customer with an active subscription, cancel the subscription first.
+  To delete a customer with an active subscription, cancel the subscription first.
 </Note>
 
 ## Customer details
 
-Click on any customer row to open their full profile.
-
-This page holds the source of truth for that user. You can see their unique Billing ID and timestamps for when they joined or were last updated.
+Click on any customer row to open their full profile. The header shows their status, email, the date they were created and their Identifier, with a copy button. Its **⋯** menu has **Edit customer**, **Copy customer ID**, **Copy signed portal link** and **Archive customer**.
 
 <Frame>
-  <img src="/images/customer-details.webp" />
+  <img src="/images/customers/customer-header-menu.webp" alt="The ⋯ menu in a customer's header with Edit customer, Copy customer ID, Copy signed portal link and Archive customer" />
+</Frame>
+
+The page has six tabs: **Overview**, **Subscriptions**, **Entitlements**, **Orders**, **Invoices** and **Timeline**. **Overview** sums up the customer at a glance:
+
+* **Recurring revenue**, **Next invoice**, **Payment health** and **Lifetime paid** cards.
+* Their **Subscriptions**, with **View all**.
+* **Recent orders** and **Invoices**, each with **View all**.
+* **Entitlements usage**, with **See details**.
+* **Billing details**: address, country and sales tax number.
+* **Recent activity**, with **View timeline** for the full history.
+
+<Frame>
+  <img src="/images/customers/customer-details.webp" alt="A customer's Overview tab: Recurring revenue, Next invoice with AI credits usage, Payment health and Lifetime paid cards, then Subscriptions, Recent orders, Invoices, Billing details, Downloads and Links" />
 </Frame>
 
 ### Subscriptions
 
-This section lists active and past plans. It shows the status, such as Active or Canceled, and the relevant dates. For a canceled subscription, the date it was canceled appears alongside the status.
+The **Subscriptions** tab lists active and past plans, with billing and the next invoice date. Each row shows the status, such as Active or Canceled; for a canceled subscription, the date it was canceled appears alongside the status.
 
-
-{/*
-**Add a subscription**
-You can generate a checkout link for a customer from here. The plan must already exist and have a published price.
+Use the **three dots** on a row to **View details**, **Copy subscription ID** or **Cancel subscription**. When you cancel, choose when it ends: **At the end of the billing period** (access continues until then), **Immediately**, or **On a specific date**, and optionally pick a reason.
 
 <Frame>
-  <img src="/images/add-subscription.webp" />
+  <img src="/images/customers/tab-subscriptions.webp" alt="The Subscriptions tab: Pixel UI Kit lifetime license, Acme Analytics Pro monthly and Acme API Growth on trial, with status, billing and next invoice date" />
 </Frame>
 
-1. Click **Add subscription**.
-2. Select a published plan.
-3. Choose the **Billing period** and **Currency**.
-4. Enter quantities for priced features when required.
-5. Enter the checkout **Success URL**.
-6. Click **Generate checkout link** and share it with the customer.
 
-The subscription starts only after the customer completes checkout. This flow does not create a plan or accept a negotiated custom amount. For either case, see [Create an Enterprise plan](/product-catalog/create-an-enterprise-plan).
+{/* Hidden: only accounts that are not merchant of record (own Stripe) see Add Subscription. Bring back if self-serve sellers get it.
+#### Add a subscription
 
-**Edit a subscription**
-You can also modify an existing subscription. Click on the subscription card to update terms, change status, or extend trial dates.
+Only for accounts that connect their own Stripe account. If Kelviq is your merchant of record, you won't see this button.
+
+You can create a checkout link for a customer from here. You need at least one published plan.
+
+<Frame>
+  <img src="/images/add-subscription.webp" alt="The Create Subscription dialog with the Pro plan, Monthly, United States Dollar, a $29 fixed charge and a success URL, and the subscription preview with Total due today" />
+</Frame>
+
+1. On the **Subscriptions** tab, click **Add Subscription**. The **Create Subscription** dialog opens.
+2. Under **Select plan**, choose a published plan.
+3. Choose the currency and billing period.
+4. Enter a **Quantity** for priced features when the plan has them.
+5. Enter the **Success URL**, where the customer lands after paying.
+6. Check the **Subscription preview** and **Total due today**, then click **Generate checkout link**.
+7. Click **Copy link** and send it to the customer.
+
+The subscription starts only after the customer completes checkout. This flow doesn't create a plan or accept a negotiated custom amount. For either, see [Create an Enterprise plan](/product-catalog/create-an-enterprise-plan).
 */}
+
+### Orders and invoices
+
+The **Orders** tab lists every order the customer placed, with its status and amount. **Invoices** lists their invoices; download any of them as a PDF.
+
+<Frame caption="Orders">
+  <img src="/images/customers/tab-orders.webp" alt="The Orders tab with three completed orders: a trial, a one-time purchase and a subscription" />
+</Frame>
+
+<Frame caption="Invoices">
+  <img src="/images/customers/tab-invoices.webp" alt="The Invoices tab with three paid invoices, each with its order, description, date, amount and a download button" />
+</Frame>
+
+### Timeline
+
+**Timeline** is the customer's full history: checkouts, orders, invoices, payments, subscription changes, trials, refunds, disputes, payment methods and emails. Filter it by category and status, and turn on **Show system events** for the background steps.
+
+<Frame>
+  <img src="/images/customers/tab-timeline.webp" alt="The Timeline tab with Category, Status and Subscription filters, Show system events, and the customer's events newest first" />
+</Frame>
 
 ### Files, links, and license keys
 
-The customer detail page shows the deliverables the customer received through their plans:
+The **Overview** tab also shows the deliverables the customer received through their plans:
 
-* **Files** — View and download digital files available to the customer.
-* **Links** — Open private or external resource links attached to the plan.
-* **License keys** — View issued license keys and use the available license-management controls.
+* **Downloads**: download a file or copy its link.
+* **Links**: open the private or external links attached to the plan.
+* **License key**: copy, regenerate, or deactivate the key, edit its activation limit, or manage its expiry.
 
 These sections let support teams confirm access without opening each order separately.
 
@@ -129,14 +162,19 @@ For catalog setup, see [Digital Downloads](/product-catalog/digital-downloads), 
 
 This view shows exactly what the customer can do right now based on their plan.
 
+<Frame>
+  <img src="/images/entitlements-details.webp" alt="The Entitlements tab: each feature with its type, usage bar, limit, reset schedule, the plan that grants it and access" />
+</Frame>
+
 **Overrides**
-You often need to make exceptions for specific users. You can do that here without changing the underlying plan.
-* Change the value of a specific feature.
-* Update the usage limit for a Meter feature.
+You often need to make exceptions for specific users. You can do that here without changing the underlying plan. Click **⋯** on a feature:
+* **Override usage** changes the feature's value or usage limit.
+* **Reset usage** sets a Meter feature's current usage back to zero.
+
+<Frame>
+  <img src="/images/customers/entitlement-row-menu.webp" alt="The ⋯ menu on an entitlement row with Override usage and Reset usage" />
+</Frame>
 
 Changes made here apply only to this specific customer.
 
-<Frame>
-  <img src="/images/entitlements-details.webp" />
-</Frame>
 

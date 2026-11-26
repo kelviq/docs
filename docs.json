@@ -41,7 +41,8 @@
               "getstarted/fees",
               "quickstart/core-concepts",
               "quickstart/dashboard-setup",
-              "quickstart/integrate-with-your-app"
+              "quickstart/integrate-with-your-app",
+              "guides/migrate-from-lemon-squeezy"
             ]
           },
           {
@@ -82,10 +83,8 @@
             "pages": [
               "product-catalog/products",
               "product-catalog/plans",
-              "product-catalog/create-a-feature",
-              "product-catalog/entitlements",
               {
-                "group": "Pricing models",
+                "group": "Pricing",
                 "pages": [
                   "product-catalog/one-time-payments",
                   "product-catalog/subscriptions",
@@ -98,14 +97,16 @@
                 ]
               },
               {
-                "group": "Usage and billing",
+                "group": "Features & limits",
                 "pages": [
+                  "product-catalog/entitlements",
+                  "product-catalog/create-a-feature",
                   "product-catalog/usage-limits",
                   "product-catalog/usage-alerts"
                 ]
               },
               {
-                "group": "What customers get",
+                "group": "Delivered after purchase",
                 "pages": [
                   "product-catalog/digital-downloads",
                   "product-catalog/license-keys",
@@ -121,19 +122,46 @@
             "icon": "/icons/credit-card.svg",
             "pages": [
               "checkout/checkout-configuration",
+              "checkout/checkout-examples",
+              "checkout/static-checkout-url",
               "checkout/checkout-design",
+              "checkout/custom-fields",
+              "checkout/apply-a-discount-code",
               {
                 "group": "Payment methods",
                 "pages": [
                   "checkout/payment-methods",
-                  "checkout/payment-methods/upi"
+                  "checkout/payment-methods/upi",
+                  "checkout/payment-methods/korea"
                 ]
               },
-              "checkout/custom-fields",
-              "checkout/static-checkout-url",
-              "checkout/checkout-examples",
-              "checkout/apply-a-discount-code",
               "checkout/checkout-metadata"
+            ]
+          },
+          {
+            "group": "Sales",
+            "icon": "/icons/receipt.svg",
+            "pages": [
+              "sales/orders",
+              "sales/checkout-sessions",
+              "sales/abandoned-cart-recovery",
+              "sales/create-a-one-time-charge"
+            ]
+          },
+          {
+            "group": "Customers",
+            "icon": "/icons/user.svg",
+            "pages": [
+              "customers-management/overview",
+              "settings/customer-emails",
+              "customer-portal/retention",
+              {
+                "group": "Customer portal",
+                "pages": [
+                  "customer-portal/overview",
+                  "customer-portal/managing-payment-methods"
+                ]
+              }
             ]
           },
           {
@@ -147,26 +175,6 @@
             ]
           },
           {
-            "group": "Sales",
-            "icon": "/icons/receipt.svg",
-            "pages": [
-              "sales/orders",
-              "sales/create-a-one-time-charge",
-              "sales/checkout-sessions",
-              "sales/abandoned-cart-recovery",
-              "customers-management/overview"
-            ]
-          },
-          {
-            "group": "Customer portal",
-            "icon": "/icons/user.svg",
-            "pages": [
-              "customer-portal/overview",
-              "customer-portal/retention",
-              "customer-portal/managing-payment-methods"
-            ]
-          },
-          {
             "group": "Payouts",
             "icon": "/icons/wallet.svg",
             "pages": [
@@ -176,47 +184,63 @@
             ]
           },
           {
-            "group": "Settings",
+            "group": "Analytics",
+            "icon": "/icons/chart-bar-trend-up.svg",
+            "pages": [
+              "home",
+              "analytics/overview"
+            ]
+          },
+          {
+            "group": "Account",
             "icon": "/icons/gear.svg",
             "pages": [
-              "settings/profile",
               "settings/members",
-              "settings/customer-emails",
-              "settings/zapier",
-              "settings/slack",
-              "settings/discord",
-              "settings/resend",
-              "settings/appwrite",
-              "settings/windmill",
-              "settings/inngest",
-              "settings/segment",
-              "settings/woocommerce",
-              "settings/fernand",
-              "settings/clerk",
-              "settings/supabase",
-              "settings/telegram",
-              "settings/hubspot",
-              "settings/posthog",
-              "settings/mailchimp",
-              "settings/loops",
-              "settings/brevo",
-              "settings/kit",
-              "settings/mixpanel",
-              "settings/notion",
-              "settings/airtable",
-              "settings/attio"
+              "settings/notifications",
+              "settings/profile"
+            ]
+          },
+          {
+            "group": "Integrations",
+            "icon": "/icons/plug-connect.svg",
+            "pages": [
+              "integrations/zapier",
+              "integrations/slack",
+              "integrations/discord",
+              "integrations/resend",
+              "integrations/inngest",
+              "integrations/segment",
+              "integrations/woocommerce",
+              "integrations/fernand",
+              "integrations/clerk",
+              "integrations/supabase",
+              "integrations/telegram",
+              "integrations/hubspot",
+              "integrations/posthog",
+              "integrations/mailchimp",
+              "integrations/brevo",
+              "integrations/kit",
+              "integrations/mixpanel",
+              "integrations/notion",
+              "integrations/airtable",
+              "integrations/attio"
             ]
           },
           {
             "group": "Guides",
             "icon": "/icons/book-open.svg",
             "pages": [
-              "guides/sandbox",
-              "guides/test-payments",
-              "guides/migrate-from-cashfree",
               "guides/subscription-integration",
               "guides/subscription-integration-for-nextjs",
-              "guides/webhooks"
+              "guides/webhooks",
+              "guides/sandbox",
+              "guides/test-payments",
+              {
+                "group": "Migrate to Kelviq",
+                "pages": [
+                  "guides/migrate-from-cashfree"
+                ]
+              }
             ]
           },
           {
@@ -388,6 +412,98 @@
     {
       "source": "/api-reference/frontend-integration/:slug*",
       "destination": "/frontend-integration/:slug*"
+    },
+    {
+      "source": "/settings/zapier",
+      "destination": "/integrations/zapier"
+    },
+    {
+      "source": "/settings/woocommerce",
+      "destination": "/integrations/woocommerce"
+    },
+    {
+      "source": "/settings/slack",
+      "destination": "/integrations/slack"
+    },
+    {
+      "source": "/settings/discord",
+      "destination": "/integrations/discord"
+    },
+    {
+      "source": "/settings/resend",
+      "destination": "/integrations/resend"
+    },
+    {
+      "source": "/settings/appwrite",
+      "destination": "/integrations/appwrite"
+    },
+    {
+      "source": "/settings/windmill",
+      "destination": "/integrations/windmill"
+    },
+    {
+      "source": "/settings/inngest",
+      "destination": "/integrations/inngest"
+    },
+    {
+      "source": "/settings/segment",
+      "destination": "/integrations/segment"
+    },
+    {
+      "source": "/settings/fernand",
+      "destination": "/integrations/fernand"
+    },
+    {
+      "source": "/settings/clerk",
+      "destination": "/integrations/clerk"
+    },
+    {
+      "source": "/settings/supabase",
+      "destination": "/integrations/supabase"
+    },
+    {
+      "source": "/settings/telegram",
+      "destination": "/integrations/telegram"
+    },
+    {
+      "source": "/settings/hubspot",
+      "destination": "/integrations/hubspot"
+    },
+    {
+      "source": "/settings/posthog",
+      "destination": "/integrations/posthog"
+    },
+    {
+      "source": "/settings/mailchimp",
+      "destination": "/integrations/mailchimp"
+    },
+    {
+      "source": "/settings/loops",
+      "destination": "/integrations/loops"
+    },
+    {
+      "source": "/settings/brevo",
+      "destination": "/integrations/brevo"
+    },
+    {
+      "source": "/settings/kit",
+      "destination": "/integrations/kit"
+    },
+    {
+      "source": "/settings/mixpanel",
+      "destination": "/integrations/mixpanel"
+    },
+    {
+      "source": "/settings/notion",
+      "destination": "/integrations/notion"
+    },
+    {
+      "source": "/settings/airtable",
+      "destination": "/integrations/airtable"
+    },
+    {
+      "source": "/settings/attio",
+      "destination": "/integrations/attio"
     }
   ],
   "logo": {

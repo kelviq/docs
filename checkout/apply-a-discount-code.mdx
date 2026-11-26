@@ -8,7 +8,7 @@ Kelviq can show a discount-code field at checkout or apply a known code before t
 
 ## Before you start
 
-Create the code in **Product Catalog → Discounts** and check that it:
+Create the code in **Product catalog → Discounts** and check that it:
 
 - is active and has not expired;
 - has not reached its redemption limit;
@@ -125,6 +125,12 @@ https://www.kelviq.com/buy/123e4567-e89b-12d3-a456-426614174000/?plan_identifier
 
 Use the product UUID shown in the Kelviq dashboard. URL-encode the code if it contains spaces or reserved characters.
 
+To build this link in the dashboard, click **Get Link** on the product, keep **Enable discounts** on, and enter the code under **Preset discount**.
+
+<Frame>
+  <img src="/images/generate-checkout-discounts.webp" alt="Enable discounts turned on in the checkout link dialog, with LAUNCH20 as the preset discount" />
+</Frame>
+
 <Info>
   The names are different by design: use `discountCode` in an API JSON body and `discount_code` in a static checkout URL.
 </Info>
@@ -149,8 +155,8 @@ Do not test a small live charge on your own card. Repeated self-payments can cau
 | --- | --- |
 | Checkout creation fails | Confirm the code is active, unexpired, within its redemption limit, and valid for the selected plan. |
 | Fixed discount is rejected | Confirm the discount currency matches the selected price currency. |
-| The code field is missing | Set `discountsEnabled` or `discounts_enabled` to `true`, depending on how you create checkout. |
+| The code field is missing | Set `discountsEnabled` or `discounts_enabled` to `true`, depending on how you create checkout. Also check that **Discount code field** is on in **Settings → Checkout design**. |
 | The code is not pre-applied | Use `discountCode` for the API or `discount_code` for a static link. |
 | Sandbox code is not found in production | Recreate the discount in production; the two environments do not share data. |
 
-For the complete request and response schema, see [Create a checkout session API reference](/api-reference/checkout/create-a-checkout-session).
+For the complete request and response schema, see the [Create a checkout session API reference](/api-reference/checkout/create-a-checkout-session).
