@@ -8232,6 +8232,16 @@
             }
           },
           {
+            "name": "product_id",
+            "in": "query",
+            "required": false,
+            "description": "Return only orders for this product (the product's UUID).",
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          },
+          {
             "name": "is_renewal",
             "in": "query",
             "required": false,
