@@ -1,0 +1,91 @@
+---
+title: 'Mailchimp'
+description: 'Keep your customers in a Mailchimp audience, tagged with their Kelviq plan and status'
+---
+
+Connect [Mailchimp](https://mailchimp.com) to keep each Kelviq customer in a Mailchimp audience, tagged with their plan and status: active, on a trial, cancelled, with a failed payment, and more. Use the tags to send campaigns and Customer Journeys to exactly the right people, for example a win-back email to cancelled customers or a tip email to everyone on Pro. Kelviq verifies every event before it changes anything.
+
+It works with Mailchimp's free plan.
+
+## What Kelviq does
+
+For each event, Kelviq adds the customer to your audience if they aren't there yet, with their first and last name, and then sets their tags:
+
+| Tag | Added when | Removed when |
+| --- | --- | --- |
+| `kelviq-customer` | Any event about the customer | Never |
+| `kelviq-active` | A subscription starts, resumes or changes | It's paused or cancelled |
+| `kelviq-plan-<plan>`, like `kelviq-plan-pro` | A subscription is on that plan | The plan changes, or it's cancelled |
+| `kelviq-trial` | A subscription is trialing | The trial ends |
+| `kelviq-trial-ending` | A trial is about to end | Never |
+| `kelviq-paused` | A subscription is paused | It resumes |
+| `kelviq-cancelled` | A subscription is cancelled | A new subscription starts |
+| `kelviq-payment-failed` | An invoice payment fails | An invoice is paid |
+| `kelviq-purchased` | A checkout completes | Never |
+| `kelviq-refunded` | A refund is made | Never |
+| `kelviq-usage-alert` | A feature usage alert | Never |
+
+Your own tags on the same people are never changed.
+
+### Email consent
+
+You choose how **new** people join your audience:
+
+- **Transactional** (default): they're in your audience and tagged, but don't get marketing emails. Use this unless they agreed to marketing.
+- **Subscribed**: they get your marketing emails. Only use this if your checkout asks for marketing consent.
+- **Pending**: Mailchimp emails them to confirm (double opt-in).
+
+People already in your audience keep their status. If someone unsubscribed, Kelviq never subscribes them again.
+
+## Before you start
+
+1. **Create an API key.** In Mailchimp, click your profile picture → **Profile → Extras → API keys → Create A Key**. Name it `Kelviq` and copy it. It ends with your data center, like `-us21`.
+2. **Find your Audience ID.** Open **Audience → All contacts → Settings → Audience name and defaults**, and copy the **Audience ID**, like `a1b2c3d4e5`.
+
+<Note>
+  Mailchimp's free plan includes up to 250 contacts. Kelviq customers count toward that limit, also when they're transactional.
+</Note>
+
+## Connect Mailchimp
+
+1. Open **Settings → Integrations**.
+2. On the **Mailchimp** card, click **Configure Mailchimp**.
+3. Paste the **API key** and the **Audience ID**.
+4. Choose how to **add new people**. Keep **Transactional** unless you have marketing consent.
+5. Optionally, enter a **Name**, such as `Customers audience`. It's only used to label the connection in Kelviq.
+6. Choose the **Events to send**. Customer, checkout, subscription, invoice and refund events are selected.
+7. Click **Connect Mailchimp**.
+
+Kelviq checks the key and the audience without adding anyone. From then on, customers are added and tagged on each selected event.
+
+<Note>
+  Connections are separate for sandbox and live. Use a separate Mailchimp audience for sandbox, so test customers stay out of your real audience.
+</Note>
+
+## Manage a connection
+
+Open **Settings → Integrations → Configure Mailchimp** to see your connected audiences. For each one you can:
+
+- **Send test**: check the key and audience still work. Nobody is added.
+- **Edit events**: change which events are sent, then click **Save events**.
+- **Disconnect**: stop updating Mailchimp. People and tags already there stay.
+
+Each connection is a Kelviq webhook endpoint, so it also appears under **Settings → Webhooks**, named `Mailchimp: <name>`. There you can see every delivery and resend one that failed. Your API key is stored encrypted and is never shown.
+
+## Troubleshooting
+
+The delivery's response in **Settings → Webhooks** says what happened:
+
+| Response | What to do |
+| --- | --- |
+| Mailchimp did not accept this API key | The key was deleted or mistyped. Create a new key, then disconnect and connect again. |
+| Mailchimp can't find this audience | Check the Audience ID. It must belong to the same Mailchimp account as the key. |
+| This person unsubscribed or was removed from Mailchimp | Nothing to do. Kelviq respects unsubscribes and leaves them out. |
+| Mailchimp did not accept this email address | Mailchimp rejects addresses that look fake. Nothing to do. |
+| … has no customer email to add to Mailchimp | The Kelviq customer has no email. |
+
+If Mailchimp is briefly unavailable or rate limits your account, Kelviq retries the delivery automatically.
+
+## Prefer code?
+
+Use [webhooks](/guides/webhooks) to receive the same events in your own backend and update Mailchimp your own way.
