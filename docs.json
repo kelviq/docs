@@ -184,7 +184,27 @@
               "settings/customer-emails",
               "settings/zapier",
               "settings/slack",
-              "settings/discord"
+              "settings/discord",
+              "settings/resend",
+              "settings/appwrite",
+              "settings/windmill",
+              "settings/inngest",
+              "settings/segment",
+              "settings/woocommerce",
+              "settings/fernand",
+              "settings/clerk",
+              "settings/supabase",
+              "settings/telegram",
+              "settings/hubspot",
+              "settings/posthog",
+              "settings/mailchimp",
+              "settings/loops",
+              "settings/brevo",
+              "settings/kit",
+              "settings/mixpanel",
+              "settings/notion",
+              "settings/airtable",
+              "settings/attio"
             ]
           },
           {
