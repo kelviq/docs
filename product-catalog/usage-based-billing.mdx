@@ -14,11 +14,11 @@ The example below is a **Pro** plan: \$29 a month, 10,000 API calls included, th
     Open the plan's pricing and expand **Usage charges**, then follow the steps below.
 
     <Frame>
-      <img src="/images/usage-pricing-card.webp" />
+      <img src="/images/usage-pricing-card.webp" alt="Base price with Monthly and Yearly ticked, and the Usage charges row highlighted" />
     </Frame>
   </Tab>
   <Tab title="CLI">
-    Define the plan in `kelviq.config.ts`. The entitlement sets the included 10,000 calls. The Pay as you go price bills calls past that at the end of each month.
+    Define the plan in `kelviq.config.ts`. The entitlement sets the included 10,000 calls. The Pay-as-you-go price bills calls past that at the end of each month.
 
     ```ts kelviq.config.ts
     import { feature, plan } from '@kelviq/cli/config';
@@ -87,28 +87,28 @@ The example below is a **Pro** plan: \$29 a month, 10,000 API calls included, th
 
 ### 1. Select or create a Meter feature
 
-Choose the metric you want to track from the dropdown list, such as API requests or tokens consumed. If the list is empty, [create a Meter feature](/product-catalog/create-a-feature) from **Product catalog → Features**, then return to the plan.
+In **Metered feature**, choose the metric you want to track, such as API requests or tokens consumed. To create a new one, type its name in the field, or [create a Meter feature](/product-catalog/create-a-feature) from **Product catalog → Features** and return to the plan.
 
 <Frame>
-  <img src="/images/select-metered-feature.webp" />
+  <img src="/images/select-metered-feature.webp" alt="The Metered feature list open, showing Team seats, Image generations, AI credits and API calls" />
 </Frame>
 
 ### 2. Choose your billing model
 
-Select how payments are structured.
+In **Billing model**, select how payments are structured.
 
 <Frame>
-  <img src="/images/select-billing-model.webp" />
+  <img src="/images/select-billing-model.webp" alt="The Billing model list open with Pay-as-you-go and Advance commitment" />
 </Frame>
 
 **Advance commitment**
 Customers pay upfront for a baseline allotment of usage. This gives your users a predictable budget. They buy a set bucket of AI tokens or API requests at the start of the month. They consume what they paid for and avoid surprise overages.
 
-**Pay as you go**
+**Pay-as-you-go**
 Customers pay for their recorded usage at the end of the monthly subscription period. You can bill for API calls, tokens, storage, compute time, or another Meter feature, either on its own or alongside a monthly base price. See [Pay as you go](/product-catalog/pay-as-you-go) for setup, usage reporting, sandbox testing, and troubleshooting.
 
 <Note>
-  Pay as you go bills monthly from reported usage, so Monthly is the plan's only billing period. Stair-step pricing and credit rollover work with Advance commitment prices.
+  Pay-as-you-go bills monthly from reported usage, so Monthly is the plan's only billing period. Stair-step pricing and credit rollover work with Advance commitment prices.
 </Note>
 
 ### 3. Configure the pricing model
@@ -116,7 +116,7 @@ Customers pay for their recorded usage at the end of the monthly subscription pe
 Kelviq supports five distinct ways to calculate the cost. Here is how the math works for each model.
 
 <Frame>
-  <img src="/images/usage-pricing-models.webp" />
+  <img src="/images/usage-pricing-models.webp" alt="The Pricing model list open with Flat, Package, Tiered, Volume and Stair-step" />
 </Frame>
 
 ---
@@ -138,7 +138,7 @@ The simplest way to charge for usage. Set one fixed rate for every unit consumed
 | **Total** | 15,000 × \$0.01 = **\$150** |
 
 <Frame>
-  <img src="/images/flat-pricing.webp" />
+  <img src="/images/flat-pricing.webp" alt="A Flat usage charge for API calls at USD 0.01 per unit, reset every month" />
 </Frame>
 
 ---
@@ -161,7 +161,7 @@ Instead of charging for every unit individually you sell usage in predefined pac
 | **Total** | 3 × \$10 = **\$30** |
 
 <Frame>
-  <img src="/images/package-pricing.webp" />
+  <img src="/images/package-pricing.webp" alt="A Package usage charge for Image generations at USD 10 per package of 100 units" />
 </Frame>
 
 ---
@@ -192,7 +192,7 @@ A customer uses 3,500 tokens.
 Kelviq tracks each pricing bracket automatically.
 
 <Frame>
-  <img src="/images/tiered-pricing.webp" />
+  <img src="/images/tiered-pricing.webp" alt="Tiered AI credits: 1 to 1000 at USD 0.10, 1001 to 5000 at USD 0.05, 5001 and up at USD 0.03" />
 </Frame>
 
 ---
@@ -222,7 +222,7 @@ A customer makes 120,000 API calls.
 Kelviq automatically applies the correct rate when customers cross a volume threshold, with no custom billing logic required.
 
 <Frame>
-  <img src="/images/volume-pricing.webp" />
+  <img src="/images/volume-pricing.webp" alt="Volume pricing for API calls: 1 to 100000 at USD 0.01, 100001 and up at USD 0.007" />
 </Frame>
 
 ---
@@ -247,18 +247,18 @@ A customer sends 12,000 emails. They fall into the second step and pay a flat **
 Kelviq automatically moves customers into the correct pricing step as their usage grows, with no custom billing logic required.
 
 <Frame>
-  <img src="/images/stair-step-pricing.webp" />
+  <img src="/images/stair-step-pricing.webp" alt="Stair-step pricing for API calls: up to 10000 for a USD 50 flat fee, 10001 to 50000 for USD 150" />
 </Frame>
 
 ---
 
 ### 4. Set the pricing rules
 
-Once you pick a pricing model you define the exact boundaries.
+Once you pick a **Pricing model** you define the exact boundaries.
 
-If you select Tiered you specify the first unit and last unit for each bucket. You can charge a per unit price and a flat fee within that same tier.
+If you select Tiered you specify the **First unit** and **Last unit** for each tier. You can charge a **Per unit** price and a **Flat fee** within that same tier. Click **Add tier** to add another row.
 
-You can also set localized pricing for usage-based pricing. This lets you define different per unit rates for specific countries and currencies.
+You can also localize usage prices in **Price localization**. This lets you define different per unit rates for specific countries and currencies.
 
 #### Price localization and usage controls
 
@@ -273,25 +273,27 @@ Configure how often the usage meter resets. Credit rollover is calculated when t
 
 Use **Never** for a lifetime limit, or choose a recurring reset such as every week or every month. A meter set to **Never** has no period boundary at which to roll unused credits forward.
 
-For monthly resets, choose either the first day of the month or the customer's subscription start date.
+For monthly resets, set **Usage reset time** to **Start day of month** or **Subscription start date**.
+
+<Frame>
+  <img src="/images/product-catalog/usage-reset-menu.webp" alt="The Usage reset list open with Never, Every hour, Every day, Every week, Every month and Every year" />
+</Frame>
 
 ### 6. Configure rollover and alerts
 
 #### Credit rollover
 
-Credit rollover lets a customer keep part of an advance commitment they did not use before the meter resets. It is available for **Advance commitment** usage prices, not **Pay as you go** prices.
+Credit rollover lets a customer keep part of an advance commitment they did not use before the meter resets. It is available for **Advance commitment** usage prices, not **Pay-as-you-go** prices.
 
 To configure it:
 
-1. In the plan editor, expand **Usage charges** and open the Meter feature.
-2. Choose **Advance commitment** as the billing model.
-3. Set the included **Value** and a recurring **Usage reset**.
-4. Turn on **Credit rollover**.
-5. Enter the **Percentage** of unused units to carry forward. The value can be from 0% to 100%.
-6. Enter a **Limit** in units to cap the rollover amount.
+1. In the plan's price editor, under **Usage charges**, pick the Meter feature and choose **Advance commitment** as the billing model.
+2. Click **More options**, then turn on **Credit rollover**.
+3. Enter the **Percentage** of unused units to carry forward. The value can be from 0% to 100%.
+4. Enter a **Limit** in units to cap the rollover amount.
 
 <Frame>
-  <img src="/images/credits-rollover.webp" />
+  <img src="/images/credits-rollover.webp" alt="More options open with Credit rollover on, Percentage 50 and Limit 750 units" />
 </Frame>
 
 For example, suppose a plan includes 10,000 credits each month. The customer has 2,000 credits left when the meter resets, and rollover is set to 50% with a 750-unit limit. Fifty percent of the unused balance is 1,000 credits, so the limit reduces the rollover to 750. The customer's next period starts with 10,750 credits.
@@ -309,10 +311,10 @@ See [Usage alerts](/product-catalog/usage-alerts) for dashboard and API configur
 ### 7. Stack multiple usage metrics
 
 <Frame>
-  <img src="/images/stack-multiple-usage-metrics.webp" />
+  <img src="/images/stack-multiple-usage-metrics.webp" alt="Three usage charges on one plan: AI credits, API calls and Image generations, with Add usage charge below" />
 </Frame>
 
-AI products rarely track just one variable. You can add as many metered usage features as you want to a single plan. Just click the Add usage pricing button at the bottom of the section to set up another metric.
+AI products rarely track just one variable. You can add as many metered usage features as you want to a single plan. Click **Add usage charge** at the bottom of the section to set up another metric.
 
 ## Check access and report usage
 

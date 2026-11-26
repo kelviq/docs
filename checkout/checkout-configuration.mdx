@@ -12,22 +12,26 @@ Kelviq's checkout system:
 - **Many payment methods** - Cards, wallets, bank payments, and local methods
 - **Highly configurable** - Control plans, pricing, trial periods, and more
 - **Multi-currency ready** - Support customers worldwide
-- **Easy to embed** - Generate links for any product and plans, or [embed checkout on your own site](/checkout/embed-checkout)
+- **Easy to embed** - Generate links for any product and its plans, or [embed checkout on your own site](/checkout/embed-checkout)
 
 ## Generating Checkout Links
 
 Checkout links are generated at the **product level**. Each link can include one or more plans.
 <Frame>
-      <img src="/images/accessing-checkout.webp" />
+      <img src="/images/accessing-checkout.webp" alt="The Get Link button on a product page" />
 </Frame>
 
 ### Quick Start
 
 1. **Go to Products** → Select your product
-2. **Click "Get Link"** → Opens the link builder
+2. **Click Get Link** → Opens the link builder
 3. **Select plans** → Choose which plans to include
 4. **Configure options** → Set defaults and features
-5. **Copy link** → Share with customers
+5. **Click Copy checkout link** → Share with customers
+
+<Frame>
+  <img src="/images/checkout/get-link-dialog.webp" alt="The Generate checkout link dialog with four Acme Analytics plans, Pro as the default, a preset discount code, and a custom field" />
+</Frame>
 
 ### Link Format
 
@@ -110,10 +114,10 @@ Plans in Kelviq can support multiple billing periods:
 | Period | Duration | Use Case |
 |--------|----------|----------|
 | **Monthly** | 1 month | Recurring subscriptions |
-| **3 Months** | 3 months | Quarterly billing |
-| **6 Months** | 6 months | Biannual billing |
+| **3 months** | 3 months | Quarterly billing |
+| **6 months** | 6 months | Biannual billing |
 | **Yearly** | 12 months | Annual billing, often with discounts |
-| **One Time** | One-off payment | Digital products, courses, lifetime access |
+| **One time** | One-off payment | Digital products, courses, lifetime access |
 
 <Tip>
   We can also add custom billing periods such as weekly, daily, or 28 days upon request. Contact [hi@kelviq.com](mailto:hi@kelviq.com) to enable these options.
@@ -162,18 +166,18 @@ Offer free trial periods before charging customers.
 ### Configuring Trials
 
 1. **Open your plan** → Go to the plan's pricing section
-2. **Enable Free Trial** → Toggle the trial option
+2. **Turn on Free trial** → Offer new customers a free trial
 3. **Set duration** → 1-365 days (default 7 days)
-4. **Save plan**
+4. **Click Save**
 
 ### Trial Behavior
 
 When a customer starts a trial:
 
 ```
-Timeline:
+Timeline (30-day trial):
 Day 0: Customer signs up, trial begins
-Days 1-30: Customer has full access, no charge
+Days 1-29: Customer has full access, no charge
 Day 30: Trial ends, first billing occurs
 Day 31+: Regular subscription
 ```
@@ -264,7 +268,7 @@ const { checkoutUrl } = await response.json();
 
 Allow customers to apply discount codes at checkout:
 <Frame>
-      <img src="/images/generate-checkout-discounts.webp" />
+      <img src="/images/generate-checkout-discounts.webp" alt="Enable discounts turned on in the checkout link dialog, with LAUNCH20 as the preset discount" />
 </Frame>
 
 ```
@@ -275,7 +279,7 @@ Customer at checkout:
 4. Complete payment
 ```
 
-Discount codes are applied automatically if the customer enters a valid code.
+A valid code is applied as soon as the customer enters it.
 
 [See API and static-link examples for applying a discount code →](/checkout/apply-a-discount-code)
 
@@ -399,7 +403,7 @@ Yes. Kelviq supports UPI AutoPay for recurring subscriptions. Eligible customers
 
 ### Multi-Currency Support
 
-Prices are stored per currency. When customers checkout:
+Prices are stored per currency. When customers check out:
 
 ```
 Customer from EU viewing checkout:
@@ -434,7 +438,7 @@ Plan: Professional
 └─ Brazil: R$99
 ```
 
-You set each amount yourself. See [Location-based pricing](/product-catalog/location-based-pricing). To give a percentage off by country instead, use [Promotions](/promotions/overview).
+You set each amount yourself. See [Price localization](/product-catalog/location-based-pricing). To give a percentage off by country instead, use [Promotions](/promotions/overview).
 
 ## Testing Checkout
 

@@ -39,10 +39,14 @@ You manage plans through a simple status flow.
     The default state for new plans. These are not visible to customers.
 * **Published**
     The plan is live and checkout is enabled.
-* **Unpublished changes**
+* **Unpublished version**
     A draft version of an existing published plan. You are editing a copy, so your live plan remains safe until you hit publish again.
-* **Archived**
-    The plan is hidden from new customers but remains active for existing subscribers.
+
+The status badge shows next to the plan's identifier on the plan page.
+
+<Frame>
+  <img src="/images/plans/plan-statuses.webp" alt="Three plan headers: a Draft plan with Publish, a Published plan, and a plan with an Unpublished version and Publish updates" />
+</Frame>
 
 ---
 
@@ -52,9 +56,9 @@ You create plans directly inside a product container.
 
 <Steps>
   <Step title="Start creation">
-    Navigate to the **Product detail page** and click **+ Create plan**.
+    Open the product and click **Create plan**.
     <Frame>
-      <img src="/images/create-plan.webp" />
+      <img src="/images/create-plan.webp" alt="The plan tabs of a product, with Create plan highlighted" />
     </Frame>
   </Step>
   <Step title="Define basics">
@@ -63,14 +67,14 @@ You create plans directly inside a product container.
     * **Identifier:** The unique ID used in your code. You can override the auto-generated ID.
     * **Description:** Optional text shown on invoices and checkout.
     <Frame>
-      <img src="/images/create-plan-modal.webp" />
+      <img src="/images/create-plan-modal.webp" alt="The Create plan dialog with Plan name, Identifier, Description and Create more turned on" style={{ maxWidth: "560px" }} />
     </Frame>
     <Tip>
       Enable the **Create more** toggle to quickly add multiple plans in a row without closing the modal.
     </Tip>
   </Step>
   <Step title="Save draft">
-    Click **Create**. The plan will appear in your list with a **Draft** badge.
+    Click **Create plan**. The plan opens as a **Draft** until you publish it.
   </Step>
 </Steps>
 
@@ -78,41 +82,42 @@ You create plans directly inside a product container.
 
 ## Configure pricing
 
-Click on any draft plan to enter the configuration view. The first step is to set how you charge.
+Open a draft plan and click **Set price** in the **Price** section. The price editor opens in place. The first step is to set how you charge.
 
 ## Pricing models
 
 Once your plan draft exists you can configure how you charge. We split these into dedicated guides.
 
-* [One time payments](/product-catalog/one-time-payments)
+* [One-time payments](/product-catalog/one-time-payments)
 * [Subscriptions](/product-catalog/subscriptions)
 * [Enterprise and bespoke plans](/product-catalog/create-an-enterprise-plan)
-* [Seat based pricing](/product-catalog/seat-based-pricing)
+* [Seat-based pricing](/product-catalog/seat-based-pricing)
 * [Usage-based pricing](/product-catalog/usage-based-billing)
 * [Free plans and trials](/product-catalog/free-and-trials)
-* [Location based pricing](/product-catalog/location-based-pricing)
+* [Price localization](/product-catalog/location-based-pricing)
 
 <Frame>
-  <img src="/images/configure-price.webp" />
+  <img src="/images/configure-price.webp" alt="A draft plan with an empty Price section and Set price highlighted" />
 </Frame>
 
 ### Free vs. Paid
-Use the toggle in the top right to switch between a free or paid plan.
+Turn on **Free plan** at the top right of **Base price** for a plan with no price.
 <Frame>
-  <img src="/images/free-paid.webp" />
+  <img src="/images/free-paid.webp" alt="Base price with the Free plan switch highlighted" />
 </Frame>
 * **Free plan:** Users are not charged. Useful for lead magnets or open-source tiers.
 * **Paid plan:** Unlocks the billing configuration options below.
 
 ### Billing cycles
-Select the intervals you want to offer. You can enable multiple intervals for a single plan.
+Select the intervals you want to offer. You can enable multiple intervals for a single plan. The list shows only the periods enabled for your organization.
 <Frame>
-  <img src="/images/billing-cycle.webp" />
+  <img src="/images/billing-cycle.webp" alt="The price editor with Monthly, Yearly and 3 months selected, Euro and Indian Rupee localized prices, and a 14-day free trial" />
 </Frame>
 * **28 days:** A recurring four-week subscription. Shown once we enable it for your organization.
 * **Monthly / Yearly:** Standard recurring subscriptions.
-* **3 Months:** Quarterly billing.
-* **6 Months:** Billing twice a year.
+* **3 months:** Quarterly billing.
+* **6 months:** Billing twice a year.
+* **Weekly / Daily:** Short billing periods, shown once we enable them for your organization.
 * **One time:** A single non-recurring payment (lifetime deal).
 
 The 28-day period is useful when you need a consistent four-week renewal schedule rather than a calendar-month renewal.
@@ -121,12 +126,16 @@ The 28-day period is useful when you need a consistent four-week renewal schedul
   To test a renewal without waiting a full month, ask support to enable daily billing for your sandbox. See [Test a subscription renewal](/guides/sandbox#test-a-subscription-renewal).
 </Tip>
 
-### Location based pricing
+### Price localization
 You can set specific prices for different countries rather than relying on auto-conversion.
 1. In the price editor, expand **Price localization**.
 2. Under **Choose a currency**, select a currency (e.g. EUR, INR) and click **Add localized price**.
-3. Enter the price for each billing cycle, then click **Save** in that currency's panel.
+3. Enter the price for each billing cycle, then click **Add** in that currency's panel.
 4. Click **Save** at the bottom of the price editor.
+
+<Frame>
+  <img src="/images/plans/price-localization.webp" alt="Price localization with a Euro pricing panel: EUR prices for Monthly, Yearly and 3 months, and the Add button" />
+</Frame>
 
 ---
 
@@ -137,7 +146,7 @@ Configure what the customer receives immediately after purchase. These assets ar
 ### Digital downloads
 Upload files that are securely delivered after purchase.
 1. Expand the **Digital downloads** accordion.
-2. Drag and drop your files (up to 5GB total).
+2. Drag and drop your files (up to 5 GB per file).
 3. Customers will see these in their portal immediately after checkout.
 
 ### License keys
@@ -161,6 +170,10 @@ Configure feature access, usage quotas, and API limits.
 * **Toggle features:** Turn specific capabilities on or off (e.g. "SSO Access").
 * **Numeric limits:** Set quotas (e.g. "5 Projects", "10,000 API calls").
 
+<Frame>
+  <img src="/images/features-limits-enttilements.webp" alt="The Features &amp; limits section of a plan, listing eight features and their values" />
+</Frame>
+
 ---
 
 ## Publishing & Versioning
@@ -170,27 +183,45 @@ We protect your live customers by creating a separate version when you edit a pl
 ### How it works
 * **Safe editing**
     When you edit a **Published** plan, we automatically create a new **Unpublished** version. Your live plan remains untouched so customers can keep buying without interruption.
-* **Unpublished changes**
-    You will see a yellow badge indicating you are working on a draft version. You can make as many changes as you want here without affecting the live site.
+* **Unpublished version**
+    You will see a yellow **Unpublished version** badge indicating you are working on a draft version. You can make as many changes as you want here without affecting the live site.
 * **Publishing**
-    When you click **Publish**, this new version replaces the old one.
+    When you click **Publish updates**, this new version replaces the old one. For a new plan, click **Publish** and confirm. A dialog then shows the plan's checkout link to copy. In live mode, customers can buy the plan only after your [business is approved](/getstarted/review-process).
+
+<Frame>
+  <img src="/images/plans/publish-plan-confirm.webp" alt="The Publish plan? confirmation with Cancel and Publish" style={{ maxWidth: "480px" }} />
+</Frame>
+
+<Frame>
+  <img src="/images/plans/plan-is-live.webp" alt="The Pro is live dialog with the checkout link and Copy link, Integrate with your app, Customize checkout and Preview checkout" style={{ maxWidth: "560px" }} />
+</Frame>
 
 ### Pushing updates
 Because the new version replaces the old one, you need to decide what happens to your current subscribers.
 
-When you click **Publish**, we will ask you to confirm the rollout strategy.
-* **For price changes:** You decide whether to grandfather existing users on the old price or migrate them to the new one.
-* **For feature changes:** You decide whether to push the new entitlements to existing users immediately or keep them on their legacy configuration.
+When you click **Publish updates**, the **Publish your changes** dialog asks what happens to existing customers.
+
+<Frame>
+  <img src="/images/plans/publish-your-changes.webp" alt="The Publish your changes dialog with Keep existing customers on previous version selected" style={{ maxWidth: "560px" }} />
+</Frame>
+
+* **Keep existing customers on previous version:** New customers get the new version. Existing customers keep their current price, features, and limits.
+* **Move everyone to new price, features:** Price updates start at the next billing cycle. Features and limits take effect in the current billing cycle.
+* **Update features only:** Pricing stays exactly the same. Features and limits take effect in the current billing cycle.
 
 If you grandfather existing customers, they keep their current price and only new customers see the updated price. If you migrate existing customers, the new price applies to their future renewals.
 
 Most recurring card and debit-card payments do not require the customer to approve the new price again. Some payment methods have additional rules. For example, an Indian UPI AutoPay mandate may require the customer to approve a renewal when the updated amount exceeds the applicable regulatory threshold.
 
-If you change your mind while editing, you can click **Discard** to delete the unpublished version and revert to the live state.
+If you change your mind while editing, open the **⋯** menu and choose **Restore last published version** to discard the unpublished version and revert to the live state.
 
 ### Plan actions
 
 Click the **⋯** menu next to the **Publish** button (**Publish updates** on a plan with unpublished changes) to see more options.
+
+<Frame>
+  <img src="/images/plans/plan-actions-menu.webp" alt="The plan actions menu next to Publish updates: Edit, Get Link, Country restrictions, Tax behavior, Delete, Restore last published version and View published version" style={{ maxWidth: "320px" }} />
+</Frame>
 
 | Action | Description |
 |--------|-------------|

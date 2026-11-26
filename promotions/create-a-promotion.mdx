@@ -7,55 +7,71 @@ A promotion ties a set of purchasing power parity (PPP) discounts to one or more
 
 <Steps>
   <Step title="Navigate to Promotions">
-    Go to **Promotions** in the sidebar, then click **+ Create promotion**.
+    Go to **Promotions** in the sidebar, then click **Create promotion**.
   </Step>
 
   <Step title="Enter a promotion name">
     Give the promotion a descriptive internal name (e.g. *PPP pricing* or *Black Friday*). This is not shown to customers.
 
-    The name field is required — you cannot create a promotion without one.
+    **Promotion name** is required.
   </Step>
 
   <Step title="Select products and plans">
     Choose which products and plans this promotion applies to. You can select multiple products, and for each product you can pick one or more plans.
 
     <Note>
-      Only **Published** plans appear in the selector. If a plan is missing, open the product in **Product catalog → Products**, then publish the plan.
+      Only published plans can be selected. Draft and unpublished plans are listed but greyed out. To use one, open the product in **Product catalog → Products**, then publish the plan.
     </Note>
 
     At least one plan must be selected before you can create the promotion.
+
+    <Frame>
+      <img src="/images/promotions/create-promotion-products.webp" alt="Create promotion with the name PPP pricing and five plans selected across Pixel UI Kit and Acme Analytics" />
+    </Frame>
   </Step>
 
   <Step title="Set up PPP group discounts">
     Kelviq groups countries into economic tiers based on purchasing power. Enter a discount percentage for each group you want to target.
 
-    * Enter a value between 1–100 in the **Discount %** field for the relevant group.
+    * Enter a value between 1 and 100 in the **Discount %** field for the relevant group.
     * Leave the field empty (or set it to 0) for groups you do not want to discount.
 
-    You can see which countries belong to each group by expanding the group row.
+    Each group row shows the flags of the countries in it. Set a discount for at least one group or country before you create the promotion.
+
+    <Frame>
+      <img src="/images/promotions/create-promotion-discounts.webp" alt="Set up discounts with an India override at 40% and group discounts from 60% down to 10%" />
+    </Frame>
   </Step>
 
   <Step title="Add country-specific overrides (optional)">
-    To override the group discount for a specific country, use the **Country-specific discounts** section.
+    To override the group discount for a specific country:
 
-    1. Search for the country by name.
+    1. Click **Add country-specific discount** and search for the country by name.
     2. Click the country to add it to the list.
-    3. Enter the exact discount percentage for that country.
+    3. Enter the discount percentage for that country under **Discount %**.
+
+    <Frame>
+      <img src="/images/promotions/add-country-discount.webp" alt="The Add country-specific discount search with India and Indonesia listed" />
+    </Frame>
 
     Country overrides take precedence over the group discount. For example, if India is in a group with 30% off but you want to offer 40% for India specifically, add India as a country override with 40%.
   </Step>
 
   <Step title="Configure security & enforcement">
-    Security toggles prevent abuse by blocking users who are masking or misrepresenting their location. All toggles are **enabled by default** — disable only if you have a specific reason to.
+    Under **Security & enforcement**, toggles prevent abuse by blocking users who are masking or misrepresenting their location. All toggles are **off by default**. Turn on the ones you need.
 
     | Toggle | Description |
     |--------|-------------|
     | **VPN protection** | Block users connecting through a VPN |
-    | **Tor Browser protection** | Block anonymous traffic routed via Tor |
-    | **Proxy server protection** | Block known proxy IP addresses |
-    | **Apple Relay protection** | Block users using Apple Private Relay |
-    | **Strict country matching** | Require the billing address country to match the discount country |
+    | **Tor browser protection** | Block anonymous traffic routed via Tor |
+    | **Proxy servers protection** | Block known commercial proxy IP addresses |
+    | **Apple Relay protection** | Block users hiding their location through Apple Private Relay |
+    | **Strict country matching** | Require the card's billing address to match the discount country |
     | **Crawler protection** | Block bots from accessing localized pricing |
+
+    <Frame>
+      <img src="/images/promotions/create-promotion-security.webp" alt="Security & enforcement with VPN, Tor browser, and Proxy servers protection turned on" />
+    </Frame>
   </Step>
 
   <Step title="Create the promotion">
@@ -65,4 +81,8 @@ A promotion ties a set of purchasing power parity (PPP) discounts to one or more
 
 ## Editing a promotion
 
-To update discounts, products, or security settings after creation, open the promotion and go to the **Edit rules** tab. Changes take effect immediately.
+To update discounts, products, or security settings after creation, open the promotion, go to the **Edit rules** tab, make your changes, and click **Update rules**. Changes take effect immediately.
+
+<Frame>
+  <img src="/images/promotions/promotion-edit-rules.webp" alt="The Edit rules tab of the PPP pricing promotion with Pixel UI Kit and Acme Analytics selected" />
+</Frame>

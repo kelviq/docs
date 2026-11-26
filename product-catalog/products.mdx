@@ -8,7 +8,7 @@ A product is the top-level container for what you sell. It groups together your 
 Before you can create plans or configure billing logic, you need to define the product they belong to.
 
 <Frame>
-  <img src="/images/product-empty-screen.webp" />
+  <img src="/images/product-empty-screen.webp" alt="The Acme Forms product page: its plans as tabs, with the Plus plan and its price" />
 </Frame>
 
 ## Create a product
@@ -17,20 +17,24 @@ Follow these steps to set up a new product.
 
 <Steps>
   <Step title="Go to Products">
-    Navigate to **Product Catalog > Products** in the sidebar.
+    Go to **Product catalog → Products** in the sidebar.
   </Step>
   <Step title="Start creation">
-    Click **+ Create product** in the top right corner.
+    Click **Create product** in the top right corner.
     <Frame>
-      <img src="/images/create-new-product.webp" />
+      <img src="/images/create-new-product.webp" alt="The Products list with Create product highlighted" />
     </Frame>
   </Step>
   <Step title="Enter details">
     Fill out the basic information for your product.
 
     * **Product name** — The public name shown to customers, such as “Pro Templates”.
+    * **Product type** — What you sell, such as SaaS (Business / B2B) or E-books & Publications. It decides how tax is calculated at checkout.
+    * **Cover image** — Upload up to 10 images to showcase the product on checkout and in the customer portal. 1600 × 1200 px (4:3) is recommended, up to 10MB each.
     * **Description** — A short summary of the offering.
-    * **Media** — Upload up to 10 images to showcase the product on checkout. We recommend a 4:3 aspect ratio (1600 × 1200 px).
+    <Frame>
+      <img src="/images/products/create-product-dialog.webp" alt="The Create product dialog filled in for Acme Forms, with a cover image uploaded and Create highlighted" style={{ maxWidth: "560px" }} />
+    </Frame>
 
     Kelviq assigns an internal UUID when the product is created. You do not need to create or manage a separate product identifier in the dashboard.
   </Step>
@@ -38,10 +42,6 @@ Follow these steps to set up a new product.
     Click **Create**. You will be redirected to the product details page.
   </Step>
 </Steps>
-
-<Frame>
-  <img src="/images/product-created.webp" />
-</Frame>
 
 ## Default currency
 

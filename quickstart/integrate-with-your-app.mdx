@@ -18,10 +18,10 @@ Code samples use the [Node SDK](/backend-integration/node-sdk) on the server and
 
 ### Get your API keys
 
-Open **Settings → API keys**. The **server key** goes in your backend and must never ship to a browser. The **client key** goes in your frontend and only reads data.
+Open **Settings → API keys**. The **Server API key** goes in your backend and must never ship to a browser. The **Client API key** goes in your frontend and only reads data.
 
 <Frame>
-  <img src="/images/api-keys.webp" alt="API keys page in Settings showing the server and client keys" />
+  <img src="/images/api-keys.webp" alt="The API keys settings page with the Server API key and Client API key, each with Regenerate" />
 </Frame>
 
 ### Work in sandbox first
@@ -31,7 +31,7 @@ New accounts start in sandbox, where you can complete the whole flow with test c
 - Tell each SDK which environment to use: `environment: 'sandbox'` on the Node client, `environment="sandbox"` on the React provider.
 - Copy checkout links from the dashboard while in sandbox mode. Sandbox links include `/sandbox/` in the path.
 
-When you are ready to take live payments, switch the dashboard to production and repeat the steps with production keys and links.
+When you are ready to take live payments, switch the dashboard to **Live** and repeat the steps with production keys and links.
 
 ---
 

@@ -9,10 +9,10 @@ You create a field once in Settings, then choose which checkout links or checkou
 
 ## Create a field
 
-1. Open **Settings → Custom fields** and click **Create custom field**.
-2. Pick a **Field type** and decide whether the field is **required**.
+1. Open **Settings → Custom fields** and click **Create custom field** (**Add Field** once you have fields).
+2. Pick a **Field type**. Tick **Set as required field** if customers must answer it.
 3. Enter the **Field label**, the question customers see above the input.
-4. Add optional **Help text**, shown below the input, and a **Placeholder** that shows the expected format.
+4. Add optional **Help text**, shown below the input, and **Placeholder text** that shows the expected format.
 5. Set the validation for the type you picked, and the **Validation error message** customers see when their answer doesn't pass.
 6. Click **Create field**.
 
@@ -30,13 +30,17 @@ You create a field once in Settings, then choose which checkout links or checkou
 | **Email** | An email address | Checked as a valid email |
 | **Dropdown** | One option from a list you define. Each option has a value and a label. | The answer must be one of your options |
 | **URL** | A web address | Checked as a valid URL |
-| **Date** | A date, in `YYYY-MM-DD` format | Earliest and latest date |
+| **Date** | A date, from a date picker | **Date format**, and earliest and latest date |
 
 Use a required **Boolean** field for "I agree to the terms" style checkboxes.
 
 ## Add a field to checkout
 
 **Checkout links:** on the product page, click **Get Link**. Under **Assign custom field**, choose the field, then copy the checkout link. Customers who open that link see the question.
+
+<Frame>
+  <img src="/images/checkout/get-link-custom-field.webp" alt="Assign custom field in the checkout link dialog, with Company name selected and custom_fields=company-name added to the checkout URL" />
+</Frame>
 
 **Checkout sessions from the API:** pass the field identifiers in `customFields` when you [create a checkout session](/api-reference/checkout/create-a-checkout-session):
 

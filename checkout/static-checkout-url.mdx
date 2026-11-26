@@ -10,11 +10,15 @@ Static links work well on pricing pages, in emails, and behind a purchase button
 
 ## Copy the checkout URL
 
-1. Open **Product Catalog → Products**.
+1. Open **Product catalog → Products**.
 2. Select a published product.
-3. Click **Get Link**, then copy the link.
-4. Choose the plans and default billing period.
-5. Copy the generated URL.
+3. Click **Get Link**.
+4. Choose the plans, the recommended plan, and each plan's default billing period.
+5. Click **Copy checkout link**.
+
+<Frame>
+  <img src="/images/checkout/get-link-dialog.webp" alt="The Generate checkout link dialog with four plans, Pro as the default, a preset discount code, and a custom field" />
+</Frame>
 
 Production links use this format:
 
@@ -32,7 +36,7 @@ The product UUID is part of the copied link.
 
 ## Available query parameters
 
-The dashboard adds the plan, billing-period, and discount options you select. You can add `customer_id` and `success_url` when your integration needs them.
+The dashboard adds the plan, billing-period, discount, and custom field options you select. You can add `customer_id` and `success_url` when your integration needs them.
 
 | Parameter | Value | What it changes |
 | --- | --- | --- |
@@ -42,6 +46,7 @@ The dashboard adds the plan, billing-period, and discount options you select. Yo
 | `discounts_enabled` | `true` or `false` | Shows or hides discount-code entry |
 | `discount_code` | An active discount code | Applies the code when checkout opens |
 | `customer_id` | Your unique customer ID | Links checkout to a specific customer record |
+| `custom_fields` | Comma-separated [custom field](/checkout/custom-fields) identifiers | Asks those fields at checkout |
 | `success_url` | A URL-encoded URL | Redirects the customer after successful checkout |
 
 Use these values for `charge_period`:
@@ -157,6 +162,7 @@ Static checkout links use snake_case query parameters. The Checkout API and back
 | `discount_code` | `discountCode` |
 | `customer_id` | `customerId` |
 | `success_url` | `successUrl` |
+| `custom_fields` | `customFields` |
 
 Do not put camelCase names into the URL. For example, `successUrl` belongs in an API request; `success_url` belongs in a static checkout URL.
 
@@ -171,13 +177,13 @@ Use the Checkout API or a backend SDK when you need per-session options that are
 - a locked email or default billing country; or
 - checkout metadata for webhook correlation.
 
-The API creates a short-lived checkout session and returns `checkoutUrl` and `checkoutSessionId`. Keep the server API key on your backend.
+The API creates a checkout session that expires after four days and returns `checkoutUrl` and `checkoutSessionId`. Keep the server API key on your backend.
 
 [Create a checkout session with the API →](/api-reference/checkout/create-a-checkout-session)
 
 ## Test the link
 
-1. Enter sandbox mode and copy a sandbox checkout link.
+1. Switch the dashboard to **Sandbox** and copy a sandbox checkout link.
 2. Add one customization at a time.
 3. Open the link and confirm the visible plans, selected period, discount behavior, and customer details.
 4. Complete a sandbox checkout.
