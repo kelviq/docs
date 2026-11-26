@@ -205,7 +205,25 @@
             "icon": "/icons/plug-connect.svg",
             "pages": [
               "integrations/zapier",
-              "integrations/woocommerce"
+              "integrations/slack",
+              "integrations/discord",
+              "integrations/resend",
+              "integrations/inngest",
+              "integrations/segment",
+              "integrations/woocommerce",
+              "integrations/fernand",
+              "integrations/clerk",
+              "integrations/supabase",
+              "integrations/telegram",
+              "integrations/hubspot",
+              "integrations/posthog",
+              "integrations/mailchimp",
+              "integrations/brevo",
+              "integrations/kit",
+              "integrations/mixpanel",
+              "integrations/notion",
+              "integrations/airtable",
+              "integrations/attio"
             ]
           },
           {
@@ -402,6 +420,90 @@
     {
       "source": "/settings/woocommerce",
       "destination": "/integrations/woocommerce"
+    },
+    {
+      "source": "/settings/slack",
+      "destination": "/integrations/slack"
+    },
+    {
+      "source": "/settings/discord",
+      "destination": "/integrations/discord"
+    },
+    {
+      "source": "/settings/resend",
+      "destination": "/integrations/resend"
+    },
+    {
+      "source": "/settings/appwrite",
+      "destination": "/integrations/appwrite"
+    },
+    {
+      "source": "/settings/windmill",
+      "destination": "/integrations/windmill"
+    },
+    {
+      "source": "/settings/inngest",
+      "destination": "/integrations/inngest"
+    },
+    {
+      "source": "/settings/segment",
+      "destination": "/integrations/segment"
+    },
+    {
+      "source": "/settings/fernand",
+      "destination": "/integrations/fernand"
+    },
+    {
+      "source": "/settings/clerk",
+      "destination": "/integrations/clerk"
+    },
+    {
+      "source": "/settings/supabase",
+      "destination": "/integrations/supabase"
+    },
+    {
+      "source": "/settings/telegram",
+      "destination": "/integrations/telegram"
+    },
+    {
+      "source": "/settings/hubspot",
+      "destination": "/integrations/hubspot"
+    },
+    {
+      "source": "/settings/posthog",
+      "destination": "/integrations/posthog"
+    },
+    {
+      "source": "/settings/mailchimp",
+      "destination": "/integrations/mailchimp"
+    },
+    {
+      "source": "/settings/loops",
+      "destination": "/integrations/loops"
+    },
+    {
+      "source": "/settings/brevo",
+      "destination": "/integrations/brevo"
+    },
+    {
+      "source": "/settings/kit",
+      "destination": "/integrations/kit"
+    },
+    {
+      "source": "/settings/mixpanel",
+      "destination": "/integrations/mixpanel"
+    },
+    {
+      "source": "/settings/notion",
+      "destination": "/integrations/notion"
+    },
+    {
+      "source": "/settings/airtable",
+      "destination": "/integrations/airtable"
+    },
+    {
+      "source": "/settings/attio",
+      "destination": "/integrations/attio"
     }
   ],
   "logo": {
