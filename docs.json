@@ -197,7 +197,14 @@
               "settings/telegram",
               "settings/hubspot",
               "settings/posthog",
-              "settings/mailchimp"
+              "settings/mailchimp",
+              "settings/loops",
+              "settings/brevo",
+              "settings/kit",
+              "settings/mixpanel",
+              "settings/notion",
+              "settings/airtable",
+              "settings/attio"
             ]
           },
           {
