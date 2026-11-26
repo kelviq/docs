@@ -199,7 +199,12 @@
               "settings/posthog",
               "settings/mailchimp",
               "settings/loops",
-              "settings/brevo"
+              "settings/brevo",
+              "settings/kit",
+              "settings/mixpanel",
+              "settings/notion",
+              "settings/airtable",
+              "settings/attio"
             ]
           },
           {
