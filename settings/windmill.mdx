@@ -1,0 +1,114 @@
+---
+title: 'Windmill'
+description: 'Run your own Windmill script or flow when something happens in Kelviq'
+---
+
+Connect [Windmill](https://www.windmill.dev) to run your own script or flow every time a customer checks out, a subscription changes, a payment fails, and more. You write the logic in Windmill (TypeScript, Python, Go and more), and Kelviq starts a run with the event's full details. Kelviq verifies every event before it starts a run.
+
+You can connect as many scripts and flows as you like, each with its own events. For example, run one flow to provision accounts on new subscriptions and another to alert finance on failed payments.
+
+## What your script receives
+
+Each event starts one run of your script or flow with a single argument, `event`. It holds the Kelviq [webhook event](/guides/webhooks#payload-structure) plus the `environment` it came from:
+
+```json
+{
+  "id": "3a7f1c2d-8e4b-4a9f-b123-0e5d6c7a8b9e",
+  "type": "subscription.created",
+  "created_at": "2026-03-11T05:25:33Z",
+  "environment": "live",
+  "data": {
+    "object": { "id": "a22f1b2a-…", "status": "active", "plan": { "identifier": "pro" }, "customer": { "customer_id": "user_123", "email": "geo@example.com" } }
+  }
+}
+```
+
+A starter TypeScript script:
+
+```ts
+type KelviqEvent = {
+  id: string;
+  type: string;
+  created_at: string;
+  environment: 'live' | 'sandbox';
+  data: { object: Record<string, any>; previous_attributes?: Record<string, any> };
+};
+
+export async function main(event: KelviqEvent) {
+  // "Send test" in Kelviq starts a run with this type. Ignore it.
+  if (event.type === 'kelviq.test') return { ok: true };
+
+  switch (event.type) {
+    case 'subscription.created':
+      // e.g. turn on features for event.data.object.customer.customer_id
+      break;
+    case 'invoice.payment_failed':
+      // e.g. notify your team, pause usage, open a ticket
+      break;
+  }
+  return { handled: event.type };
+}
+```
+
+<Note>
+  Kelviq may deliver the same event more than once, for example when it retries. Use `event.id` to skip events your script has already handled.
+</Note>
+
+## Before you start
+
+1. **Create the script or flow** in your Windmill workspace with one argument named `event` (see above), and deploy it.
+2. **Copy its async webhook URL.** Open the script or flow → **Triggers → Webhooks**, and copy the **async** URL. It looks like `https://app.windmill.dev/api/w/<workspace>/jobs/run/p/<path>`. Self-hosted Windmill works too, as long as it has a public HTTPS address.
+3. **Create a webhook-specific token** on the same tab. It can only run this script or flow. Copy it.
+
+<Tip>
+  Use the async URL, not the sync one (`run_wait_result`). Kelviq only needs to start the run, so your script can take as long as it needs.
+</Tip>
+
+## Connect Windmill
+
+1. Open **Settings → Integrations**.
+2. On the **Windmill** card, click **Configure Windmill**.
+3. Paste the **Webhook URL** (without `?token=` at the end).
+4. Paste the **Webhook token**.
+5. Optionally, enter a **Name**, such as `Billing automation`. It's only used to label the connection in Kelviq.
+6. Choose the **Events to send**. These are selected by default:
+   - Checkout completed
+   - Subscription created
+   - Subscription cancelled
+   - Invoice payment failed
+   - Refund created
+7. Click **Connect Windmill**.
+
+Kelviq starts one test run (type `kelviq.test`) to check the URL and token work. You'll see it under **Runs** in Windmill. From then on, every selected event starts a run.
+
+<Note>
+  Connections are separate for sandbox and live. If you connect Windmill while in [sandbox mode](/guides/sandbox), only sandbox events start runs, with `environment` set to `sandbox`. Switch to live mode and connect again for live events.
+</Note>
+
+## Manage a connection
+
+Open **Settings → Integrations → Configure Windmill** to see your connected scripts. For each one you can:
+
+- **Send test**: start a test run (type `kelviq.test`) to check the connection still works.
+- **Edit events**: change which events start runs, then click **Save events**.
+- **Disconnect**: stop starting runs.
+
+To run another script or flow, click **Add another script**.
+
+Each connection is a Kelviq webhook endpoint, so it also appears under **Settings → Webhooks**, named `Windmill: <name>`. There you can see every delivery and resend one that failed. Your Windmill token is stored encrypted and is never shown.
+
+## Troubleshooting
+
+Click **Send test** to check the connection. The error tells you what's wrong:
+
+| Error | What to do |
+| --- | --- |
+| This Windmill token is not valid | Create a new webhook token for the script or flow, then disconnect and connect again with it. |
+| This Windmill token can't run this script or flow | Create the token on this script's or flow's Webhooks tab, and check you can run it yourself. |
+| Windmill could not find this script or flow | Check the workspace and path in the URL, and that the script or flow is deployed. |
+
+If a run starts but fails, check its logs under **Runs** in Windmill: Kelviq only starts the run. If Windmill is briefly unavailable, Kelviq retries the delivery automatically.
+
+## Prefer code?
+
+Use [webhooks](/guides/webhooks) to receive the same events directly in your own backend.

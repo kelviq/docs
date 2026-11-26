@@ -1,0 +1,98 @@
+---
+title: 'Brevo'
+description: 'Keep each Brevo contact’s plan and status, and start your Brevo automations from Kelviq events'
+---
+
+Connect [Brevo](https://www.brevo.com) to send Kelviq events, such as checkouts, new subscriptions, plan changes, failed payments and refunds, to Brevo. Kelviq keeps each customer's Brevo contact up to date with their plan and status, so you can use them in segments, and each event can start an automation: for example a welcome series when someone subscribes, or a reminder when a payment fails. Kelviq verifies every event before it sends it.
+
+It works with Brevo's free plan.
+
+## What Brevo receives
+
+For each Kelviq event, Kelviq creates or updates the contact with the customer's email, then sends a Brevo event named `kelviq_<event type>` on that contact.
+
+| Kelviq event | Brevo event |
+| --- | --- |
+| `checkout.completed` | `kelviq_checkout_completed` |
+| `subscription.created` | `kelviq_subscription_created` |
+| `subscription.plan_changed` | `kelviq_subscription_plan_changed` |
+| `subscription.cancelled` | `kelviq_subscription_cancelled` |
+| `subscription.trial_will_end` | `kelviq_subscription_trial_will_end` |
+| `invoice.payment_failed` | `kelviq_invoice_payment_failed` |
+| `refund.created` | `kelviq_refund_created` |
+| Any other Kelviq event | `kelviq_` + the event type, with dots as `_` |
+
+**Event properties** you can use in automations: `amount`, `currency`, `plan`, `plan_name`, `product`, `status`, `recurrence`, `kelviq_event_id` and `kelviq_environment`, when the event has them.
+
+**Contact attributes** Kelviq keeps up to date:
+
+| Attribute | Value |
+| --- | --- |
+| `FIRSTNAME`, `LASTNAME` | From the customer's name in Kelviq |
+| `KELVIQ_CUSTOMER_ID` | Your customer ID in Kelviq |
+| `KELVIQ_PLAN` | The plan the customer can use now, like `pro` (empty when cancelled or paused) |
+| `KELVIQ_STATUS` | `active`, `trialing`, `past_due`, `paused` or `cancelled` |
+
+Kelviq creates these attributes in Brevo for you if they don't exist yet.
+
+## Before you start
+
+1. **Sign in to Brevo** at [app.brevo.com](https://app.brevo.com). The free plan works.
+2. **Create an API key.** Click your name at the top right, open **SMTP & API → API keys**, click **Generate a new API key**, name it `Kelviq` and copy it. It starts with `xkeysib-`. If Brevo asks which parts the key can use, allow at least **Contacts** and **Events**.
+
+<Warning>
+  Use an **API key**, not an SMTP key (`xsmtpsib-…`). SMTP keys only send emails and can't update contacts.
+</Warning>
+
+3. **Allow Kelviq's requests.** Brevo blocks API requests from IP addresses it doesn't know, and Kelviq's servers don't have one fixed address. Click your name at the top right, open **Security → Authorized IPs**, and under **Blocking unauthorized IP addresses**, click **Deactivate for API keys**.
+
+## Connect Brevo
+
+1. Open **Settings → Integrations**.
+2. On the **Brevo** card, click **Configure Brevo**.
+3. Paste the **API key**.
+4. Optionally, enter a **Name**, such as `Our Brevo account`. It's only used to label the connection in Kelviq.
+5. Choose the **Events to send**. Checkout, subscription, failed payment and refund events are selected.
+6. Click **Connect Brevo**.
+
+Kelviq checks the key and adds the Kelviq contact attributes to Brevo.
+
+## Start an automation from a Kelviq event
+
+1. In Brevo, open **Automations → Create an automation**, and start from scratch.
+2. Choose **Custom event** as the entry point, and enter the event name, for example `kelviq_invoice_payment_failed`.
+3. Add your emails and other steps. Event properties like `amount` can be used in conditions and in the email text.
+4. Activate the automation.
+
+Kelviq's events appear in Brevo after the first time each one is sent. To see them sooner, wait for the first real event, or [resend a delivery](/guides/webhooks) from **Settings → Webhooks**.
+
+<Note>
+  Connections are separate for sandbox and live. If you connect Brevo while in [sandbox mode](/guides/sandbox), only sandbox events are sent, with `kelviq_environment` set to `sandbox`. Use a separate Brevo account for sandbox, so test contacts don't get your real emails.
+</Note>
+
+## Manage a connection
+
+Open **Settings → Integrations → Configure Brevo** to see your connections. For each one you can:
+
+- **Send test**: check the key still works. No contact or event is created.
+- **Edit events**: change which events are sent, then click **Save events**.
+- **Disconnect**: stop sending events.
+
+Each connection is a Kelviq webhook endpoint, so it also appears under **Settings → Webhooks**, named `Brevo: <name>`. There you can see every delivery and resend one that failed. Your API key is stored encrypted and is never shown.
+
+## Troubleshooting
+
+| Error | What to do |
+| --- | --- |
+| Brevo did not accept this API key | The key was deleted or mistyped. Generate a new key in **SMTP & API → API keys**, then disconnect and connect again. |
+| Brevo blocked Kelviq because the request came from an IP address it does not know | In Brevo, open **Security → Authorized IPs** and, under **Blocking unauthorized IP addresses**, click **Deactivate for API keys**. Kelviq retries the blocked deliveries; click **Send test** to check at once. |
+| This Brevo API key is not allowed to use … | The key is limited to some parts of Brevo. Create a new API key with access to **Contacts** and **Events** (or full access), then disconnect and connect again. |
+| This is an SMTP key | Paste an API key that starts with `xkeysib-` instead. |
+| … has no customer email for a Brevo contact | The Kelviq customer has no email. |
+| Brevo returned an error: … | Brevo's own message says what's wrong, for example an email address it can't accept. |
+
+If Brevo is briefly unavailable or rate limits your account, Kelviq retries the delivery automatically.
+
+## Prefer code?
+
+Use [webhooks](/guides/webhooks) to receive the same events in your own backend and send them to Brevo your own way.
