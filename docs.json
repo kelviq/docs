@@ -203,7 +203,8 @@
               "settings/kit",
               "settings/mixpanel",
               "settings/notion",
-              "settings/airtable"
+              "settings/airtable",
+              "settings/attio"
             ]
           },
           {
