@@ -128,7 +128,7 @@ Both methods take `url`, the optional `theme`, and the callbacks below. `Kelviq.
 | --- | --- | --- | --- |
 | `theme` | `"light" \| "dark" \| "system"` | Dashboard default | The color mode the checkout renders in, so it matches your page. `"system"` follows the customer's OS preference. Requires `@kelviq/js-checkout` 1.1.0 or later. |
 
-Pass the mode your page is currently showing. When you omit it, the **Default mode** configured in the dashboard applies. The checkout's own light/dark switcher is hidden whenever it is embedded; your page decides.
+Pass the mode your page is currently showing. It wins over the dashboard's **Default mode** and over a session's [`customization.theme.colorMode`](/checkout/customize-a-checkout-session). When you omit it, the session's `colorMode` applies, then the **Default mode** configured in the dashboard. The checkout's own light/dark switcher is hidden whenever it is embedded; your page decides.
 
 ```js
 Kelviq.open({

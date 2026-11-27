@@ -125,6 +125,7 @@
               "checkout/checkout-examples",
               "checkout/static-checkout-url",
               "checkout/checkout-design",
+              "checkout/customize-a-checkout-session",
               "checkout/custom-fields",
               "checkout/apply-a-discount-code",
               {
