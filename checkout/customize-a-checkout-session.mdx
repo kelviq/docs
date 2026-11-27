@@ -1,0 +1,314 @@
+---
+title: "Customize a checkout session"
+sidebarTitle: "Customize a session"
+description: "Override the logo, colors, shape, and visible sections of a single checkout session with the customization object"
+---
+
+`customization` is an optional object on `POST /api/v1/checkout/`. It takes the same settings as **Settings → Checkout design** and applies them to one checkout session, without touching your account settings.
+
+A common example is a partner-branded checkout:
+
+```json
+{
+  "customization": {
+    "branding": {
+      "brandName": "Acme for Northwind",
+      "logoLight": "https://example.com/northwind-logo.png"
+    },
+    "theme": {
+      "schemes": {
+        "light": { "primary": "#7C3AED" }
+      }
+    }
+  }
+}
+```
+
+## Checkout design or session customization
+
+| | [Checkout design](/checkout/checkout-design) | Session `customization` |
+| --- | --- | --- |
+| Where you set it | **Settings → Checkout design** | The Checkout API request body |
+| Applies to | Every checkout link and checkout session | One checkout session |
+| Use it for | Your default brand | Per-customer, per-campaign, or per-partner changes |
+
+Set your default look in the dashboard first. Send `customization` only for the sessions that need to differ.
+
+<Note>
+  The Node SDK, Python SDK, and MCP server do not have a `customization` parameter. Send the request over HTTP, as shown on this page.
+</Note>
+
+## How values are merged
+
+Kelviq builds the final look in three layers. Each layer overrides the one before it:
+
+1. Kelviq's built-in defaults.
+2. Your **Checkout design** settings.
+3. The session's `customization`.
+
+Objects merge key by key, at every depth. A session can change one nested key and keep everything else.
+
+This request changes one color and hides one section:
+
+```json
+{
+  "customization": {
+    "theme": {
+      "schemes": {
+        "light": { "primary": "#7C3AED" }
+      }
+    },
+    "visibility": {
+      "discountCodeField": false
+    }
+  }
+}
+```
+
+Every other color and section comes from Checkout design.
+
+Light and dark mode have separate colors. The example above changes light mode only. Set the same key under `schemes.dark` if customers can see dark mode.
+
+Send `null` for a field to drop the Checkout design value and use the built-in default.
+
+## Create a customized session
+
+Pass `customization` at the top level of the request body.
+
+<CodeGroup>
+
+```bash cURL
+curl --request POST \
+  --url https://sandboxapi.kelviq.com/api/v1/checkout/ \
+  --header "Authorization: Bearer $KELVIQ_SANDBOX_SERVER_API_KEY" \
+  --header "Content-Type: application/json" \
+  --data '{
+    "planIdentifier": "pro",
+    "chargePeriod": "MONTHLY",
+    "customerId": "cust_789",
+    "successUrl": "https://example.com/checkout/success",
+    "customization": {
+      "branding": {
+        "brandName": "Acme for Northwind",
+        "logoLight": "https://example.com/northwind-logo.png",
+        "logoDark": "https://example.com/northwind-logo-dark.png",
+        "logoHeight": "40px"
+      },
+      "theme": {
+        "colorMode": "light",
+        "schemes": {
+          "light": {
+            "primary": "#7C3AED",
+            "primaryForeground": "#FFFFFF",
+            "focusRing": "#7C3AED"
+          },
+          "dark": {
+            "primary": "#A78BFA",
+            "primaryForeground": "#1E1B4B",
+            "focusRing": "#A78BFA"
+          }
+        },
+        "shape": {
+          "borderRadius": "16px",
+          "buttonBorderRadius": "999px",
+          "inputBorderRadius": "10px"
+        }
+      },
+      "visibility": {
+        "productImages": false,
+        "discountCodeField": false
+      }
+    }
+  }'
+```
+
+```javascript fetch
+const response = await fetch("https://sandboxapi.kelviq.com/api/v1/checkout/", {
+  method: "POST",
+  headers: {
+    "Content-Type": "application/json",
+    Authorization: `Bearer ${process.env.KELVIQ_SANDBOX_SERVER_API_KEY}`,
+  },
+  body: JSON.stringify({
+    planIdentifier: "pro",
+    chargePeriod: "MONTHLY",
+    customerId: "cust_789",
+    successUrl: "https://example.com/checkout/success",
+    customization: {
+      branding: {
+        brandName: "Acme for Northwind",
+        logoLight: "https://example.com/northwind-logo.png",
+      },
+      theme: {
+        schemes: {
+          light: { primary: "#7C3AED" },
+          dark: { primary: "#A78BFA" },
+        },
+      },
+      visibility: { discountCodeField: false },
+    },
+  }),
+});
+
+const { checkoutUrl, checkoutSessionId } = await response.json();
+```
+
+</CodeGroup>
+
+The response contains the checkout URL and the session ID. It does not echo `customization`:
+
+```json
+{
+  "checkoutUrl": "https://kelviq.com/checkout/cs_eeCGdGayc5oTMdGNV5XocfRk6o87K0vlwwCuKeiE7BLU9/",
+  "checkoutSessionId": "cs_eeCGdGayc5oTMdGNV5XocfRk6o87K0vlwwCuKeiE7BLU9"
+}
+```
+
+Redirect the customer to `checkoutUrl`, or [embed it](/checkout/embed-checkout).
+
+`customization` must be a JSON object. Any other type returns `400`:
+
+```json
+{
+  "detail": "customization must be a JSON object"
+}
+```
+
+Kelviq does not validate the keys or values inside the object. A misspelled key or an invalid color is stored and has no effect.
+
+<Info>
+  This guide uses the sandbox host and a sandbox server API key. Switch both to production together when you are ready to accept live payments.
+</Info>
+
+## Read the customization back
+
+`GET /api/v1/checkout/sessions/{session_id}/` returns the object you sent, under `customization`:
+
+```json
+{
+  "id": "cs_eeCGdGayc5oTMdGNV5XocfRk6o87K0vlwwCuKeiE7BLU9",
+  "customization": {
+    "theme": {
+      "schemes": {
+        "light": { "primary": "#7C3AED" }
+      }
+    },
+    "visibility": {
+      "discountCodeField": false
+    }
+  }
+}
+```
+
+This is the session's own override, not the merged result. Values from Checkout design are not included. A session created without `customization` returns `{}`.
+
+## Field reference
+
+Every field is optional. Each one matches a setting on the [Checkout design](/checkout/checkout-design) page. The **Default** column is Kelviq's built-in value, used when neither the session nor Checkout design sets the field.
+
+### Branding
+
+Set under `customization.branding`.
+
+| Field | Checkout design setting | Type | Default | What it changes |
+| --- | --- | --- | --- | --- |
+| `brandName` | Business name | string | Your business name | The name at the top of checkout, and the logo's alt text |
+| `logoLight` | Logo | URL string | Your account logo | The logo at the top of checkout |
+| `logoDark` | Dark mode logo | URL string | `logoLight` | The logo in dark mode |
+| `logoHeight` | Logo height | string or number | `"60px"` | Maximum logo height. A number is pixels. A string is any CSS length. The logo is never wider than 120px |
+| `favicon` | Favicon | URL string | Kelviq favicon | The icon in the browser tab |
+| `backgroundImage` | Background image | URL string | None | An image behind the product panel |
+
+### Theme
+
+Set under `customization.theme`.
+
+| Field | Checkout design setting | Type | Default | What it changes |
+| --- | --- | --- | --- | --- |
+| `colorMode` | Default mode | `"light"`, `"dark"`, or `"system"` | `"system"` | The mode checkout opens in. `"system"` follows the customer's device. On the hosted page, customers can still switch modes, and their choice is remembered |
+| `schemes.light` | Colors, light mode | object | See [Colors](#colors) | Colors for light mode |
+| `schemes.dark` | Colors, dark mode | object | See [Colors](#colors) | Colors for dark mode |
+| `shape` | Shape | object | See [Shape](#shape) | Corner radius |
+
+#### Colors
+
+Set under `customization.theme.schemes.light` and `customization.theme.schemes.dark`. Both take the same keys.
+
+Use literal color values such as `#7C3AED` or `rgb(124, 58, 237)`. The card fields render in a separate frame and cannot read CSS variables from the page.
+
+| Field | Checkout design setting | What it colors | Light default | Dark default |
+| --- | --- | --- | --- | --- |
+| `primary` | Primary | Pay button, selected plan card outline, checkboxes | `#007CE9` | `#0079E6` |
+| `primaryForeground` | Primary text | Text and icons on the pay button | `#FFFFFF` | `#C7E9FF` |
+| `backgroundSidebar` | Product panel | The panel with the product details | `#F8F9FA` | `#09090B` |
+| `backgroundPayment` | Payment panel | The panel with the payment form | `#FFFFFF` | `#0D0D0F` |
+| `surface` | Raised surface | Selected billing-period tab and the light/dark switcher | `#FFFFFF` | `#111113` |
+| `backgroundSelected` | Selected plan | Selected plan card | `#F1F9FF` | `#111113` |
+| `backgroundSubtle` | Subtle fill | Hovered quantity buttons and disabled inputs | `#F8F9FA` | `#14191F` |
+| `backgroundTabSubtle` | Billing period track | Track behind the billing-period tabs. Light mode only. Dark mode uses `inputBackground` | `#EBEDF0` | Not used |
+| `inputBackground` | Input background | Input fields, including the card fields | `#FFFFFF` | `#18181B` |
+| `focusRing` | Focus ring | Outline of a focused field | `#007CE9` | `#0079E6` |
+| `focusHalo` | Focus glow | Soft glow around a focused field | `#007CE91A` | `#0079E61A` |
+| `text` | Text | Body text | `#151617` | `#DCDEE0` |
+| `textMuted` | Muted text | Labels and secondary text | `#79818D` | `#83838A` |
+| `textGhost` | Placeholder text | Placeholder text | `#6F7783` | `#6C6C72A6` |
+| `textDisabled` | Disabled text | Disabled text | `#BBC2CC` | `#A1A1AA` |
+| `border` | Input border | Input borders | `#F0F2F4` | `#3F3F46` |
+| `borderSubtle` | Dividers | Divider lines between sections | `#E4E7EB` | `#30363D` |
+| `planCardBorder` | Plan card border | Outline of unselected plan cards | `borderSubtle` | `borderSubtle` |
+| `error` | Error | Error messages and invalid fields | `#E11D48` | `#FB7185` |
+| `success` | Success | The secure-payment line under the pay button | `#0A9429` | `#34D399` |
+| `warning` | Warning | The confirmation screen for a payment that is still pending | `#B45309` | `#FBBF24` |
+
+<Tip>
+  Keep enough contrast between `primary` and `primaryForeground`. The button label sits on the primary color.
+</Tip>
+
+#### Shape
+
+Set under `customization.theme.shape`. Values are CSS lengths, such as `"12px"`.
+
+| Field | Checkout design setting | Default | What it changes |
+| --- | --- | --- | --- |
+| `borderRadius` | Corner radius | `"12px"` | Corner radius of plan cards |
+| `buttonBorderRadius` | Button radius | `"8px"` | Corner radius of the pay button. The **Add promotion code** button does not change |
+| `inputBorderRadius` | Input radius | `"8px"` | Corner radius of inputs, including the card fields |
+
+### Visibility
+
+Set under `customization.visibility`. Each field is a boolean. `false` hides the section.
+
+| Field | Checkout design setting | Default | Shows |
+| --- | --- | --- | --- |
+| `logo` | Logo | `true` | The logo at the top. The brand name stays |
+| `heading` | Heading | `true` | The product name |
+| `productDescription` | Product description | `true` | The text under the product image |
+| `productImages` | Product images | `true` | The images you added to the product |
+| `planSelector` | Plan selector | `true` | The plan cards and billing-period tabs. Hidden anyway when there is only one plan and period |
+| `meteredFeatures` | Metered features | `false` | Optional paid add-ons that the customer picks a quantity for |
+| `includedFeatures` | Included features | `true` | The plan's features and limits |
+| `discountCodeField` | Discount code field | `true` | The promotion code field |
+| `priceBreakdown` | Price breakdown | `true` | Subtotal, discount, and tax lines above the total |
+
+Hiding the plan selector only hides the list. Checkout still uses the plan from the session.
+
+## How it works with other options
+
+| Option | Behavior |
+| --- | --- |
+| `discountsEnabled` | The promotion code field shows only when `discountsEnabled` is `true` and `visibility.discountCodeField` is not `false`. Either one can hide it. Neither can show it when the other hides it. A `discountCode` on the session still applies |
+| Embed `theme` | In an [embedded checkout](/checkout/embed-checkout#color-mode-theme), the `theme` option wins over `theme.colorMode`. Without `theme`, `colorMode` applies. The light/dark switcher is hidden in an embed, so the customer cannot change the mode |
+| Static checkout URLs | A [static checkout URL](/checkout/static-checkout-url) has no `customization` parameter. It uses Checkout design |
+
+## Limitations
+
+- **Nothing inside the object is validated.** Check key names and color values yourself.
+- **The SDKs and MCP server cannot send `customization`.** Use an HTTP request.
+
+## Related documentation
+
+- [Checkout design](/checkout/checkout-design)
+- [Checkout configuration](/checkout/checkout-configuration)
+- [Embed checkout](/checkout/embed-checkout)
+- [Add metadata to checkout](/checkout/checkout-metadata)
+- [Checkout API reference](/api-reference/checkout/create-a-checkout-session)

@@ -526,8 +526,28 @@
             "type": "object",
             "additionalProperties": true,
             "nullable": true,
-            "description": "Optional free-form object of checkout page customizations (colors, fonts, layout). Stored on the session and returned as `customization` in checkout session responses.",
-            "example": {}
+            "description": "Overrides the look of this checkout session with the same settings as Checkout design: `branding`, `theme`, and `visibility`. Deep-merged over your Checkout design settings, so you only send the keys you want to change. Must be a JSON object; the keys inside it are not validated. See [Customize a checkout session](/checkout/customize-a-checkout-session) for every field.",
+            "example": {
+              "branding": {
+                "brandName": "Acme for Northwind",
+                "logoLight": "https://example.com/northwind-logo.png"
+              },
+              "theme": {
+                "colorMode": "light",
+                "schemes": {
+                  "light": {
+                    "primary": "#7C3AED",
+                    "primaryForeground": "#FFFFFF"
+                  }
+                },
+                "shape": {
+                  "buttonBorderRadius": "999px"
+                }
+              },
+              "visibility": {
+                "discountCodeField": false
+              }
+            }
           }
         }
       },
@@ -5930,8 +5950,20 @@
           },
           "customization": {
             "type": "object",
-            "description": "Customer-supplied checkout UI customization passed at session creation.",
-            "additionalProperties": true
+            "description": "The `customization` object passed when the session was created, or `{}`. This is the session's own override, not the result of merging it with your Checkout design settings. See [Customize a checkout session](/checkout/customize-a-checkout-session).",
+            "additionalProperties": true,
+            "example": {
+              "theme": {
+                "schemes": {
+                  "light": {
+                    "primary": "#7C3AED"
+                  }
+                }
+              },
+              "visibility": {
+                "discountCodeField": false
+              }
+            }
           },
           "trialPeriod": {
             "type": "integer",
