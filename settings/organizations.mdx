@@ -1,0 +1,51 @@
+---
+title: 'Organizations'
+description: 'Give each product or brand its own organization, and switch between them from the sidebar'
+---
+
+An organization holds one business in Kelviq: its products, customers, API keys and settings. When you launch a second product or brand, create a new organization for it instead of mixing both in one catalog.
+
+## Create an organization
+
+1. Open **Settings → Organizations** and click **Create organization**. The same button is in the organization switcher in the sidebar.
+2. Enter the **Organization name**, for example "Acme Mobile". Customers see this name on checkout, receipts and emails.
+3. Click **Create organization**.
+
+<Frame>
+  <img src="/images/settings/organizations-create.webp" alt="The Create an organization dialog with Acme Studio typed as the organization name, and Cancel and Create organization" style={{ maxWidth: "580px" }} />
+</Frame>
+
+Kelviq opens the new organization right away. It starts empty, so add its products, plans and checkout design the way you did for your first one.
+
+| | |
+| --- | --- |
+| **Who can create** | The owner of an organization. Members who aren't owners are asked to contact the owner. A member who owns an organization of their own can create one, and it's created under the organization they own. |
+| **Where** | Live mode only. In sandbox you can see the list but not create. |
+| **Name** | Up to 200 characters. |
+
+## Switch between organizations
+
+Pick an organization in the switcher at the top of the sidebar, or click **Switch** next to it in **Settings → Organizations**.
+
+<Frame>
+  <img src="/images/settings/organizations-switcher.webp" alt="The organization switcher open in the sidebar: Acme Inc ticked, Acme Mobile and Acme Academy, then Create organization and Logout" style={{ maxWidth: "280px" }} />
+</Frame>
+
+**Settings → Organizations** lists your organization first, then every organization created under it. The one you're in is marked **Current**.
+
+<Frame>
+  <img src="/images/settings/organizations-list.webp" alt="Settings → Organizations: Acme Inc marked Current, Acme Mobile and Acme Academy with Switch, and the Create organization button" />
+</Frame>
+
+## What a new organization shares
+
+Products, customers, API keys and settings are separate. You sign in with the same login, and two things carry over from the organization it was created under:
+
+| | How it works |
+| --- | --- |
+| **Payout account** | Add the new organization's business details. Once they're approved, open its **Payouts** page and click **Use [parent]'s payout account**. Its payouts then go to the same bank account. |
+| **Owner** | **Settings → Members** shows the parent organization as the owner, as "[parent] (owner)". That row can't be edited or removed. |
+
+<Card title="Next: invite your team" icon="users" href="/settings/members" horizontal>
+  Add members to the new organization.
+</Card>
