@@ -1,11 +1,13 @@
 ---
 title: "Migrate from Lemon Squeezy"
 sidebarTitle: "Migrate from Lemon Squeezy"
-description: "Import your Lemon Squeezy store into Kelviq, start selling on Kelviq, and plan what happens to your existing subscribers."
-keywords: ['Lemon Squeezy', 'migration', 'import', 'migrate', 'switch to Kelviq']
+description: "Import your Lemon Squeezy store into Kelviq, start selling on Kelviq, and move your subscribers and their saved cards through Lemon Squeezy's migration form."
+keywords: ['Lemon Squeezy', 'migration', 'import', 'migrate', 'switch to Kelviq', 'migration form', 'saved cards', 'subscriptions']
 ---
 
 Kelviq imports your Lemon Squeezy store for you. Your products, plans, customers, order history, discount codes, files, and license keys arrive in your Kelviq organization. Your plans are published and your discount codes work at checkout, so they are ready to sell as soon as the import finishes. A report is emailed to you at the end.
+
+You can also move your active subscriptions. Choose Kelviq as your new payment provider in Lemon Squeezy's migration form, and your card subscriptions move to Kelviq along with their saved cards. See [Move subscribers and their saved cards](#move-subscribers-and-their-saved-cards).
 
 <Tip>
 Import by January 31, 2027 and you pay 2.9% + 40¢ on your first &#36;50,000 in sales. See the [special offer](#special-offer).
@@ -76,14 +78,38 @@ The move happens on two tracks, and you can start the first one today.
 | | What happens |
 | --- | --- |
 | **New sales** | Go through Kelviq as soon as your app points at Kelviq checkout. The import publishes your plans. |
-| **Existing subscriptions** | Are imported as history. They keep renewing on Lemon Squeezy until it stops processing payments on March 31, 2027. Kelviq does not charge them. |
+| **Existing subscriptions** | Are imported as history. They keep renewing on Lemon Squeezy until it stops processing payments on March 31, 2027. Kelviq does not charge them until you [move them](#move-subscribers-and-their-saved-cards). |
 
 Your customers are not emailed during the import, and no webhooks fire for imported records. Nothing changes for a buyer until you change your app.
 
-To keep those subscribers paying after March 31, 2027, do one of two things: have Kelviq move them (write to [hi@kelviq.com](mailto:hi@kelviq.com)), or have them subscribe again on Kelviq before their last Lemon Squeezy renewal.
+To keep those subscribers paying after March 31, 2027, do one of two things: [move them and their saved cards to Kelviq](#move-subscribers-and-their-saved-cards), or have them subscribe again on Kelviq before their last Lemon Squeezy renewal.
+
+### Move subscribers and their saved cards
+
+In Lemon Squeezy's migration form, you can choose Kelviq as your new payment provider. Lemon Squeezy then copies your customers and their saved cards to Kelviq, so your card subscribers keep paying without entering their card details again.
+
+<Warning>
+Contact us before you open the form. It asks for a destination Stripe account ID, and that ID comes from Kelviq. Write to [hi@kelviq.com](mailto:hi@kelviq.com) first.
+</Warning>
+
+1. **Write to [hi@kelviq.com](mailto:hi@kelviq.com)** from the email address on your Kelviq account. We send you the Stripe account ID the form asks for.
+2. **Open the form.** In Lemon Squeezy, go to **My Account → Settings → Migration**.
+3. **Fill it in.**
+
+   | Field | What to enter |
+   | --- | --- |
+   | Merchant | Your store. Lemon Squeezy fills this in. |
+   | Contact email | Where Lemon Squeezy sends updates about the request. |
+   | New payment provider | **Kelviq** |
+   | Destination Stripe account | The account ID we sent you. It starts with `acct_`. |
+   | Customer ID list | Nothing. Lemon Squeezy attaches the list when you submit. |
+
+4. **Submit it, and tell us.** Once Lemon Squeezy has copied the cards, your migration contact moves your card subscriptions with you, so that their renewals continue on Kelviq.
+
+Lemon Squeezy only lets subscriptions paid by card move to another provider. A subscriber who pays another way, such as PayPal, subscribes again on Kelviq. Kelviq checkout takes [PayPal for subscriptions](/checkout/payment-methods), so they can keep paying the way they do today.
 
 <Note>
-To move active subscriptions and saved cards so that renewals continue on Kelviq, write to [hi@kelviq.com](mailto:hi@kelviq.com) before you choose a destination in Lemon Squeezy's migration form. Lemon Squeezy only lets subscriptions paid by card move to another provider.
+Submit the form well before March 31, 2027. The cards have to be copied, and the subscriptions moved, before Lemon Squeezy stops processing payments.
 </Note>
 
 ---
@@ -119,7 +145,7 @@ The import runs as eight steps, in this order. You can run all of them or pick a
 
 Later steps build on earlier ones: `orders` needs `products`, and `renewals` and `licenses` need `orders`. A license key is imported only if its order was.
 
-Not part of the import: affiliate programs, email subscriber lists, and storefront pages.
+Not part of the import: affiliate programs, email subscriber lists, and storefront pages. Saved cards are not part of it either. They reach Kelviq through [Lemon Squeezy's migration form](#move-subscribers-and-their-saved-cards).
 
 ---
 
@@ -135,6 +161,14 @@ You need four things. If [our team runs the import for you](#have-kelviq-run-it-
 <Warning>
 Both keys are secrets. Keep them in an env file or your shell, never in source control or a chat window.
 </Warning>
+
+To move your subscribers as well, you need one more thing: the Stripe account ID that Lemon Squeezy's migration form asks for. Write to [hi@kelviq.com](mailto:hi@kelviq.com) for it before you open the form. See [Move subscribers and their saved cards](#move-subscribers-and-their-saved-cards).
+
+### Check that Kelviq fits your store
+
+* **Your country.** Kelviq pays out to businesses registered in 120 countries. See the [supported payout countries](/getstarted/review-process#supported-payout-countries).
+* **What you sell.** SaaS, software, digital downloads and memberships are supported. The [acceptable use policy](/legal/approved-prohibited-policy) has the full list.
+* **How your customers pay.** Cards, Apple Pay, Google Pay, PayPal, UPI and local methods. See [payment methods](/checkout/payment-methods).
 
 ---
 
@@ -268,7 +302,7 @@ If you would rather not run anything yourself, a dedicated person on the Kelviq 
 1. **Create your Kelviq organization** at [app.kelviq.com](https://app.kelviq.com).
 2. **Create a Lemon Squeezy API key just for the move.** In your Lemon Squeezy dashboard, go to **Settings → API** and create a new key. Do not reuse the key your app runs on.
 3. **Share the key and your store id** with us at [hi@kelviq.com](mailto:hi@kelviq.com), from the email address on your Kelviq account.
-4. **Your migration contact does the rest.** They do a dry run and send you the report. Once you approve it, they run the import, then check your plans, discount codes and license keys against your Lemon Squeezy store with you.
+4. **Your migration contact does the rest.** They do a dry run and send you the report. Once you approve it, they run the import, then check your plans, discount codes and license keys against your Lemon Squeezy store with you. If you have subscribers to move, they also send you the Stripe account ID for Lemon Squeezy's migration form.
 5. **Delete the key** in Lemon Squeezy as soon as we confirm the import is finished, so it only lives as long as the move does.
 
 Adding Kelviq checkout and webhooks to your app is still a change in your code. The same person helps you through [those steps](#2-add-the-kelviq-equivalent-of-each-lemon-squeezy-call) too.
@@ -325,7 +359,7 @@ Existing subscribers still use the Lemon Squeezy calls in your app, so add the K
 | Customer portal URL | A [portal session](/backend-integration/node-sdk#portal) from `client.portal.createSession`; append the returned `token` to `customerPortalUrl` to build the link you send the customer |
 | Discount code | [Discount code](/product-catalog/discounts) |
 
-Copies of your app that are already installed keep calling Lemon Squeezy's license API until your users update. Ship the license change well before March 31, 2027.
+Copies of your app that are already installed keep calling Lemon Squeezy's license API until your users update. Ship the [license change](#license-keys) well before March 31, 2027.
 
 Creating a checkout and verifying a webhook look like this in Node. `body` is the raw request body, and `client` is your [Kelviq client](/backend-integration/node-sdk#configuring-the-client).
 
@@ -397,6 +431,62 @@ Register your endpoint and write its signing secret into your env file in one co
 kelviq webhook add https://app.example.com/api/kelviq/webhooks --events checkout.completed,order.refunded,subscription.created,subscription.updated,subscription.cancelled,invoice.paid,invoice.payment_failed --write-secret .env.local
 ```
 
+#### License keys
+
+The import keeps each license key as it was in Lemon Squeezy. Your customers do not get a new key, and a device that is already activated does not have to activate again.
+
+| | What Kelviq keeps |
+| --- | --- |
+| Key | The same string. |
+| Expiry date | The same date. |
+| Disabled keys | They arrive disabled, and fail validation on Kelviq too. |
+| Activation limit | The same limit. A key with unlimited activations stays unlimited. |
+| Activations | Each one keeps its Lemon Squeezy `instance_id` and its name. Send the value your app saved as `instanceId`. |
+
+Keys issued and devices activated on Lemon Squeezy after your last import are not in Kelviq until you [run the import again](#5-run-the-import-again-to-catch-up). So while both platforms are selling, have your app ask Kelviq first, and Lemon Squeezy only when Kelviq does not have the key or the activation yet.
+
+```typescript
+async function isLicenseValid(licenseKey: string, instanceId?: string) {
+  const response = await fetch("https://api.kelviq.com/api/v1/license/validate/", {
+    method: "POST",
+    headers: {
+      Authorization: `Bearer ${KELVIQ_CLIENT_API_KEY}`,
+      "Content-Type": "application/json",
+    },
+    body: JSON.stringify({ licenseKey, instanceId }),
+  });
+
+  // Kelviq has the key. Its answer is final.
+  if (response.status === 200) {
+    const { valid } = await response.json();
+    return valid;
+  }
+
+  // Kelviq does not have this key or this activation yet.
+  if (response.status === 404) {
+    return isLicenseValidOnLemonSqueezy(licenseKey, instanceId); // Your existing check.
+  }
+
+  // Anything else is an outage, not an invalid key.
+  throw new Error(`Kelviq license check failed with status ${response.status}`);
+}
+```
+
+| Kelviq returns | `code` | What your app does |
+| --- | --- | --- |
+| `200`, `valid: true` | `VALID` | Grants access. |
+| `200`, `valid: false` | `LICENSE_EXPIRED` (expired or disabled), `INSTANCE_DEACTIVATED` | Refuses. Do not ask Lemon Squeezy. |
+| `404` | `INVALID_KEY`, `INSTANCE_NOT_FOUND` | Asks Lemon Squeezy. |
+| Anything else | | Treats it as an outage, the way it handles one today. |
+
+An app you ship to customers calls this endpoint with a **Client API Key**. Remove the Lemon Squeezy check once you have stopped selling there and a final import has run.
+
+#### Customer IDs
+
+Each imported customer has the ID `ls_` followed by their Lemon Squeezy customer id, for example `ls_48213`. A customer whose email was already in your organization keeps the ID they had.
+
+When one of these customers buys on Kelviq, pass that ID as `customerId` in the checkout session, so that the purchase joins their imported history. Lemon Squeezy sends the same id as `customer_id` in its order and subscription webhooks, so your database most likely has it already.
+
 ### 3. Keep the Lemon Squeezy path running
 
 Existing subscribers still renew on Lemon Squeezy. Keep your Lemon Squeezy webhook handler, its signing secret, and the Lemon Squeezy portal link those subscribers use. Record which platform each subscription bills on, so that portal and cancel actions go to the right one. Remove the Lemon Squeezy path only when no subscription is billing there any more.
@@ -426,6 +516,12 @@ kelviq import lemon-squeezy --store 12345 --only orders,renewals
 ## Common questions
 
 <AccordionGroup>
+
+<Accordion title="Can I move my active subscriptions to Kelviq?">
+Yes, the ones paid by card. Choose Kelviq as your new payment provider in Lemon Squeezy's migration form, under **My Account → Settings → Migration**. Lemon Squeezy then copies your customers and their saved cards to Kelviq, so your subscribers keep paying without entering their card details again.
+
+Write to [hi@kelviq.com](mailto:hi@kelviq.com) first for the Stripe account ID the form asks for. See [Move subscribers and their saved cards](#move-subscribers-and-their-saved-cards) for what to enter in each field.
+</Accordion>
 
 <Accordion title="The import was rejected. What do I check?">
 A `400` with `Lemon Squeezy rejected the API key or the store id.` or `Lemon Squeezy store 12345 was not found for this API key.` means the Lemon Squeezy key or the store id is wrong. Check both. To list the store ids your key can reach, run this in a shell where `LEMONSQUEEZY_API_KEY` is set:
