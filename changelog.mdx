@@ -13,16 +13,20 @@ import { ChangelogFilter } from "/snippets/changelog-filter.jsx";
 
 ### New Features
 
-#### List a license's instances
+#### Manage licenses from your backend
 
-[List License Instances](/api-reference/license/list-license-instances) returns the instances (activations) of one license, so you can show a customer which devices their license is active on.
+Your backend can now read and manage licenses and their activations, which until now was only possible in the dashboard.
 
-- `GET /license/{licenseId}/instances/` takes the license's `id`, which comes back in the activate and validate responses. It is not the license key.
-- Each instance carries its ID and name, activation, deactivation and last-seen timestamps, its metadata, and the license it belongs to.
-- Deactivated instances are included, with `deactivatedAt` set.
-- Results are paginated with `page` and `page_size`.
+- [List Licenses](/api-reference/license/list-licenses) (`GET /license/`) returns the licenses your organization has issued.
+- [Retrieve a License](/api-reference/license/retrieve-a-license) (`GET /license/{licenseId}/`) returns one license with its customer, plan and subscription.
+- [Update a License](/api-reference/license/update-a-license) (`PATCH /license/{licenseId}/`) changes `enabled`, `activationLimit` or `expiresOn`.
+- [List License Instances](/api-reference/license/list-license-instances) (`GET /license/{licenseId}/instances/`) returns the instances (activations) of one license, so you can show a customer which devices their license is active on. Deactivated instances are included, with `deactivatedAt` set.
 
-Authenticate with a Client API Key or a Server API Key, the same as activate, validate and deactivate. See [License keys](/product-catalog/license-keys).
+Send `enabled: false` to disable a license, for example when its order is refunded, and `enabled: true` to bring it back. Its instances are kept, so re-enabling restores every activation.
+
+`licenseId` is the license's `id`, not the license key. It comes back in the `license` array on orders, subscriptions and invoices, and in the activate and validate responses.
+
+All four endpoints require a Server API Key. Activate, validate and deactivate still accept a Client API Key as well. See [License keys](/product-catalog/license-keys).
 
 </Update>
 

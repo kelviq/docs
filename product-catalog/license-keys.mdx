@@ -186,7 +186,7 @@ Choose the key based on where the request originates:
 | Browser, desktop app, mobile app, CLI, or plugin | Client API Key | Safe to include in distributed client software. The customer still supplies the license key. |
 | Your backend or another trusted server | Server API Key | Keep it secret and load it from your server environment. |
 
-Both key types can call `POST /license/activate/`, `POST /license/validate/`, `POST /license/deactivate/`, and `GET /license/{licenseId}/instances/`. Use a key from the same environment as the license: a sandbox key with a sandbox license, or a production key with a production license.
+Both key types can call `POST /license/activate/`, `POST /license/validate/`, and `POST /license/deactivate/`. The other license endpoints require a Server API Key. Use a key from the same environment as the license: a sandbox key with a sandbox license, or a production key with a production license.
 
 <Warning>
   Never expose a Server API Key in frontend code or software distributed to customers. Use a Client API Key for those integrations.
@@ -291,11 +291,11 @@ Removes an activation from a specific device/instance.
 
 ### 3.4 List a License's Instances
 
-Lists the instances (activations) of one license.
+Lists the instances (activations) of one license from your server.
 
 **Endpoint**: `GET /license/{licenseId}/instances/`
 
-**Authentication**: Client API Key or Server API Key
+**Authentication**: Server API Key only
 
 **When to use**:
 - Showing a customer the devices their license is active on
@@ -311,6 +311,40 @@ Lists the instances (activations) of one license.
 - `licenseId` is the license's `id` (a UUID) from the activate or validate response, not the license key
 - Deactivated instances are included, with `deactivatedAt` set
 - Results are paginated with `page` and `page_size`
+
+**Full documentation**: [List License Instances API](https://docs.kelviq.com/api-reference/license/list-license-instances)
+
+---
+
+### 3.5 List, Retrieve and Update Licenses
+
+Reads and manages whole licenses from your server.
+
+**Endpoints**:
+- `GET /license/` lists the licenses your organization has issued, oldest first
+- `GET /license/{licenseId}/` returns one license with its customer, plan and subscription
+- `PATCH /license/{licenseId}/` updates a license
+
+**Authentication**: Server API Key only
+
+**When to use**:
+- Disabling a license when its order is refunded, and re-enabling it later
+- Raising a customer's activation limit or extending their expiry
+- Syncing licenses into your own back office
+
+**What you can update**:
+- `enabled`: `false` disables the license, `true` re-enables it
+- `activationLimit`: the maximum number of active instances
+- `expiresOn`: when the license expires
+
+**Key behaviors**:
+- `licenseId` is the license's `id` (a UUID), not the license key. It comes back in the `license` array on orders, subscriptions and invoices, and in the activate and validate responses
+- A disabled license fails validation and refuses new activations. Its instances are kept, so re-enabling restores every activation as it was
+- Send only the fields you want to change. Other fields in the body, such as `licenseKey`, are ignored
+
+<Warning>
+  These endpoints do not accept a Client API Key. Call them from your backend.
+</Warning>
 
 ---
 

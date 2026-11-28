@@ -17,6 +17,10 @@
   ],
   "tags": [
     {
+      "name": "License",
+      "description": "Activate, validate and deactivate license keys, and read and manage licenses and their instances."
+    },
+    {
       "name": "Products",
       "description": "Catalog products."
     },
@@ -968,6 +972,55 @@
             "items": {
               "$ref": "#/components/schemas/LicenseInstance"
             }
+          }
+        }
+      },
+      "LicenseListResponse": {
+        "type": "object",
+        "properties": {
+          "count": {
+            "type": "integer",
+            "example": 1
+          },
+          "next": {
+            "type": "string",
+            "format": "uri",
+            "nullable": true,
+            "example": null
+          },
+          "previous": {
+            "type": "string",
+            "format": "uri",
+            "nullable": true,
+            "example": null
+          },
+          "results": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/LicenseDetails"
+            }
+          }
+        }
+      },
+      "LicenseUpdate": {
+        "type": "object",
+        "description": "Fields to change. Send only the ones you want to update; any other field in the body is ignored.",
+        "properties": {
+          "enabled": {
+            "type": "boolean",
+            "description": "Set to `false` to disable the license: validation returns `valid: false` and new activations are refused. Set back to `true` to re-enable it. Existing instances are kept either way."
+          },
+          "activationLimit": {
+            "type": "integer",
+            "minimum": 0,
+            "nullable": true,
+            "description": "Maximum number of active instances. `null` removes the limit."
+          },
+          "expiresOn": {
+            "type": "string",
+            "format": "date-time",
+            "nullable": true,
+            "description": "When the license expires. `null` removes the expiry."
           }
         }
       },
@@ -8158,22 +8211,303 @@
         }
       }
     },
+    "/license/": {
+      "get": {
+        "tags": [
+          "License"
+        ],
+        "summary": "List Licenses",
+        "description": "Returns a paginated list of the licenses issued by the authenticated organization, oldest first. Requires a Server API Key.",
+        "operationId": "listLicenses",
+        "x-mint": {
+          "content": "<Info>Click the base URL in the API playground and select the **Sandbox** host for test data or the **Production** host for live data. Use credentials from the same environment.</Info>"
+        },
+        "parameters": [
+          {
+            "name": "page_size",
+            "in": "query",
+            "required": false,
+            "description": "Number of results per page. Defaults to 10, maximum 100.",
+            "schema": {
+              "type": "integer",
+              "minimum": 1,
+              "maximum": 100
+            }
+          },
+          {
+            "name": "page",
+            "in": "query",
+            "required": false,
+            "description": "Page number to return.",
+            "schema": {
+              "type": "integer",
+              "minimum": 1
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "A paginated list of licenses.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/LicenseListResponse"
+                },
+                "example": {
+                  "count": 1,
+                  "next": null,
+                  "previous": null,
+                  "results": [
+                    {
+                      "id": "7be7a5b6-7a0e-4178-a085-8ef48f0649ab",
+                      "licenseKey": "LIC-A8D5F89E-B46B-472C-9BED-66EE2545B85E",
+                      "activatedOn": "2026-01-22T03:26:56Z",
+                      "expiresOn": "2026-01-23T03:26:56Z",
+                      "activationUsage": 1,
+                      "activationLimit": 4,
+                      "enabled": true,
+                      "customer": {
+                        "customerId": "cfa95cf8c8d24e8b9d3d2d1ada98a94d",
+                        "name": "Geo",
+                        "email": "geo@kelviq.com"
+                      },
+                      "plan": {
+                        "identifier": "pro-yearly",
+                        "name": "Pro Yearly",
+                        "product": {
+                          "id": "d970ab2d-834f-4c52-8742-2e6ed7e8a31f",
+                          "identifier": "kelviq-engine",
+                          "name": "Kelviq Engine",
+                          "taxCode": "software"
+                        }
+                      },
+                      "subscription": {
+                        "id": "09d706ca-58f3-4fb2-818f-5b8623d67e6e",
+                        "recurrence": "1 month",
+                        "billingPeriodStartTime": "2026-01-22T03:26:56Z",
+                        "billingPeriodEndTime": "2026-02-22T03:26:56Z",
+                        "startDate": "2026-01-22",
+                        "endDate": null,
+                        "status": "active",
+                        "amount": "49.00",
+                        "currency": "usd",
+                        "trialDaysRemaining": 0,
+                        "billingType": "SUBSCRIPTION",
+                        "recurrenceUnit": 1,
+                        "recurrenceType": "MONTH"
+                      }
+                    }
+                  ]
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized \u2014 missing or invalid API key."
+          }
+        }
+      }
+    },
+    "/license/{licenseId}/": {
+      "get": {
+        "tags": [
+          "License"
+        ],
+        "summary": "Retrieve a License",
+        "description": "Returns a single license by its ID, with its customer, plan and subscription. Requires a Server API Key.",
+        "operationId": "retrieveLicense",
+        "x-mint": {
+          "content": "<Info>Click the base URL in the API playground and select the **Sandbox** host for test data or the **Production** host for live data. Use credentials from the same environment.</Info>"
+        },
+        "parameters": [
+          {
+            "name": "licenseId",
+            "in": "path",
+            "required": true,
+            "description": "The license's UUID (the `id` of a license object, not the license key).",
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            },
+            "example": "7be7a5b6-7a0e-4178-a085-8ef48f0649ab"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "The license.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/LicenseDetails"
+                },
+                "example": {
+                  "id": "7be7a5b6-7a0e-4178-a085-8ef48f0649ab",
+                  "licenseKey": "LIC-A8D5F89E-B46B-472C-9BED-66EE2545B85E",
+                  "activatedOn": "2026-01-22T03:26:56Z",
+                  "expiresOn": "2026-01-23T03:26:56Z",
+                  "activationUsage": 1,
+                  "activationLimit": 4,
+                  "enabled": true,
+                  "customer": {
+                    "customerId": "cfa95cf8c8d24e8b9d3d2d1ada98a94d",
+                    "name": "Geo",
+                    "email": "geo@kelviq.com"
+                  },
+                  "plan": {
+                    "identifier": "pro-yearly",
+                    "name": "Pro Yearly",
+                    "product": {
+                      "id": "d970ab2d-834f-4c52-8742-2e6ed7e8a31f",
+                      "identifier": "kelviq-engine",
+                      "name": "Kelviq Engine",
+                      "taxCode": "software"
+                    }
+                  },
+                  "subscription": {
+                    "id": "09d706ca-58f3-4fb2-818f-5b8623d67e6e",
+                    "recurrence": "1 month",
+                    "billingPeriodStartTime": "2026-01-22T03:26:56Z",
+                    "billingPeriodEndTime": "2026-02-22T03:26:56Z",
+                    "startDate": "2026-01-22",
+                    "endDate": null,
+                    "status": "active",
+                    "amount": "49.00",
+                    "currency": "usd",
+                    "trialDaysRemaining": 0,
+                    "billingType": "SUBSCRIPTION",
+                    "recurrenceUnit": 1,
+                    "recurrenceType": "MONTH"
+                  }
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized \u2014 missing or invalid API key."
+          },
+          "404": {
+            "description": "No license with that ID for the authenticated organization."
+          }
+        }
+      },
+      "patch": {
+        "tags": [
+          "License"
+        ],
+        "summary": "Update a License",
+        "description": "Updates a license: disable or re-enable it, change its activation limit, or change its expiry. Send only the fields you want to change. Requires a Server API Key.",
+        "operationId": "updateLicense",
+        "x-mint": {
+          "content": "<Info>Click the base URL in the API playground and select the **Sandbox** host for test data or the **Production** host for live data. Use credentials from the same environment.</Info>"
+        },
+        "parameters": [
+          {
+            "name": "licenseId",
+            "in": "path",
+            "required": true,
+            "description": "The license's UUID (the `id` of a license object, not the license key).",
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            },
+            "example": "7be7a5b6-7a0e-4178-a085-8ef48f0649ab"
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/LicenseUpdate"
+              },
+              "example": {
+                "enabled": false
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "The updated license.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/LicenseDetails"
+                },
+                "example": {
+                  "id": "7be7a5b6-7a0e-4178-a085-8ef48f0649ab",
+                  "licenseKey": "LIC-A8D5F89E-B46B-472C-9BED-66EE2545B85E",
+                  "activatedOn": "2026-01-22T03:26:56Z",
+                  "expiresOn": "2026-01-23T03:26:56Z",
+                  "activationUsage": 1,
+                  "activationLimit": 4,
+                  "enabled": false,
+                  "customer": {
+                    "customerId": "cfa95cf8c8d24e8b9d3d2d1ada98a94d",
+                    "name": "Geo",
+                    "email": "geo@kelviq.com"
+                  },
+                  "plan": {
+                    "identifier": "pro-yearly",
+                    "name": "Pro Yearly",
+                    "product": {
+                      "id": "d970ab2d-834f-4c52-8742-2e6ed7e8a31f",
+                      "identifier": "kelviq-engine",
+                      "name": "Kelviq Engine",
+                      "taxCode": "software"
+                    }
+                  },
+                  "subscription": {
+                    "id": "09d706ca-58f3-4fb2-818f-5b8623d67e6e",
+                    "recurrence": "1 month",
+                    "billingPeriodStartTime": "2026-01-22T03:26:56Z",
+                    "billingPeriodEndTime": "2026-02-22T03:26:56Z",
+                    "startDate": "2026-01-22",
+                    "endDate": null,
+                    "status": "active",
+                    "amount": "49.00",
+                    "currency": "usd",
+                    "trialDaysRemaining": 0,
+                    "billingType": "SUBSCRIPTION",
+                    "recurrenceUnit": 1,
+                    "recurrenceType": "MONTH"
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad Request - Request body failed validation.",
+            "content": {
+              "application/json": {
+                "example": {
+                  "expiresOn": [
+                    "Datetime has wrong format. Use one of these formats instead: YYYY-MM-DDThh:mm[:ss[.uuuuuu]][+HH:MM|-HH:MM|Z]."
+                  ]
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized \u2014 missing or invalid API key."
+          },
+          "404": {
+            "description": "No license with that ID for the authenticated organization."
+          }
+        }
+      }
+    },
     "/license/{licenseId}/instances/": {
       "get": {
         "operationId": "listLicenseInstances",
         "x-mint": {
-          "content": "<Info>This endpoint accepts either a **Client API Key** or a **Server API Key** as a Bearer token. Use a Client API Key in browser or distributed client software, and keep Server API Keys on trusted backends. Select the matching Sandbox or Production host and key.</Info>"
+          "content": "<Info>Click the base URL in the API playground and select the **Sandbox** host for test data or the **Production** host for live data. Use credentials from the same environment.</Info>"
         },
         "tags": [
           "License"
         ],
         "summary": "List License Instances",
-        "description": "Returns a paginated list of the instances (activations) of one license, oldest activation first. Deactivated instances are included, with `deactivatedAt` set. Accepts either a Client API Key or a Server API Key as a Bearer token.",
-        "security": [
-          {
-            "licenseBearerAuth": []
-          }
-        ],
+        "description": "Returns a paginated list of the instances (activations) of one license, oldest activation first. Deactivated instances are included, with `deactivatedAt` set. Requires a Server API Key.",
         "parameters": [
           {
             "name": "licenseId",
