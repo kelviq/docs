@@ -9,6 +9,23 @@ import { ChangelogFilter } from "/snippets/changelog-filter.jsx";
 
 <ChangelogFilter products={["App","JS SDK","React SDK","Node SDK","Python SDK","JS Promotions UI","MCP Server","CLI","API"]} />
 
+<Update label="v1.30" description="November 28, 2026" tags={["API"]}>
+
+### New Features
+
+#### List a license's instances
+
+[List License Instances](/api-reference/license/list-license-instances) returns the instances (activations) of one license, so you can show a customer which devices their license is active on.
+
+- `GET /license/{licenseId}/instances/` takes the license's `id`, which comes back in the activate and validate responses. It is not the license key.
+- Each instance carries its ID and name, activation, deactivation and last-seen timestamps, its metadata, and the license it belongs to.
+- Deactivated instances are included, with `deactivatedAt` set.
+- Results are paginated with `page` and `page_size`.
+
+Authenticate with a Client API Key or a Server API Key, the same as activate, validate and deactivate. See [License keys](/product-catalog/license-keys).
+
+</Update>
+
 <Update label="v1.29" description="November 20, 2026" tags={["App"]}>
 
 ## Choose the emails Kelviq sends you

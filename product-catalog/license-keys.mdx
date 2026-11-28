@@ -186,7 +186,7 @@ Choose the key based on where the request originates:
 | Browser, desktop app, mobile app, CLI, or plugin | Client API Key | Safe to include in distributed client software. The customer still supplies the license key. |
 | Your backend or another trusted server | Server API Key | Keep it secret and load it from your server environment. |
 
-Both key types can call `POST /license/activate/`, `POST /license/validate/`, and `POST /license/deactivate/`. Use a key from the same environment as the license: a sandbox key with a sandbox license, or a production key with a production license.
+Both key types can call `POST /license/activate/`, `POST /license/validate/`, `POST /license/deactivate/`, and `GET /license/{licenseId}/instances/`. Use a key from the same environment as the license: a sandbox key with a sandbox license, or a production key with a production license.
 
 <Warning>
   Never expose a Server API Key in frontend code or software distributed to customers. Use a Client API Key for those integrations.
@@ -286,6 +286,31 @@ Removes an activation from a specific device/instance.
 - The license can be re-activated on the same or different device
 
 **Full documentation**: [Deactivate License API](https://docs.kelviq.com/api-reference/license/deactivate-license)
+
+---
+
+### 3.4 List a License's Instances
+
+Lists the instances (activations) of one license.
+
+**Endpoint**: `GET /license/{licenseId}/instances/`
+
+**Authentication**: Client API Key or Server API Key
+
+**When to use**:
+- Showing a customer the devices their license is active on
+- Checking when an instance was last seen before freeing up a slot
+
+**Response includes**:
+- Instance ID and name
+- Activation, deactivation and last-seen timestamps
+- Instance metadata
+- The license the instance belongs to
+
+**Key behaviors**:
+- `licenseId` is the license's `id` (a UUID) from the activate or validate response, not the license key
+- Deactivated instances are included, with `deactivatedAt` set
+- Results are paginated with `page` and `page_size`
 
 ---
 
